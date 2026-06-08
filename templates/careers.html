@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% block body_class %}dark-hero-nav{% endblock %}
+
 {% block title %}Careers – Join ThinkArtha's Enterprise Data & AI Team{% endblock %}
 
 {% block extra_meta %}
@@ -404,5 +406,22 @@ document.querySelectorAll('a[href="#open-positions"]').forEach(a => {
     document.getElementById('open-positions').scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 });
+
+// Scroll-aware nav: switch from dark-transparent to white-glass when past hero
+(function() {
+  const header = document.getElementById('main-header');
+  const hero = document.querySelector('.careers-hero');
+  if (!header || !hero) return;
+  const heroBottom = () => hero.getBoundingClientRect().bottom + window.scrollY;
+  const check = () => {
+    if (window.scrollY > heroBottom() - 20) {
+      header.classList.add('scrolled-past-hero');
+    } else {
+      header.classList.remove('scrolled-past-hero');
+    }
+  };
+  window.addEventListener('scroll', check, { passive: true });
+  check(); // run on load
+})();
 </script>
 {% endblock %}

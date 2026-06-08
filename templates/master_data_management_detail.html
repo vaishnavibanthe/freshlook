@@ -134,19 +134,32 @@
 <!-- ══════════════════════════════════════════
      CASE STUDY SPOTLIGHT 1
      ═════════════════════════════════════════════ -->
+{% set cs1 = get_case_study('enterprise-data-governance-mdm') %}
 <section class="sol-cs-section" id="sol-case-study">
     <div class="container sol-cs-grid">
         <div class="sol-cs-content">
             <div class="hero-badge" style="margin-bottom:16px; border-color:rgba(16,185,129,0.3); color:#10b981;"><i class="fas fa-file-invoice"></i> Insurance Success</div>
-            <h2 style="font-size:clamp(22px,3vw,36px); font-weight:800; color:var(--text-primary); line-height:1.3; margin-bottom:16px;">
-                Enhancing Financial Transparency for IFRS 17 Implementation
-            </h2>
-            <p style="font-size:15px; color:var(--text-secondary); line-height:1.75; margin-bottom:28px;">
-                Artha Solutions implemented an enterprise MDM and data governance strategy to compile policy data across legacy insurance lines, achieving total compliance with IFRS 17 guidelines.
-            </p>
-            <a href="/case-studies" class="btn btn-primary" style="padding:13px 26px; background:linear-gradient(135deg,#10b981,#06b6d4); border:none;">
-                Download Case Study <i class="fas fa-download btn-icon"></i>
-            </a>
+            {% if cs1 %}
+                <h2 style="font-size:clamp(22px,3vw,36px); font-weight:800; color:var(--text-primary); line-height:1.3; margin-bottom:16px;">
+                    {{ cs1.title }}
+                </h2>
+                <p style="font-size:15px; color:var(--text-secondary); line-height:1.75; margin-bottom:28px;">
+                    {{ cs1.card_summary or cs1.executive_summary }}
+                </p>
+                <a href="/case-studies/{{ cs1.slug }}" class="btn btn-primary" style="padding:13px 26px; background:linear-gradient(135deg,#10b981,#06b6d4); border:none;">
+                    Read Success Story <i class="fas fa-arrow-right btn-icon"></i>
+                </a>
+            {% else %}
+                <h2 style="font-size:clamp(22px,3vw,36px); font-weight:800; color:var(--text-primary); line-height:1.3; margin-bottom:16px;">
+                    Enhancing Financial Transparency for IFRS 17 Implementation
+                </h2>
+                <p style="font-size:15px; color:var(--text-secondary); line-height:1.75; margin-bottom:28px;">
+                    Artha Solutions implemented an enterprise MDM and data governance strategy to compile policy data across legacy insurance lines, achieving total compliance with IFRS 17 guidelines.
+                </p>
+                <a href="/case-studies" class="btn btn-primary" style="padding:13px 26px; background:linear-gradient(135deg,#10b981,#06b6d4); border:none;">
+                    Download Case Study <i class="fas fa-download btn-icon"></i>
+                </a>
+            {% endif %}
         </div>
         <div class="sol-cs-visual">
             <div class="sol-cs-card" style="border-color:rgba(16,185,129,0.2);">
@@ -225,17 +238,27 @@
 <!-- ══════════════════════════════════════════
      CASE STUDY SPOTLIGHT 2
      ═════════════════════════════════════════════ -->
+{% set cs2 = get_case_study('customer-360-unified-view-mdm') %}
 <section class="sol-cs2-section" style="background:var(--bg-primary); padding:70px 0;">
     <div class="container">
         <div class="sol-cs2-card">
             <div class="sol-cs2-icon" style="background:rgba(16,185,129,0.1); color:#10b981;"><i class="fas fa-arrows-rotate"></i></div>
             <div class="sol-cs2-body">
                 <div class="hero-badge" style="margin-bottom:12px; color:#10b981; background:rgba(16,185,129,0.1); border-color:rgba(16,185,129,0.2);">Data Consolidation</div>
-                <h4>From Fragmented Data to Unified Insights</h4>
-                <p>Read our retail banking case study on consolidating customer records across credit card, retail banking, and mortgage lending databases to feed unified profiles directly into central CRM systems.</p>
+                {% if cs2 %}
+                    <h4>{{ cs2.title }}</h4>
+                    <p>{{ cs2.card_summary or cs2.executive_summary }}</p>
+                {% else %}
+                    <h4>From Fragmented Data to Unified Insights</h4>
+                    <p>Read our retail banking case study on consolidating customer records across credit card, retail banking, and mortgage lending databases to feed unified profiles directly into central CRM systems.</p>
+                {% endif %}
             </div>
             <div class="sol-cs2-action">
-                <a href="/case-studies" class="btn btn-outline" style="border-color:#10b981; color:#10b981;">Read Story <i class="fas fa-arrow-right"></i></a>
+                {% if cs2 %}
+                    <a href="/case-studies/{{ cs2.slug }}" class="btn btn-outline" style="border-color:#10b981; color:#10b981;">Read Story <i class="fas fa-arrow-right"></i></a>
+                {% else %}
+                    <a href="/case-studies" class="btn btn-outline" style="border-color:#10b981; color:#10b981;">Read Story <i class="fas fa-arrow-right"></i></a>
+                {% endif %}
             </div>
         </div>
     </div>

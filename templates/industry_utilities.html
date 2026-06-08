@@ -181,6 +181,7 @@
     </div>
 </section>
 
+{% set cs = get_case_study('talend-data-integration-hub-validation') %}
 <!-- Success Story spotlight -->
 <section class="section-alt" id="case-study">
     <div class="container feature-split">
@@ -189,10 +190,17 @@
         </div>
         <div class="feature-content">
             <div class="hero-badge badge-brand"><i class="fas fa-book-open"></i> Success Story</div>
-            <h2 class="feature-title">Enhancing Data Ingestion and Integration: Success with Talend Data Hub</h2>
-            <p class="feature-desc">Empowering utilities worldwide to drive operational efficiency and regulatory compliance through advanced data governance.</p>
-            <p class="feature-desc">Artha Solutions deployed an enterprise Talend configuration to streamline high-volume log parsing and compliance validation pipelines.</p>
-            <a href="/contact-us" class="btn btn-primary" style="background: linear-gradient(135deg, #06b6d4, #f59e0b); border: none;">Read Full Story</a>
+            {% if cs %}
+                <h2 class="feature-title">{{ cs.title }}</h2>
+                <p class="feature-desc">{{ cs.card_summary or cs.executive_summary }}</p>
+                <p class="feature-desc">Artha Solutions deployed an enterprise Talend configuration to streamline high-volume log parsing and compliance validation pipelines.</p>
+                <a href="/case-studies/{{ cs.slug }}" class="btn btn-primary" style="background: linear-gradient(135deg, #06b6d4, #f59e0b); border: none;">Read Success Story <i class="fas fa-arrow-right btn-icon"></i></a>
+            {% else %}
+                <h2 class="feature-title">Enhancing Data Ingestion and Integration: Success with Talend Data Hub</h2>
+                <p class="feature-desc">Empowering utilities worldwide to drive operational efficiency and regulatory compliance through advanced data governance.</p>
+                <p class="feature-desc">Artha Solutions deployed an enterprise Talend configuration to streamline high-volume log parsing and compliance validation pipelines.</p>
+                <a href="/contact-us" class="btn btn-primary" style="background: linear-gradient(135deg, #06b6d4, #f59e0b); border: none;">Read Full Story</a>
+            {% endif %}
         </div>
     </div>
 </section>

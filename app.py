@@ -354,6 +354,21 @@ def inject_global_data():
             return json.loads(val)
         except Exception:
             return []
+
+    def get_case_study(slug):
+        try:
+            conn = sqlite3.connect('blog.db')
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM case_studies WHERE slug=?", (slug,))
+            row = cursor.fetchone()
+            conn.close()
+            if row:
+                return dict(row)
+        except Exception as e:
+            print(f"Error fetching case study {slug}: {e}")
+        return None
+
     return {
         'nav_solutions': SOLUTIONS_DATA,
         'nav_industries': INDUSTRIES_DATA,
@@ -367,6 +382,7 @@ def inject_global_data():
         'nav_whitepapers': WHITEPAPERS_DATA,
         'nav_jobs': JOBS_DATA,
         'load_json_helper': load_json_helper,
+        'get_case_study': get_case_study,
         'navigation_menu': load_navigation_menu()
     }
 

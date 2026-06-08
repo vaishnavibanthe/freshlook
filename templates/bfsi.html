@@ -101,6 +101,7 @@
 </section>
 
 <!-- Success Story Showcase -->
+{% set cs = get_case_study('automated-data-quality-audits-talend') %}
 <section class="section" id="bfsi-showcase">
     <div class="container feature-split">
         <div class="feature-visual feature-visual-glow">
@@ -108,10 +109,16 @@
         </div>
         <div class="feature-content">
             <div class="hero-badge"><i class="fas fa-file-invoice-dollar"></i> Success Story</div>
-            <h2 class="feature-title">Optimizing Retail Banking with Data Quality Automation</h2>
-            <p class="feature-desc">Artha Solutions helped a leading retail bank implement Talend's data management platform to clean inconsistent customer metadata, establish a governed stewardship portal, and eliminate duplicate records.</p>
-            <p class="feature-desc">The initiative resulted in a 65% reduction in account profile errors and automated 90% of daily validation checks.</p>
-            <a href="/contact-us" class="btn btn-primary">Request Full Case Study <i class="fas fa-download btn-icon"></i></a>
+            {% if cs %}
+                <h2 class="feature-title">{{ cs.title }}</h2>
+                <p class="feature-desc">{{ cs.card_summary or cs.executive_summary }}</p>
+                <a href="/case-studies/{{ cs.slug }}" class="btn btn-primary">Read Success Story <i class="fas fa-arrow-right btn-icon"></i></a>
+            {% else %}
+                <h2 class="feature-title">Optimizing Retail Banking with Data Quality Automation</h2>
+                <p class="feature-desc">Artha Solutions helped a leading retail bank implement Talend's data management platform to clean inconsistent customer metadata, establish a governed stewardship portal, and eliminate duplicate records.</p>
+                <p class="feature-desc">The initiative resulted in a 65% reduction in account profile errors and automated 90% of daily validation checks.</p>
+                <a href="/contact-us" class="btn btn-primary">Request Full Case Study <i class="fas fa-download btn-icon"></i></a>
+            {% endif %}
         </div>
     </div>
 </section>

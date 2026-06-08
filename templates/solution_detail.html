@@ -69,6 +69,7 @@
 
 <!-- Case Study Callout (Dynamic if exists) -->
 {% if data.case_study %}
+{% set cs = get_case_study(data.case_study.slug) if data.case_study.slug else None %}
 <section class="section-alt" id="solution-case">
     <div class="container feature-split">
         <div class="feature-visual feature-visual-glow">
@@ -76,10 +77,17 @@
         </div>
         <div class="feature-content">
             <div class="hero-badge"><i class="fas fa-book-open"></i> Client Success</div>
-            <h2 class="feature-title">{{ data.case_study.title }}</h2>
-            <p class="feature-desc">{{ data.case_study.desc }}</p>
-            <p class="feature-desc">Discover how Artha Solutions transforms databases and accelerates migration with certified support.</p>
-            <a href="/contact-us" class="btn btn-primary">Request Full Story Case</a>
+            {% if cs %}
+                <h2 class="feature-title">{{ cs.title }}</h2>
+                <p class="feature-desc">{{ cs.card_summary or cs.executive_summary }}</p>
+                <p class="feature-desc">Discover how Artha Solutions transforms databases and accelerates migration with certified support.</p>
+                <a href="/case-studies/{{ cs.slug }}" class="btn btn-primary">Read Success Story</a>
+            {% else %}
+                <h2 class="feature-title">{{ data.case_study.title }}</h2>
+                <p class="feature-desc">{{ data.case_study.desc }}</p>
+                <p class="feature-desc">Discover how Artha Solutions transforms databases and accelerates migration with certified support.</p>
+                <a href="/contact-us" class="btn btn-primary">Request Full Story Case</a>
+            {% endif %}
         </div>
     </div>
 </section>

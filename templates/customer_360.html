@@ -178,19 +178,32 @@
 <!-- ══════════════════════════════════════════
      SUCCESS STORY CALLOUT 1
      ═════════════════════════════════════════════ -->
+{% set cs1 = get_case_study('customer-360-unified-view-mdm') %}
 <section class="c360-cs-section" id="c360-cs1">
     <div class="container c360-cs-grid">
         <div class="c360-cs-content">
             <div class="hero-badge" style="margin-bottom:16px;"><i class="fas fa-file-lines"></i> Success Story</div>
-            <h2 style="font-size:clamp(22px,3vw,36px); font-weight:800; color:var(--text-primary); line-height:1.3; margin-bottom:16px;">
-                Accelerating Consumer Insights with MDM: A FMCG Success Story
-            </h2>
-            <p style="font-size:15px; color:var(--text-secondary); line-height:1.75; margin-bottom:28px;">
-                Artha unlocked growth by consolidating consumer data, enabling personalized experiences, and overcoming data challenges. Learn how a single consolidated dashboard unlocked critical purchasing behavior insight.
-            </p>
-            <a href="/case-studies" class="btn btn-primary" style="padding:13px 26px;">
-                Read Case Study <i class="fas fa-arrow-right btn-icon"></i>
-            </a>
+            {% if cs1 %}
+                <h2 style="font-size:clamp(22px,3vw,36px); font-weight:800; color:var(--text-primary); line-height:1.3; margin-bottom:16px;">
+                    {{ cs1.title }}
+                </h2>
+                <p style="font-size:15px; color:var(--text-secondary); line-height:1.75; margin-bottom:28px;">
+                    {{ cs1.card_summary or cs1.executive_summary }}
+                </p>
+                <a href="/case-studies/{{ cs1.slug }}" class="btn btn-primary" style="padding:13px 26px;">
+                    Read Success Story <i class="fas fa-arrow-right btn-icon"></i>
+                </a>
+            {% else %}
+                <h2 style="font-size:clamp(22px,3vw,36px); font-weight:800; color:var(--text-primary); line-height:1.3; margin-bottom:16px;">
+                    Accelerating Consumer Insights with MDM: A FMCG Success Story
+                </h2>
+                <p style="font-size:15px; color:var(--text-secondary); line-height:1.75; margin-bottom:28px;">
+                    Artha unlocked growth by consolidating consumer data, enabling personalized experiences, and overcoming data challenges. Learn how a single consolidated dashboard unlocked critical purchasing behavior insight.
+                </p>
+                <a href="/case-studies" class="btn btn-primary" style="padding:13px 26px;">
+                    Read Case Study <i class="fas fa-arrow-right btn-icon"></i>
+                </a>
+            {% endif %}
         </div>
         <div class="c360-cs-visual">
             <div class="c360-cs-card">
@@ -282,6 +295,7 @@
      ═════════════════════════════════════════════ -->
 <section class="c360-cs2-section">
     <div class="container">
+        {% set cs2 = get_case_study('consolidating-guest-data-personalized-experiences') %}
         <div class="c360-cs2-card">
             <div class="c360-cs2-icon">
                 <i class="fas fa-ship"></i>
@@ -290,15 +304,27 @@
                 <div class="hero-badge" style="margin-bottom:12px; background:rgba(139,92,246,0.1); border-color:rgba(139,92,246,0.2); color:#a78bfa;">
                     <i class="fas fa-star"></i> Customer Success
                 </div>
-                <h3 style="font-size:clamp(18px,2.5vw,28px); font-weight:800; color:var(--text-primary); margin-bottom:10px; line-height:1.3;">
-                    Transforming Guest Experiences through Data Modernization for a leading Cruise Line
-                </h3>
-                <p style="font-size:14px; color:var(--text-secondary); line-height:1.7; margin-bottom:20px;">
-                    Artha integrated fragmented guest data, enabled advanced analytics, and elevated customer experiences, driving loyalty and revenue growth across fleet voyages.
-                </p>
-                <a href="/case-studies" class="btn btn-primary" style="padding:11px 22px; font-size:14px;">
-                    Read Full Story <i class="fas fa-arrow-right btn-icon"></i>
-                </a>
+                {% if cs2 %}
+                    <h3 style="font-size:clamp(18px,2.5vw,28px); font-weight:800; color:var(--text-primary); margin-bottom:10px; line-height:1.3;">
+                        {{ cs2.title }}
+                    </h3>
+                    <p style="font-size:14px; color:var(--text-secondary); line-height:1.7; margin-bottom:20px;">
+                        {{ cs2.card_summary or cs2.executive_summary }}
+                    </p>
+                    <a href="/case-studies/{{ cs2.slug }}" class="btn btn-primary" style="padding:11px 22px; font-size:14px;">
+                        Read Full Story <i class="fas fa-arrow-right btn-icon"></i>
+                    </a>
+                {% else %}
+                    <h3 style="font-size:clamp(18px,2.5vw,28px); font-weight:800; color:var(--text-primary); margin-bottom:10px; line-height:1.3;">
+                        Transforming Guest Experiences through Data Modernization for a leading Cruise Line
+                    </h3>
+                    <p style="font-size:14px; color:var(--text-secondary); line-height:1.7; margin-bottom:20px;">
+                        Artha integrated fragmented guest data, enabled advanced analytics, and elevated customer experiences, driving loyalty and revenue growth across fleet voyages.
+                    </p>
+                    <a href="/case-studies" class="btn btn-primary" style="padding:11px 22px; font-size:14px;">
+                        Read Full Story <i class="fas fa-arrow-right btn-icon"></i>
+                    </a>
+                {% endif %}
             </div>
             <div class="c360-cs2-stats">
                 <div class="c360-cs2-stat-item">

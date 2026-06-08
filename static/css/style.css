@@ -10369,3 +10369,129 @@ body.home-page-light .header.scrolled .header-cta-btn:not(.btn-primary):hover {
 .mega-menu-section-label-link:hover .mega-menu-section-label {
     color: var(--accent-blue) !important;
 }
+
+/* ============================================================
+   Dark Hero Nav – for pages with dark hero sections
+   (e.g. Careers, Industry pages with dark banners)
+   Add class="dark-hero-nav" to <body> in the template
+   ============================================================ */
+body.dark-hero-nav .header {
+    background-color: rgba(10, 8, 26, 0.35) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: none !important;
+    backdrop-filter: blur(16px) saturate(160%) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(160%) !important;
+    transition: background-color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease !important;
+}
+
+body.dark-hero-nav .header.scrolled-past-hero {
+    background-color: rgba(255, 255, 255, 0.95) !important;
+    border-bottom: 1px solid rgba(124, 58, 237, 0.12) !important;
+    box-shadow: 0 4px 24px rgba(124, 58, 237, 0.08) !important;
+    backdrop-filter: blur(20px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+}
+
+body.dark-hero-nav .nav-link {
+    color: rgba(255, 255, 255, 0.9) !important;
+    transition: color 0.2s ease !important;
+}
+
+body.dark-hero-nav .nav-link:hover,
+body.dark-hero-nav .nav-link.active {
+    color: #a78bfa !important;
+}
+
+body.dark-hero-nav .header.scrolled-past-hero .nav-link {
+    color: #475569 !important;
+}
+
+body.dark-hero-nav .header.scrolled-past-hero .nav-link:hover,
+body.dark-hero-nav .header.scrolled-past-hero .nav-link.active {
+    color: #7c3aed !important;
+}
+
+/* Keep colored logo on dark nav, switch appropriately */
+body.dark-hero-nav .logo-main {
+    display: none !important;
+}
+
+body.dark-hero-nav .logo-white {
+    display: inline-block !important;
+    filter: brightness(1) !important;
+}
+
+body.dark-hero-nav .header.scrolled-past-hero .logo-main {
+    display: inline-block !important;
+}
+
+body.dark-hero-nav .header.scrolled-past-hero .logo-white {
+    display: none !important;
+}
+
+/* Header CTAs on dark nav */
+body.dark-hero-nav .header-cta-btn.btn-primary {
+    background: linear-gradient(135deg, #6d28d9, #d946ef) !important;
+    border-color: transparent !important;
+    color: #fff !important;
+}
+
+body.dark-hero-nav .header-cta-btn:not(.btn-primary) {
+    color: rgba(255, 255, 255, 0.85) !important;
+    border-color: rgba(255, 255, 255, 0.25) !important;
+    background: transparent !important;
+}
+
+body.dark-hero-nav .header-cta-btn:not(.btn-primary):hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Scrolled-past-hero: restore standard CTA styles */
+body.dark-hero-nav .header.scrolled-past-hero .header-cta-btn:not(.btn-primary) {
+    color: #7c3aed !important;
+    border-color: rgba(124, 58, 237, 0.4) !important;
+}
+
+/* Search icon */
+body.dark-hero-nav .search-overlay-trigger-btn {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+body.dark-hero-nav .header.scrolled-past-hero .search-overlay-trigger-btn {
+    color: var(--text-secondary) !important;
+}
+
+/* Mega menu dropdown - always stays light */
+body.dark-hero-nav .nav-mega-menu {
+    background-color: rgba(255, 255, 255, 0.98) !important;
+    border: 1px solid rgba(124, 58, 237, 0.12) !important;
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.12) !important;
+    backdrop-filter: blur(24px) !important;
+}
+
+body.dark-hero-nav .mega-menu-title {
+    color: #0f172a !important;
+}
+
+body.dark-hero-nav .mega-menu-link:hover .mega-menu-title {
+    color: #7c3aed !important;
+}
+
+body.dark-hero-nav .mega-menu-desc {
+    color: #64748b !important;
+}
+
+body.dark-hero-nav .mega-menu-section-label {
+    color: #7c3aed !important;
+}
+
+/* Chevron on dark nav */
+body.dark-hero-nav .nav-link .fa-chevron-down {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+body.dark-hero-nav .header.scrolled-past-hero .nav-link .fa-chevron-down {
+    color: var(--text-tertiary) !important;
+}
+

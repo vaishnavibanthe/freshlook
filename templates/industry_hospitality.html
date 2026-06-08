@@ -132,15 +132,23 @@
     </div>
 </section>
 
+{% set cs1 = get_case_study('consolidating-guest-data-personalized-experiences') %}
 <!-- Success Story spotlight 1 (Cruise Line) -->
 <section class="section" id="case-study-cruise">
     <div class="container feature-split">
         <div class="feature-content">
             <div class="hero-badge badge-brand"><i class="fas fa-ship"></i> Cruise Solutions</div>
-            <h2 class="feature-title">Transforming Guest Experiences through Data Modernization for a leading Cruise Line</h2>
-            <p class="feature-desc">Artha integrated fragmented guest data, enabled advanced analytics, and elevated customer experiences, driving loyalty and revenue growth.</p>
-            <p class="feature-desc">By consolidating loyalty card programs, cabin booking systems, and point-of-sale logs, we delivered a true Guest 360 solution.</p>
-            <a href="/contact-us" class="btn btn-primary" style="background: linear-gradient(135deg, #f43f5e, #f59e0b); border: none;">Download Full Case Details</a>
+            {% if cs1 %}
+                <h2 class="feature-title">{{ cs1.title }}</h2>
+                <p class="feature-desc">{{ cs1.card_summary or cs1.executive_summary }}</p>
+                <p class="feature-desc">By consolidating loyalty card programs, cabin booking systems, and point-of-sale logs, we delivered a true Guest 360 solution.</p>
+                <a href="/case-studies/{{ cs1.slug }}" class="btn btn-primary" style="background: linear-gradient(135deg, #f43f5e, #f59e0b); border: none;">Read Success Story <i class="fas fa-arrow-right btn-icon"></i></a>
+            {% else %}
+                <h2 class="feature-title">Transforming Guest Experiences through Data Modernization for a leading Cruise Line</h2>
+                <p class="feature-desc">Artha integrated fragmented guest data, enabled advanced analytics, and elevated customer experiences, driving loyalty and revenue growth.</p>
+                <p class="feature-desc">By consolidating loyalty card programs, cabin booking systems, and point-of-sale logs, we delivered a true Guest 360 solution.</p>
+                <a href="/contact-us" class="btn btn-primary" style="background: linear-gradient(135deg, #f43f5e, #f59e0b); border: none;">Download Full Case Details</a>
+            {% endif %}
         </div>
         <div class="feature-visual feature-visual-glow">
             <img src="https://images.unsplash.com/photo-1548574505-5e239809ee19?auto=format&fit=crop&w=800&q=80" alt="Large white cruise line ship floating on ocean water during sunset">
@@ -196,6 +204,7 @@
     </div>
 </section>
 
+{% set cs2 = get_case_study('gdpr-compliance-customer-data-security') %}
 <!-- Success Story spotlight 2 (Hotel Management) -->
 <section class="section" id="case-study-hotel">
     <div class="container feature-split">
@@ -204,10 +213,17 @@
         </div>
         <div class="feature-content">
             <div class="hero-badge badge-brand"><i class="fas fa-hotel"></i> Hotel Solutions</div>
-            <h2 class="feature-title">Revolutionizing Hotel Management through Customer-Centric Integration</h2>
-            <p class="feature-desc">Artha Solutions helped a global hospitality firm transform hotel management with 100% data security, automated bookings, improved efficiency, and enhanced customer satisfaction.</p>
-            <p class="feature-desc">Using open-API architectures, we unified booking flows across 150+ properties dynamically.</p>
-            <a href="/contact-us" class="btn btn-primary" style="background: linear-gradient(135deg, #f43f5e, #f59e0b); border: none;">Read Full Story</a>
+            {% if cs2 %}
+                <h2 class="feature-title">{{ cs2.title }}</h2>
+                <p class="feature-desc">{{ cs2.card_summary or cs2.executive_summary }}</p>
+                <p class="feature-desc">Using open-API architectures, we unified booking flows across 150+ properties dynamically.</p>
+                <a href="/case-studies/{{ cs2.slug }}" class="btn btn-primary" style="background: linear-gradient(135deg, #f43f5e, #f59e0b); border: none;">Read Success Story <i class="fas fa-arrow-right btn-icon"></i></a>
+            {% else %}
+                <h2 class="feature-title">Revolutionizing Hotel Management through Customer-Centric Integration</h2>
+                <p class="feature-desc">Artha Solutions helped a global hospitality firm transform hotel management with 100% data security, automated bookings, improved efficiency, and enhanced customer satisfaction.</p>
+                <p class="feature-desc">Using open-API architectures, we unified booking flows across 150+ properties dynamically.</p>
+                <a href="/contact-us" class="btn btn-primary" style="background: linear-gradient(135deg, #f43f5e, #f59e0b); border: none;">Read Full Story</a>
+            {% endif %}
         </div>
     </div>
 </section>

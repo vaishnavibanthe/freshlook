@@ -12,7 +12,7 @@ SOLUTIONS_DATA = {
             {'title': 'Business Alignment', 'desc': 'Bridging the gap between corporate goals and engineering pipelines to guarantee high ROI on data investments.'}
         ],
         'stats': [{'val': '40%', 'label': 'Implementation Speedup'}, {'val': '2-4 Wk', 'label': 'Initial Assessment'}],
-        'case_study': {'title': 'Financial Operations Strategy', 'desc': 'Artha helped a global banking corporation structure their data modernization blueprint, reducing metadata search times by 40%.'}
+        'case_study': {'title': 'Financial Operations Strategy', 'desc': 'Artha helped a global banking corporation structure their data modernization blueprint, reducing metadata search times by 40%.', 'slug': 'metadata-driven-etl-framework'}
     },
     'master-data-management': {
         'title': 'Master Data Management (MDM)',
@@ -25,7 +25,7 @@ SOLUTIONS_DATA = {
             {'title': 'Identity Resolution', 'desc': 'Real-time matching algorithms to connect data points dynamically across systems.'}
         ],
         'stats': [{'val': '40%', 'label': 'Reduction in Setup Cost'}, {'val': '65%', 'label': 'Deduplication Accuracy'}],
-        'case_study': {'title': 'Fastest MDM Rollout', 'desc': 'Carhartt Inc. partnered with Artha for an automated MDM deployment, unifying customer records and accelerating supply chains.'}
+        'case_study': {'title': 'Fastest MDM Rollout', 'desc': 'Carhartt Inc. partnered with Artha for an automated MDM deployment, unifying customer records and accelerating supply chains.', 'slug': 'rapid-talend-mdm-deployment'}
     },
     'enterprise-data-management': {
         'title': 'Enterprise Data Management',
@@ -38,7 +38,7 @@ SOLUTIONS_DATA = {
             {'title': 'Platform Migrations', 'desc': 'Seamless transitions between database architectures with zero downtime and strict data security.'}
         ],
         'stats': [{'val': '300+', 'label': 'Projects Delivered'}, {'val': '24/7', 'label': 'Support Exposure'}],
-        'case_study': {'title': 'Healthcare Platform Migration', 'desc': 'Migrated legacy patient systems for a health distributor, automating data verification checks for 90% accuracy.'}
+        'case_study': {'title': 'Healthcare Platform Migration', 'desc': 'Migrated legacy patient systems for a health distributor, automating data verification checks for 90% accuracy.', 'slug': 'healthcare-member-provider-data-platform'}
     },
     'data-governance': {
         'title': 'Data Governance & Compliance',
@@ -51,7 +51,7 @@ SOLUTIONS_DATA = {
             {'title': 'Privacy & Consent', 'desc': 'Enforce data masking, role-based access, and compliance checks dynamically.'}
         ],
         'stats': [{'val': '40%', 'label': 'Search Time Reduction'}, {'val': '100%', 'label': 'Compliance Audit Readiness'}],
-        'case_study': {'title': 'Adira Financial Governance', 'desc': 'Enhanced governance and metadata search for Adira, reducing compliance audit preparation times by 65%.'}
+        'case_study': {'title': 'Adira Financial Governance', 'desc': 'Enhanced governance and metadata search for Adira, reducing compliance audit preparation times by 65%.', 'slug': 'enterprise-data-governance-mdm'}
     },
     'bigdata': {
         'title': 'Big Data Analytics',
@@ -64,7 +64,7 @@ SOLUTIONS_DATA = {
             {'title': 'Real-time Log Ingestion', 'desc': 'Stream millions of events per second with schema validation and error-quarantine queues.'}
         ],
         'stats': [{'val': '3×', 'label': 'Faster Query Speeds'}, {'val': '26', 'label': 'Countries Served'}],
-        'case_study': {'title': 'Telecom Scale Ingestion', 'desc': 'Implemented a distributed ingestion pipeline for a telecom provider to process millions of diagnostic events in real-time.'}
+        'case_study': {'title': 'Telecom Scale Ingestion', 'desc': 'Implemented a distributed ingestion pipeline for a telecom provider to process millions of diagnostic events in real-time.', 'slug': 'enterprise-big-data-integration'}
     },
     'data-quality': {
         'title': 'Data Quality Management',
@@ -77,7 +77,7 @@ SOLUTIONS_DATA = {
             {'title': 'Data Reconciliation', 'desc': 'Active verification scripts to cross-reference data integrity across sources.'}
         ],
         'stats': [{'val': '80%', 'label': 'Data Reliability'}, {'val': '85%', 'label': 'Validation Accuracy'}],
-        'case_study': {'title': 'Automated Quality Checking', 'desc': 'Partnered with a retail bank to automate metadata checks, boosting data validation accuracy to 85%.'}
+        'case_study': {'title': 'Automated Quality Checking', 'desc': 'Partnered with a retail bank to automate metadata checks, boosting data validation accuracy to 85%.', 'slug': 'automated-data-quality-audits-talend'}
     },
     'data-science-analytics': {
         'title': 'Data Science & Analytics',
@@ -90,7 +90,7 @@ SOLUTIONS_DATA = {
             {'title': 'Feature Engineering', 'desc': 'Clean and transform raw data signals into highly predictive input matrices for ML pipelines.'}
         ],
         'stats': [{'val': '3×', 'label': 'Faster Decision Speeds'}, {'val': '75%', 'label': 'Error Rate Reduction'}],
-        'case_study': {'title': 'Staffing Demand Prediction', 'desc': 'Developed an AI staffing forecast engine for a healthcare distributor, matching employee schedules with patient spikes.'}
+        'case_study': {'title': 'Staffing Demand Prediction', 'desc': 'Developed an AI staffing forecast engine for a healthcare distributor, matching employee schedules with patient spikes.', 'slug': 'healthcare-resource-predictive-forecasting'}
     },
     'servicenow-2': {
         'title': 'ServiceNow Services',
@@ -103,7 +103,7 @@ SOLUTIONS_DATA = {
             {'title': 'Custom Integration Hub', 'desc': 'Connect ServiceNow with CRMs, ERPs, and database platforms seamlessly.'}
         ],
         'stats': [{'val': '80%', 'label': 'Steps Automated'}, {'val': '24/7', 'label': 'Support Coverage'}],
-        'case_study': {'title': 'Workplace Workflow Automation', 'desc': 'Automated IT ticketing routing for a global manufacturing firm, slashing ticket resolution times by 40%.'}
+        'case_study': {'title': 'Workplace Workflow Automation', 'desc': 'Automated IT ticketing routing for a global manufacturing firm, slashing ticket resolution times by 40%.', 'slug': 'premises-to-cloud-it-transition'}
     },
     'oracle-services': {
         'title': 'Oracle Services & Consulting',
@@ -116,7 +116,7 @@ SOLUTIONS_DATA = {
             {'title': 'ERP Application Support', 'desc': 'Managed functional support for Oracle E-Business Suite and cloud applications.'}
         ],
         'stats': [{'val': '300+', 'label': 'Expert Engineers'}, {'val': '26', 'label': 'Countries Served'}],
-        'case_study': {'title': 'Global ERP Synchronization', 'desc': 'Managed database replication and query tuning for a global retail network, stabilizing order processing.'}
+        'case_study': {'title': 'Global ERP Synchronization', 'desc': 'Managed database replication and query tuning for a global retail network, stabilizing order processing.', 'slug': 'ecommerce-gateway-integration'}
     },
     'sap': {
         'title': 'Artha Advantage for SAP',
@@ -129,7 +129,7 @@ SOLUTIONS_DATA = {
             {'title': 'Pre-Migration Profiling', 'desc': 'Clean and purge redundant client database records before migration to save memory.'}
         ],
         'stats': [{'val': '90%', 'label': 'Automated Mapping'}, {'val': '70%', 'label': 'Faster Timelines'}],
-        'case_study': {'title': 'Commonwealth Care SAP Upgrade', 'desc': 'Assisted in validating data integrity for an ERP upgrade, recognized with Talend\'s Data Masters award.'}
+        'case_study': {'title': 'Commonwealth Care SAP Upgrade', 'desc': 'Assisted in validating data integrity for an ERP upgrade, recognized with Talend\'s Data Masters award.', 'slug': 'sap-s4hana-cloud-migration-talend'}
     },
     'cloud': {
         'title': 'Cloud Services & Consulting',
@@ -142,7 +142,7 @@ SOLUTIONS_DATA = {
             {'title': 'Cost Optimization (FinOps)', 'desc': 'Monitor cloud resources to scale down idle nodes, slashing monthly cloud invoices.'}
         ],
         'stats': [{'val': '40%', 'label': 'Overhead Cost Savings'}, {'val': '24/7', 'label': 'Active Monitoring'}],
-        'case_study': {'title': 'Cloud Migration Challenges Solved', 'desc': 'Helped a health services provider transition local server logs to Azure, structuring secure and HIPAA-compliant partitions.'}
+        'case_study': {'title': 'Cloud Migration Challenges Solved', 'desc': 'Helped a health services provider transition local server logs to Azure, structuring secure and HIPAA-compliant partitions.', 'slug': 'premises-to-cloud-it-transition'}
     },
     'managed-services': {
         'title': 'Managed IT & Data Services',
@@ -155,7 +155,7 @@ SOLUTIONS_DATA = {
             {'title': 'Service Level Agreements (SLAs)', 'desc': 'Guaranteed response times, incident escalation channels, and transparent reporting.'}
         ],
         'stats': [{'val': '300+', 'label': 'Expert Engineers'}, {'val': '12+ Yrs', 'label': 'Partnership Legacy'}],
-        'case_study': {'title': 'Health Alliance Support', 'desc': 'Partnered with Commonwealth Care Alliance to deliver ongoing 24/7 support for data pipelines and reporting engines.'}
+        'case_study': {'title': 'Health Alliance Support', 'desc': 'Partnered with Commonwealth Care Alliance to deliver ongoing 24/7 support for data pipelines and reporting engines.', 'slug': 'managed-services-operations-optimization'}
     }
 }
 
@@ -170,7 +170,7 @@ INDUSTRIES_DATA = {
             {'title': 'Regulatory Compliance', 'desc': 'Automate tracking for financial audits, GDPR, and anti-money laundering regulations.'},
             {'title': 'Fraud Prevention', 'desc': 'Identify transaction anomalies in real-time with machine learning models.'}
         ],
-        'case_study': {'title': 'Deduplication in Retail Banking', 'desc': 'Helped a bank deploy an ML deduplication engine on consumer accounts, reducing profile duplicates by 65%.'}
+        'case_study': {'title': 'Deduplication in Retail Banking', 'desc': 'Helped a bank deploy an ML deduplication engine on consumer accounts, reducing profile duplicates by 65%.', 'slug': 'real-time-customer-matching-fraud-prevention'}
     },
     'healthcare': {
         'title': 'Healthcare & Life Sciences',
@@ -182,7 +182,7 @@ INDUSTRIES_DATA = {
             {'title': 'Supply Chain Optimization', 'desc': 'Forecasting medical supply requirements with predictive analytics.'},
             {'title': 'Regulatory Guardrails', 'desc': 'Establish secure, governed data partitions ensuring strict HIPAA audit trails.'}
         ],
-        'case_study': {'title': 'Patient Deduplication in Care', 'desc': 'Implemented an AI deduplication algorithm for diabetes care profiles, enhancing record validation.'}
+        'case_study': {'title': 'Patient Deduplication in Care', 'desc': 'Implemented an AI deduplication algorithm for diabetes care profiles, enhancing record validation.', 'slug': 'ml-deduplication-patient-identity-resolution'}
     },
     'retail': {
         'title': 'Retail & E-Commerce',
@@ -194,7 +194,7 @@ INDUSTRIES_DATA = {
             {'title': 'Streaming Analytics', 'desc': 'Track and process checkout transactions in real-time to adjust pricing dynamically.'},
             {'title': 'Supply Chain Visibility', 'desc': 'Optimize store inventories using automated warehouse stock reports.'}
         ],
-        'case_study': {'title': 'Streaming Data Processing', 'desc': 'Introduced real-time transaction streaming for a sportswear brand, providing store managers with instant sales metrics.'}
+        'case_study': {'title': 'Streaming Data Processing', 'desc': 'Introduced real-time transaction streaming for a sportswear brand, providing store managers with instant sales metrics.', 'slug': 'ecommerce-gateway-integration'}
     },
     'manufacturing': {
         'title': 'Manufacturing',
@@ -206,7 +206,7 @@ INDUSTRIES_DATA = {
             {'title': 'Supply Chain Tracking', 'desc': 'Unify component tracking from supplier shipping docks to final assembly lines.'},
             {'title': 'Operational Dashboards', 'desc': 'Provide floor supervisors with real-time analytics on production cycle times.'}
         ],
-        'case_study': {'title': 'Factory Logistics Modernization', 'desc': 'Helped a heavy manufacturing firm unify local supplier inventory databases, boosting tracking speed.'}
+        'case_study': {'title': 'Factory Logistics Modernization', 'desc': 'Helped a heavy manufacturing firm unify local supplier inventory databases, boosting tracking speed.', 'slug': 'real-time-logistics-analytics-etl'}
     },
     'utilities': {
         'title': 'Utilities & Telecom',
@@ -218,7 +218,7 @@ INDUSTRIES_DATA = {
             {'title': 'Compliance Governance', 'desc': 'Ensure adherence to government utility operations policies.'},
             {'title': 'Customer Support Copilots', 'desc': 'Deploy conversational assistants to handle outages reporting.'}
         ],
-        'case_study': {'title': 'Grid Sensor Log Processing', 'desc': 'Built a Spark-driven log processing pipeline for an electrical utility, accelerating diagnostic analytics.'}
+        'case_study': {'title': 'Grid Sensor Log Processing', 'desc': 'Built a Spark-driven log processing pipeline for an electrical utility, accelerating diagnostic analytics.', 'slug': 'premises-to-cloud-it-transition'}
     },
     'hospitality': {
         'title': 'Hospitality & Travel',
@@ -230,7 +230,7 @@ INDUSTRIES_DATA = {
             {'title': 'Dynamic Pricing Analytics', 'desc': 'Predict room demand trends to maximize booking revenues.'},
             {'title': 'Feedback Sentiment Analysis', 'desc': 'Scan reviews and surveys automatically to resolve issues.'}
         ],
-        'case_study': {'title': 'Hotel Customer 360 Rollout', 'desc': 'Unified guest profile databases across a luxury resort brand, feeding CRM platforms with direct preferences.'}
+        'case_study': {'title': 'Hotel Customer 360 Rollout', 'desc': 'Unified guest profile databases across a luxury resort brand, feeding CRM platforms with direct preferences.', 'slug': 'consolidating-guest-data-personalized-experiences'}
     },
     'telecom': {
         'title': 'Telecommunications',
@@ -242,7 +242,7 @@ INDUSTRIES_DATA = {
             {'title': 'Billing Reconciliation', 'desc': 'Automate order-to-billing validation checks to isolate errors.'},
             {'title': 'Churn Prediction', 'desc': 'Identify customer accounts showing declining call patterns to target promotions.'}
         ],
-        'case_study': {'title': 'Cellular Log Ingestion', 'desc': 'Implemented a metadata-driven ingestion framework for a mobile carrier, processing billions of log events daily.'}
+        'case_study': {'title': 'Cellular Log Ingestion', 'desc': 'Implemented a metadata-driven ingestion framework for a mobile carrier, processing billions of log events daily.', 'slug': 'data-management-platform-mdm-bigdata'}
     }
 }
 

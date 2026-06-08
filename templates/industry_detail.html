@@ -69,6 +69,7 @@
 
 <!-- Case Study Callout -->
 {% if data.case_study %}
+{% set cs = get_case_study(data.case_study.slug) if data.case_study.slug else None %}
 <section class="section" id="industry-case">
     <div class="container feature-split">
         <div class="feature-visual feature-visual-glow">
@@ -76,10 +77,17 @@
         </div>
         <div class="feature-content">
             <div class="hero-badge"><i class="fas fa-book-open"></i> Success Story</div>
-            <h2 class="feature-title">{{ data.case_study.title }}</h2>
-            <p class="feature-desc">{{ data.case_study.desc }}</p>
-            <p class="feature-desc">Artha Solutions deploys industry-specific frameworks to unify data governance and accelerate digital transformation.</p>
-            <a href="/contact-us" class="btn btn-primary">Request Full Case Details</a>
+            {% if cs %}
+                <h2 class="feature-title">{{ cs.title }}</h2>
+                <p class="feature-desc">{{ cs.card_summary or cs.executive_summary }}</p>
+                <p class="feature-desc">Artha Solutions deploys industry-specific frameworks to unify data governance and accelerate digital transformation.</p>
+                <a href="/case-studies/{{ cs.slug }}" class="btn btn-primary">Read Success Story</a>
+            {% else %}
+                <h2 class="feature-title">{{ data.case_study.title }}</h2>
+                <p class="feature-desc">{{ data.case_study.desc }}</p>
+                <p class="feature-desc">Artha Solutions deploys industry-specific frameworks to unify data governance and accelerate digital transformation.</p>
+                <a href="/contact-us" class="btn btn-primary">Request Full Case Details</a>
+            {% endif %}
         </div>
     </div>
 </section>

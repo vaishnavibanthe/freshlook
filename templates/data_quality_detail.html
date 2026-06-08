@@ -131,22 +131,32 @@
     </div>
 </section>
 
-<!-- ══════════════════════════════════════════
-     CASE STUDY SPOTLIGHT 1 (Retail Talend Success)
-     ═════════════════════════════════════════════ -->
+{% set cs = get_case_study('data-quality-improvement-talend') %}
 <section class="sol-cs-section" id="sol-case-study">
     <div class="container sol-cs-grid">
         <div class="sol-cs-content">
             <div class="hero-badge" style="margin-bottom:16px; border-color:rgba(6,182,212,0.3); color:#06b6d4;"><i class="fas fa-file-invoice"></i> Retail Success</div>
-            <h2 style="font-size:clamp(22px,3vw,36px); font-weight:800; color:var(--text-primary); line-height:1.3; margin-bottom:16px;">
-                Quality Data, Quality Customers: Retail Success
-            </h2>
-            <p style="font-size:15px; color:var(--text-secondary); line-height:1.75; margin-bottom:28px;">
-                Artha Solutions, using Talend, enhanced data quality for a global retail brand. We implemented advanced de-duplication and real-time address validation, improving customer info accuracy.
-            </p>
-            <a href="/case-studies" class="btn btn-primary" style="padding:13px 26px; background:linear-gradient(135deg,#06b6d4,#10b981); border:none;">
-                Download Case Study <i class="fas fa-download btn-icon"></i>
-            </a>
+            {% if cs %}
+                <h2 style="font-size:clamp(22px,3vw,36px); font-weight:800; color:var(--text-primary); line-height:1.3; margin-bottom:16px;">
+                    {{ cs.title }}
+                </h2>
+                <p style="font-size:15px; color:var(--text-secondary); line-height:1.75; margin-bottom:28px;">
+                    {{ cs.card_summary or cs.executive_summary }}
+                </p>
+                <a href="/case-studies/{{ cs.slug }}" class="btn btn-primary" style="padding:13px 26px; background:linear-gradient(135deg,#06b6d4,#10b981); border:none;">
+                    Read Success Story <i class="fas fa-arrow-right btn-icon"></i>
+                </a>
+            {% else %}
+                <h2 style="font-size:clamp(22px,3vw,36px); font-weight:800; color:var(--text-primary); line-height:1.3; margin-bottom:16px;">
+                    Quality Data, Quality Customers: Retail Success
+                </h2>
+                <p style="font-size:15px; color:var(--text-secondary); line-height:1.75; margin-bottom:28px;">
+                    Artha Solutions, using Talend, enhanced data quality for a global retail brand. We implemented advanced de-duplication and real-time address validation, improving customer info accuracy.
+                </p>
+                <a href="/case-studies" class="btn btn-primary" style="padding:13px 26px; background:linear-gradient(135deg,#06b6d4,#10b981); border:none;">
+                    Download Case Study <i class="fas fa-download btn-icon"></i>
+                </a>
+            {% endif %}
         </div>
         <div class="sol-cs-visual">
             <div class="sol-cs-card" style="border-color:rgba(6,182,212,0.2);">
