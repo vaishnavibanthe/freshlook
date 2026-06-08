@@ -2,139 +2,649 @@
 
 {% block title %}About Us - Quality, Integrity & Trust{% endblock %}
 
+{% block extra_meta %}
+<meta name="description" content="Learn more about Artha Solutions, a premier business and technology consulting firm. Discover our mission, vision, 8+ global awards, and core expertise in AI and enterprise data solutions.">
+{% endblock %}
+
 {% block content %}
-<!-- Detail Hero -->
-<section class="hero" style="min-height: 60vh; padding-top: calc(var(--nav-height) + 60px); padding-bottom: 60px;">
-    <div class="hero-bg-glow hero-glow-1"></div>
-    <div class="container hero-grid" style="grid-template-columns: 1.25fr 0.75fr;">
+<style>
+:root {
+    --brand-purple: #7c3aed;
+    --brand-magenta: #d946ef;
+    --brand-cyan: #06b6d4;
+    --brand-glow-purple: rgba(124, 58, 237, 0.08);
+    --brand-glow-magenta: rgba(217, 70, 239, 0.08);
+    --brand-border: rgba(124, 58, 237, 0.15);
+}
+
+@keyframes floatGraphic {
+    0% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-10px) rotate(3deg); }
+    100% { transform: translateY(0px) rotate(0deg); }
+}
+
+@keyframes rotateOrbit {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.about-hero-graphic {
+    position: relative;
+    width: 100%;
+    height: 350px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: floatGraphic 6s ease-in-out infinite;
+}
+
+.about-orbit-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px dashed var(--brand-purple);
+    opacity: 0.3;
+}
+
+.about-orbit-node {
+    position: absolute;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--brand-purple), var(--brand-magenta));
+    box-shadow: 0 0 15px var(--brand-purple);
+}
+
+.card-brand-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid var(--border-color);
+}
+
+.card-brand-hover:hover {
+    border-color: var(--brand-purple) !important;
+    box-shadow: 0 12px 30px rgba(124, 58, 237, 0.12) !important;
+    transform: translateY(-6px);
+}
+
+.badge-brand {
+    background: rgba(124, 58, 237, 0.08);
+    color: var(--brand-purple);
+    border: 1px solid rgba(124, 58, 237, 0.2);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 18px;
+}
+
+.gradient-text {
+    background: linear-gradient(135deg, var(--brand-purple) 0%, var(--brand-magenta) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 700;
+}
+
+/* Timeline specific styles */
+.timeline-container {
+    position: relative;
+    margin-top: 40px;
+    padding-left: 20px;
+    border-left: 2px solid rgba(124, 58, 237, 0.15);
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 30px;
+    padding-left: 20px;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -29px;
+    top: 5px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--bg-primary);
+    border: 3px solid var(--brand-purple);
+    box-shadow: 0 0 8px var(--brand-purple);
+    z-index: 2;
+    transition: all 0.3s ease;
+}
+
+.timeline-item:hover::before {
+    background: var(--brand-magenta);
+    border-color: var(--brand-magenta);
+    box-shadow: 0 0 12px var(--brand-magenta);
+}
+
+.timeline-year {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--brand-purple);
+    display: inline-block;
+    margin-bottom: 6px;
+    background: rgba(124, 58, 237, 0.08);
+    padding: 2px 10px;
+    border-radius: 12px;
+}
+
+.timeline-desc {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+}
+
+/* Strengths list styling */
+.strengths-list, .roadmap-list {
+    list-style: none;
+    padding: 0;
+}
+
+.strengths-list li, .roadmap-list li {
+    position: relative;
+    padding-left: 28px;
+    margin-bottom: 14px;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--text-secondary);
+}
+
+.strengths-list li::before {
+    content: "\f00c";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    position: absolute;
+    left: 0;
+    top: 2px;
+    color: #10b981; /* Green check */
+    font-size: 14px;
+}
+
+.roadmap-list li::before {
+    content: "\f061";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    position: absolute;
+    left: 0;
+    top: 2px;
+    color: var(--brand-cyan); /* Cyan arrow */
+    font-size: 14px;
+}
+</style>
+
+<!-- Hero Section -->
+<section class="hero" style="min-height: 65vh; padding-top: calc(var(--nav-height) + 60px); padding-bottom: 60px; background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);">
+    <div class="hero-bg-glow hero-glow-1" style="background: radial-gradient(circle, rgba(124,58,237,0.08) 0%, transparent 70%);"></div>
+    <div class="container hero-grid" style="grid-template-columns: 1.2fr 0.8fr; gap: 40px; align-items: center;">
         <div class="hero-content">
-            <div class="hero-badge"><i class="fas fa-circle-info"></i> Corporate Profile</div>
-            <h1 class="hero-title" style="font-size: 48px;">
-                About <span>Artha Solutions</span>
+            <div class="badge-brand"><i class="fas fa-info-circle"></i> Corporate Profile</div>
+            <h1 class="hero-title" style="font-size: clamp(36px, 5vw, 48px); line-height: 1.15; margin-bottom: 18px;">
+                About <span class="gradient-text">Artha Solutions</span>
             </h1>
-            <p class="hero-desc">
-                We are a premier business and technology consulting firm. We optimize transformation across multiple industries with quality, integrity, and trust.
+            <p class="hero-desc" style="font-size: 18px; line-height: 1.6; color: var(--text-secondary); margin-bottom: 24px; font-weight: 500;">
+                Quality, Integrity & Trust — Empowering Businesses with Insightful Innovations
+            </p>
+            <p class="hero-desc" style="color: var(--text-tertiary); margin-bottom: 30px;">
+                Artha Solutions is a premier business and technology consulting firm providing insights and expertise in both business strategy and technical implementations.
+            </p>
+            <div class="hero-buttons" style="display:flex; gap:14px; flex-wrap:wrap;">
+                <a href="/contact-us" class="btn btn-primary btn-glow" style="background: linear-gradient(135deg, var(--brand-purple), var(--brand-magenta)); border: none;">Connect With Us <i class="fas fa-chevron-right btn-icon"></i></a>
+                <a href="#what-we-do" class="btn btn-outline">What We Do</a>
+            </div>
+        </div>
+        
+        <div class="hero-visual" style="display: flex; justify-content: center;">
+            <div class="about-hero-graphic">
+                <div style="position: absolute; width: 300px; height: 300px; border-radius: 50%; background: radial-gradient(circle, rgba(124,58,237,0.1) 0%, transparent 75%); filter: blur(25px);"></div>
+                <!-- Outer Ring -->
+                <div class="about-orbit-ring" style="width: 270px; height: 270px; animation: rotateOrbit 30s linear infinite;"></div>
+                <!-- Inner Ring -->
+                <div class="about-orbit-ring" style="width: 190px; height: 190px; animation: rotateOrbit 20s linear reverse infinite;"></div>
+                <!-- Core node -->
+                <div class="ai-core" style="width: 95px; height: 95px; background: linear-gradient(135deg, var(--brand-purple), var(--brand-magenta)); box-shadow: 0 0 35px rgba(124,58,237,0.4); z-index: 2; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid rgba(255,255,255,0.2);">
+                    <i class="fas fa-circle-nodes" style="font-size: 38px; color: #fff;"></i>
+                </div>
+                <!-- Nodes -->
+                <div class="about-orbit-node" style="width: 14px; height: 14px; top: 40px; left: 100px;"></div>
+                <div class="about-orbit-node" style="width: 10px; height: 10px; bottom: 50px; right: 80px; background: var(--brand-cyan); box-shadow: 0 0 10px var(--brand-cyan);"></div>
+                <div class="about-orbit-node" style="width: 12px; height: 12px; top: 180px; left: 40px;"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Strip -->
+<section class="stats-section" style="padding: 50px 0; background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%); border-y: 1px solid rgba(124,58,237,0.15);">
+    <div class="container stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); text-align: center; gap: 30px;">
+        <div class="stat-item" style="display: flex; flex-direction: column; align-items: center; padding: 10px;">
+            <span class="stat-number" style="font-size: 56px; font-weight: 800; color: var(--brand-purple); line-height: 1;">300+</span>
+            <span class="stat-label" style="font-size: 16px; font-weight: 700; color: #fff; margin-top: 12px;">Over 300 Projects</span>
+            <p style="font-size: 13px; color: #94a3b8; max-width: 260px; margin-top: 8px;">Successfully delivered over 300 projects globally for Data Solutions, AI and Managed Services.</p>
+        </div>
+        <div class="stat-item" style="display: flex; flex-direction: column; align-items: center; padding: 10px; border-left: 1px solid rgba(255,255,255,0.08); border-right: 1px solid rgba(255,255,255,0.08);">
+            <span class="stat-number" style="font-size: 56px; font-weight: 800; color: var(--brand-magenta); line-height: 1;">330+</span>
+            <span class="stat-label" style="font-size: 16px; font-weight: 700; color: #fff; margin-top: 12px;">330+ Engineers</span>
+            <p style="font-size: 13px; color: #94a3b8; max-width: 260px; margin-top: 8px;">A dedicated team of over 330 expert engineers from multiple ethnicities located across various countries.</p>
+        </div>
+        <div class="stat-item" style="display: flex; flex-direction: column; align-items: center; padding: 10px;">
+            <span class="stat-number" style="font-size: 56px; font-weight: 800; color: var(--brand-cyan); line-height: 1;">26</span>
+            <span class="stat-label" style="font-size: 16px; font-weight: 700; color: #fff; margin-top: 12px;">26 Countries</span>
+            <p style="font-size: 13px; color: #94a3b8; max-width: 260px; margin-top: 8px;">Proudly serving clients in 26 countries, bringing a diverse global perspective to every project we undertake.</p>
+        </div>
+    </div>
+</section>
+
+<!-- What We Do Section -->
+<section class="section" id="what-we-do" style="background: var(--bg-primary); padding: 80px 0;">
+    <div class="container">
+        <div class="section-header" style="text-align: center; max-width: 700px; margin: 0 auto 50px;">
+            <div class="badge-brand"><i class="fas fa-gear"></i> Core Mandate</div>
+            <h2 class="section-title" style="font-size: 32px;">What We <span>Do</span></h2>
+            <p class="section-desc" style="margin-top: 10px;">Artha Solutions is a premier business and technology consulting firm committing to make data and analytics work for you.</p>
+        </div>
+        
+        <div class="card-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
+            <!-- Breathe Data -->
+            <div class="card card-brand-hover" style="padding: 30px; display: flex; flex-direction: column; gap: 18px; border-radius: var(--border-radius-md); background: var(--bg-secondary);">
+                <div class="card-icon-box" style="background: rgba(124, 58, 237, 0.08); color: var(--brand-purple); width: 54px; height: 54px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px;">
+                    <i class="fas fa-wind"></i>
+                </div>
+                <h3 class="card-title" style="font-size: 20px; font-weight: 700; color: var(--text-primary);">We Breathe Data</h3>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6; color: var(--text-secondary);">
+                    Our expertise in data management fuels innovation and drives intelligent solutions for your business. From data integration to analytics, we make data work for you.
+                </p>
+            </div>
+            
+            <!-- Success to AI -->
+            <div class="card card-brand-hover" style="padding: 30px; display: flex; flex-direction: column; gap: 18px; border-radius: var(--border-radius-md); background: var(--bg-secondary);">
+                <div class="card-icon-box" style="background: rgba(217, 70, 239, 0.08); color: var(--brand-magenta); width: 54px; height: 54px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px;">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h3 class="card-title" style="font-size: 20px; font-weight: 700; color: var(--text-primary);">We Ensure Success to AI</h3>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6; color: var(--text-secondary);">
+                    By providing high-quality, well-governed data, we empower AI systems to perform at their best. Your AI initiatives succeed with accurate, reliable data at the core.
+                </p>
+            </div>
+            
+            <!-- Support 24x7 -->
+            <div class="card card-brand-hover" style="padding: 30px; display: flex; flex-direction: column; gap: 18px; border-radius: var(--border-radius-md); background: var(--bg-secondary);">
+                <div class="card-icon-box" style="background: rgba(6, 182, 212, 0.08); color: var(--brand-cyan); width: 54px; height: 54px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px;">
+                    <i class="fas fa-headset"></i>
+                </div>
+                <h3 class="card-title" style="font-size: 20px; font-weight: 700; color: var(--text-primary);">We Support you 24x7</h3>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6; color: var(--text-secondary);">
+                    Our dedicated team is always available to offer expert assistance around the clock, ensuring your business runs smoothly and efficiently, no matter the time zone.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Company Profile Feature Detail -->
+<section class="section-alt" style="padding: 80px 0; background: var(--bg-secondary);">
+    <div class="container feature-split" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 50px; align-items: center;">
+        <div class="feature-content">
+            <div class="badge-brand"><i class="fas fa-building"></i> Overview</div>
+            <h2 class="feature-title" style="font-size: 32px; margin-bottom: 20px;">Corporate <span>Profile</span></h2>
+            <p class="feature-desc" style="font-size: 15px; line-height: 1.7; color: var(--text-secondary); margin-bottom: 16px;">
+                Artha Solutions is a premier business and technology consulting firm providing insights and expertise in both business strategy and technical implementations. Artha brings forward thinking and innovation to a new level with years of technical and industry expertise and complete transparency.
+            </p>
+            <p class="feature-desc" style="font-size: 15px; line-height: 1.7; color: var(--text-secondary);">
+                Artha has a proven track record working with SMBs (small to medium businesses) to Fortune 500 enterprises turning their business and technology challenges into business value.
             </p>
         </div>
-        <div class="hero-visual">
-            <div class="ai-graphic-container" style="max-width: 280px; height: 280px;">
-                <div class="ai-node-circle circle-md"></div>
-                <div class="ai-core" style="width: 80px; height: 80px; background: var(--grad-primary);">
-                    <i class="fas fa-users" style="font-size: 28px;"></i>
+        <div class="feature-visual" style="border-radius: var(--border-radius-lg); overflow: hidden; box-shadow: var(--card-shadow); border: 1px solid var(--border-color);">
+            <div style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.04) 0%, rgba(217, 70, 239, 0.04) 100%); padding: 40px; display: flex; flex-direction: column; gap: 20px;">
+                <div style="font-size: 18px; font-weight: 700; color: var(--text-primary); border-left: 4px solid var(--brand-purple); padding-left: 14px;">
+                    Value Driven Methodology
+                </div>
+                <p style="font-size: 14px; line-height: 1.6; color: var(--text-secondary);">
+                    We translate complicated data silos into integrated frameworks. Our focus is ensuring data quality and corporate accountability are built directly into implementation pipelines.
+                </p>
+                <div style="display: flex; gap: 14px; margin-top: 10px;">
+                    <span style="font-size: 12px; font-weight: 700; color: var(--brand-purple); text-transform: uppercase;">✔ Accuracy</span>
+                    <span style="font-size: 12px; font-weight: 700; color: var(--brand-magenta); text-transform: uppercase;">✔ Transparency</span>
+                    <span style="font-size: 12px; font-weight: 700; color: var(--brand-cyan); text-transform: uppercase;">✔ Efficiency</span>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Core Stats Strip -->
-<section class="stats-section" style="padding: 40px 0; background: var(--grad-cyan-blue);">
-    <div class="container stats-grid">
-        <div class="stat-item">
-            <span class="stat-number">300+</span>
-            <span class="stat-label">Projects Delivered Globally</span>
-        </div>
-        <div class="stat-item">
-            <span class="stat-number">330+</span>
-            <span class="stat-label">Expert Certified Engineers</span>
-        </div>
-        <div class="stat-item">
-            <span class="stat-number">26</span>
-            <span class="stat-label">Countries Served Proudly</span>
-        </div>
-    </div>
-</section>
-
-<!-- Vision & Mission Split -->
-<section class="section" id="vision-mission">
-    <div class="container feature-split">
-        <div class="feature-content">
-            <div class="hero-badge"><i class="fas fa-eye"></i> Future Vision</div>
-            <h2 class="feature-title">Our Vision & Mission</h2>
-            <p class="feature-desc" style="font-size: 18px; font-weight: 700; color: var(--text-primary); line-height: 1.5; margin-bottom: 20px;">
-                "To be the trusted global leader in data-driven innovation, transforming businesses through cutting-edge technology and strategic insights."
-            </p>
-            <p class="feature-desc">
-                At Artha, our mission is to deliver transformative business solutions that leverage the power of data, advanced analytics, and AI. We help organizations make smarter decisions and unlock new opportunities for innovation.
+<!-- Vision & Mission Side-by-Side -->
+<section class="section" style="padding: 80px 0; background: var(--bg-primary);">
+    <div class="container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 30px;">
+        <!-- Vision Card -->
+        <div class="card card-brand-hover" style="padding: 35px; border-radius: var(--border-radius-md); background: var(--bg-secondary); border-top: 4px solid var(--brand-purple);">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+                <i class="fas fa-eye" style="font-size: 24px; color: var(--brand-purple);"></i>
+                <h3 style="font-size: 22px; font-weight: 700; color: var(--text-primary);">Vision</h3>
+            </div>
+            <p style="font-size: 15px; line-height: 1.7; color: var(--text-secondary);">
+                To be the trusted global leader in data-driven innovation, transforming businesses through cutting-edge technology and strategic insights, empowering organizations to achieve sustainable growth and operational excellence.
             </p>
         </div>
-        <div class="feature-visual feature-visual-glow">
-            <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80" alt="Team discussing corporate mission and values layouts">
+        
+        <!-- Mission Card -->
+        <div class="card card-brand-hover" style="padding: 35px; border-radius: var(--border-radius-md); background: var(--bg-secondary); border-top: 4px solid var(--brand-magenta);">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+                <i class="fas fa-bullseye" style="font-size: 24px; color: var(--brand-magenta);"></i>
+                <h3 style="font-size: 22px; font-weight: 700; color: var(--text-primary);">Mission</h3>
+            </div>
+            <p style="font-size: 15px; line-height: 1.7; color: var(--text-secondary);">
+                At Artha Data Solutions, our mission is to deliver transformative business solutions that leverage the power of data, advanced analytics, and AI. We are committed to helping organizations optimize their operations, make smarter decisions, and unlock new opportunities for innovation, while providing unparalleled support and expertise across industries.
+            </p>
         </div>
     </div>
 </section>
 
-<!-- Core Strengths Section -->
-<section class="section-alt" id="why-artha">
-    <div class="container">
-        <div class="section-header">
-            <span class="section-subtitle">Why Artha Solutions</span>
-            <h2 class="section-title">Key Strengths driving <span>Transformation</span></h2>
+<!-- Experience & Future Roadmap Split Grid -->
+<section class="section-alt" style="padding: 80px 0; background: var(--bg-secondary);">
+    <div class="container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 50px;">
+        <!-- Experience & Exposure -->
+        <div class="card" style="padding: 35px; border-radius: var(--border-radius-lg); background: var(--bg-primary); border: 1px solid var(--border-color); box-shadow: var(--card-shadow);">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+                <div class="card-icon-box" style="background: rgba(124, 58, 237, 0.08); color: var(--brand-purple); width: 44px; height: 44px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px;">
+                    <i class="fas fa-award"></i>
+                </div>
+                <h3 style="font-size: 22px; font-weight: 700; color: var(--text-primary);">Experience & Exposure</h3>
+            </div>
+            <p style="font-size: 14px; line-height: 1.6; color: var(--text-secondary); margin-bottom: 20px;">
+                We transform complex data challenges into strategic business opportunities. Our AI-driven platforms and expert engineers ensure that we deliver seamless, high-quality data management, governance, and integration services tailored to your business needs. We prioritize accuracy, efficiency, and compliance, empowering our clients with data-driven insights and 24×7 support.
+            </p>
+            <h4 style="font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px;">Key Strengths:</h4>
+            <ul class="strengths-list">
+                <li>Over 330 engineers driving innovation and data transformation</li>
+                <li>Expertise in AI-driven data governance, MDM, and SAP S/4HANA migrations</li>
+                <li>Serving clients across 26 countries with customized data solutions</li>
+                <li>24×7 support for seamless operations and continuous improvement</li>
+                <li>Proven track record of delivering faster time-to-market and regulatory compliance</li>
+            </ul>
         </div>
         
-        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));">
-            <!-- Strength 1 -->
-            <div class="card">
-                <div class="card-icon-box"><i class="fas fa-bullseye"></i></div>
-                <h3 class="card-title">Precision Execution</h3>
-                <p class="card-desc">Tailored, results-driven strategies aligned with your goals. Our adaptable methodologies ensure seamless execution across all projects.</p>
+        <!-- Governance & AI Roadmap -->
+        <div class="card" style="padding: 35px; border-radius: var(--border-radius-lg); background: var(--bg-primary); border: 1px solid var(--border-color); box-shadow: var(--card-shadow);">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+                <div class="card-icon-box" style="background: rgba(6, 182, 212, 0.08); color: var(--brand-cyan); width: 44px; height: 44px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px;">
+                    <i class="fas fa-map-location-dot"></i>
+                </div>
+                <h3 style="font-size: 22px; font-weight: 700; color: var(--text-primary);">Governance & AI</h3>
+            </div>
+            <p style="font-size: 14px; line-height: 1.6; color: var(--text-secondary); margin-bottom: 20px;">
+                Our future roadmap is centered on innovation, scalability, and continuous improvement. We are committed to expanding our AI-driven solutions, further enhancing data governance, and optimizing business processes for our clients.
+            </p>
+            <h4 style="font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px;">Future Roadmap:</h4>
+            <ul class="roadmap-list">
+                <li>Expand AI and automation capabilities for more intelligent data solutions</li>
+                <li>Drive cloud adoption and migration strategies to future-proof businesses</li>
+                <li>Invest in predictive analytics to enhance operational efficiency</li>
+                <li>Strengthen global partnerships to deliver tailored, industry-specific solutions</li>
+                <li>Foster innovation with a focus on sustainability and digital transformation</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- Why Artha Solutions Detailed Cards -->
+<section class="section" id="why-artha" style="padding: 80px 0; background: var(--bg-primary);">
+    <div class="container">
+        <div class="section-header" style="text-align: center; max-width: 700px; margin: 0 auto 55px;">
+            <div class="badge-brand"><i class="fas fa-star"></i> Core Advantages</div>
+            <h2 class="section-title" style="font-size: 32px;">Why <span>Artha Solutions</span></h2>
+            <p class="section-desc" style="margin-top: 10px;">Our values drive alignment, performance, and long-term customer success.</p>
+        </div>
+        
+        <div class="card-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 30px;">
+            <!-- Advantage Group 1 -->
+            <div class="card card-brand-hover" style="padding: 30px; border-radius: var(--border-radius-md); background: var(--bg-secondary); border-top: 4px solid var(--brand-purple);">
+                <div style="font-size: 32px; font-weight: 800; color: rgba(124, 58, 237, 0.15); margin-bottom: 15px;">01</div>
+                <h3 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 18px;">Transform & Optimize</h3>
+                <ul class="strengths-list" style="margin: 0; padding: 0;">
+                    <li style="font-size: 13.5px; margin-bottom: 10px;"><strong>Transform with Precision:</strong> Tailored, results-driven strategies aligned with your goals.</li>
+                    <li style="font-size: 13.5px; margin-bottom: 10px;"><strong>End-to-End Solutions:</strong> From strategy to execution, we optimize transformation across multiple industries.</li>
+                    <li style="font-size: 13.5px; margin-bottom: 0;">Our adaptable methodologies ensure seamless execution across all projects.</li>
+                </ul>
             </div>
             
-            <!-- Strength 2 -->
-            <div class="card">
-                <div class="card-icon-box"><i class="fas fa-lightbulb"></i></div>
-                <h3 class="card-title">Data-Driven Innovation</h3>
-                <p class="card-desc">Utilize AI-driven insights and big data analytics for smarter business decisions. Adopt scalable solutions and stay agile with cutting-edge technologies.</p>
+            <!-- Advantage Group 2 -->
+            <div class="card card-brand-hover" style="padding: 30px; border-radius: var(--border-radius-md); background: var(--bg-secondary); border-top: 4px solid var(--brand-magenta);">
+                <div style="font-size: 32px; font-weight: 800; color: rgba(217, 70, 239, 0.15); margin-bottom: 15px;">02</div>
+                <h3 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 18px;">Lead & Innovate</h3>
+                <ul class="strengths-list" style="margin: 0; padding: 0;">
+                    <li style="font-size: 13.5px; margin-bottom: 10px;"><strong>Innovation with Data:</strong> Utilize AI-driven insights and big data analytics for smarter decisions.</li>
+                    <li style="font-size: 13.5px; margin-bottom: 10px;"><strong>Built-In Agility:</strong> Adopt scalable solutions and stay agile with cutting-edge AI and automation.</li>
+                    <li style="font-size: 13.5px; margin-bottom: 0;"><strong>Expertise Across Domains:</strong> Deep knowledge provides market-specific, compliant solutions.</li>
+                </ul>
             </div>
             
-            <!-- Strength 3 -->
-            <div class="card">
-                <div class="card-icon-box"><i class="fas fa-handshake"></i></div>
-                <h3 class="card-title">Trusted Long-Term Partner</h3>
-                <p class="card-desc">Over 300 successful projects with long-term partnerships, 24/7 managed services, database administration, and continuous improvement support.</p>
+            <!-- Advantage Group 3 -->
+            <div class="card card-brand-hover" style="padding: 30px; border-radius: var(--border-radius-md); background: var(--bg-secondary); border-top: 4px solid var(--brand-cyan);">
+                <div style="font-size: 32px; font-weight: 800; color: rgba(6, 182, 212, 0.15); margin-bottom: 15px;">03</div>
+                <h3 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 18px;">Trust & Managed Support</h3>
+                <ul class="strengths-list" style="margin: 0; padding: 0;">
+                    <li style="font-size: 13.5px; margin-bottom: 10px;"><strong>Partner for Success:</strong> Over 300 successful projects with long-term partnership commitments.</li>
+                    <li style="font-size: 13.5px; margin-bottom: 0;"><strong>24/7 Managed Services & Support:</strong> End-to-end enterprise data management, cloud services, and real-time analytics.</li>
+                </ul>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Awards and Recognition Section -->
-<section class="section" id="awards">
+<!-- Awards and Recognition Timeline Section -->
+<section class="section-alt" id="awards-timeline" style="padding: 80px 0; background: var(--bg-secondary);">
     <div class="container">
-        <div class="section-header">
-            <span class="section-subtitle">Awards & Recognition</span>
-            <h2 class="section-title">Ecosystem <span>Achievements</span></h2>
-            <p class="section-desc">Our dedication to data engineering and customer success has been recognized globally by our technology partners.</p>
+        <div class="section-header" style="text-align: center; max-width: 700px; margin: 0 auto 50px;">
+            <div class="badge-brand"><i class="fas fa-trophy"></i> Recognition</div>
+            <h2 class="section-title" style="font-size: 32px;">Awards and <span>Recognition</span></h2>
+            <p class="section-desc" style="margin-top: 10px;">Our dedication to faster rollouts, ecosystem alignment, and customer value has been honored globally.</p>
         </div>
         
-        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;">
-            <!-- Award 2024 -->
-            <div class="card" style="padding: 24px;">
-                <span style="font-size: 13px; font-weight: 700; color: var(--accent-blue);">2024</span>
-                <h4 style="font-size: 16px; margin: 12px 0 8px;">Qlik Customer Success Champion</h4>
-                <p style="font-size: 13px; color: var(--text-secondary);">Honored as Customer Success Champion for North America.</p>
+        <div class="timeline-container">
+            <!-- 2024 -->
+            <div class="timeline-item">
+                <div class="timeline-year">2024</div>
+                <h4 style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-top: 5px; margin-bottom: 6px;">Qlik North America Customer Success Champion</h4>
+                <p class="timeline-desc">Artha Solutions Named Qlik North America Customer Success Champion of 2024 in recognition of excellence in deploying scalable customer analytic environments.</p>
             </div>
             
-            <!-- Award 2023 -->
-            <div class="card" style="padding: 24px;">
-                <span style="font-size: 13px; font-weight: 700; color: var(--accent-blue);">2023</span>
-                <h4 style="font-size: 16px; margin: 12px 0 8px;">Qlik Best Enabled Partner</h4>
-                <p style="font-size: 13px; color: var(--text-secondary);">Recognized for exceptional enablement and technical certifications.</p>
+            <!-- 2023 -->
+            <div class="timeline-item">
+                <div class="timeline-year">2023</div>
+                <h4 style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-top: 5px; margin-bottom: 6px;">Qlik Best Enabled Partner of the Year</h4>
+                <p class="timeline-desc">Artha Solutions is recognized as the Best Enabled Partner of the Year 2023 by Qlik, celebrating team-wide technical enablement and certifications.</p>
             </div>
             
-            <!-- Award 2022 -->
-            <div class="card" style="padding: 24px;">
-                <span style="font-size: 13px; font-weight: 700; color: var(--accent-blue);">2022</span>
-                <h4 style="font-size: 16px; margin: 12px 0 8px;">Talend Partner of the Year</h4>
-                <p style="font-size: 13px; color: var(--text-secondary);">Americas NorAm System Integrator Partner of the Year.</p>
+            <!-- 2022 Award 2 -->
+            <div class="timeline-item">
+                <div class="timeline-year">2022</div>
+                <h4 style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-top: 5px; margin-bottom: 6px;">Talend Partner of the Year (NorAm)</h4>
+                <p class="timeline-desc">Artha Solutions received 2022 Partner of the year (NorAm) Award from Talend during Engageapalooza for excellence in North American operations.</p>
             </div>
             
-            <!-- Award 2021 -->
-            <div class="card" style="padding: 24px;">
-                <span style="font-size: 13px; font-weight: 700; color: var(--accent-blue);">2021</span>
-                <h4 style="font-size: 16px; margin: 12px 0 8px;">Talend Americas Partner</h4>
-                <p style="font-size: 13px; color: var(--text-secondary);">Honored in recognition of excellence within the Talend partner ecosystem.</p>
+            <!-- 2022 Award 1 -->
+            <div class="timeline-item">
+                <div class="timeline-year">2022</div>
+                <h4 style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-top: 5px; margin-bottom: 6px;">Talend Data Masters Award (Client Spotlight)</h4>
+                <p class="timeline-desc">Artha Solutions client, Commonwealth Care Alliance awarded with Data Masters Award by Talend, demonstrating the real-world impact of our integrations.</p>
+            </div>
+            
+            <!-- 2021 -->
+            <div class="timeline-item">
+                <div class="timeline-year">2021</div>
+                <h4 style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-top: 5px; margin-bottom: 6px;">Talend Americas Partner of the Year</h4>
+                <p class="timeline-desc">Artha Solutions is honored with “Americas Partner of the Year” by Talend in recognition of excellence within the Talend partner ecosystem.</p>
+            </div>
+            
+            <!-- 2020 -->
+            <div class="timeline-item">
+                <div class="timeline-year">2020</div>
+                <h4 style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-top: 5px; margin-bottom: 6px;">Talend Partner of the Year (SI Category)</h4>
+                <p class="timeline-desc">Artha Solutions received Talend partner of the Year Award in the category of “System Integrator” of the Year 2020.</p>
+            </div>
+            
+            <!-- 2019 -->
+            <div class="timeline-item">
+                <div class="timeline-year">2019</div>
+                <h4 style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-top: 5px; margin-bottom: 6px;">Global Channel Partner Supporting Talend Core Values</h4>
+                <p class="timeline-desc">Artha Solutions honored with Global Award - Channel Partner Supporting Talend Core Values at Partner Excellence Awards.</p>
+            </div>
+            
+            <!-- 2018 -->
+            <div class="timeline-item" style="margin-bottom: 0;">
+                <div class="timeline-year">2018</div>
+                <h4 style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-top: 5px; margin-bottom: 6px;">Talend Global Partner MDM Award</h4>
+                <p class="timeline-desc">Artha Solutions received “MDM Award” at Talend’s 2018 Global Partner Awards for faster MDM Implementation.</p>
             </div>
         </div>
+    </div>
+</section>
+
+<!-- Upcoming Events Center -->
+<section class="section" id="events" style="padding: 80px 0; background: var(--bg-primary);">
+    <div class="container">
+        <div class="section-header" style="text-align: center; max-width: 700px; margin: 0 auto 50px;">
+            <div class="badge-brand"><i class="fas fa-calendar-days"></i> Global Reach</div>
+            <h2 class="section-title" style="font-size: 32px;">Upcoming <span>Events</span></h2>
+            <p class="section-desc" style="margin-top: 10px;">Meet our team and learn about the next generation of data-driven architectures.</p>
+        </div>
+        
+        <div class="card-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
+            <!-- Event 1 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between; padding: 26px; border-radius: var(--border-radius-md); background: var(--bg-secondary);">
+                <div>
+                    <span style="font-size: 12px; color: var(--brand-purple); text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Webinar &middot; May 31</span>
+                    <h4 style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Future Ready Data Foundation From AI Pilot to Production Value</h4>
+                    <p class="card-desc" style="font-size: 13.5px; line-height: 1.5; color: var(--text-secondary);">
+                        Explores how organizations can overcome data hurdles by building a future-ready data foundation that enables trusted, scalable, and AI-ready pipelines.
+                    </p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: var(--brand-purple); font-size: 13px; font-weight: 700; text-decoration: none;">Register Now <i class="fas fa-chevron-right" style="font-size: 11px; margin-left: 4px;"></i></a>
+                </div>
+            </div>
+            
+            <!-- Event 2 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between; padding: 26px; border-radius: var(--border-radius-md); background: var(--bg-secondary);">
+                <div>
+                    <span style="font-size: 12px; color: var(--brand-magenta); text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Event &middot; Apr 13</span>
+                    <h4 style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Artha Solutions Proud Sponsor of Qlik Connect 2026</h4>
+                    <p class="card-desc" style="font-size: 13.5px; line-height: 1.5; color: var(--text-secondary);">
+                        Gaylord Palms Resort & Convention Center, Kissimmee, Florida. Artha Solutions is showcases AI-ready data foundations, data integration, and MDM solutions at Booth# SS15.
+                    </p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: var(--brand-magenta); font-size: 13px; font-weight: 700; text-decoration: none;">Meet Us There <i class="fas fa-chevron-right" style="font-size: 11px; margin-left: 4px;"></i></a>
+                </div>
+            </div>
+            
+            <!-- Event 3 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between; padding: 26px; border-radius: var(--border-radius-md); background: var(--bg-secondary);">
+                <div>
+                    <span style="font-size: 12px; color: var(--brand-cyan); text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Event &middot; Nov 27</span>
+                    <h4 style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Qlik AI Reality Tour 2025 – Bengaluru</h4>
+                    <p class="card-desc" style="font-size: 13.5px; line-height: 1.5; color: var(--text-secondary);">
+                        Artha Solutions is proud to host the Qlik AI Reality Tour 2025 in Bengaluru, an exclusive event designed to turn data, analytics, and AI initiatives into real business value.
+                    </p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: var(--brand-cyan); font-size: 13px; font-weight: 700; text-decoration: none;">View Details <i class="fas fa-chevron-right" style="font-size: 11px; margin-left: 4px;"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Blog Insights Section -->
+<section class="section-alt" id="blogs" style="padding: 80px 0; background: var(--bg-secondary);">
+    <div class="container">
+        <div class="section-header" style="text-align: center; max-width: 700px; margin: 0 auto 50px;">
+            <div class="badge-brand"><i class="fas fa-newspaper"></i> Insights</div>
+            <h2 class="section-title" style="font-size: 32px;">Latest <span>Blog Posts</span></h2>
+            <p class="section-desc" style="margin-top: 10px;">Articles and best-practices compiled by our senior data architects and strategists.</p>
+        </div>
+        
+        <div class="card-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
+            <!-- Blog 1 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between; padding: 26px; border-radius: var(--border-radius-md); background: var(--bg-primary);">
+                <div>
+                    <span style="font-size: 11px; color: var(--text-tertiary); font-weight: 700; display: block; margin-bottom: 8px;">BY THINKARTHA &middot; BLOG</span>
+                    <h4 style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">How To Overcome 9 Common Data Governance Challenges</h4>
+                    <p class="card-desc" style="font-size: 13.5px; line-height: 1.5; color: var(--text-secondary);">
+                        Overcoming Data Governance Challenges. As data becomes the most household word of the decade, the discussions about data governance are massively confusing.
+                    </p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/blogs" class="card-link" style="color: var(--brand-purple); font-size: 13px; font-weight: 700; text-decoration: none;">Read More <i class="fas fa-arrow-right" style="font-size: 11px; margin-left: 4px;"></i></a>
+                </div>
+            </div>
+            
+            <!-- Blog 2 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between; padding: 26px; border-radius: var(--border-radius-md); background: var(--bg-primary);">
+                <div>
+                    <span style="font-size: 11px; color: var(--text-tertiary); font-weight: 700; display: block; margin-bottom: 8px;">BY THINKARTHA &middot; BLOG</span>
+                    <h4 style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">The Evolution of Digital Transformation Services in Banking</h4>
+                    <p class="card-desc" style="font-size: 13.5px; line-height: 1.5; color: var(--text-secondary);">
+                        Shifting from traditional banking services to the digital space is only one aspect of digital transformation services. The way in which banks optimize operations...
+                    </p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/blogs" class="card-link" style="color: var(--brand-purple); font-size: 13px; font-weight: 700; text-decoration: none;">Read More <i class="fas fa-arrow-right" style="font-size: 11px; margin-left: 4px;"></i></a>
+                </div>
+            </div>
+            
+            <!-- Blog 3 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between; padding: 26px; border-radius: var(--border-radius-md); background: var(--bg-primary);">
+                <div>
+                    <span style="font-size: 11px; color: var(--text-tertiary); font-weight: 700; display: block; margin-bottom: 8px;">BY THINKARTHA &middot; BLOG</span>
+                    <h4 style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Decoding Efficiency: The Transformative Role of Data Catalogues in Banking</h4>
+                    <p class="card-desc" style="font-size: 13.5px; line-height: 1.5; color: var(--text-secondary);">
+                        Data catalogues play a pivotal role in organizations by assisting in managing, organizing, and governance of data assets, enhancing operational efficiency.
+                    </p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/blogs" class="card-link" style="color: var(--brand-purple); font-size: 13px; font-weight: 700; text-decoration: none;">Read More <i class="fas fa-arrow-right" style="font-size: 11px; margin-left: 4px;"></i></a>
+                </div>
+            </div>
+            
+            <!-- Blog 4 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between; padding: 26px; border-radius: var(--border-radius-md); background: var(--bg-primary);">
+                <div>
+                    <span style="font-size: 11px; color: var(--text-tertiary); font-weight: 700; display: block; margin-bottom: 8px;">BY SAIGEETA PILLI &middot; BLOG, RETAIL</span>
+                    <h4 style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Streaming Data Processing: Real-Time Insights for Retail</h4>
+                    <p class="card-desc" style="font-size: 13.5px; line-height: 1.5; color: var(--text-secondary);">
+                        In the modern retail world, the ability to process and act on data as it happens has become a competitive necessity. Customers expect seamless, instant response.
+                    </p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/blogs" class="card-link" style="color: var(--brand-purple); font-size: 13px; font-weight: 700; text-decoration: none;">Read More <i class="fas fa-arrow-right" style="font-size: 11px; margin-left: 4px;"></i></a>
+                </div>
+            </div>
+            
+            <!-- Blog 5 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between; padding: 26px; border-radius: var(--border-radius-md); background: var(--bg-primary);">
+                <div>
+                    <span style="font-size: 11px; color: var(--text-tertiary); font-weight: 700; display: block; margin-bottom: 8px;">BY THINKARTHA &middot; BLOG</span>
+                    <h4 style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Fastest MDM Rollout</h4>
+                    <p class="card-desc" style="font-size: 13.5px; line-height: 1.5; color: var(--text-secondary);">
+                        Carhartt Inc., a prominent apparel company, has been manufacturing and supplying work wear since 1889. Discover how their MDM system rollout was optimized.
+                    </p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/blogs" class="card-link" style="color: var(--brand-purple); font-size: 13px; font-weight: 700; text-decoration: none;">Read More <i class="fas fa-arrow-right" style="font-size: 11px; margin-left: 4px;"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Bottom CTA -->
+<section class="section" style="text-align: center; background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--brand-glow-purple) 100%); padding: 80px 0;">
+    <div class="container">
+        <h2 class="section-title" style="font-size: 32px; margin-bottom: 15px;">Build a Future-Ready <span>Data Strategy</span></h2>
+        <p class="section-desc" style="max-width: 600px; margin: 0 auto 30px; font-size: 15px; color: var(--text-secondary);">Learn how Artha Solutions can streamline your master data management, cloud migration, and AI implementations.</p>
+        <a href="/contact-us" class="btn btn-primary btn-glow" style="background: linear-gradient(135deg, var(--brand-purple), var(--brand-magenta)); border: none; box-shadow: 0 0 20px rgba(124,58,237,0.25);">Get Started Today</a>
     </div>
 </section>
 {% endblock %}
