@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block title %}BFSI - Data Intelligence & Compliance for Financial Services{% endblock %}
+
+{% block content %}
+<!-- Subpage Hero -->
+<section class="hero" style="min-height: 60vh; padding-top: calc(var(--nav-height) + 60px); padding-bottom: 60px;" id="bfsi-hero">
+    <div class="hero-bg-glow hero-glow-1"></div>
+    <div class="container hero-grid" style="grid-template-columns: 1.2fr 0.8fr;">
+        <div class="hero-content">
+            <div class="hero-badge"><i class="fas fa-bank"></i> Financial Services</div>
+            <h1 class="hero-title" style="font-size: 48px;">
+                Data Intelligence <span>for BFSI</span>
+            </h1>
+            <p class="hero-desc">
+                We make data governance and compliance easy for financial institutions. Our solutions guarantee data quality, active deduplication, and secure audit tracking.
+            </p>
+        </div>
+        <div class="hero-visual">
+            <div class="ai-graphic-container" style="max-width: 300px; height: 300px;">
+                <div class="ai-node-circle circle-lg"></div>
+                <div class="ai-core" style="width: 80px; height: 80px; background: var(--grad-cyan-blue);">
+                    <i class="fas fa-vault" style="font-size: 28px;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Strip -->
+<section class="stats-section" style="padding: 40px 0;" id="bfsi-stats">
+    <div class="container stats-grid">
+        <div class="stat-item">
+            <span class="stat-number">80%</span>
+            <span class="stat-label">Ensured Data Reliability via Active Reconciliation</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number">75%</span>
+            <span class="stat-label">Enhanced Stewardship & Error Handling</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number">85%</span>
+            <span class="stat-label">Validation Accuracy with Custom Rules</span>
+        </div>
+    </div>
+</section>
+
+<!-- What BFSI Demands -->
+<section class="section-alt" id="bfsi-demands">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-subtitle">Core Pillars</span>
+            <h2 class="section-title">What <span>BFSI Demands</span></h2>
+            <p class="section-desc">Create stronger, secure financial data processes by leveraging Artha's industry expertise and proven methodologies.</p>
+        </div>
+        
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));">
+            <!-- 1. Customer Lifetime Value -->
+            <div class="card">
+                <div class="card-icon-box"><i class="fas fa-hand-holding-dollar"></i></div>
+                <h3 class="card-title">Customer Lifetime Value Prediction</h3>
+                <p class="card-desc">Analyze transactional and behavioral history to predict lifetime value, focusing retention programs on key clients.</p>
+            </div>
+            
+            <!-- 2. Personalized Banking Services -->
+            <div class="card">
+                <div class="card-icon-box"><i class="fas fa-user-gear"></i></div>
+                <h3 class="card-title">Personalized Banking Services</h3>
+                <p class="card-desc">Utilize real-time data analysis to feed customized financial recommendations and services to mobile banking platforms.</p>
+            </div>
+            
+            <!-- 3. Regulatory Compliance Management -->
+            <div class="card">
+                <div class="card-icon-box"><i class="fas fa-shield-halved"></i></div>
+                <h3 class="card-title">Regulatory Compliance</h3>
+                <p class="card-desc">Automate compliance reporting and active audit trails, simplifying adherence to ever-evolving global financial rules.</p>
+            </div>
+            
+            <!-- 4. Fraud Detection and Prevention -->
+            <div class="card">
+                <div class="card-icon-box"><i class="fas fa-mask"></i></div>
+                <h3 class="card-title">Fraud Detection & Prevention</h3>
+                <p class="card-desc">Deploy predictive ML models to detect anomalies and flag potentially fraudulent transactions in real-time, safeguarding depositors.</p>
+            </div>
+            
+            <!-- 5. Customer Segmentation and Targeting -->
+            <div class="card">
+                <div class="card-icon-box"><i class="fas fa-circle-nodes"></i></div>
+                <h3 class="card-title">Customer Segmentation</h3>
+                <p class="card-desc">Create high-fidelity client profiles, enabling marketing teams to launch hyper-targeted product offers with higher conversions.</p>
+            </div>
+            
+            <!-- 6. Operational Efficiency Optimization -->
+            <div class="card">
+                <div class="card-icon-box"><i class="fas fa-chart-line"></i></div>
+                <h3 class="card-title">Operational Efficiency</h3>
+                <p class="card-desc">Identify process bottlenecks, automate data entry reconciliations, and reduce operational overheads across branches.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Success Story Showcase -->
+<section class="section" id="bfsi-showcase">
+    <div class="container feature-split">
+        <div class="feature-visual feature-visual-glow">
+            <img src="https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=800&q=80" alt="Financial charts and digital analysis boards">
+        </div>
+        <div class="feature-content">
+            <div class="hero-badge"><i class="fas fa-file-invoice-dollar"></i> Success Story</div>
+            <h2 class="feature-title">Optimizing Retail Banking with Data Quality Automation</h2>
+            <p class="feature-desc">Artha Solutions helped a leading retail bank implement Talend's data management platform to clean inconsistent customer metadata, establish a governed stewardship portal, and eliminate duplicate records.</p>
+            <p class="feature-desc">The initiative resulted in a 65% reduction in account profile errors and automated 90% of daily validation checks.</p>
+            <a href="/contact-us" class="btn btn-primary">Request Full Case Study <i class="fas fa-download btn-icon"></i></a>
+        </div>
+    </div>
+</section>
+
+<!-- Bottom CTA -->
+<section class="section-alt" style="text-align: center;" id="bfsi-cta">
+    <div class="container">
+        <h2 class="section-title">Upgrade Your <span>Financial Data Architecture</span></h2>
+        <p class="section-desc" style="max-width: 600px; margin: 0 auto 30px;">Speak with our certified financial systems architects to map a secure, compliant path for your data integration.</p>
+        <a href="/contact-us" class="btn btn-primary btn-glow">Speak with a BFSI Architect</a>
+    </div>
+</section>
+{% endblock %}

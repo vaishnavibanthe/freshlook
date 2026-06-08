@@ -1,0 +1,318 @@
+{% extends "base.html" %}
+
+{% block title %}Talend Consulting Services{% endblock %}
+
+{% block extra_meta %}
+<meta name="description" content="Unlock the full potential of your data with our expert Talend Consulting Services. Streamline integration, enhance data quality, and drive business insights.">
+{% endblock %}
+
+{% block content %}
+<style>
+:root {
+    --brand-color: #10b981;
+    --brand-color-rgb: 16, 185, 129;
+    --brand-glow: rgba(16, 185, 129, 0.15);
+}
+@keyframes spinOrbit {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+@keyframes spinOrbitReverse {
+    0% { transform: rotate(360deg); }
+    100% { transform: rotate(0deg); }
+}
+.brand-orbit-node {
+    position: absolute;
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--brand-color);
+}
+.card-brand-hover {
+    transition: all 0.3s ease;
+}
+.card-brand-hover:hover {
+    border-color: var(--brand-color) !important;
+    box-shadow: 0 10px 30px var(--brand-glow) !important;
+    transform: translateY(-5px);
+}
+.badge-brand {
+    background: var(--brand-glow);
+    color: var(--brand-color);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+</style>
+
+<!-- Detail Hero -->
+<section class="hero" style="min-height: 60vh; padding-top: calc(var(--nav-height) + 60px); padding-bottom: 60px;">
+    <div class="hero-bg-glow hero-glow-1" style="background: radial-gradient(circle, rgba(16,185,129,0.2) 0%, transparent 70%);"></div>
+    <div class="container hero-grid" style="grid-template-columns: 1.2fr 0.8fr;">
+        <div class="hero-content">
+            <div class="hero-badge badge-brand"><i class="fas fa-handshake"></i> Strategic Partners &middot; Qlik Talend</div>
+            <h1 class="hero-title" style="font-size: clamp(36px, 5vw, 48px); line-height: 1.15; margin-bottom: 18px;">
+                Talend <span>Consulting Services</span>
+            </h1>
+            <p class="hero-desc">
+                Unlock the full potential of your data with our expert Talend Consulting Services. Streamline integration, enhance data quality, and drive business insights with tailored solutions that meet your unique needs.
+            </p>
+            <div class="hero-buttons" style="display:flex; gap:14px; flex-wrap:wrap;">
+                <a href="/contact-us" class="btn btn-primary btn-glow" style="background: linear-gradient(135deg, #10b981, #059669); border: none;">Consult Partner Architect <i class="fas fa-chevron-right btn-icon"></i></a>
+                <a href="#solutions" class="btn btn-outline">Explore Solutions</a>
+            </div>
+            
+            <div class="sol-tag-row" style="margin-top: 30px; display: flex; gap: 10px; flex-wrap: wrap;">
+                <span class="sol-tag-pill" style="font-size: 12px; background: rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);"><i class="fas fa-certificate" style="color: #10b981; margin-right: 6px;"></i> Platinum Partner</span>
+                <span class="sol-tag-pill" style="font-size: 12px; background: rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);"><i class="fas fa-trophy" style="color: #10b981; margin-right: 6px;"></i> Partner of the Year x6</span>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="brand-graphic" style="position: relative; width: 100%; height: 350px; display: flex; justify-content: center; align-items: center;">
+                <div style="position: absolute; width: 280px; height: 280px; border-radius: 50%; background: radial-gradient(circle, rgba(16,185,129,0.15) 0%, transparent 70%); filter: blur(20px);"></div>
+                <div style="position: absolute; width: 260px; height: 260px; border: 1px dashed rgba(16,185,129,0.2); border-radius: 50%; animation: spinOrbit 25s linear infinite;"></div>
+                <div style="position: absolute; width: 180px; height: 180px; border: 1px dashed rgba(5,150,105,0.3); border-radius: 50%; animation: spinOrbitReverse 15s linear infinite;"></div>
+                <div class="ai-core" style="width: 90px; height: 90px; background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 0 30px rgba(16,185,129,0.4); z-index: 2; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-cube" style="font-size: 32px; color: #fff;"></i>
+                </div>
+                <!-- Nodes -->
+                <div class="brand-orbit-node" style="width: 12px; height: 12px; background: #10b981; top: 75px; left: 85px;"></div>
+                <div class="brand-orbit-node" style="width: 8px; height: 8px; background: #34d399; bottom: 85px; right: 95px;"></div>
+                <div class="brand-orbit-node" style="width: 10px; height: 10px; background: #6ee7b7; top: 180px; right: 65px;"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Our Talend Solutions -->
+<section class="section-alt" id="solutions">
+    <div class="container">
+        <div class="section-header" style="text-align: center; margin-bottom: 50px;">
+            <span class="section-subtitle">Data Modernization</span>
+            <h2 class="section-title">Our Talend <span>Solutions</span></h2>
+            <p class="section-desc">Accelerate your digital transformation and drive data availability with modern cloud architectures.</p>
+        </div>
+        
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 30px;">
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(16,185,129,0.1); color: #10b981;">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                </div>
+                <h3 class="card-title">Cloud Migration</h3>
+                <p class="card-desc">We help you accelerate your migration from Talend on-premises to Talend Cloud. Eliminate the need for infrastructure management, ongoing product upgrades, and lengthy testing and deployment cycles. Simplify your cloud migration journey with our expertise.</p>
+            </div>
+            
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(16,185,129,0.1); color: #10b981;">
+                    <i class="fas fa-users-cog"></i>
+                </div>
+                <h3 class="card-title">Customer 360</h3>
+                <p class="card-desc">Accelerate your Customer 360 journey with the Talend platform by unifying past transactions and current interactions to better predict future customer behavior. Discover more about our Customer 360 solutions.</p>
+            </div>
+            
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(16,185,129,0.1); color: #10b981;">
+                    <i class="fas fa-database"></i>
+                </div>
+                <h3 class="card-title">Data Lakes</h3>
+                <p class="card-desc">We build modern data lakes with Talend and advanced technologies to unify structured and unstructured data, enabling fast, reliable discovery, analysis, reporting, and downstream consumption.</p>
+            </div>
+            
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(16,185,129,0.1); color: #10b981;">
+                    <i class="fas fa-server"></i>
+                </div>
+                <h3 class="card-title">Data Modernization</h3>
+                <p class="card-desc">Talend's data modernization solutions enable streamlined, accelerated data integration, providing clean, reliable access across cloud and on-premises. Drive digital transformation, improve data quality, and make faster, informed decisions with Talend.</p>
+            </div>
+            
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(16,185,129,0.1); color: #10b981;">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3 class="card-title">Data Governance</h3>
+                <p class="card-desc">Data Governance ensures your data's availability, usability, integrity, and security through Talend Data Fabric. With our Talend expertise, we provide end-to-end governance services, helping medium to large enterprises manage data effectively in line with internal standards.</p>
+            </div>
+            
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(16,185,129,0.1); color: #10b981;">
+                    <i class="fas fa-project-diagram"></i>
+                </div>
+                <h3 class="card-title">Metadata Management</h3>
+                <p class="card-desc">Talend Metadata Management offers a unified view of data assets, enhancing discovery, governance, and lineage for better visibility and compliance. It fosters collaboration between business and IT, boosting data transparency and enabling confident, informed decision-making across the organization.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Years of Partnership spotlight -->
+<section class="section" style="background: linear-gradient(180deg, var(--bg-primary) 0%, rgba(16,185,129,0.03) 50%, var(--bg-primary) 100%);">
+    <div class="container" style="text-align: center; max-width: 800px; padding: 60px 20px;">
+        <div style="font-size: 64px; font-weight: 800; color: #10b981; line-height: 1; margin-bottom: 20px;">11+ Years</div>
+        <h3 style="font-size: 24px; color: var(--text-primary); margin-bottom: 15px;">Partnership with Talend</h3>
+        <p style="font-size: 18px; color: var(--text-secondary); line-height: 1.6; margin: 0 auto 30px;">
+            Recognized as a Partner of the Year within different categories <strong>6 times in a row since 2018</strong>. This validation of our capabilities guarantees top-tier architectural design and migration support for your pipelines.
+        </p>
+        <a href="/contact-us" class="btn btn-primary btn-glow" style="background: linear-gradient(135deg, #10b981, #059669); border: none;">Consult Partner Architect</a>
+    </div>
+</section>
+
+<!-- Our Talend Expertise -->
+<section class="section-alt" id="expertise">
+    <div class="container">
+        <div class="section-header" style="text-align: center; margin-bottom: 50px;">
+            <span class="section-subtitle">Deep Expertise</span>
+            <h2 class="section-title">Our Talend <span>Expertise</span></h2>
+            <p class="section-desc">Our certified engineers possess deep capabilities across the entire Talend platform catalog.</p>
+        </div>
+        
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;">
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-sign-in-alt" style="color: #10b981;"></i> Talend Data Integration
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">Our Talend Data Integration service helps you unify, cleanse, and move data across multiple systems seamlessly. By leveraging Talend’s powerful ETL capabilities, we enable efficient data consolidation and transformation, ensuring real-time access to critical business insights.</p>
+            </div>
+            
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-check-circle" style="color: #10b981;"></i> Talend Data Quality
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">With Talend Data Quality, we help you maintain clean, accurate, and reliable data across your organization. Our solutions focus on data profiling, validation, and standardization, ensuring that your data meets the highest quality standards for better decision-making and compliance.</p>
+            </div>
+            
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-network-wired" style="color: #10b981;"></i> Talend Big Data (Integration)
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">Our Talend Big Data Integration services simplify the processing of massive datasets, enabling you to scale and accelerate your data pipelines. We leverage Talend’s big data connectors to integrate and transform high-volume data from diverse sources for real-time analytics and insights.</p>
+            </div>
+            
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-link" style="color: #10b981;"></i> Talend Application Integration
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">Artha Solutions provides Talend Application Integration services to seamlessly connect and orchestrate workflows between different enterprise applications. Whether on-premise or in the cloud, we ensure your apps communicate efficiently, driving improved operational efficiency and agility.</p>
+            </div>
+            
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-user-shield" style="color: #10b981;"></i> Talend Data Governance
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">Talend Data Governance solutions at Artha Solutions empower you to define, implement, and enforce policies for data access, security, and usage. By ensuring compliance and data stewardship, we help you establish trust and accountability throughout your data lifecycle.</p>
+            </div>
+            
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-cloud" style="color: #10b981;"></i> Talend Cloud
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">Our Talend Cloud services deliver flexible, scalable, and secure cloud-based data management solutions. Whether you need data integration, quality management, or governance in the cloud, we offer comprehensive support to help you harness the power of cloud-native data operations.</p>
+            </div>
+            
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-book" style="color: #10b981;"></i> Talend Data Catalog
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">With Talend Data Catalog, we provide a centralized platform to discover, organize, and govern your data assets. By offering robust metadata management and data lineage tracking, we help you maintain a clear understanding of your data sources for enhanced analytics and governance.</p>
+            </div>
+            
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-map-marked-alt" style="color: #10b981;"></i> Talend Data Mapper
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">Our Talend Data Mapper services enables seamless transformation of complex data formats such as XML, JSON, EDI, and COBOL. By leveraging Talend’s advanced mapping capabilities, we simplify data integration and ensure accurate, high-quality data exchange across systems for accelerating your digital transformation journey.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Resources section -->
+<section class="section" id="resources">
+    <div class="container">
+        <div class="section-header" style="text-align: center; margin-bottom: 50px;">
+            <span class="section-subtitle">Insights</span>
+            <h2 class="section-title">Partner <span>Resources</span></h2>
+            <p class="section-desc">Stay updated with our joint announcements, webinars, and operational case studies.</p>
+        </div>
+        
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
+            <!-- Resource 1 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #10b981; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Artha Advantage, Banking</span>
+                    <h4 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Artha Solutions & Qlik as Associate Partners for ET BFSI CXO Conclave 2025, Mumbai</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">Artha Solutions and Qlik are proud to join as Associate Partners at the ET BFSI CXO Conclave...</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #10b981;">Learn more <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <!-- Resource 2 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #10b981; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Artha Advantage, Qlik</span>
+                    <h4 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Accelerating Migration from Informatica with B’etl</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">Informatica PowerCenter 10.5 is reaching end-of-support. Join this exclusive webinar to learn how enterprises are migrating to...</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #10b981;">Learn more <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <!-- Resource 3 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #10b981; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Artha Advantage, Banking, Qlik</span>
+                    <h4 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Future Bank India Conclave 2025: Data, Compliance & AI for Banks</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">Explore how Indian banks can achieve compliance, data maturity, and AI readiness to lead the digital future....</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #10b981;">Learn more <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <!-- Resource 4 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #10b981; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Artha Advantage, Artificial Intelligence, Qlik</span>
+                    <h4 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Visit the Data Distillery at Qlik Connect 2025, Booth #1013 in Orlando</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">Experience the journey of your enterprise data like never before. At Artha Data Solutions, we believe data...</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #10b981;">Learn more <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <!-- Resource 5 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #10b981; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Artha Advantage, MDM, Retail</span>
+                    <h4 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Boosting Operational Efficiency with Managed Services for Healthcare</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">Read how a leading healthcare organization partnered with Artha Solutions for Managed Services and modernized processes to...</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #10b981;">Download Now! <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <!-- Resource 6 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #10b981; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Artha Advantage, Data Quality, MDM, Retail</span>
+                    <h4 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Unified Customer Data and Improved Operational Efficiency for a Perfume Manufacturer</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">A perfume manufacturer, plagued by scattered customer data, partnered with Artha Solutions. Implementing MDM and Dynamic Ingestion...</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #10b981;">Download Now! <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Bottom CTA -->
+<section class="section-alt" style="text-align: center; background: linear-gradient(180deg, var(--bg-secondary) 0%, rgba(16,185,129,0.05) 100%);">
+    <div class="container">
+        <h2 class="section-title">Initiate Your <span>Integration Journey</span></h2>
+        <p class="section-desc" style="max-width: 600px; margin: 0 auto 30px;">Artha Solutions helps you deploy, clean, and govern Qlik Talend platforms at up to 40% savings.</p>
+        <a href="/contact-us" class="btn btn-primary btn-glow" style="background: linear-gradient(135deg, #10b981, #059669); border: none; box-shadow: 0 0 20px rgba(16,185,129,0.3);">Request a Joint Solution Demo</a>
+    </div>
+</section>
+{% endblock %}

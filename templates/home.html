@@ -1,0 +1,982 @@
+{% extends "base.html" %}
+
+{% block title %}Think Data... Think Artha | Enterprise AI & Data Services Provider{% endblock %}
+
+{% block body_class %}home-page-light{% endblock %}
+
+{% block content %}
+<!-- 1. Hero Section (Synapse Style) -->
+<section class="hero-slider" id="home-hero-slider">
+    <div class="slider-track">
+        <!-- Slide 1: Power up your data & AI workflows with ease (current) -->
+        <div class="slide active">
+            <div class="slide-video-container">
+                <div class="slide-poster" style="background-image: url('{{ url_for('static', filename='img/vimeo_thumb_1198668451.jpg') }}');"></div>
+                <iframe class="hero-vimeo-bg" src="https://player.vimeo.com/video/1198668451?autoplay=1&loop=1&muted=1&background=1" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+                <div class="hero-video-overlay"></div>
+            </div>
+            <div class="container hero-grid">
+                <div class="hero-content">
+                    <div class="hero-badge">
+                        <i class="fas fa-sparkles"></i> AI-POWERED PLATFORM - VERSION 3.0
+                    </div>
+                    <h1 class="hero-title">
+                        Power up your <span class="highlight">data & AI</span> workflows with ease.
+                    </h1>
+                    <p class="hero-desc">
+                        Maximize the value of your enterprise data. We modernize data lakes, consolidate master data, and build robust AI-ready foundations with metadata-driven pipelines.
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="/contact-us" class="btn btn-primary">Start Data Assessment <i class="fas fa-arrow-right btn-icon"></i></a>
+                        <a href="/artha-advantage" class="btn btn-secondary">Explore Accelerators</a>
+                    </div>
+                </div>
+                
+                <div class="hero-visual">
+                    <div class="ai-graphic-container">
+                        <!-- Glowing Orbit Circles -->
+                        <div class="ai-node-circle circle-lg">
+                            <div class="orbiting-node" style="top: 0; left: 50%; transform: translate(-50%, -50%);"><i class="fas fa-database"></i></div>
+                            <div class="orbiting-node" style="bottom: 50%; left: 50%; transform: translate(-50%, 50%);"><i class="fas fa-lock"></i></div>
+                        </div>
+                        <div class="ai-node-circle circle-md">
+                            <div class="orbiting-node" style="top: 50%; left: 0; transform: translate(-50%, -50%);"><i class="fas fa-cloud"></i></div>
+                            <div class="orbiting-node" style="top: 50%; right: 0; transform: translate(50%, -50%);"><i class="fas fa-network-wired"></i></div>
+                        </div>
+                        <div class="ai-node-circle circle-sm">
+                            <div class="orbiting-node" style="top: 15%; left: 15%;"><i class="fas fa-chart-line"></i></div>
+                            <div class="orbiting-node" style="bottom: 15%; right: 15%;"><i class="fas fa-microchip"></i></div>
+                        </div>
+                        <!-- Core Neural Node -->
+                        <div class="ai-core">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: Watch IDC Webcast -->
+        <div class="slide">
+            <div class="slide-video-container">
+                <div class="slide-poster" style="background-image: url('{{ url_for('static', filename='img/vimeo_thumb_1015578521.jpg') }}');"></div>
+                <iframe class="hero-vimeo-bg" data-vimeo-id="1015578521" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+                <div class="hero-video-overlay"></div>
+            </div>
+            <div class="container hero-grid">
+                <div class="hero-content">
+                    <div class="hero-badge">
+                        <i class="fas fa-video"></i> ON-DEMAND WEBCAST
+                    </div>
+                    <h1 class="hero-title">
+                        Future-Ready Data Foundation: <span class="highlight">AI Pilot to Production</span>
+                    </h1>
+                    <p class="hero-desc">
+                        Featuring IDC Research VP Stewart Bond and Qlik experts. Learn how organizations overcome data fragmentation, build trusted data lineage, and scale AI workflows successfully.
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="/webinar-view/future-ready-data-foundation-from-ai-pilot-to-production-value" class="btn btn-primary webcast-play-trigger" data-vimeo-id="1158932159">Watch Webcast <i class="fas fa-play btn-icon"></i></a>
+                        <a href="/white-papers/future-ready-data-foundation-from-ai-pilot-to-production-value" class="btn btn-secondary">Get Spotlight Paper</a>
+                    </div>
+                </div>
+                
+                <div class="hero-visual">
+                    <div class="slider-visual-card">
+                        <a href="/webinar-view/future-ready-data-foundation-from-ai-pilot-to-production-value" class="webcast-preview-banner webcast-play-trigger" data-vimeo-id="1158932159">
+                            <!-- Logo -->
+                            <div class="webcast-card-logo" style="display: flex; gap: 8px; align-items: center; border-radius: 4px;">
+                                <span style="font-family: var(--font-heading); font-weight: 800; font-size: 16px; color: #2563eb; letter-spacing: 0.5px;">IDC</span>
+                                <span style="font-family: var(--font-heading); font-weight: 500; font-size: 13px; color: #64748b; letter-spacing: 0.5px;">Spotlight</span>
+                            </div>
+                            <div class="play-overlay">
+                                <i class="fas fa-play"></i>
+                            </div>
+                            <div class="webcast-card-info">
+                                <span class="webcast-card-tag">On-Demand Event</span>
+                                <h4 class="webcast-card-title">From AI Pilot to Production Value</h4>
+                                <p class="webcast-card-meta">IDC & Qlik Guest Speaker • Stewart Bond</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Download IDC Spotlight Paper -->
+        <div class="slide">
+            <div class="slide-video-container">
+                <div class="slide-poster" style="background-image: url('{{ url_for('static', filename='img/vimeo_thumb_1019769159.jpg') }}');"></div>
+                <iframe class="hero-vimeo-bg" data-vimeo-id="1019769159" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+                <div class="hero-video-overlay"></div>
+            </div>
+            <div class="container hero-grid">
+                <div class="hero-content">
+                    <div class="hero-badge">
+                        <i class="fas fa-file-invoice"></i> IDC ANALYST SPOTLIGHT
+                    </div>
+                    <h1 class="hero-title">
+                        AI and Data Modernization: <span class="highlight">Value Realization</span>
+                    </h1>
+                    <p class="hero-desc">
+                        Get the official IDC Analyst Connection report. Read how data readiness, integration checkpoints, and robust cataloging map direct value to your enterprise AI roadmap.
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="/white-papers/ai-and-data-modernization-enterprise-readiness-and-value-realization" class="btn btn-primary">Download Paper <i class="fas fa-file-download btn-icon"></i></a>
+                        <a href="/artha-advantage" class="btn btn-secondary">Explore Accelerators</a>
+                    </div>
+                </div>
+                
+                <div class="hero-visual">
+                    <div class="ai-graphic-container purple-theme">
+                        <!-- Glowing Orbit Circles -->
+                        <div class="ai-node-circle circle-lg">
+                            <div class="orbiting-node" style="top: 0; left: 50%; transform: translate(-50%, -50%);" title="Value Realization"><i class="fas fa-award"></i></div>
+                            <div class="orbiting-node" style="bottom: 50%; left: 50%; transform: translate(-50%, 50%);" title="Analyst Connection"><i class="fas fa-file-contract"></i></div>
+                        </div>
+                        <div class="ai-node-circle circle-md">
+                            <div class="orbiting-node" style="top: 50%; left: 0; transform: translate(-50%, -50%);" title="Data Governance"><i class="fas fa-shield-halved"></i></div>
+                            <div class="orbiting-node" style="top: 50%; right: 0; transform: translate(50%, -50%);" title="Data Ingestion"><i class="fas fa-database"></i></div>
+                        </div>
+                        <div class="ai-node-circle circle-sm">
+                            <div class="orbiting-node" style="top: 15%; left: 15%;" title="Integration Checkpoints"><i class="fas fa-code-branch"></i></div>
+                            <div class="orbiting-node" style="bottom: 15%; right: 15%;" title="Growth Metrics"><i class="fas fa-chart-line"></i></div>
+                        </div>
+                        <!-- Core Neural Node -->
+                        <div class="ai-core">
+                            <i class="fas fa-book-open"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Data Governance Page Banner -->
+        <div class="slide">
+            <div class="slide-video-container">
+                <div class="slide-poster" style="background-image: url('{{ url_for('static', filename='img/vimeo_thumb_1019769117.jpg') }}');"></div>
+                <iframe class="hero-vimeo-bg" data-vimeo-id="1019769117" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+                <div class="hero-video-overlay"></div>
+            </div>
+            <div class="container hero-grid">
+                <div class="hero-content">
+                    <div class="hero-badge" style="background-color: rgba(236, 72, 153, 0.05) !important; border-color: rgba(236, 72, 153, 0.15) !important; color: #ec4899 !important;">
+                        <i class="fas fa-shield-alt"></i> ACTIVE DATA GOVERNANCE
+                    </div>
+                    <h1 class="hero-title">
+                        Govern, Audit, and Trust <span class="highlight" style="background: linear-gradient(135deg, #7c3aed 0%, #ec4899 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Your Enterprise Data</span>
+                    </h1>
+                    <p class="hero-desc">
+                        Enforce compliance, mask sensitive PII fields, and construct end-to-end data lineage maps automatically. Build confidence in your data catalog across all departments.
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="/solutions/data-governance" class="btn btn-primary" style="background: linear-gradient(135deg, #7c3aed 0%, #ec4899 100%); border-color: transparent;">Explore Governance <i class="fas fa-shield-check btn-icon"></i></a>
+                        <a href="/contact-us" class="btn btn-secondary">Request Consultation</a>
+                    </div>
+                </div>
+                
+                <div class="hero-visual">
+                    <div class="slider-visual-card">
+                        <div class="readiness-card-box" style="border-color: rgba(236, 72, 153, 0.2); box-shadow: 0 20px 40px rgba(236, 72, 153, 0.05);">
+                            <div class="readiness-score-header">
+                                <span>Data Lineage & Governance Map</span>
+                                <span class="score-percentage" style="color: #ec4899;"><i class="fas fa-shield-check"></i> Compliant</span>
+                            </div>
+                            <div class="progress-bar-container" style="margin-bottom: 20px;">
+                                <div class="progress-bar-fill" style="width: 100%; background: linear-gradient(135deg, #7c3aed 0%, #ec4899 100%);"></div>
+                            </div>
+                            <div class="readiness-metrics-list" style="gap: 12px;">
+                                <div class="metric-row pass">
+                                    <i class="fas fa-shield-alt" style="color: #ec4899; font-size: 16px; margin-top: 2px;"></i>
+                                    <div class="metric-info">
+                                        <strong>Active Policy Guardrails</strong>
+                                        <span>PII masking & role access restrictions enforced</span>
+                                    </div>
+                                </div>
+                                <div class="metric-row pass">
+                                    <i class="fas fa-sitemap" style="color: #7c3aed; font-size: 16px; margin-top: 2px;"></i>
+                                    <div class="metric-info">
+                                        <strong>Metadata Cataloging</strong>
+                                        <span>Automatic schemas harvested from Snowflake & SAP</span>
+                                    </div>
+                                </div>
+                                <div class="metric-row pass">
+                                    <i class="fas fa-history" style="color: #06b6d4; font-size: 16px; margin-top: 2px;"></i>
+                                    <div class="metric-info">
+                                        <strong>End-to-End Lineage</strong>
+                                        <span>Track data from source ingestion to BI dashboards</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slider Controls -->
+    <div class="slider-controls">
+        <button class="slider-arrow prev-slide" aria-label="Previous Slide"><i class="fas fa-chevron-left"></i></button>
+        <button class="slider-arrow next-slide" aria-label="Next Slide"><i class="fas fa-chevron-right"></i></button>
+    </div>
+    
+    <!-- Slider Indicator Dots -->
+    <div class="slider-indicator-dots">
+        <span class="slider-dot active"></span>
+        <span class="slider-dot"></span>
+        <span class="slider-dot"></span>
+        <span class="slider-dot"></span>
+    </div>
+</section>
+
+<!-- Client Logos Section -->
+<section class="section" id="client-logos" style="background-color: #fafaf9; padding: 60px 0; border-bottom: 1px solid rgba(15, 23, 42, 0.05); overflow: hidden;">
+    <div class="container">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <span class="section-subtitle-badge" style="margin-bottom: 10px;">Our Clients</span>
+            <h3 style="font-family: var(--font-heading); font-size: 24px; font-weight: 700; color: #0f172a; margin-top: 5px;">Trusted by Leading Global Enterprises</h3>
+        </div>
+    </div>
+    
+    <div class="logo-scroll-container">
+        <div class="logo-scroll-track">
+            <!-- Group 1 -->
+            <div class="logo-scroll-group">
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/CCA.svg" alt="Commonwealth Care Alliance"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/04/Managed-Health-Care-Associates-MHA.svg" alt="Managed Healthcare Associates"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/Danamon-2.svg" alt="PT Bank Danamon"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/Security-Bank-1.svg" alt="Security Bank"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/DBS.svg" alt="DBS Bank"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/Bank-of-America.svg" alt="Bank of America"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/FastMed.svg" alt="FastMed"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/Generali.svg" alt="Generali"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/Lowes.svg" alt="Lowes"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/Hilton.svg" alt="Hilton"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/ESTEE-Lauder.svg" alt="Estee Lauder"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/CITI.svg" alt="Citi Bank"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/American-Express.svg" alt="American Express"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/Visa.svg" alt="Visa"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/Verizon.svg" alt="Verizon"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/Reliant.svg" alt="Reliant Energy"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/Globe.svg" alt="Globe Telecom"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/Gap.svg" alt="Gap"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/match.com_.svg" alt="Match.com"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/mandiri.svg" alt="Bank Mandiri"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/zafin.svg" alt="Zafin"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/nupco.svg" alt="Nupco"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/CenturyLink.svg" alt="CenturyLink"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/HIL.png" alt="HIL Limited"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/MT-Bank.svg" alt="M&T Bank"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/maxix.svg" alt="Maxis"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/IRVING.svg" alt="Irving Oil"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/Pegadaian.svg" alt="Pegadaian"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/Lincolin-Finance.svg" alt="Lincoln Finance"></div>
+            </div>
+            <!-- Group 2 (Seamless loop duplicate) -->
+            <div class="logo-scroll-group">
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/CCA.svg" alt="Commonwealth Care Alliance"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/04/Managed-Health-Care-Associates-MHA.svg" alt="Managed Healthcare Associates"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/Danamon-2.svg" alt="PT Bank Danamon"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/Security-Bank-1.svg" alt="Security Bank"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/DBS.svg" alt="DBS Bank"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/Bank-of-America.svg" alt="Bank of America"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/FastMed.svg" alt="FastMed"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/Generali.svg" alt="Generali"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/Lowes.svg" alt="Lowes"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/Hilton.svg" alt="Hilton"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/ESTEE-Lauder.svg" alt="Estee Lauder"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/CITI.svg" alt="Citi Bank"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/American-Express.svg" alt="American Express"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/Visa.svg" alt="Visa"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/Verizon.svg" alt="Verizon"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/Reliant.svg" alt="Reliant Energy"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/Globe.svg" alt="Globe Telecom"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/Gap.svg" alt="Gap"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/match.com_.svg" alt="Match.com"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/mandiri.svg" alt="Bank Mandiri"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/zafin.svg" alt="Zafin"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/nupco.svg" alt="Nupco"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/CenturyLink.svg" alt="CenturyLink"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/HIL.png" alt="HIL Limited"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/MT-Bank.svg" alt="M&T Bank"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/maxix.svg" alt="Maxis"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/IRVING.svg" alt="Irving Oil"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/Pegadaian.svg" alt="Pegadaian"></div>
+                <div class="scrolling-logo-card"><img src="https://www.thinkartha.com/wp-content/uploads/2025/01/Lincolin-Finance.svg" alt="Lincoln Finance"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+<!-- 3. The Challenge Section -->
+<section class="section tech-dot-grid" id="challenges">
+    <div class="container">
+        <div class="section-header" style="text-align: center;">
+            <span class="section-subtitle-badge">The Challenge</span>
+            <h2 class="section-title">Why Traditional Data Stacks <span>Stall</span></h2>
+            <p class="section-desc" style="max-width: 680px; margin: 0 auto;">Enterprises face complex data quality and integration barriers that block scalable production AI.</p>
+        </div>
+        
+        <div class="challenge-grid">
+            <!-- Card 1 -->
+            <div class="challenge-card synapse-glass-card neon-border-glow">
+                <div class="challenge-card-icon red">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3>Unclear Information</h3>
+                <p>Untrustworthy pipelines, silent schema drift, and poor metadata cataloging leave enterprise models operating on bad or obsolete datasets.</p>
+            </div>
+            
+            <!-- Card 2 -->
+            <div class="challenge-card synapse-glass-card neon-border-glow">
+                <div class="challenge-card-icon yellow">
+                    <i class="fas fa-network-wired"></i>
+                </div>
+                <h3>Scattered Data</h3>
+                <p>Unconsolidated transactional databases, siloed cloud warehouses, and scattered ERP systems prevent building a single unified version of truth.</p>
+            </div>
+            
+            <!-- Card 3 -->
+            <div class="challenge-card synapse-glass-card neon-border-glow">
+                <div class="challenge-card-icon blue">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3>Complex Governance</h3>
+                <p>Strict compliance standards, manual data masking rules, and lack of active lineage tracking block pilot-to-production scalability.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Core Key Solutions Section -->
+<section class="section" id="core-solutions" style="background-color: var(--bg-secondary); border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); position: relative; overflow: hidden; padding: 100px 0 90px 0;">
+    <!-- Ambient subtle background glows -->
+    <div class="hero-bg-glow hero-glow-1" style="opacity: 0.15; top: 10%; left: 10%; width: 300px; height: 300px; position: absolute; pointer-events: none;"></div>
+    <div class="hero-bg-glow hero-glow-2" style="opacity: 0.1; bottom: 10%; right: 10%; width: 400px; height: 400px; position: absolute; pointer-events: none;"></div>
+
+    <div class="container" style="position: relative; z-index: 2;">
+        <div class="section-header" style="text-align: center; margin-bottom: 60px;">
+            <span class="section-subtitle-badge">Solutions Hub</span>
+            <h2 class="section-title">Our Key <span>Data & AI Solutions</span></h2>
+            <p class="section-desc" style="max-width: 680px; margin: 0 auto; margin-top: 12px;">Build trusted data architectures, deploy outcome-driven AI engines, and enforce enterprise-grade compliance layers.</p>
+        </div>
+
+        <div class="solutions-grid-4">
+            <!-- Solution 1: Data Readiness for AI -->
+            <div class="solution-card synapse-glass-card hover-glow-cyan">
+                <div class="solution-icon-wrapper cyan">
+                    <div class="icon-glow-ring"></div>
+                    <i class="fas fa-microchip solution-icon animated-brain"></i>
+                </div>
+                <h3>Data Readiness for AI</h3>
+                <p>Cleanse, structure, and tag database records for model ingestion. We build active RAG indexes and verify metadata schema alignments to ensure your enterprise AI is trained on high-fidelity, trusted data.</p>
+                <a href="/artificial-intelligence" class="solution-learn-link">Explore Service <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <!-- Solution 2: Intelligent Decisions -->
+            <div class="solution-card synapse-glass-card hover-glow-purple">
+                <div class="solution-icon-wrapper purple">
+                    <div class="icon-glow-ring"></div>
+                    <i class="fas fa-brain solution-icon animated-chart"></i>
+                </div>
+                <h3>Intelligent Decisions</h3>
+                <p>Deploy AutoML forecasting, dynamic pricing engines, and scenario simulations. We transform historical datasets into active strategic intelligence that drives bottom-line profitability and automated workflows.</p>
+                <a href="/artificial-intelligence/intelligent-solutions" class="solution-learn-link">Explore Service <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <!-- Solution 3: Data Governance -->
+            <div class="solution-card synapse-glass-card hover-glow-red">
+                <div class="solution-icon-wrapper red">
+                    <div class="icon-glow-ring"></div>
+                    <i class="fas fa-shield-halved solution-icon animated-shield"></i>
+                </div>
+                <h3>Data Governance</h3>
+                <p>Establish role-based access controls, active data lineage tracking, and automated GDPR/CCPA masking rules. Enforce regulatory compliance guidelines without slowing down engineering speed.</p>
+                <a href="/solutions/data-governance" class="solution-learn-link">Explore Service <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <!-- Solution 4: Master Data Management -->
+            <div class="solution-card synapse-glass-card hover-glow-yellow">
+                <div class="solution-icon-wrapper yellow">
+                    <div class="icon-glow-ring"></div>
+                    <i class="fas fa-database solution-icon animated-database"></i>
+                </div>
+                <h3>Master Data Management</h3>
+                <p>Consolidate and de-duplicate client databases, vendor accounts, and inventory catalogs across ERP channels. Secure a single, verified golden master profile for all operational business systems.</p>
+                <a href="/solutions/master-data-management" class="solution-learn-link">Explore Service <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- AI ROI Solutions Section -->
+<section class="section ai-roi-hub-section" id="ai-roi-solutions">
+    <!-- Subtle ambient glows -->
+    <div class="hero-bg-glow hero-glow-3" style="opacity: 0.08; top: 20%; right: 10%; width: 400px; height: 400px; position: absolute; pointer-events: none;"></div>
+    <div class="hero-bg-glow hero-glow-1" style="opacity: 0.05; bottom: 10%; left: 5%; width: 350px; height: 350px; position: absolute; pointer-events: none;"></div>
+
+    <div class="container">
+        <div class="section-header" style="text-align: center; margin-bottom: 50px;">
+            <span class="section-subtitle-badge">Outcome Engineering</span>
+            <h2 class="section-title">AI Built Around <span>Your ROI. Not Ours.</span></h2>
+            <p class="section-desc" style="max-width: 680px; margin: 0 auto; margin-top: 12px;">
+                We build production-ready AI models and safety middleware designed to optimize infrastructure costs, validate outcomes, and protect data integrity.
+            </p>
+        </div>
+
+        <div class="ai-roi-grid">
+            <!-- Card 1: AI SniffGuard -->
+            <div class="ai-roi-card sniffguard-theme">
+                <div class="card-badge">Commercial Accelerator</div>
+                <h3>AI SniffGuard</h3>
+                <h4>Active Cost & Security Middleware</h4>
+                <p>
+                    Ensure LLM API calls are cost-efficient and compliant. AI SniffGuard acts as a secure proxy layer that performs real-time rate limiting, dynamic prompt caching, model fallbacks, and automatic PII masking.
+                </p>
+                <ul class="ai-roi-features-list">
+                    <li><i class="fas fa-shield-halved"></i> Real-time cost & latency audits</li>
+                    <li><i class="fas fa-key"></i> Active PII masking & guardrails</li>
+                    <li><i class="fas fa-server"></i> Automated context caching</li>
+                </ul>
+                <a href="/artha-advantage/ai-sniffguard" class="btn btn-outline card-cta" style="border-color: rgba(239, 68, 68, 0.4); color: #ef4444;">
+                    Explore AI SniffGuard <i class="fas fa-arrow-right btn-icon" style="margin-left: 6px;"></i>
+                </a>
+            </div>
+
+            <!-- Card 2: AI ROI Solutions Framework -->
+            <div class="ai-roi-card framework-theme">
+                <div class="card-badge">Enterprise Deployment</div>
+                <h3>AI ROI Framework</h3>
+                <h4>Governed Production AI at Scale</h4>
+                <p>
+                    Deploy secure end-to-end AI applications built specifically for your database workloads. Our framework integrates data ingestion pipelines directly with custom RAG indexes, fine-tuning scripts, and automated action loops.
+                </p>
+                <ul class="ai-roi-features-list">
+                    <li><i class="fas fa-cubes"></i> Custom RAG & semantic indexes</li>
+                    <li><i class="fas fa-sitemap"></i> End-to-end data lineage & security</li>
+                    <li><i class="fas fa-bolt"></i> Runs on MAAC Catalyst orchestration</li>
+                </ul>
+                <a href="/artificial-intelligence/ai-roi-framework" class="btn btn-primary btn-glow card-cta" style="background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%); border: none;">
+                    Explore ROI Framework <i class="fas fa-arrow-right btn-icon" style="margin-left: 6px;"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 4. Analyst Speak Section -->
+<section class="analyst-speak-section" id="analyst-speak">
+    <div class="container">
+        <div class="analyst-speak-grid">
+            <!-- Left Side: Content & Metrics -->
+            <div class="analyst-content-block">
+                <div class="analyst-badge-row">
+                    <span class="section-subtitle-badge" style="margin-bottom: 0;">Analyst Speak</span>
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSf6V6eBl7dUwKIdMe_XPLKzGsvI_mEV7wGw&s" alt="IDC Logo" class="analyst-idc-logo">
+                </div>
+                
+                <h2 class="section-title" style="margin-bottom: 20px; text-align: left;">
+                    Future-Ready Data Foundation: <span>AI Pilot to Production</span>
+                </h2>
+                
+                <p class="section-desc" style="text-align: left; max-width: 100%; margin-bottom: 24px; font-weight: 300;">
+                    According to the IDC Analyst Spotlight, sponsored by Qlik and Artha Solutions, missing the next 12 months on data readiness may allow rivals to lock in key AI advantages around speed, accuracy, and customer trust. Deploying robust enterprise intelligence services is a strategic necessity to scale AI successfully.
+                </p>
+
+                <!-- Metrics Grid -->
+                <div class="analyst-metrics-row">
+                    <div class="analyst-metric-box">
+                        <div class="icon-box"><i class="fas fa-route"></i></div>
+                        <div class="metric-info">
+                            <h4>37%</h4>
+                            <p>Pilot to Production Rate</p>
+                        </div>
+                    </div>
+                    <div class="analyst-metric-box">
+                        <div class="icon-box"><i class="fas fa-rocket"></i></div>
+                        <div class="metric-info">
+                            <h4>+24%</h4>
+                            <p>Faster Innovation</p>
+                        </div>
+                    </div>
+                    <div class="analyst-metric-box">
+                        <div class="icon-box"><i class="fas fa-chart-pie"></i></div>
+                        <div class="metric-info">
+                            <h4>19%</h4>
+                            <p>Average Cost Savings</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CTA Buttons -->
+                <div class="analyst-buttons">
+                    <a href="/white-papers/future-ready-data-foundation-from-ai-pilot-to-production-value" class="btn btn-primary btn-glow">
+                        Download Spotlight Paper <i class="fas fa-file-download btn-icon" style="margin-left: 6px;"></i>
+                    </a>
+                    <a href="/contact-us" class="btn btn-outline" style="border-color: var(--accent-blue); color: var(--accent-blue);">
+                        Request Data Assessment
+                    </a>
+                </div>
+            </div>
+
+            <!-- Right Side: Analyst Image & Floating Overlay -->
+            <div class="analyst-visual-box">
+                <div class="analyst-photo-frame">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8a8kWDH-MUSDrWJoqnW13FeYhZ5l5juM8-Q&s" alt="Stewart Bond - IDC Analyst" class="analyst-img">
+                    <div style="padding: 15px 20px; background-color: #ffffff; border-top: 1px solid rgba(15, 23, 42, 0.05);">
+                        <strong style="display: block; font-size: 14.5px; color: var(--text-primary); font-family: var(--font-heading);">Stewart Bond</strong>
+                        <span style="display: block; font-size: 11px; color: var(--text-secondary); margin-top: 2px;">Research VP, Data Intelligence (IDC)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 5. Step by Step / Works Section -->
+<section class="section tech-dot-grid" id="works-steps">
+    <div class="container">
+        <div class="section-header" style="text-align: center; margin-bottom: 60px;">
+            <span class="section-subtitle-badge">Roadmap</span>
+            <h2 class="section-title">Simple Steps To <span>Data Maturity</span></h2>
+            <p class="section-desc" style="max-width: 680px; margin: 0 auto;">Our straightforward deployment methodology quickly bridges the gap between data silo and governed model insights.</p>
+        </div>
+        
+        <div class="challenge-grid">
+            <!-- Step 1 -->
+            <div class="step-card synapse-glass-card neon-border-glow">
+                <span class="step-num">01</span>
+                <h4 style="font-size: 18px; margin-bottom: 12px; font-weight: 700;">Assess & Discover</h4>
+                <p style="font-size: 14px; line-height: 1.6; position: relative; z-index: 2; margin-bottom: 0;">Run our complimentary AI Data Readiness Evaluation. We scan schema fields, track latency values, and flag masking needs.</p>
+                <div class="roadmap-links">
+                    <a href="/artificial-intelligence/data-readiness" class="roadmap-link-item"><i class="fas fa-shield-halved"></i> AI Data Readiness</a>
+                    <a href="/solutions/data-strategy" class="roadmap-link-item"><i class="fas fa-chess"></i> Data Strategy Consulting</a>
+                    <a href="/artha-advantage/data-insights-platform" class="roadmap-link-item"><i class="fas fa-chart-pie"></i> Metadata Profiling (DIP)</a>
+                </div>
+            </div>
+            
+            <!-- Step 2 -->
+            <div class="step-card synapse-glass-card neon-border-glow">
+                <span class="step-num">02</span>
+                <h4 style="font-size: 18px; margin-bottom: 12px; font-weight: 700;">Integrate & Modernize</h4>
+                <p style="font-size: 14px; line-height: 1.6; position: relative; z-index: 2; margin-bottom: 0;">Connect our accelerators to clean databases, bridge pipeline models, and build high-speed governed lakes.</p>
+                <div class="roadmap-links">
+                    <a href="/artha-advantage/dynamic-ingestion-framework" class="roadmap-link-item"><i class="fas fa-network-wired"></i> Dynamic Ingestion (DIF)</a>
+                    <a href="/artha-advantage/technology-and-data-migration" class="roadmap-link-item"><i class="fas fa-truck-ramp-box"></i> ETL Tool Migration</a>
+                    <a href="/solutions/master-data-management" class="roadmap-link-item"><i class="fas fa-database"></i> Master Data Management</a>
+                </div>
+            </div>
+            
+            <!-- Step 3 -->
+            <div class="step-card synapse-glass-card neon-border-glow">
+                <span class="step-num">03</span>
+                <h4 style="font-size: 18px; margin-bottom: 12px; font-weight: 700;">Optimize & Govern</h4>
+                <p style="font-size: 14px; line-height: 1.6; position: relative; z-index: 2; margin-bottom: 0;">Leverage active governance (SniffGuard) to track cost footprint, maintain security rules, and optimize token flow.</p>
+                <div class="roadmap-links">
+                    <a href="/artha-advantage/ai-sniffguard" class="roadmap-link-item"><i class="fas fa-shield-halved"></i> AI SniffGuard Proxy</a>
+                    <a href="/solutions/data-governance" class="roadmap-link-item"><i class="fas fa-gavel"></i> Data Governance</a>
+                    <a href="/artificial-intelligence/ai-roi-framework" class="roadmap-link-item"><i class="fas fa-cubes"></i> AI ROI Framework</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 5b. Core Industries Section -->
+<section class="section tech-dot-grid" id="home-industries" style="border-top: 1px solid var(--border-color); padding: 80px 0;">
+    <div class="container">
+        <div class="section-header" style="text-align: center; margin-bottom: 50px;">
+            <span class="section-subtitle-badge">Our Focus</span>
+            <h2 class="section-title">Tailored Solutions for <span>Core Industries</span></h2>
+            <p class="section-desc" style="max-width: 680px; margin: 0 auto;">We combine deep domain expertise with modular frameworks to accelerate digital transformation, data quality, and secure AI adoption across key market segments.</p>
+        </div>
+        
+        <div class="industry-carousel-wrapper">
+            <div class="industry-carousel-track" id="industry-track">
+                <!-- 1. Manufacturing -->
+                <a href="/industries/manufacturing" class="industry-card">
+                    <div class="industry-card-text">
+                        <span class="industry-card-tag">Manufacturing</span>
+                        <h4 class="industry-card-title">Streamline Operations & Supply Chain</h4>
+                        <p class="industry-card-desc">Enhance shop floor visibility, reduce equipment downtime, and optimize warehouse logistics with active data cataloging and predictive intelligence.</p>
+                    </div>
+                    <div class="industry-card-img-box">
+                        <img src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80" alt="Engineer working on device in high-tech factory" class="industry-card-img">
+                    </div>
+                </a>
+                
+                <!-- 2. Healthcare -->
+                <a href="/industries/healthcare" class="industry-card">
+                    <div class="industry-card-text">
+                        <span class="industry-card-tag">Healthcare</span>
+                        <h4 class="industry-card-title">Patient Care & Data Interoperability</h4>
+                        <p class="industry-card-desc">Build robust patient identities, resolve cross-system sharing blocks, and run secure voice QA scoring under strict HIPAA and GDPR standards.</p>
+                    </div>
+                    <div class="industry-card-img-box">
+                        <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=600&q=80" alt="Doctors discussing patient health data on tablet" class="industry-card-img">
+                    </div>
+                </a>
+                
+                <!-- 3. BFSI -->
+                <a href="/industries/bfsi" class="industry-card">
+                    <div class="industry-card-text">
+                        <span class="industry-card-tag">BFSI</span>
+                        <h4 class="industry-card-title">Risk Management & Active Compliance</h4>
+                        <p class="industry-card-desc">Deploy ML-based customer identity resolution, automate security controls, and protect transaction assets against model drift and bias.</p>
+                    </div>
+                    <div class="industry-card-img-box">
+                        <img src="https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=600&q=80" alt="Financial charts and graphs showing risk analytics" class="industry-card-img">
+                    </div>
+                </a>
+                
+                <!-- 4. Retail -->
+                <a href="/industries/retail" class="industry-card">
+                    <div class="industry-card-text">
+                        <span class="industry-card-tag">Retail</span>
+                        <h4 class="industry-card-title">Smarter Customer Campaigns</h4>
+                        <p class="industry-card-desc">Merge POS logs and transaction files into a unified Customer 360 view. Drive demand forecasts and optimize pricing workflows.</p>
+                    </div>
+                    <div class="industry-card-img-box">
+                        <img src="{{ url_for('static', filename='img/retail_focus.png') }}" alt="Vibrant digital store front apparel shopping display" class="industry-card-img">
+                    </div>
+                </a>
+            </div>
+            
+            <!-- Carousel Controls -->
+            <div class="industry-carousel-controls">
+                <button class="industry-carousel-arrow" id="industry-prev-btn" aria-label="Previous slide"><i class="fas fa-chevron-left"></i></button>
+                <button class="industry-carousel-arrow" id="industry-next-btn" aria-label="Next slide"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const track = document.getElementById('industry-track');
+        const prevBtn = document.getElementById('industry-prev-btn');
+        const nextBtn = document.getElementById('industry-next-btn');
+        
+        if (track && prevBtn && nextBtn) {
+            prevBtn.addEventListener('click', function() {
+                const cardWidth = track.firstElementChild.getBoundingClientRect().width + 30; // card width + gap
+                track.scrollBy({ left: -cardWidth, behavior: 'smooth' });
+            });
+            
+            nextBtn.addEventListener('click', function() {
+                const cardWidth = track.firstElementChild.getBoundingClientRect().width + 30; // card width + gap
+                track.scrollBy({ left: cardWidth, behavior: 'smooth' });
+            });
+        }
+    });
+</script>
+
+<!-- 6. Proven Impact Section -->
+<section class="section-alt stats-section tech-dot-grid" id="proven-impact" style="border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); padding: 70px 0;">
+    <div class="container">
+        <!-- Section Header -->
+        <div class="section-header" style="text-align: center; margin-bottom: 50px;">
+            <span class="section-subtitle-badge" style="background-color: rgba(124, 58, 237, 0.08); border-color: rgba(124, 58, 237, 0.15); color: #7c3aed;">PROVEN VALUE</span>
+            <h2 class="section-title">Delivering <span>Measurable Outcomes</span></h2>
+            <p class="section-desc" style="max-width: 680px; margin: 20px auto 0;">
+                Our active data reconciliation, automated migrations, and intelligent assessments deliver quantifiable efficiency improvements across enterprise systems.
+            </p>
+        </div>
+
+        <!-- Grid of Impact Cards -->
+        <div class="impact-grid">
+            <!-- Card 1: Metadata Search -->
+            <div class="impact-card">
+                <div>
+                    <div class="impact-card-icon"><i class="fas fa-magnifying-glass"></i></div>
+                    <div class="impact-card-number stat-number" data-target="40%">40%</div>
+                    <h3 class="impact-card-title">Metadata Search Efficiency</h3>
+                    <p class="impact-card-desc">Accelerated data discovery and audit cycles using automated cataloging and lineage checks.</p>
+                </div>
+                <a href="/artha-advantage" class="impact-card-link">Explore Platforms <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <!-- Card 2: Data Accuracy -->
+            <div class="impact-card">
+                <div>
+                    <div class="impact-card-icon"><i class="fas fa-circle-check"></i></div>
+                    <div class="impact-card-number stat-number" data-target="65%">65%</div>
+                    <h3 class="impact-card-title">Enterprise Data Accuracy</h3>
+                    <p class="impact-card-desc">Continuous validation of syntax, schemas, and values to ensure high-fidelity inputs for downstream AI applications.</p>
+                </div>
+                <a href="/data-readiness-assessment" class="impact-card-link">Run Assessment <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <!-- Card 3: Active Reconciliation -->
+            <div class="impact-card">
+                <div>
+                    <div class="impact-card-icon"><i class="fas fa-shield-halved"></i></div>
+                    <div class="impact-card-number stat-number" data-target="80%">80%</div>
+                    <h3 class="impact-card-title">Active Data Reconciliation</h3>
+                    <p class="impact-card-desc">Zero-trust reconciliation of database updates to eliminate data drift and secure transactional assets.</p>
+                </div>
+                <a href="/artha-advantage/ai-sniffguard" class="impact-card-link">Explore SniffGuard <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <!-- Card 4: ETL Migration -->
+            <div class="impact-card">
+                <div>
+                    <div class="impact-card-icon"><i class="fas fa-shuffle"></i></div>
+                    <div class="impact-card-number stat-number" data-target="90%">90%</div>
+                    <h3 class="impact-card-title">ETL Tool Migration</h3>
+                    <p class="impact-card-desc">Automated translation of legacy pipelines to modern cloud architectures with full code mapping.</p>
+                </div>
+                <a href="/contact-us" class="impact-card-link">Migrate Pipelines <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+<!-- 8. Testimonials Section -->
+<section class="section" id="testimonials">
+    <div class="container">
+        <div class="section-header" style="text-align: center; margin-bottom: 60px;">
+            <span class="section-subtitle-badge">Testimonials</span>
+            <h2 class="section-title">What Our <span>Partners & Clients Say</span></h2>
+            <p class="section-desc" style="max-width: 680px; margin: 0 auto; color: #475569; font-size: 16px; font-family: var(--font-body); font-weight: 300;">Trusted by the biggest enterprises and the fastest startups.</p>
+        </div>
+        
+        <div class="testimonials-masonry-grid">
+            <!-- Column 1 -->
+            <div class="testimonial-col">
+                <!-- Top Card: Talend Logo & Rating -->
+                <div class="logo-rating-card">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <svg class="partner-logo-svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#ff6b00" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                            <polyline points="2 17 12 22 22 17"></polyline>
+                            <polyline points="2 12 12 17 22 12"></polyline>
+                        </svg>
+                        <span style="font-weight: 800; font-family: var(--font-heading); color: #0f172a; letter-spacing: -0.5px; font-size: 16px; text-transform: lowercase;">talend</span>
+                    </div>
+                    <div class="rating-stars">
+                        <span class="rating-val">4.9</span>
+                        <i class="fas fa-star star-blue"></i>
+                    </div>
+                </div>
+                
+                <!-- Bottom Card: Steve Brennan Testimonial -->
+                <div class="testimonial-detail-card">
+                    <h4>"For enterprises seeking absolute database scale"</h4>
+                    <p>Consolidating customer databases with Artha's MDM Lite enabled <strong>personalized logistics analytics</strong>, dramatically improving <strong>active dashboard updates</strong> across our entire regional team.</p>
+                    <div class="testimonial-author-block">
+                        <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=150&h=150&q=80" alt="Steve Brennan" class="testimonial-avatar">
+                        <div class="testimonial-author-info">
+                            <span class="testimonial-author-name">Steve Brennan</span>
+                            <span class="testimonial-author-role">Vice President, Data Strategy & Analytics</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Column 2 -->
+            <div class="testimonial-col">
+                <!-- Top Card: Vivek Makan Testimonial -->
+                <div class="testimonial-detail-card">
+                    <h4>"Results That Speak for Themselves"</h4>
+                    <p>During our SAP modernization, Artha Solutions maintained <strong>zero system downtime</strong> and provided <strong>governed compliance pipelines</strong> throughout the standard migration timeline. The process was incredibly smooth.</p>
+                    <div class="testimonial-author-block">
+                        <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&h=150&q=80" alt="Vivek Makan" class="testimonial-avatar">
+                        <div class="testimonial-author-info">
+                            <span class="testimonial-author-name">Vivek Makan</span>
+                            <span class="testimonial-author-role">Director, Managed Healthcare Associates</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Bottom Card: Qlik Logo & Rating -->
+                <div class="logo-rating-card">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <svg class="partner-logo-svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#009845" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path d="M16.24 7.76a6 6 0 1 0 0 8.49"></path>
+                        </svg>
+                        <span style="font-weight: 800; font-family: var(--font-heading); color: #0f172a; letter-spacing: -0.5px; font-size: 16px;">Qlik</span>
+                    </div>
+                    <div class="rating-stars">
+                        <span class="rating-val">4.9</span>
+                        <i class="fas fa-star star-blue"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Column 3 -->
+            <div class="testimonial-col">
+                <!-- Top Card: Snowflake Logo & Rating -->
+                <div class="logo-rating-card">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <svg class="partner-logo-svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#29b6f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="2" x2="12" y2="22"></line>
+                            <line x1="2" y1="12" x2="22" y2="12"></line>
+                            <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
+                            <line x1="4.93" y1="19.07" x2="19.07" y2="4.93"></line>
+                            <polygon points="12 8 10 12 12 16 14 12"></polygon>
+                            <polygon points="8 12 12 10 16 12 12 14"></polygon>
+                        </svg>
+                        <span style="font-weight: 800; font-family: var(--font-heading); color: #0f172a; letter-spacing: -0.8px; font-size: 16px; text-transform: lowercase;">snowflake</span>
+                    </div>
+                    <div class="rating-stars">
+                        <span class="rating-val">4.9</span>
+                        <i class="fas fa-star star-blue"></i>
+                    </div>
+                </div>
+                
+                <!-- Bottom Card: Gopichand Padikala Testimonial -->
+                <div class="testimonial-detail-card">
+                    <h4>"Join a community that grows with you"</h4>
+                    <p>Deploying DIP established <strong>active data lineage</strong> and resolved <strong>reconciliation bottlenecks</strong>, delivering instant and auditable value to our business logic from day one.</p>
+                    <div class="testimonial-author-block">
+                        <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=150&h=150&q=80" alt="Gopichand Padikala" class="testimonial-avatar">
+                        <div class="testimonial-author-info">
+                            <span class="testimonial-author-name">Gopichand Padikala</span>
+                            <span class="testimonial-author-role">Head of Digital & Analytics</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 8.25. Partners Section -->
+<section class="partner-section" id="home-partners">
+    <div class="container partner-logo-grid">
+        <span style="font-family: var(--font-heading); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #64748b;">Partners:</span>
+        <a href="/partners/qlik" class="partner-item">
+            <i class="fas fa-bolt"></i> Qlik
+        </a>
+        <a href="/partners/talend" class="partner-item">
+            <i class="fas fa-cube"></i> Talend
+        </a>
+        <a href="/partners/aws-cloud-services" class="partner-item">
+            <i class="fab fa-aws"></i> AWS
+        </a>
+        <a href="/partners/azure-cloud-services" class="partner-item">
+            <i class="fab fa-microsoft"></i> Azure
+        </a>
+        <a href="/partners/alation" class="partner-item">
+            <i class="fas fa-book-open"></i> Alation
+        </a>
+    </div>
+</section>
+
+
+
+<!-- 8.5. Events & Webinars Hub Section (Interactive Mini Cards) -->
+<section class="section" id="home-events-webinars" style="background-color: var(--bg-primary); padding: 80px 0; position: relative; overflow: hidden;">
+    <div class="hero-bg-glow hero-glow-2" style="opacity: 0.15; top: 10%; right: -10%;"></div>
+    <div class="container">
+        
+        <!-- Section Header -->
+        <div class="section-header" style="text-align: center; margin-bottom: 45px;">
+            <span class="section-subtitle-badge" style="background-color: rgba(59, 130, 246, 0.08); border-color: rgba(59, 130, 246, 0.15); color: var(--accent-blue);">Learning Hub</span>
+            <h2 class="section-title">Knowledge & <span>Industry Events</span></h2>
+            <p class="section-desc" style="max-width: 680px; margin: 20px auto 0;">
+                Learn directly from certified data engineers at our upcoming summits or view on-demand webinars detail-mapping migration and compliance strategies.
+            </p>
+        </div>
+
+        <!-- Cards Grid -->
+        <div class="events-cards-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 24px;">
+            {% for item in events_list[:6] %}
+            <div class="event-mini-card synapse-glass-card neon-border-glow" data-type="{{ item.type|lower }}" style="display: flex; flex-direction: column; justify-content: space-between; border-radius: 16px; padding: 28px; background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(255, 255, 255, 0.02) 100%); border: 1px solid var(--border-color); box-shadow: var(--card-shadow); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);">
+                <div>
+                    <!-- Badges Row -->
+                    <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 18px; flex-wrap: wrap;">
+                        <!-- Type Badge -->
+                        {% if item.type == 'Event' %}
+                        <span class="ai-card-tag" style="margin: 0; background: rgba(59, 130, 246, 0.08); color: #3b82f6; border-color: rgba(59, 130, 246, 0.15); font-size: 10px; padding: 4px 10px; font-weight: 700;"><i class="fas fa-calendar-days" style="margin-right: 4px;"></i> Live Event</span>
+                        {% else %}
+                        <span class="ai-card-tag" style="margin: 0; background: rgba(168, 85, 247, 0.08); color: #a855f7; border-color: rgba(168, 85, 247, 0.15); font-size: 10px; padding: 4px 10px; font-weight: 700;"><i class="fas fa-circle-play" style="margin-right: 4px;"></i> Webinar</span>
+                        {% endif %}
+
+                        <!-- Delivery Mode Badge -->
+                        {% if item.delivery_type == 'Online' %}
+                        <span class="ai-card-tag" style="margin: 0; background: rgba(16, 185, 129, 0.08); color: #10b981; border-color: rgba(16, 185, 129, 0.15); font-size: 10px; padding: 4px 10px; font-weight: 700;">Online</span>
+                        {% elif item.delivery_type == 'Hybrid' %}
+                        <span class="ai-card-tag" style="margin: 0; background: rgba(245, 158, 11, 0.08); color: #f59e0b; border-color: rgba(245, 158, 11, 0.15); font-size: 10px; padding: 4px 10px; font-weight: 700;">Hybrid</span>
+                        {% else %}
+                        <span class="ai-card-tag" style="margin: 0; background: rgba(239, 68, 68, 0.08); color: #ef4444; border-color: rgba(239, 68, 68, 0.15); font-size: 10px; padding: 4px 10px; font-weight: 700;">In-Person</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Title & description -->
+                    <h3 style="font-size: 18.5px; font-weight: 800; line-height: 1.35; margin: 0 0 12px 0; color: var(--text-primary);">
+                        {{ item.title }}
+                    </h3>
+                    <p style="font-size: 13.5px; line-height: 1.55; color: var(--text-secondary); margin: 0 0 20px 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; height: 63px;">
+                        {{ item.summary }}
+                    </p>
+                </div>
+
+                <!-- Footer details & button -->
+                <div>
+                    <!-- Date & time section -->
+                    <div style="border-top: 1px solid var(--border-color); padding-top: 16px; margin-bottom: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--text-tertiary);">
+                            <i class="far fa-calendar" style="color: var(--accent-blue); font-size: 14px;"></i>
+                            <span>{{ item.date_str }}</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--text-tertiary);">
+                            <i class="far fa-clock" style="color: var(--accent-blue); font-size: 14px;"></i>
+                            <span>{{ item.time }}</span>
+                        </div>
+                        <div style="grid-column: span 2; display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--text-tertiary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                            {% if item.type == 'Event' %}
+                            <i class="fas fa-location-dot" style="color: var(--accent-blue); font-size: 14px;"></i>
+                            {% else %}
+                            <i class="fas fa-user-tie" style="color: var(--accent-blue); font-size: 14px;"></i>
+                            {% endif %}
+                            <span title="{{ item.location }}">{{ item.location }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Action Button -->
+                    <a href="{{ item.url }}" class="btn {% if item.type == 'Event' %}btn-primary{% else %}btn-secondary{% endif %}" style="display: block; text-align: center; font-size: 13px; font-weight: 700; padding: 11px 0; border-radius: 8px; text-decoration: none; transition: all 0.3s ease;">
+                        {% if item.type == 'Event' %}
+                        Register for Event <i class="fas fa-arrow-right" style="margin-left: 6px; font-size: 10px;"></i>
+                        {% else %}
+                        Watch Webinar <i class="fas fa-circle-play" style="margin-left: 6px; font-size: 11px;"></i>
+                        {% endif %}
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- View All Button -->
+        <div style="text-align: center; margin-top: 45px;">
+            <a href="/resources/events" class="btn btn-secondary btn-glow" style="padding: 12px 32px; border-radius: 30px; font-weight: 700; font-size: 14.5px;">View All Events & Webinars <i class="fas fa-calendar-alt" style="margin-left: 8px;"></i></a>
+        </div>
+    </div>
+</section>
+
+<!-- Inline styles & scripts for tabs & micro-animations -->
+<style>
+    .event-mini-card:hover {
+        transform: translateY(-6px);
+        border-color: rgba(37, 99, 235, 0.3) !important;
+        box-shadow: 0 12px 30px rgba(37, 99, 235, 0.05) !important;
+    }
+</style>
+
+<!-- 9. Final CTA Section -->
+<section class="section-alt cta-banner-cosmic tech-dot-grid" style="text-align: center; padding: 100px 0;" id="cta-hub">
+    <div class="glow-blob" style="top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.15; width: 600px; height: 600px;"></div>
+    <div class="container" style="position: relative; z-index: 2;">
+        <span class="section-subtitle-badge" style="background-color: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.1); color: #ffffff;">GET STARTED TODAY</span>
+        <h2 class="section-title" style="margin-bottom: 24px; font-size: 48px;">Chart Your Actionable <span>Data & AI Roadmap</span></h2>
+        <p class="section-desc" style="max-width: 680px; margin: 0 auto 40px; color: #cbd5e1;">Work directly with our consulting architects to identify metadata gaps, audit data assets, and construct a detailed framework tailored for your organization.</p>
+        <a href="/contact-us" class="btn btn-primary btn-glow" style="padding: 16px 36px; font-size: 16px; border-radius: 50px;">Request an On-Demand Workshop <i class="fas fa-calendar-alt btn-icon"></i></a>
+    </div>
+</section>
+{% endblock %}

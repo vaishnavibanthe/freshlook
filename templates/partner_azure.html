@@ -1,0 +1,286 @@
+{% extends "base.html" %}
+
+{% block title %}Azure Cloud Services & Consulting{% endblock %}
+
+{% block extra_meta %}
+<meta name="description" content="Unlock cloud potential with Artha Solutions' Azure Expertise. Achieve business goals with custom Azure migration, DevOps automation, and security hardening.">
+{% endblock %}
+
+{% block content %}
+<style>
+:root {
+    --brand-color: #0078d4;
+    --brand-color-rgb: 0, 120, 212;
+    --brand-glow: rgba(0, 120, 212, 0.15);
+}
+@keyframes spinOrbit {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+@keyframes spinOrbitReverse {
+    0% { transform: rotate(360deg); }
+    100% { transform: rotate(0deg); }
+}
+.brand-orbit-node {
+    position: absolute;
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--brand-color);
+}
+.card-brand-hover {
+    transition: all 0.3s ease;
+}
+.card-brand-hover:hover {
+    border-color: var(--brand-color) !important;
+    box-shadow: 0 10px 30px var(--brand-glow) !important;
+    transform: translateY(-5px);
+}
+.badge-brand {
+    background: var(--brand-glow);
+    color: var(--brand-color);
+    border: 1px solid rgba(0, 120, 212, 0.3);
+}
+</style>
+
+<!-- Detail Hero -->
+<section class="hero" style="min-height: 60vh; padding-top: calc(var(--nav-height) + 60px); padding-bottom: 60px;">
+    <div class="hero-bg-glow hero-glow-1" style="background: radial-gradient(circle, rgba(0,120,212,0.15) 0%, transparent 70%);"></div>
+    <div class="container hero-grid" style="grid-template-columns: 1.2fr 0.8fr;">
+        <div class="hero-content">
+            <div class="hero-badge badge-brand"><i class="fab fa-microsoft"></i> Strategic Partners &middot; Azure Cloud Services</div>
+            <h1 class="hero-title" style="font-size: clamp(34px, 4.5vw, 46px); line-height: 1.15; margin-bottom: 18px;">
+                Azure Cloud Services <span>Consulting</span>
+            </h1>
+            <p class="hero-desc">
+                As a leading Azure consulting services provider, we empower businesses to maximize Azure's features for accelerated growth. We assess, plan, migrate, and optimize workloads to deliver custom cloud performance.
+            </p>
+            <div class="hero-buttons" style="display:flex; gap:14px; flex-wrap:wrap;">
+                <a href="/contact-us" class="btn btn-primary btn-glow" style="background: linear-gradient(135deg, #0078d4, #4f46e5); border: none;">Consult Partner Architect <i class="fas fa-chevron-right btn-icon"></i></a>
+                <a href="#services" class="btn btn-outline">Explore Services</a>
+            </div>
+            
+            <div class="sol-tag-row" style="margin-top: 30px; display: flex; gap: 10px; flex-wrap: wrap;">
+                <span class="sol-tag-pill" style="font-size: 12px; background: rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);"><i class="fab fa-windows" style="color: #0078d4; margin-right: 6px;"></i> Solutions Partner</span>
+                <span class="sol-tag-pill" style="font-size: 12px; background: rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);"><i class="fas fa-server" style="color: #0078d4; margin-right: 6px;"></i> DevOps & Automation</span>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="brand-graphic" style="position: relative; width: 100%; height: 350px; display: flex; justify-content: center; align-items: center;">
+                <div style="position: absolute; width: 280px; height: 280px; border-radius: 50%; background: radial-gradient(circle, rgba(0,120,212,0.1) 0%, transparent 70%); filter: blur(20px);"></div>
+                <div style="position: absolute; width: 260px; height: 260px; border: 1px dashed rgba(0,120,212,0.2); border-radius: 50%; animation: spinOrbit 25s linear infinite;"></div>
+                <div style="position: absolute; width: 180px; height: 180px; border: 1px dashed rgba(79,70,229,0.3); border-radius: 50%; animation: spinOrbitReverse 15s linear infinite;"></div>
+                <div class="ai-core" style="width: 90px; height: 90px; background: linear-gradient(135deg, #0078d4, #4f46e5); box-shadow: 0 0 30px rgba(0,120,212,0.4); z-index: 2; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <i class="fab fa-microsoft" style="font-size: 38px; color: #fff;"></i>
+                </div>
+                <!-- Nodes -->
+                <div class="brand-orbit-node" style="width: 12px; height: 12px; background: #0078d4; top: 140px; right: 45px;"></div>
+                <div class="brand-orbit-node" style="width: 8px; height: 8px; background: #6366f1; bottom: 140px; left: 45px;"></div>
+                <div class="brand-orbit-node" style="width: 10px; height: 10px; background: #3b82f6; bottom: 50px; right: 120px;"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Strategic Azure Services to Transform Your Enterprise -->
+<section class="section-alt" id="services">
+    <div class="container">
+        <div class="section-header" style="text-align: center; margin-bottom: 50px;">
+            <span class="section-subtitle">Azure Services</span>
+            <h2 class="section-title">Strategic Azure Services <span>to Transform Your Enterprise</span></h2>
+            <p class="section-desc">Discover comprehensive Azure Consulting services that unlock value and minimize risks for your business.</p>
+        </div>
+        
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 30px;">
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(0,120,212,0.1); color: #0078d4;">
+                    <i class="fas fa-magic"></i>
+                </div>
+                <h3 class="card-title">Custom Solutions</h3>
+                <p class="card-desc">Azure consultants tailor cloud strategies to your business needs, ensuring optimized performance, security, and scalability. They design flexible solutions that adapt as your business evolves.</p>
+            </div>
+            
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(0,120,212,0.1); color: #0078d4;">
+                    <i class="fas fa-funnel-dollar"></i>
+                </div>
+                <h3 class="card-title">Cost Optimization</h3>
+                <p class="card-desc">Consultants help reduce cloud costs by identifying inefficiencies, optimizing resource use, and leveraging Azure’s pay-as-you-go model for maximum value and sustainable investment.</p>
+            </div>
+            
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(0,120,212,0.1); color: #0078d4;">
+                    <i class="fas fa-shipping-fast"></i>
+                </div>
+                <h3 class="card-title">Accelerated Cloud Adoption</h3>
+                <p class="card-desc">Consulting services fast-track your cloud journey with strategic planning, seamless transitions, and expert guidance, enabling quicker innovation and business agility.</p>
+            </div>
+            
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(0,120,212,0.1); color: #0078d4;">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                </div>
+                <h3 class="card-title">Seamless Cloud Migration</h3>
+                <p class="card-desc">Consultants ensure smooth workload migration to Azure with minimal downtime, using best practices to handle all dependencies and risks for a hassle-free transition.</p>
+            </div>
+            
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(0,120,212,0.1); color: #0078d4;">
+                    <i class="fas fa-tasks"></i>
+                </div>
+                <h3 class="card-title">Improved Operational Efficiency</h3>
+                <p class="card-desc">By automating processes and optimizing resources, Azure consulting enhances productivity, accelerates development cycles, and improves overall system performance.</p>
+            </div>
+            
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(0,120,212,0.1); color: #0078d4;">
+                    <i class="fas fa-history"></i>
+                </div>
+                <h3 class="card-title">24/7 Support and Monitoring</h3>
+                <p class="card-desc">With round-the-clock monitoring and expert support, consultants ensure your Azure environment remains secure, available, and optimized for continuous operation.</p>
+            </div>
+            
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(0,120,212,0.1); color: #0078d4;">
+                    <i class="fas fa-signal"></i>
+                </div>
+                <h3 class="card-title">Scalability and Performance</h3>
+                <p class="card-desc">Azure consultants design scalable, high-performance cloud architectures that grow with your business, ensuring reliable, responsive service during peak demand.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Our Expertise in Azure -->
+<section class="section" id="expertise">
+    <div class="container">
+        <div class="section-header" style="text-align: center; margin-bottom: 50px;">
+            <span class="section-subtitle">Consulting Areas</span>
+            <h2 class="section-title">Our Expertise in <span>Microsoft Azure</span></h2>
+            <p class="section-desc">Tailored Azure methodologies covering DevOps orchestration, migrations, and database administration.</p>
+        </div>
+        
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;">
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-map" style="color: #0078d4;"></i> Cloud Strategy and Planning
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">Achieve your business goals with a tailored cloud strategy. At Artha Solutions, we assess your current infrastructure, identify Azure adoption opportunities, and develop a comprehensive roadmap for seamless Azure implementation, aligned with your objectives and IT vision.</p>
+            </div>
+            
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-external-link-alt" style="color: #0078d4;"></i> Migration and Modernization
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">Seamlessly migrate your workloads to Azure with our secure and efficient methodologies. From lift-and-shift to re-platforming and re-architecting, Artha Solutions ensures a smooth transition with minimal downtime and disruption.</p>
+            </div>
+            
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-infinity" style="color: #0078d4;"></i> Azure DevOps and Automation
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">We Streamline your software development and delivery with our Azure DevOps and Automation services. Our experts leverage Azure DevOps, Azure Automation, and Azure Resource Manager to automate build, test, and deployment processes, accelerating time-to-market while enhancing software quality.</p>
+            </div>
+            
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-shield-alt" style="color: #0078d4;"></i> Support and Security
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">We provide expert Azure support at an affordable cost. Our services include managing, monitoring, and resolving cloud issues, along with security hardening, disaster recovery testing, log management, and continuous monitoring to ensure a secure and reliable Azure environment.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Resources section -->
+<section class="section-alt" id="resources">
+    <div class="container">
+        <div class="section-header" style="text-align: center; margin-bottom: 50px;">
+            <span class="section-subtitle">Insights</span>
+            <h2 class="section-title">Partner <span>Resources</span></h2>
+            <p class="section-desc">Explore whitepapers, case studies, and insights from Artha Solutions.</p>
+        </div>
+        
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
+            <!-- Resource 1 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #0078d4; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Artha Advantage, Banking</span>
+                    <h4 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Artha Solutions & Qlik as Associate Partners for ET BFSI CXO Conclave 2025, Mumbai</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">Artha Solutions and Qlik are proud to join as Associate Partners at the ET BFSI CXO Conclave...</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #0078d4;">Learn more <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <!-- Resource 2 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #0078d4; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Artha Advantage, Banking, Qlik</span>
+                    <h4 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Future Bank India Conclave 2025: Data, Compliance & AI for Banks</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">Explore how Indian banks can achieve compliance, data maturity, and AI readiness to lead the digital future....</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #0078d4;">Learn more <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <!-- Resource 3 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #0078d4; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Data Governance, Data Integration, Healthcare</span>
+                    <h4 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Transforming Healthcare Insurance Operations: A Data Governance Journey for MOOP Compliance</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">Learn how we addressed critical data integration challenges and enhanced policyholder expense management, ensured accurate claims</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #0078d4;">Download Now! <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <!-- Resource 4 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #0078d4; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Analytics, Data Solutions, Healthcare</span>
+                    <h4 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Enhancing Recruitment with Unified Talent Analytics</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">A leading healthcare provider specializing in therapy services faced challenges in managing its talent acquisition processes efficiently....</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #0078d4;">Download Now! <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <!-- Resource 5 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #0078d4; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Artha Advantage, Data Solutions, Utilities</span>
+                    <h4 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Enhancing Data Ingestion and Integration: Success with Talend Data Hub</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">A home repair services provider used Talend Data Integration Hub to streamline data ingestion, boost efficiency, and...</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #0078d4;">Download Now! <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <!-- Resource 6 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #0078d4; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Artha Advantage, Data Integration, Healthcare</span>
+                    <h4 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Enhancing Data Integration and Performance using Talend</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">Artha Solutions optimized data integration, improved performance, standardized processes, and enhanced monitoring, streamlining operations and preparing for...</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #0078d4;">Download Now! <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Bottom CTA -->
+<section class="section" style="text-align: center; background: linear-gradient(180deg, var(--bg-primary) 0%, rgba(0,120,212,0.05) 100%);">
+    <div class="container">
+        <h2 class="section-title">Initiate Your <span>Integration Journey</span></h2>
+        <p class="section-desc" style="max-width: 600px; margin: 0 auto 30px;">Artha Solutions helps you deploy, secure, and govern Azure workloads at up to 40% savings.</p>
+        <a href="/contact-us" class="btn btn-primary btn-glow" style="background: linear-gradient(135deg, #0078d4, #4f46e5); border: none; box-shadow: 0 0 20px rgba(0,120,212,0.3);">Request a Joint Solution Demo</a>
+    </div>
+</section>
+{% endblock %}

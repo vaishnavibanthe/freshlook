@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}{% if use_case %}Edit Use Case - {{ use_case.title }}{% else %}New Use Case{% endif %} - Control Center{% endblock %}
+
+{% block content %}
+<div style="height: var(--nav-height); background-color: var(--bg-secondary);"></div>
+
+<section class="section" style="min-height: 90vh; background-color: var(--bg-secondary); padding: 40px 0;">
+    <div class="container" style="display: grid; grid-template-columns: 260px 1fr; gap: 40px; align-items: start;">
+        
+        <!-- Sidebar Navigation -->
+        {% include 'admin_sidebar.html' %}
+        
+        <!-- Main Content -->
+        <div>
+            <!-- Header -->
+            <div style="margin-bottom: 32px;">
+                <a href="/admin/industries/manufacturing/use-cases" style="color: #ea580c; font-size: 14px; text-decoration: none; font-weight: 600;"><i class="fas fa-arrow-left"></i> Back to Use Cases</a>
+                <h2 style="font-size: 28px; font-weight: 800; letter-spacing: -0.5px; color: var(--text-primary); margin-top: 10px;">
+                    {% if use_case %}Edit Use Case: {{ use_case.title }}{% else %}Create New Use Case{% endif %}
+                </h2>
+                <p style="font-size: 13px; color: var(--text-tertiary); margin-top: 4px;">Define the client problem, data domains involved, and business outcomes achieved.</p>
+            </div>
+            
+            <!-- Form Card -->
+            <div style="background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); padding: 32px; box-shadow: var(--card-shadow);">
+                <form method="POST" action="{% if use_case %}/admin/industries/manufacturing/use-cases/{{ use_case.id }}{% else %}/admin/industries/manufacturing/use-cases/new{% endif %}">
+                    
+                    <!-- Section 1: Basic Info -->
+                    <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 20px; border-bottom: 2px solid #ffedd5; padding-bottom: 8px; color: #ea580c;"><i class="fas fa-circle-info"></i> Basic Information</h3>
+                    
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 25px;">
+                        <div>
+                            <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">Use Case Title</label>
+                            <input type="text" name="title" value="{{ use_case.title if use_case else '' }}" required style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px;" placeholder="e.g. Material Master Modernization">
+                        </div>
+                        <div>
+                            <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">Category</label>
+                            <select name="category" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px; background: white;">
+                                <option value="MDM" {% if use_case and use_case.category == 'MDM' %}selected{% endif %}>MDM</option>
+                                <option value="Analytics" {% if use_case and use_case.category == 'Analytics' %}selected{% endif %}>Analytics</option>
+                                <option value="AI Readiness" {% if use_case and use_case.category == 'AI Readiness' %}selected{% endif %}>AI Readiness</option>
+                                <option value="Supply Chain" {% if use_case and use_case.category == 'Supply Chain' %}selected{% endif %}>Supply Chain</option>
+                                <option value="Operations" {% if use_case and use_case.category == 'Operations' %}selected{% endif %}>Operations</option>
+                                <option value="Quality" {% if use_case and use_case.category == 'Quality' %}selected{% endif %}>Quality</option>
+                                <option value="Assets" {% if use_case and use_case.category == 'Assets' %}selected{% endif %}>Assets</option>
+                                <option value="Energy" {% if use_case and use_case.category == 'Energy' %}selected{% endif %}>Energy</option>
+                                <option value="ERP/SAP" {% if use_case and use_case.category == 'ERP/SAP' %}selected{% endif %}>ERP/SAP</option>
+                                <option value="PLM" {% if use_case and use_case.category == 'PLM' %}selected{% endif %}>PLM</option>
+                                <option value="Data Governance" {% if use_case and use_case.category == 'Data Governance' %}selected{% endif %}>Data Governance</option>
+                                <option value="Data Quality" {% if use_case and use_case.category == 'Data Quality' %}selected{% endif %}>Data Quality</option>
+                                <option value="Cloud Modernization" {% if use_case and use_case.category == 'Cloud Modernization' %}selected{% endif %}>Cloud Modernization</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px;">
+                        <div>
+                            <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">Slug (URL Path)</label>
+                            <input type="text" name="slug" value="{{ use_case.slug if use_case else '' }}" required style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px; font-family: monospace;" placeholder="manufacturing/use-cases/material-master">
+                        </div>
+                        <div>
+                            <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">Filter Tags (Comma separated)</label>
+                            <input type="text" name="tags" value="{{ use_case.tags if use_case else '' }}" required style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px;" placeholder="MDM, Materials, SAP">
+                        </div>
+                    </div>
+
+                    <!-- Section 2: Case Copy -->
+                    <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 20px; border-bottom: 2px solid #ffedd5; padding-bottom: 8px; color: #ea580c;"><i class="fas fa-file-text"></i> Business & Tech Copy</h3>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">Problem Statement</label>
+                        <textarea name="problem" rows="3" required style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px; font-family: inherit; resize: vertical;" placeholder="Describe the operational issue manufacturers experience...">{{ use_case.problem if use_case else '' }}</textarea>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">Artha Solution</label>
+                        <textarea name="artha_solution" rows="3" required style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px; font-family: inherit; resize: vertical;" placeholder="Describe Artha's data modeling, cleaning, and delivery solution...">{{ use_case.artha_solution if use_case else '' }}</textarea>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px;">
+                        <div>
+                            <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">Data Domains Involved</label>
+                            <input type="text" name="data_domains" value="{{ use_case.data_domains if use_case else '' }}" required style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px;" placeholder="e.g. Material master catalog, supplier profiles">
+                        </div>
+                        <div>
+                            <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">Technologies & Services Involved</label>
+                            <input type="text" name="technologies" value="{{ use_case.technologies if use_case else '' }}" required style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px;" placeholder="e.g. Master Data Management, Talend, Snowflake">
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 25px;">
+                        <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">Business Outcomes & Metrics</label>
+                        <textarea name="business_outcomes" rows="2" required style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px; font-family: inherit; resize: vertical;" placeholder="e.g. Duplicate orders cut by 90%, saving $1.2M in annual inventory write-offs.">{{ use_case.business_outcomes if use_case else '' }}</textarea>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 35px;">
+                        <div>
+                            <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">Related Public Pages (Comma separated)</label>
+                            <input type="text" name="related_services" value="{{ use_case.related_services if use_case else '' }}" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px;" placeholder="Manufacturing MDM, Manufacturing Analytics">
+                        </div>
+                        <div>
+                            <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">Related Case Studies (Comma separated)</label>
+                            <input type="text" name="related_case_studies" value="{{ use_case.related_case_studies if use_case else '' }}" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px;" placeholder="Manufacturing MDM transformation">
+                        </div>
+                    </div>
+
+                    <!-- Section 3: SEO and AI Summary -->
+                    <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 20px; border-bottom: 2px solid #ffedd5; padding-bottom: 8px; color: #ea580c;"><i class="fas fa-magnifying-glass"></i> SEO & Search Engine Optimization</h3>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px;">
+                        <div>
+                            <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">SEO Title Tag</label>
+                            <input type="text" name="seo_title" value="{{ use_case.seo_title if use_case else '' }}" required style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px;">
+                        </div>
+                        <div>
+                            <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">AI Summary (For AI Search Engines)</label>
+                            <input type="text" name="ai_summary" value="{{ use_case.ai_summary if use_case else '' }}" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px;">
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 25px;">
+                        <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">SEO Meta Description</label>
+                        <textarea name="seo_description" rows="2" required style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px; font-family: inherit; resize: vertical;">{{ use_case.seo_description if use_case else '' }}</textarea>
+                    </div>
+
+                    <div style="margin-bottom: 35px;">
+                        <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">Publication Status</label>
+                        <select name="status" style="width: 300px; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px; background: white;">
+                            <option value="Published" {% if use_case and use_case.status == 'Published' %}selected{% endif %}>Published</option>
+                            <option value="Draft" {% if use_case and use_case.status == 'Draft' %}selected{% endif %}>Draft (Hidden)</option>
+                        </select>
+                    </div>
+
+                    <!-- Form Action buttons -->
+                    <div style="display: flex; gap: 15px; border-top: 1px solid var(--border-color); padding-top: 30px;">
+                        <button type="submit" class="btn btn-primary" style="padding: 12px 30px; font-size: 15px;">
+                            Save Use Case <i class="fas fa-save" style="margin-left: 6px;"></i>
+                        </button>
+                        <a href="/admin/industries/manufacturing/use-cases" class="btn btn-outline" style="padding: 12px 30px; font-size: 15px; border-color: #d1d5db; color: var(--text-secondary); text-decoration: none; text-align: center;">
+                            Cancel
+                        </a>
+                    </div>
+                    
+                </form>
+            </div>
+            
+        </div>
+    </div>
+</section>
+{% endblock %}

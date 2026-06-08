@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Our Solutions - Enterprise Data Modernization{% endblock %}
+
+{% block content %}
+<!-- Detail Hero -->
+<section class="hero" style="min-height: 50vh; padding-top: calc(var(--nav-height) + 60px); padding-bottom: 60px;">
+    <div class="hero-bg-glow hero-glow-1"></div>
+    <div class="container hero-grid" style="grid-template-columns: 1.2fr 0.8fr;">
+        <div class="hero-content">
+            <div class="hero-badge"><i class="fas fa-toolbox"></i> Solutions Index</div>
+            <h1 class="hero-title" style="font-size: 48px;">
+                Enterprise <span>Data Solutions</span>
+            </h1>
+            <p class="hero-desc">
+                From database strategy to managed operations, discover our full suite of professional services designed to maximize data performance.
+            </p>
+        </div>
+        <div class="hero-visual">
+            <div class="ai-graphic-container" style="max-width: 260px; height: 260px;">
+                <div class="ai-node-circle circle-sm"></div>
+                <div class="ai-core" style="width: 70px; height: 70px; background: var(--grad-primary);">
+                    <i class="fas fa-list-check" style="font-size: 22px;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Solutions Grid Section -->
+<section class="section-alt" id="all-solutions">
+    <div class="container">
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));">
+            {% for slug, solution in nav_solutions.items() %}
+            <div class="card">
+                <div class="card-icon-box">
+                    <i class="fas fa-{{ solution.icon }}"></i>
+                </div>
+                <h3 class="card-title">{{ solution.title }}</h3>
+                <p class="card-desc">{{ solution.tagline }}</p>
+                <a href="/solutions/{{ slug }}" class="card-link">Learn More <i class="fas fa-chevron-right"></i></a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Bottom CTA -->
+<section class="section" style="text-align: center;">
+    <div class="container">
+        <h2 class="section-title">Design a Custom <span>Data Roadmap</span></h2>
+        <p class="section-desc" style="max-width: 600px; margin: 0 auto 30px;">Artha Solutions helps you deploy, clean, and govern enterprise database systems.</p>
+        <a href="/contact-us" class="btn btn-primary btn-glow">Request an Assessment Workshop</a>
+    </div>
+</section>
+{% endblock %}

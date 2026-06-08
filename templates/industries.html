@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Industries We Serve - Artha Solutions{% endblock %}
+
+{% block content %}
+<!-- Subpage Spacer -->
+<div style="height: var(--nav-height); background-color: var(--bg-secondary);"></div>
+
+<section class="hero" style="min-height: 50vh; padding-top: 60px; padding-bottom: 60px;">
+    <div class="hero-bg-glow hero-glow-1"></div>
+    <div class="container hero-grid" style="grid-template-columns: 1.2fr 0.8fr;">
+        <div class="hero-content">
+            <div class="hero-badge"><i class="fas fa-building"></i> Industry Consulting</div>
+            <h1 class="hero-title" style="font-size: 48px;">
+                Industry <span>Specializations</span>
+            </h1>
+            <p class="hero-desc">
+                From banking regulatory reporting to healthcare patient record matching and retail POS streaming, we build tailored data and governance structures matching industry standards.
+            </p>
+            <div class="hero-buttons">
+                <a href="/contact-us" class="btn btn-primary btn-glow">Consult Industry Advisor</a>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="ai-graphic-container" style="max-width: 260px; height: 260px;">
+                <div class="ai-node-circle circle-sm"></div>
+                <div class="ai-core" style="width: 70px; height: 70px; background: var(--grad-cyan-blue);">
+                    <i class="fas fa-industry" style="font-size: 22px;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Industries Grid Section -->
+<section class="section-alt" id="all-industries">
+    <div class="container">
+        <div class="section-header" style="margin-bottom: 50px;">
+            <span class="section-subtitle">Core Verticals</span>
+            <h2 class="section-title">Serving Specialized <span>Markets</span></h2>
+            <p class="section-desc">Select an industry to explore case studies, regulatory compliance solutions, and dedicated data pipelines.</p>
+        </div>
+        
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));">
+            {% for slug, industry in nav_industries.items() %}
+            <div class="card">
+                <div class="card-icon-box">
+                    <i class="fas {% if slug == 'bfsi' %}fa-piggy-bank{% elif slug == 'healthcare' %}fa-heart-pulse{% elif slug == 'retail' %}fa-shopping-cart{% elif slug == 'manufacturing' %}fa-industry{% elif slug == 'utilities' %}fa-bolt{% elif slug == 'hospitality' %}fa-hotel{% else %}fa-tower-cell{% endif %}"></i>
+                </div>
+                <h3 class="card-title">{{ industry.title }}</h3>
+                <p class="card-desc">{{ industry.tagline }}</p>
+                <a href="/industries/{{ slug }}" class="card-link">Explore Offerings <i class="fas fa-chevron-right"></i></a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Bottom CTA -->
+<section class="section" style="text-align: center;">
+    <div class="container">
+        <h2 class="section-title">Stabilize Industry <span>Data Operations</span></h2>
+        <p class="section-desc" style="max-width: 600px; margin: 0 auto 30px;">Certified industry experts to evaluate technical systems and ensure strict regulatory audit readiness.</p>
+        <a href="/contact-us" class="btn btn-primary btn-glow">Schedule an Operations Assessment</a>
+    </div>
+</section>
+{% endblock %}

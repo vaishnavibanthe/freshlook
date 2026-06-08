@@ -1,0 +1,283 @@
+{% extends "ai_base.html" %}
+
+{% block ai_hero %}
+<!-- Campaign Webcast Hero -->
+<section class="ai-hero" style="background: linear-gradient(135deg, #1e1b4b, #311042); color: white; padding-top: calc(var(--nav-height) + 60px); padding-bottom: 60px;">
+    <div class="container ai-hero-grid" style="grid-template-columns: 1.15fr 0.85fr; gap: 50px;">
+        <div class="ai-hero-content">
+            <div class="ai-badge" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; border-color: rgba(245, 158, 11, 0.2);"><i class="fas fa-video"></i> On-Demand Webcast</div>
+            <h1 class="ai-hero-title" style="color: white; font-size: 38px; line-height: 1.2; margin-top: 15px;">
+                Future-Ready Data Foundation: <br><span style="color: #c084fc;">From AI Pilot to Production Value</span>
+            </h1>
+            <p style="color: rgba(255,255,255,0.85); font-size: 15.5px; line-height: 1.6; margin-top: 20px;">
+                {{ body_sections.webcast_teaser }}
+            </p>
+            <div style="margin-top: 30px; display: flex; gap: 15px; flex-wrap: wrap;">
+                <a href="#register-form" class="btn btn-primary btn-glow" style="background: #a855f7; border-color: #a855f7; color: white;">Watch On-Demand <i class="fas fa-circle-play" style="margin-left: 8px;"></i></a>
+                <a href="#speakers" class="btn btn-secondary" style="border-color: rgba(255,255,255,0.3); color: white;" onmouseover="this.style.backgroundColor='rgba(255,255,255,0.1)'" onmouseout="this.style.backgroundColor='transparent'">Meet The Speakers</a>
+            </div>
+        </div>
+        <div class="ai-hero-visual" style="display: flex; align-items: center; justify-content: center;">
+            <div class="ai-vis-container" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 30px; text-align: center; max-width: 360px; box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
+                <div style="font-size: 48px; color: #a855f7; margin-bottom: 15px;"><i class="fas fa-file-pdf"></i></div>
+                <h3 style="font-size: 16px; font-weight: 700; color: white; margin-bottom: 8px;">Featured Webcast Resource</h3>
+                <span style="font-size: 12px; color: #c084fc; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 12px;">IDC Analyst Spotlight</span>
+                <p style="font-size: 13px; color: rgba(255,255,255,0.7); line-height: 1.4; margin-bottom: 0;">
+                    Get complimentary access to the spotlight paper: <strong>Building Robust Data Foundations for Day Zero of AI</strong>.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block ai_content %}
+<!-- Webcast Details & Offer -->
+<section class="ai-section" style="padding-bottom: 0;">
+    <div class="container" style="display: grid; grid-template-columns: 1fr 1.1fr; gap: 60px; align-items: start;">
+        <div>
+            <span class="ai-subtitle">Assessment Special</span>
+            <h2 class="ai-title" style="font-size: 28px; margin-bottom: 20px;">{{ body_sections.offer_title }}</h2>
+            <p style="color: var(--text-secondary); font-size: 14.5px; line-height: 1.6; margin-bottom: 25px;">
+                {{ body_sections.offer_desc }}
+            </p>
+            <div style="background: rgba(124, 58, 237, 0.03); border: 1px solid var(--border-color); border-left: 4px solid var(--ai-purple); padding: 20px; border-radius: 6px;">
+                <h4 style="font-size: 14.5px; font-weight: 700; margin-bottom: 8px; color: var(--text-primary);"><i class="fas fa-info-circle" style="color: var(--ai-purple); margin-right: 6px;"></i> Complimentary With Webcast</h4>
+                <p style="font-size: 13.5px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0;">
+                    Registering for the webcast entitles you to request an AI Data Readiness assessment (normally valued at $15,999) for just $1. Reviewing current tables, catalog files, and data pipelines.
+                </p>
+            </div>
+        </div>
+        
+        <!-- Registration Form Card -->
+        <div id="register-form" class="ai-card" style="padding: 40px; box-shadow: var(--glass-shadow); border: 1px solid var(--border-color); background: white; border-radius: 8px; position: relative; top: -80px; z-index: 10;">
+            <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 8px; color: var(--text-primary);">Watch the Webcast</h3>
+            <p style="font-size: 13px; color: var(--text-tertiary); margin-bottom: 25px;">Fill out the form below with your corporate details to stream the on-demand recording.</p>
+            
+            <form id="campaign-webcast-form" method="POST" action="/artificial-intelligence/submit-lead">
+                <input type="text" name="website_url_honeypot" style="display:none !important" tabindex="-1" autocomplete="off">
+                <input type="hidden" name="source_page" value="events/future-ready-data-foundation">
+                <input type="hidden" name="cta_clicked" value="Watch Webcast Campaign">
+                
+                <div class="form-grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-field" style="margin-bottom: 15px;">
+                        <label for="c_first_name" style="display: block; font-size: 12.5px; font-weight: 600; margin-bottom: 6px; color: var(--text-secondary);">First Name</label>
+                        <input type="text" id="c_first_name" name="first_name" placeholder="John" required class="form-input" style="width: 100%; border: 1px solid var(--border-color); padding: 10px; border-radius: 6px; font-size: 13.5px;">
+                    </div>
+                    <div class="form-field" style="margin-bottom: 15px;">
+                        <label for="c_last_name" style="display: block; font-size: 12.5px; font-weight: 600; margin-bottom: 6px; color: var(--text-secondary);">Last Name</label>
+                        <input type="text" id="c_last_name" name="last_name" placeholder="Doe" required class="form-input" style="width: 100%; border: 1px solid var(--border-color); padding: 10px; border-radius: 6px; font-size: 13.5px;">
+                    </div>
+                </div>
+                
+                <div class="form-field" style="margin-bottom: 15px;">
+                    <label for="c_business_email" style="display: block; font-size: 12.5px; font-weight: 600; margin-bottom: 6px; color: var(--text-secondary);">Business Email <span class="required-star">*</span></label>
+                    <input type="email" id="c_business_email" name="business_email" placeholder="john.doe@enterprise.com" required class="form-input" style="width: 100%; border: 1px solid var(--border-color); padding: 10px; border-radius: 6px; font-size: 13.5px;">
+                    <span class="form-error-msg" id="c-email-error-msg" style="color: #dc2626; font-size: 12px; display: none; margin-top: 4px;">
+                        <i class="fas fa-circle-exclamation"></i> Please use your corporate business email. Personal domains (gmail, yahoo) are not accepted.
+                    </span>
+                </div>
+                
+                <div class="form-grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-field" style="margin-bottom: 15px;">
+                        <label for="c_company" style="display: block; font-size: 12.5px; font-weight: 600; margin-bottom: 6px; color: var(--text-secondary);">Company</label>
+                        <input type="text" id="c_company" name="company" placeholder="Enterprise Inc" required class="form-input" style="width: 100%; border: 1px solid var(--border-color); padding: 10px; border-radius: 6px; font-size: 13.5px;">
+                    </div>
+                    <div class="form-field" style="margin-bottom: 15px;">
+                        <label for="c_job_title" style="display: block; font-size: 12.5px; font-weight: 600; margin-bottom: 6px; color: var(--text-secondary);">Job Title</label>
+                        <input type="text" id="c_job_title" name="job_title" placeholder="Director of Data" required class="form-input" style="width: 100%; border: 1px solid var(--border-color); padding: 10px; border-radius: 6px; font-size: 13.5px;">
+                    </div>
+                </div>
+
+                <div class="form-grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-field" style="margin-bottom: 15px;">
+                        <label for="c_phone" style="display: block; font-size: 12.5px; font-weight: 600; margin-bottom: 6px; color: var(--text-secondary);">Phone</label>
+                        <input type="tel" id="c_phone" name="phone" placeholder="+1 (555) 019-2834" class="form-input" style="width: 100%; border: 1px solid var(--border-color); padding: 10px; border-radius: 6px; font-size: 13.5px;">
+                    </div>
+                    <div class="form-field" style="margin-bottom: 15px;">
+                        <label for="c_country" style="display: block; font-size: 12.5px; font-weight: 600; margin-bottom: 6px; color: var(--text-secondary);">Country</label>
+                        <input type="text" id="c_country" name="country" placeholder="United States" required class="form-input" style="width: 100%; border: 1px solid var(--border-color); padding: 10px; border-radius: 6px; font-size: 13.5px;">
+                    </div>
+                </div>
+                
+                <div class="form-checkbox" style="display: flex; gap: 8px; align-items: flex-start; margin: 15px 0;">
+                    <input type="checkbox" id="c_consent" name="consent" value="1" required style="margin-top: 3px;">
+                    <label for="c_consent" style="font-size: 12px; color: var(--text-secondary); cursor: pointer; line-height: 1.4;">
+                        I consent to receive event and corporate communication from Artha Solutions. <span class="required-star">*</span>
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 12px;">
+                    Access Webcast Now <i class="fas fa-video"></i>
+                </button>
+                <div id="c-form-response-msg" style="margin-top: 12px; padding: 10px; border-radius: 6px; display: none; font-size: 13.5px;"></div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- Speakers Section -->
+<section class="ai-section section-alt" id="speakers" style="margin-top: -60px;">
+    <div class="container">
+        <div class="ai-section-header text-center">
+            <span class="ai-subtitle">Speakers</span>
+            <h2 class="ai-title">Meet Our <span>Webcast panel</span></h2>
+            <p class="ai-desc">Industry research analysts and consulting architects mapping the value journey.</p>
+        </div>
+        
+        <div class="ai-card-grid grid-2" style="margin-top: 40px;">
+            {% for speaker in body_sections.speakers %}
+            <div class="ai-card" style="display: grid; grid-template-columns: 80px 1fr; gap: 20px; padding: 30px; background: white; box-shadow: var(--card-shadow); border-radius: 8px; align-items: start;">
+                <div style="width: 80px; height: 80px; border-radius: 50%; background: var(--bg-secondary); border: 2px solid var(--ai-purple); color: var(--ai-purple); display: flex; align-items: center; justify-content: center; font-size: 28px;">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+                <div>
+                    <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 4px; color: var(--text-primary);">{{ speaker.name }}</h3>
+                    <div style="font-size: 13px; font-weight: 600; color: var(--ai-purple); margin-bottom: 12px;">{{ speaker.title }}</div>
+                    <p style="font-size: 13.5px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0;">{{ speaker.bio }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Accordion section -->
+<section class="ai-section">
+    <div class="container">
+        <div class="ai-section-header text-center">
+            <span class="ai-subtitle">FAQ</span>
+            <h2 class="ai-title">Got Webcast <span>Questions?</span></h2>
+        </div>
+        
+        <div class="faq-list" style="max-width: 800px; margin: 0 auto;">
+            {% for faq in faqs %}
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaqAccordion(event)">
+                    <span>{{ faq.q }}</span>
+                    <i class="fas fa-chevron-down faq-icon"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>{{ faq.a }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Hidden Webcast video viewer trigger -->
+<div id="webcast-video-modal" class="ai-modal">
+    <div class="ai-modal-content" style="max-width: 800px; padding: 40px; text-align: center;">
+        <span class="ai-modal-close" onclick="closeVideoModal()">&times;</span>
+        <h3 style="font-size: 22px; font-weight: 700; margin-bottom: 15px; color: var(--text-primary);">Webcast Recording</h3>
+        <p style="color: var(--text-secondary); font-size: 14.5px; margin-bottom: 25px;">
+            Thank you for registering. You can stream the webcast recording below.
+        </p>
+        <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 8px; background: #000; box-shadow: var(--card-shadow);">
+            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #fff; text-align: center; width: 80%;">
+                <i class="fas fa-circle-play" style="font-size: 64px; color: #a855f7; margin-bottom: 15px; cursor: pointer;"></i>
+                <h4 style="font-size: 16px;">[Webcast Player Placeholder]</h4>
+                <p style="font-size: 12px; opacity: 0.7;">IDC: Building Robust Data Foundations for Day Zero of AI</p>
+            </div>
+        </div>
+        <div style="margin-top: 30px; text-align: center;">
+            <a href="javascript:void(0);" onclick="triggerPdfDownload()" class="btn btn-primary btn-glow" style="background: #059669; border-color: #059669;"><i class="fas fa-download" style="margin-right: 8px;"></i> Download IDC Spotlight PDF</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // FAQ toggle
+    function toggleFaqAccordion(evt) {
+        const item = evt.currentTarget.parentElement;
+        const answer = item.querySelector('.faq-answer');
+        const icon = item.querySelector('.faq-icon');
+        const isOpen = item.classList.contains('active');
+        
+        document.querySelectorAll('.faq-item').forEach(faq => {
+            faq.classList.remove('active');
+            faq.querySelector('.faq-answer').style.maxHeight = null;
+            faq.querySelector('.faq-icon').style.transform = 'rotate(0deg)';
+        });
+        
+        if (!isOpen) {
+            item.classList.add('active');
+            answer.style.maxHeight = answer.scrollHeight + "px";
+            icon.style.transform = 'rotate(180deg)';
+        }
+    }
+
+    // Video modal controls
+    const videoModal = document.getElementById('webcast-video-modal');
+    
+    function closeVideoModal() {
+        videoModal.style.display = 'none';
+    }
+
+    function triggerPdfDownload() {
+        alert("Downloading IDC Spotlight: Future-Ready Data Foundation.pdf...");
+        window.location.href = "https://www.thinkartha.com/wp-content/uploads/2026/03/What-Is-an-AI-Ready-Data-Foundation-scaled.jpg"; // Placeholder link
+    }
+
+    // Handle form submission
+    const form = document.getElementById('campaign-webcast-form');
+    const responseMsg = document.getElementById('c-form-response-msg');
+    const emailInput = document.getElementById('c_business_email');
+    const emailError = document.getElementById('c-email-error-msg');
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        responseMsg.style.display = 'none';
+        emailError.style.display = 'none';
+
+        const email = emailInput.value.trim().toLowerCase();
+        const personalDomains = [
+            'gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'rediffmail.com',
+            'protonmail.com', 'icloud.com', 'aol.com', 'mail.com', 'gmx.com',
+            'yandex.com', 'zoho.com', 'proton.me', 'live.com', 'yahoo.co.in', 'hotmail.co.uk'
+        ];
+        const domain = email.split('@')[1];
+        if (personalDomains.includes(domain)) {
+            emailError.style.display = 'block';
+            return;
+        }
+
+        const formData = new FormData(form);
+        fetch('/artificial-intelligence/submit-lead', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            responseMsg.style.display = 'block';
+            if (data.status === 'success') {
+                responseMsg.style.backgroundColor = 'rgba(16, 185, 129, 0.1)';
+                responseMsg.style.color = '#10b981';
+                responseMsg.style.border = '1px solid rgba(16, 185, 129, 0.2)';
+                responseMsg.innerText = "Registration successful! Loading webcast...";
+                form.reset();
+                setTimeout(() => {
+                    responseMsg.style.display = 'none';
+                    videoModal.style.display = 'flex';
+                }, 2000);
+            } else {
+                responseMsg.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
+                responseMsg.style.color = '#ef4444';
+                responseMsg.style.border = '1px solid rgba(239, 68, 68, 0.2)';
+                responseMsg.innerText = data.message;
+            }
+        })
+        .catch(err => {
+            responseMsg.style.display = 'block';
+            responseMsg.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
+            responseMsg.style.color = '#ef4444';
+            responseMsg.style.border = '1px solid rgba(239, 68, 68, 0.2)';
+            responseMsg.innerText = 'Something went wrong. Please try again.';
+        });
+    });
+</script>
+{% endblock %}

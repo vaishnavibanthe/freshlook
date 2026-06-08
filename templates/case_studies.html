@@ -1,0 +1,645 @@
+{% extends "base.html" %}
+
+{% block title %}Case Studies - Enterprise AI & Data Modernization Success Stories | Artha Solutions{% endblock %}
+
+{% block content %}
+<style>
+    /* Landing page outcomes dashboard */
+    .landing-outcomes-dashboard {
+        background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(255, 255, 255, 0.02) 100%);
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius-lg);
+        padding: 30px;
+        margin-bottom: 40px;
+        box-shadow: var(--card-shadow);
+        position: relative;
+        overflow: hidden;
+    }
+    .landing-outcomes-dashboard::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: var(--grad-primary);
+        opacity: 0.8;
+    }
+    .dashboard-header {
+        font-size: 16px;
+        font-weight: 800;
+        color: var(--text-primary);
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        letter-spacing: -0.2px;
+    }
+    .dashboard-header i {
+        color: var(--accent-blue);
+    }
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 24px;
+    }
+    .dashboard-stat-card {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        background: rgba(255, 255, 255, 0.01);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 18px 20px;
+        transition: all 0.3s ease;
+    }
+    .dashboard-stat-card:hover {
+        transform: translateY(-3px);
+        border-color: rgba(37, 99, 235, 0.2);
+        box-shadow: 0 8px 24px rgba(37, 99, 235, 0.04);
+    }
+    .stat-circle-gauge {
+        position: relative;
+        width: 60px;
+        height: 60px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .stat-svg {
+        width: 100%;
+        height: 100%;
+    }
+    .stat-bg {
+        fill: none;
+        stroke: rgba(226, 232, 240, 0.06);
+        stroke-width: 8px;
+    }
+    body:not(.dark-mode) .stat-bg {
+        stroke: rgba(226, 232, 240, 0.5);
+    }
+    .stat-fill {
+        fill: none;
+        stroke-width: 8px;
+        stroke-linecap: round;
+        stroke-dasharray: 263.89;
+        stroke-dashoffset: 263.89;
+        transform: rotate(-90deg);
+        transform-origin: 50px 50px;
+        transition: stroke-dashoffset 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .stat-number {
+        position: absolute;
+        font-size: 13.5px;
+        font-weight: 800;
+        color: var(--text-primary);
+        letter-spacing: -0.5px;
+    }
+    .stat-details {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+    .stat-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+    }
+    .stat-desc {
+        font-size: 11px;
+        line-height: 1.3;
+        color: var(--text-secondary);
+        margin: 0;
+    }
+
+    /* Modern Card Overrides */
+    .case-study-list-grid .card {
+        background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(255, 255, 255, 0.02) 100%) !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: 16px !important;
+        box-shadow: var(--card-shadow) !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+    .case-study-list-grid .card:hover {
+        transform: translateY(-6px);
+        border-color: var(--accent-blue) !important;
+        box-shadow: 0 16px 40px rgba(37, 99, 235, 0.06) !important;
+    }
+    
+    .tech-stack-badge-pill {
+        font-size: 11px;
+        font-weight: 700;
+        background-color: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        color: var(--text-secondary);
+        padding: 4px 10px;
+        border-radius: 30px;
+        transition: all 0.2s ease;
+    }
+    .tech-stack-badge-pill:hover {
+        border-color: var(--accent-blue);
+        color: var(--accent-blue);
+        background-color: rgba(37, 99, 235, 0.02);
+    }
+    .stat-badge-callout {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(37, 99, 235, 0.04);
+        border: 1px solid rgba(37, 99, 235, 0.12);
+        color: var(--accent-blue);
+        padding: 4px 10px;
+        border-radius: 30px;
+        font-size: 11px;
+        font-weight: 700;
+        align-self: flex-start;
+        margin-top: 10px;
+    }
+</style>
+<!-- Case Studies Hero -->
+<section class="hero" style="min-height: 45vh; padding-top: calc(var(--nav-height) + 50px); padding-bottom: 50px;">
+    <div class="hero-bg-glow hero-glow-1"></div>
+    <div class="container hero-grid" style="grid-template-columns: 1.2fr 0.8fr; gap: 30px;">
+        <div class="hero-content">
+            <div class="hero-badge"><i class="fas fa-chart-line-up"></i> Real Enterprise Outcomes</div>
+            <h1 class="hero-title" style="font-size: 44px; line-height: 1.2;">
+                Proven <span>Data & AI Solutions</span> in Production
+            </h1>
+            <p class="hero-desc">
+                Explore how Artha Solutions guides Fortune 500 banks, healthcare providers, and global manufacturers from initial AI pilot workloads to fully realized enterprise scale.
+            </p>
+        </div>
+        <div class="hero-visual">
+            <div class="ai-graphic-container" style="max-width: 240px; height: 240px;">
+                <div class="ai-node-circle circle-sm"></div>
+                <div class="ai-core" style="width: 70px; height: 70px; background: var(--grad-cyan-blue);">
+                    <i class="fas fa-clipboard-list-check" style="font-size: 24px;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Filter Workspace & Main Feed -->
+<section class="section" style="padding: 60px 0; background-color: var(--bg-primary);">
+    <!-- SVG Defs for Dashboard Gradients -->
+    <svg style="width:0; height:0; position:absolute;" aria-hidden="true" focusable="false">
+        <defs>
+            <linearGradient id="dashboard-grad-1" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#3b82f6" />
+                <stop offset="100%" stop-color="#1d4ed8" />
+            </linearGradient>
+            <linearGradient id="dashboard-grad-2" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#10b981" />
+                <stop offset="100%" stop-color="#047857" />
+            </linearGradient>
+            <linearGradient id="dashboard-grad-3" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#f97316" />
+                <stop offset="100%" stop-color="#c2410c" />
+            </linearGradient>
+            <linearGradient id="dashboard-grad-4" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#8b5cf6" />
+                <stop offset="100%" stop-color="#6d28d9" />
+            </linearGradient>
+        </defs>
+    </svg>
+    
+    <div class="container">
+        
+        <!-- Outcomes Dashboard At A Glance -->
+        <div class="landing-outcomes-dashboard">
+            <h2 class="dashboard-header"><i class="fas fa-chart-line"></i> Enterprise Outcomes at a Glance</h2>
+            <div class="dashboard-grid">
+                <div class="dashboard-stat-card">
+                    <div class="stat-circle-gauge" data-percent="100">
+                        <svg class="stat-svg" viewBox="0 0 100 100">
+                            <circle class="stat-bg" cx="50" cy="50" r="42"></circle>
+                            <circle class="stat-fill" cx="50" cy="50" r="42" stroke="url(#dashboard-grad-1)"></circle>
+                        </svg>
+                        <div class="stat-number">55+</div>
+                    </div>
+                    <div class="stat-details">
+                        <h4 class="stat-title">Deployments</h4>
+                        <p class="stat-desc">Production AI & Data integrations</p>
+                    </div>
+                </div>
+                <div class="dashboard-stat-card">
+                    <div class="stat-circle-gauge" data-percent="99.5">
+                        <svg class="stat-svg" viewBox="0 0 100 100">
+                            <circle class="stat-bg" cx="50" cy="50" r="42"></circle>
+                            <circle class="stat-fill" cx="50" cy="50" r="42" stroke="url(#dashboard-grad-2)"></circle>
+                        </svg>
+                        <div class="stat-number">99.5%</div>
+                    </div>
+                    <div class="stat-details">
+                        <h4 class="stat-title">Accuracy Rate</h4>
+                        <p class="stat-desc">For member & product catalogs</p>
+                    </div>
+                </div>
+                <div class="dashboard-stat-card">
+                    <div class="stat-circle-gauge" data-percent="80">
+                        <svg class="stat-svg" viewBox="0 0 100 100">
+                            <circle class="stat-bg" cx="50" cy="50" r="42"></circle>
+                            <circle class="stat-fill" cx="50" cy="50" r="42" stroke="url(#dashboard-grad-3)"></circle>
+                        </svg>
+                        <div class="stat-number">5X</div>
+                    </div>
+                    <div class="stat-details">
+                        <h4 class="stat-title">Acceleration</h4>
+                        <p class="stat-desc">In operational reporting latency</p>
+                    </div>
+                </div>
+                <div class="dashboard-stat-card">
+                    <div class="stat-circle-gauge" data-percent="85">
+                        <svg class="stat-svg" viewBox="0 0 100 100">
+                            <circle class="stat-bg" cx="50" cy="50" r="42"></circle>
+                            <circle class="stat-fill" cx="50" cy="50" r="42" stroke="url(#dashboard-grad-4)"></circle>
+                        </svg>
+                        <div class="stat-number">$15M</div>
+                    </div>
+                    <div class="stat-details">
+                        <h4 class="stat-title">Cost Savings</h4>
+                        <p class="stat-desc">In legacy license reductions</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                const fills = document.querySelectorAll(".stat-fill");
+                fills.forEach(fill => {
+                    const parent = fill.closest(".stat-circle-gauge");
+                    const percent = parseFloat(parent.getAttribute("data-percent") || "100");
+                    const circumference = 263.89;
+                    const offset = circumference - (percent / 100) * circumference;
+                    setTimeout(() => {
+                        fill.style.strokeDashoffset = offset;
+                    }, 200);
+                });
+            });
+        </script>
+        
+        <div style="display: grid; grid-template-columns: 280px 1fr; gap: 40px; align-items: start;">
+            
+            <!-- Filters Sidebar -->
+            <aside style="background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--border-radius-md); padding: 24px; position: sticky; top: 100px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                    <h3 style="font-size: 16px; font-weight: 700; color: var(--text-primary);">Filters</h3>
+                    <a href="/case-studies" style="font-size: 12px; color: var(--accent-blue); font-weight: 500;">Clear All</a>
+                </div>
+                
+                <form action="/case-studies" method="GET" id="filter-form">
+                    <!-- Search Input -->
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-tertiary); margin-bottom: 8px;">Search</label>
+                        <div style="position: relative;">
+                            <input type="text" name="q" value="{{ search_query or '' }}" placeholder="Keywords, tech, etc..." class="form-control" style="font-size: 12px; padding: 10px 12px; border-radius: 8px;">
+                            {% if search_query %}
+                            <a href="/case-studies" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: var(--text-tertiary); font-size: 12px;"><i class="fas fa-times"></i></a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Industry Filter -->
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-tertiary); margin-bottom: 8px;">Industry</label>
+                        <select name="industry" class="form-control" style="font-size: 12px; padding: 10px;" onchange="this.form.submit()">
+                            <option value="">All Industries</option>
+                            {% for ind in filter_options.industries %}
+                            <option value="{{ ind }}" {% if selected_industry == ind %}selected{% endif %}>{{ ind }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <!-- Solution Area Filter -->
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-tertiary); margin-bottom: 8px;">Solution Area</label>
+                        <select name="solution_area" class="form-control" style="font-size: 12px; padding: 10px;" onchange="this.form.submit()">
+                            <option value="">All Solutions</option>
+                            {% for sol in filter_options.solution_areas %}
+                            <option value="{{ sol }}" {% if selected_solution_area == sol %}selected{% endif %}>{{ sol }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Technology Filter -->
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-tertiary); margin-bottom: 8px;">Technology</label>
+                        <select name="technology" class="form-control" style="font-size: 12px; padding: 10px;" onchange="this.form.submit()">
+                            <option value="">All Technologies</option>
+                            {% for tech in filter_options.technologies %}
+                            <option value="{{ tech }}" {% if selected_technology == tech %}selected{% endif %}>{{ tech }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <!-- Region Filter -->
+                    <div style="margin-bottom: 24px;">
+                        <label style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-tertiary); margin-bottom: 8px;">Region</label>
+                        <select name="region" class="form-control" style="font-size: 12px; padding: 10px;" onchange="this.form.submit()">
+                            <option value="">All Regions</option>
+                            {% for reg in filter_options.regions %}
+                            <option value="{{ reg }}" {% if selected_region == reg %}selected{% endif %}>{{ reg }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-glow" style="width: 100%; font-size: 12px; padding: 10px; border-radius: 8px;">Apply Filters</button>
+                </form>
+            </aside>
+            
+            <!-- Case Studies Grid -->
+            <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                    <p style="font-size: 14px; color: var(--text-secondary);">Showing <strong>{{ case_studies|length }}</strong> published success stories</p>
+                    
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <span style="font-size: 12px; color: var(--text-tertiary);">Sort:</span>
+                        <a href="?{% if search_query %}q={{ search_query }}&{% endif %}{% if selected_industry %}industry={{ selected_industry }}&{% endif %}{% if selected_solution_area %}solution_area={{ selected_solution_area }}&{% endif %}{% if selected_technology %}technology={{ selected_technology }}&{% endif %}{% if selected_region %}region={{ selected_region }}&{% endif %}sort=recent" 
+                           style="font-size: 12px; font-weight: {% if sort_by == 'recent' %}700; color: var(--accent-blue){% else %}500; color: var(--text-secondary){% endif %}; margin-right: 8px;">Recent</a>
+                        <a href="?{% if search_query %}q={{ search_query }}&{% endif %}{% if selected_industry %}industry={{ selected_industry }}&{% endif %}{% if selected_solution_area %}solution_area={{ selected_solution_area }}&{% endif %}{% if selected_technology %}technology={{ selected_technology }}&{% endif %}{% if selected_region %}region={{ selected_region }}&{% endif %}sort=featured" 
+                           style="font-size: 12px; font-weight: {% if sort_by == 'featured' %}700; color: var(--accent-blue){% else %}500; color: var(--text-secondary){% endif %};">Featured</a>
+                    </div>
+                </div>
+                
+                {% if case_studies %}
+                <div class="case-study-list-grid" style="display: grid; grid-template-columns: 1fr; gap: 24px;">
+                    {% for study in case_studies %}
+                    <div class="card" style="padding: 32px; display: grid; grid-template-columns: 1fr 200px; gap: 30px; align-items: start; transition: var(--transition-normal);">
+                        
+                        <!-- Main Card Content -->
+                        <div>
+                            <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px;">
+                                <span class="ai-card-tag ai-tag-existing" style="margin: 0; font-size: 9px; padding: 3px 8px;">{{ study.industry }}</span>
+                                <span class="ai-card-tag ai-tag-new" style="margin: 0; font-size: 9px; padding: 3px 8px; background: rgba(6,182,212,0.06); color: var(--accent-cyan); border-color: rgba(6,182,212,0.15);">{{ study.solution_area }}</span>
+                                {% if study.featured %}
+                                <span class="ai-card-tag" style="margin: 0; font-size: 9px; padding: 3px 8px; background: #fffbeb; color: #d97706; border-color: #fef3c7;"><i class="fas fa-star" style="margin-right: 3px;"></i>Featured</span>
+                                {% endif %}
+                            </div>
+                            
+                            <h3 class="card-title" style="font-size: 20px; line-height: 1.4; margin-bottom: 10px; font-weight: 700;">
+                                <a href="/case-studies/{{ study.slug }}" style="color: var(--text-primary); hover: color: var(--accent-blue);">{{ study.title }}</a>
+                            </h3>
+                            
+                            <p style="font-size: 13px; color: var(--text-tertiary); font-weight: 500; margin-bottom: 12px;">
+                                <i class="far fa-building" style="margin-right: 4px;"></i> {{ study.client_display_name }} 
+                                <span style="margin: 0 8px; color: var(--border-color);">|</span>
+                                <i class="far fa-map" style="margin-right: 4px;"></i> {{ study.region }}
+                            </p>
+                            
+                            <p class="card-desc" style="font-size: 14px; line-height: 1.6; margin-bottom: 20px;">
+                                {{ study.card_summary or study.executive_summary[:180] + '...' }}
+                            </p>
+                            
+                            <!-- Tags and Technologies -->
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                                 <span style="font-size: 11px; color: var(--text-tertiary); font-weight: 700; margin-right: 4px;">Tech Stack:</span>
+                                 {% set tech_list = study.technologies.split(',') %}
+                                 {% for tech in tech_list[:4] %}
+                                     {% if tech.strip() %}
+                                     <span class="tech-stack-badge-pill">{{ tech.strip() }}</span>
+                                     {% endif %}
+                                 {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <!-- Sidebar Stat Callout & CTAs -->
+                        <div style="display: flex; flex-direction: column; justify-content: space-between; height: 100%; border-left: 1px solid var(--border-color); padding-left: 30px; min-height: 180px;">
+                            
+                            <!-- Top Metric Callout -->
+                            <div>
+                                <span style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-tertiary); margin-bottom: 6px;">Key Result</span>
+                                {% set metrics = load_json_helper(study.key_metrics) %}
+                                {% if metrics and metrics|length > 0 %}
+                                    <div style="font-size: 32px; font-weight: 900; color: var(--accent-blue); line-height: 1; letter-spacing: -1px; margin-bottom: 6px;">
+                                        {{ metrics[0].value }}
+                                    </div>
+                                    <!-- Graphical progress track -->
+                                    <div style="height: 4px; width: 100%; background: rgba(37,99,235,0.06); border-radius: 4px; overflow: hidden; margin-bottom: 8px;">
+                                        {% set metric_val = metrics[0].value.replace('%', '').replace('X', '').replace('+', '').replace('$', '').strip() %}
+                                        {% set pct = 85 %}
+                                        {% if metric_val.isdigit() %}
+                                            {% set pct = metric_val|int %}
+                                            {% if pct > 100 %}{% set pct = 95 %}{% endif %}
+                                            {% if pct < 5 %}{% set pct = pct * 20 %}{% endif %}
+                                        {% endif %}
+                                        <div style="height: 100%; width: {{ pct }}%; background: var(--grad-primary); border-radius: 4px;"></div>
+                                    </div>
+                                    <div style="font-size: 11.5px; line-height: 1.35; color: var(--text-secondary); font-weight: 600;">
+                                        {{ metrics[0].label }}
+                                    </div>
+                                {% else %}
+                                    <div style="font-size: 32px; font-weight: 900; color: var(--accent-blue); line-height: 1; margin-bottom: 6px;">100%</div>
+                                    <div style="height: 4px; width: 100%; background: rgba(37,99,235,0.06); border-radius: 4px; overflow: hidden; margin-bottom: 8px;">
+                                        <div style="height: 100%; width: 100%; background: var(--grad-primary); border-radius: 4px;"></div>
+                                    </div>
+                                    <div style="font-size: 11px; color: var(--text-secondary); font-weight: 600;">Governance Success</div>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Action Buttons -->
+                            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px;">
+                                <a href="/case-studies/{{ study.slug }}" class="btn btn-secondary" style="padding: 8px 12px; font-size: 12px; text-align: center; border-radius: 8px;">Read Study</a>
+                                <button onclick="openDownloadModal('{{ study.slug }}', '{{ study.title }}')" class="btn btn-primary btn-glow" style="padding: 8px 12px; font-size: 12px; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; border: none; width: 100%;">
+                                    <i class="fas fa-download"></i> PDF Download
+                                </button>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div style="text-align: center; padding: 60px 0; border: 1px dashed var(--border-color); border-radius: var(--border-radius-lg); background-color: var(--bg-secondary);">
+                    <i class="fas fa-file-invoice" style="font-size: 48px; color: var(--text-tertiary); margin-bottom: 16px;"></i>
+                    <h3>No Case Studies Found</h3>
+                    <p style="color: var(--text-secondary); margin-top: 8px;">Try adjusting your filters, search term, or sorting preferences.</p>
+                    <a href="/case-studies" class="btn btn-primary" style="margin-top: 20px; font-size: 13px; border-radius: 30px;">Reset All Filters</a>
+                </div>
+                {% endif %}
+            </div>
+            
+        </div>
+    </div>
+</section>
+
+<!-- Gated Download Lead Form Modal -->
+<div class="modal-overlay" id="gated-download-modal">
+    <div class="contact-card modal-content" style="max-width: 500px; width: 100%; padding: 40px; border-radius: var(--border-radius-lg); box-shadow: var(--glass-shadow); position: relative; z-index: 100;">
+        <button onclick="closeDownloadModal()" style="position: absolute; right: 20px; top: 20px; border: none; background: none; font-size: 18px; color: var(--text-tertiary); cursor: pointer;"><i class="fas fa-times"></i></button>
+        
+        <div style="text-align: center; margin-bottom: 24px;">
+            <div class="card-icon-box" style="margin: 0 auto 16px; background-color: #eff6ff; color: var(--accent-blue); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-file-pdf" style="font-size: 20px;"></i>
+            </div>
+            <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 8px;">Download Full Case Study</h3>
+            <p id="modal-study-title" style="font-size: 13px; color: var(--text-secondary); font-weight: 500;">Case Study Title Placeholder</p>
+        </div>
+        
+        <!-- Error Alert -->
+        <div id="modal-error-alert" style="background-color: #fef2f2; border: 1px solid #fee2e2; border-radius: var(--border-radius-sm); padding: 12px 16px; margin-bottom: 20px; color: #dc2626; font-size: 13px; display: none; align-items: center; gap: 8px;">
+            <i class="fas fa-circle-exclamation"></i> <span id="modal-error-msg">Error message</span>
+        </div>
+        
+        <!-- Lead form -->
+        <form id="lead-download-form" onsubmit="handleGatedFormSubmit(event)">
+            <!-- Honeypot field to block spam bots -->
+            <input type="text" name="website_url_honeypot" style="display: none;" tabindex="-1" autocomplete="off">
+            <input type="hidden" name="case_study_slug" id="modal-study-slug">
+            
+            <div class="form-group">
+                <label for="business_email" class="form-label">Business Email <span style="color:#ef4444">*</span></label>
+                <input type="email" id="business_email" name="business_email" class="form-control" required placeholder="name@company.com" style="padding: 10px 12px; font-size: 13px;">
+                <span style="font-size: 11px; color: var(--text-tertiary); margin-top: 4px; display: block;">Gmail, Yahoo, Outlook, and personal domains are not accepted.</span>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="first_name" class="form-label">First Name</label>
+                    <input type="text" id="first_name" name="first_name" class="form-control" placeholder="John" style="padding: 10px 12px; font-size: 13px;">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="last_name" class="form-label">Last Name</label>
+                    <input type="text" id="last_name" name="last_name" class="form-control" placeholder="Doe" style="padding: 10px 12px; font-size: 13px;">
+                </div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="company" class="form-label">Company Name</label>
+                    <input type="text" id="company" name="company" class="form-control" placeholder="Acme Corp" style="padding: 10px 12px; font-size: 13px;">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="job_title" class="form-label">Job Title</label>
+                    <input type="text" id="job_title" name="job_title" class="form-control" placeholder="Director of IT" style="padding: 10px 12px; font-size: 13px;">
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="phone" class="form-label">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" class="form-control" placeholder="+1 (555) 019-2834" style="padding: 10px 12px; font-size: 13px;">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="country" class="form-label">Country</label>
+                    <input type="text" id="country" name="country" class="form-control" placeholder="United States" style="padding: 10px 12px; font-size: 13px;">
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 24px; display: flex; align-items: start; gap: 8px;">
+                <input type="checkbox" id="consent" name="consent" value="1" required style="margin-top: 4px; cursor: pointer;">
+                <label for="consent" style="font-size: 11px; line-height: 1.4; color: var(--text-secondary); cursor: pointer;">
+                    I consent to receive resource guides, newsletters, and promotional alerts from Artha Solutions in accordance with the <a href="#" style="color: var(--accent-blue); text-decoration: underline;">Privacy Policy</a>. *
+                </label>
+            </div>
+            
+            <button type="submit" id="modal-submit-btn" class="btn btn-primary btn-glow" style="width: 100%; padding: 12px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                Request Case Study PDF <i class="fas fa-paper-plane"></i>
+            </button>
+        </form>
+        
+        <!-- Thank you screen (success) -->
+        <div id="modal-success-screen" style="display: none; text-align: center; padding: 20px 0;">
+            <div class="card-icon-box" style="margin: 0 auto 20px; background-color: #ecfeff; color: var(--accent-cyan); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-circle-check" style="font-size: 28px;"></i>
+            </div>
+            <h4 style="font-size: 20px; font-weight: 700; margin-bottom: 12px;">Thank You!</h4>
+            <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 24px;">
+                Your request has been verified successfully. Your high-resolution PDF download will begin automatically. If it doesn't start, please click the button below.
+            </p>
+            <a id="modal-download-link" href="#" class="btn btn-primary btn-glow" style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px;">
+                <i class="fas fa-download"></i> Download PDF Document
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+function openDownloadModal(slug, title) {
+    document.getElementById('modal-study-slug').value = slug;
+    document.getElementById('modal-study-title').textContent = title;
+    
+    // Reset form states
+    document.getElementById('lead-download-form').style.display = 'block';
+    document.getElementById('modal-success-screen').style.display = 'none';
+    document.getElementById('modal-error-alert').style.display = 'none';
+    document.getElementById('lead-download-form').reset();
+    
+    // Show modal overlay
+    const modal = document.getElementById('gated-download-modal');
+    modal.classList.add('active');
+}
+
+function closeDownloadModal() {
+    const modal = document.getElementById('gated-download-modal');
+    modal.classList.remove('active');
+}
+
+function handleGatedFormSubmit(e) {
+    e.preventDefault();
+    
+    const form = document.getElementById('lead-download-form');
+    const formData = new FormData(form);
+    const slug = formData.get('case_study_slug');
+    
+    const submitBtn = document.getElementById('modal-submit-btn');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing Request...';
+    
+    const alertBox = document.getElementById('modal-error-alert');
+    alertBox.style.display = 'none';
+    
+    // Collect UTM parameters from URL search params
+    const urlParams = new URLSearchParams(window.location.search);
+    formData.append('utm_source', urlParams.get('utm_source') || '');
+    formData.append('utm_medium', urlParams.get('utm_medium') || '');
+    formData.append('utm_campaign', urlParams.get('utm_campaign') || '');
+    formData.append('utm_term', urlParams.get('utm_term') || '');
+    formData.append('utm_content', urlParams.get('utm_content') || '');
+    formData.append('referrer', document.referrer || '');
+    formData.append('source_url', window.location.href);
+
+    fetch(`/api/case-studies/${slug}/download`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Request Case Study PDF <i class="fas fa-paper-plane"></i>';
+        
+        if (data.status === 'success') {
+            // Hide form and show success screen
+            form.style.display = 'none';
+            document.getElementById('modal-success-screen').style.display = 'block';
+            
+            // Set download token link
+            const downloadUrl = `/case-studies/download-pdf/${data.token}`;
+            const downloadLink = document.getElementById('modal-download-link');
+            downloadLink.href = downloadUrl;
+            
+            // Trigger automatic download
+            const tempLink = document.createElement('a');
+            tempLink.href = downloadUrl;
+            tempLink.download = `${slug}.pdf`;
+            document.body.appendChild(tempLink);
+            tempLink.click();
+            document.body.removeChild(tempLink);
+        } else {
+            document.getElementById('modal-error-msg').textContent = data.message;
+            alertBox.style.display = 'flex';
+        }
+    })
+    .catch(err => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Request Case Study PDF <i class="fas fa-paper-plane"></i>';
+        document.getElementById('modal-error-msg').textContent = 'A connection error occurred. Please try again.';
+        alertBox.style.display = 'flex';
+        console.error(err);
+    });
+}
+</script>
+{% endblock %}

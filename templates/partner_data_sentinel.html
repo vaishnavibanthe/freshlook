@@ -1,0 +1,300 @@
+{% extends "base.html" %}
+
+{% block title %}Data Sentinel Privacy Partner{% endblock %}
+
+{% block extra_meta %}
+<meta name="description" content="Safeguard your success with cutting-edge Data Privacy Solutions. Empower your business with Next-Gen Data Privacy Protection, compliance audits, and assessments.">
+{% endblock %}
+
+{% block content %}
+<style>
+:root {
+    --brand-color: #dc2626;
+    --brand-color-rgb: 220, 38, 38;
+    --brand-glow: rgba(220, 38, 38, 0.15);
+}
+@keyframes spinOrbit {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+@keyframes spinOrbitReverse {
+    0% { transform: rotate(360deg); }
+    100% { transform: rotate(0deg); }
+}
+.brand-orbit-node {
+    position: absolute;
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--brand-color);
+}
+.card-brand-hover {
+    transition: all 0.3s ease;
+}
+.card-brand-hover:hover {
+    border-color: var(--brand-color) !important;
+    box-shadow: 0 10px 30px var(--brand-glow) !important;
+    transform: translateY(-5px);
+}
+.badge-brand {
+    background: var(--brand-glow);
+    color: var(--brand-color);
+    border: 1px solid rgba(220, 38, 38, 0.3);
+}
+</style>
+
+<!-- Detail Hero -->
+<section class="hero" style="min-height: 60vh; padding-top: calc(var(--nav-height) + 60px); padding-bottom: 60px;">
+    <div class="hero-bg-glow hero-glow-1" style="background: radial-gradient(circle, rgba(220,38,38,0.15) 0%, transparent 70%);"></div>
+    <div class="container hero-grid" style="grid-template-columns: 1.2fr 0.8fr;">
+        <div class="hero-content">
+            <div class="hero-badge badge-brand"><i class="fas fa-lock"></i> Strategic Partners &middot; Data Sentinel</div>
+            <h1 class="hero-title" style="font-size: clamp(34px, 4.5vw, 46px); line-height: 1.15; margin-bottom: 18px;">
+                Data Sentinel <span>Privacy Solutions</span>
+            </h1>
+            <p class="hero-desc">
+                Safeguard Your Success with cutting edge Data Privacy Solutions &middot; Empower Your Business with Next-Gen Data Privacy Protection. Assess vulnerabilities, verify compliance dynamically, and maps privacy metadata.
+            </p>
+            <div class="hero-buttons" style="display:flex; gap:14px; flex-wrap:wrap;">
+                <a href="/contact-us" class="btn btn-primary btn-glow" style="background: linear-gradient(135deg, #dc2626, #eab308); border: none;">Consult Partner Architect <i class="fas fa-chevron-right btn-icon"></i></a>
+                <a href="#services" class="btn btn-outline">Explore Solutions</a>
+            </div>
+            
+            <div class="sol-tag-row" style="margin-top: 30px; display: flex; gap: 10px; flex-wrap: wrap;">
+                <span class="sol-tag-pill" style="font-size: 12px; background: rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);"><i class="fas fa-shield-alt" style="color: #dc2626; margin-right: 6px;"></i> Next-Gen Protection</span>
+                <span class="sol-tag-pill" style="font-size: 12px; background: rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);"><i class="fas fa-check-shield" style="color: #dc2626; margin-right: 6px;"></i> Compliance Auditing</span>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="brand-graphic" style="position: relative; width: 100%; height: 350px; display: flex; justify-content: center; align-items: center;">
+                <div style="position: absolute; width: 280px; height: 280px; border-radius: 50%; background: radial-gradient(circle, rgba(220,38,38,0.1) 0%, transparent 70%); filter: blur(20px);"></div>
+                <div style="position: absolute; width: 260px; height: 260px; border: 1px dashed rgba(220,38,38,0.2); border-radius: 50%; animation: spinOrbit 25s linear infinite;"></div>
+                <div style="position: absolute; width: 180px; height: 180px; border: 1px dashed rgba(234,179,8,0.3); border-radius: 50%; animation: spinOrbitReverse 15s linear infinite;"></div>
+                <div class="ai-core" style="width: 90px; height: 90px; background: linear-gradient(135deg, #dc2626, #eab308); box-shadow: 0 0 30px rgba(220,38,38,0.4); z-index: 2; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-lock" style="font-size: 32px; color: #fff;"></i>
+                </div>
+                <!-- Nodes -->
+                <div class="brand-orbit-node" style="width: 12px; height: 12px; background: #dc2626; top: 70px; left: 70px;"></div>
+                <div class="brand-orbit-node" style="width: 8px; height: 8px; background: #ef4444; bottom: 70px; right: 70px;"></div>
+                <div class="brand-orbit-node" style="width: 10px; height: 10px; background: #facc15; top: 160px; right: 50px;"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Strategic Data Sentinel Services -->
+<section class="section-alt" id="services">
+    <div class="container">
+        <div class="section-header" style="text-align: center; margin-bottom: 50px;">
+            <span class="section-subtitle">Core Capabilities</span>
+            <h2 class="section-title">Strategic Data Sentinel Services <span>to Transform Your Enterprise</span></h2>
+            <p class="section-desc">Discover comprehensive Data Sentinel Consulting services that unlock value and minimize compliance risks.</p>
+        </div>
+        
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 30px;">
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(220,38,38,0.1); color: #dc2626;">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <h3 class="card-title">Data Privacy Solutions</h3>
+                <p class="card-desc">Ensure compliance, safeguard sensitive information, and build trust with our customized data privacy solutions. Tailored to address evolving regulations and minimize risks, our expertise enables you to maintain customer confidence, streamline operations, and thrive in an increasingly data-driven world.</p>
+            </div>
+            
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(220,38,38,0.1); color: #dc2626;">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h3 class="card-title">Automated Data Discovery and Classification</h3>
+                <p class="card-desc">Identify and categorize structured and unstructured data across on-premises and cloud environments. Persistent scanning ensures real-time, up-to-date data inventories, enabling comprehensive oversight.</p>
+            </div>
+            
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(220,38,38,0.1); color: #dc2626;">
+                    <i class="fas fa-database"></i>
+                </div>
+                <h3 class="card-title">Sensitive Data Management</h3>
+                <p class="card-desc">Efficiently discover, classify, and track sensitive data assets to ensure compliance with privacy regulations. Monitors non-compliant data usage and triggers real-time alarms or remediation actions. Our customizable sensitivity classification adapts to your organization’s specific needs.</p>
+            </div>
+            
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(220,38,38,0.1); color: #dc2626;">
+                    <i class="fas fa-sitemap"></i>
+                </div>
+                <h3 class="card-title">Data Governance Mapping</h3>
+                <p class="card-desc">Ensure your data is governed in line with company policies. Seamlessly integrates with governance, risk, and compliance (GRC) platforms to enhance your organization’s risk management framework.</p>
+            </div>
+            
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(220,38,38,0.1); color: #dc2626;">
+                    <i class="fas fa-sliders-h"></i>
+                </div>
+                <h3 class="card-title">Performance and Customization</h3>
+                <p class="card-desc">Engineered to support extensive data inventories while offering intuitive customization. We help businesses extract value from their data while minimizing risk exposure.</p>
+            </div>
+            
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(220,38,38,0.1); color: #dc2626;">
+                    <i class="fas fa-balance-scale"></i>
+                </div>
+                <h3 class="card-title">Regulatory Compliance</h3>
+                <p class="card-desc">Supports compliance with global data privacy laws, including GDPR and CCPA, by enabling Data Protection Impact Assessments (DPIA). Tracks sensitive data risks and generates financial risk assessments to support informed strategic decision-making.</p>
+            </div>
+            
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(220,38,38,0.1); color: #dc2626;">
+                    <i class="fas fa-heartbeat"></i>
+                </div>
+                <h3 class="card-title">Disaster Recovery and Business Continuity</h3>
+                <p class="card-desc">We design fault-tolerant architectures for high availability, implement backup and recovery solutions, and develop disaster recovery plans, ensuring your business remains operational in the face of disruptions.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Expert Solutions for Your Business Needs -->
+<section class="section" id="expert-solutions">
+    <div class="container">
+        <div class="section-header" style="text-align: center; margin-bottom: 50px;">
+            <span class="section-subtitle">Solutions</span>
+            <h2 class="section-title">Expert Solutions <span>for Your Business Needs</span></h2>
+            <p class="section-desc">Active consulting models covering security hardening, risk assessments, and Privacy-By-Design implementation.</p>
+        </div>
+        
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;">
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-user-md" style="color: #dc2626;"></i> Data Privacy Consulting
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">Our expert Data Privacy Consulting Services offer a strategic approach to navigating complex privacy laws and regulations, including GDPR, CCPA, and HIPAA. We work with you to assess data privacy risks, design privacy policies, and implement strategies that protect your organization and customers, ensuring compliance.</p>
+            </div>
+            
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-lock" style="color: #dc2626;"></i> Protection and Security
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">Artha Solutions provides cutting-edge Data Protection and Security Solutions to safeguard your sensitive data across its entire lifecycle. From encryption to secure access controls, we deploy advanced technologies that prevent unauthorized access, data leaks, and cyber threats.</p>
+            </div>
+            
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-file-invoice" style="color: #dc2626;"></i> Audits and Assessments
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">Our comprehensive Data Privacy Audits and Assessments give you a thorough analysis of your current data privacy practices and compliance status. We identify gaps, vulnerabilities, and areas for improvement, offering actionable insights to ensure alignment.</p>
+            </div>
+            
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-check-double" style="color: #dc2626;"></i> Compliance Services
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">Artha Solutions offers end-to-end support to help your business stay compliant with data privacy regulations. From conducting risk assessments and implementing policies to providing employee training, we reduce the risk of non-compliance and penalties.</p>
+            </div>
+            
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-pencil-ruler" style="color: #dc2626;"></i> Privacy-By-Design
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">We implement Privacy-By-Design principles to integrate data privacy into your systems and processes from the outset. By adopting data minimization strategies, we help reduce unnecessary data collection, ensuring personal information is only used for its intended purpose.</p>
+            </div>
+            
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-fire-extinguisher" style="color: #dc2626;"></i> Incident Response
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">In the event of a data breach, our Incident Response and Breach Management services ensure a swift, effective response. We provide expert guidance on how to handle breaches, notify affected parties, and comply with legal obligations to recover with minimal disruption.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Resources section -->
+<section class="section-alt" id="resources">
+    <div class="container">
+        <div class="section-header" style="text-align: center; margin-bottom: 50px;">
+            <span class="section-subtitle">Insights</span>
+            <h2 class="section-title">Partner <span>Resources</span></h2>
+            <p class="section-desc">Explore whitepapers, case studies, and insights from Artha Solutions.</p>
+        </div>
+        
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
+            <!-- Resource 1 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #dc2626; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Artha Advantage, Banking</span>
+                    <h4 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Artha Solutions & Qlik as Associate Partners for ET BFSI CXO Conclave 2025, Mumbai</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">Artha Solutions and Qlik are proud to join as Associate Partners at the ET BFSI CXO Conclave...</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #dc2626;">Learn more <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <!-- Resource 2 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #dc2626; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Artha Advantage, Banking, Qlik</span>
+                    <h4 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Future Bank India Conclave 2025: Data, Compliance & AI for Banks</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">Explore how Indian banks can achieve compliance, data maturity, and AI readiness to lead the digital future....</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #dc2626;">Learn more <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <!-- Resource 3 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #dc2626; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Data Governance, Data Integration, Healthcare</span>
+                    <h4 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Transforming Healthcare Insurance Operations: A Data Governance Journey for MOOP Compliance</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">Learn how we addressed critical data integration challenges and enhanced policyholder expense management, ensured accurate claims</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #dc2626;">Download Now! <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <!-- Resource 4 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #dc2626; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Analytics, Data Solutions, Healthcare</span>
+                    <h4 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Enhancing Recruitment with Unified Talent Analytics</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">A leading healthcare provider specializing in therapy services faced challenges in managing its talent acquisition processes efficiently....</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #dc2626;">Download Now! <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <!-- Resource 5 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #dc2626; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Artha Advantage, Data Solutions, Utilities</span>
+                    <h4 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Enhancing Data Ingestion and Integration: Success with Talend Data Hub</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">A home repair services provider used Talend Data Integration Hub to streamline data ingestion, boost efficiency, and...</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #dc2626;">Download Now! <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <!-- Resource 6 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #dc2626; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Artha Advantage, Data Integration, Healthcare</span>
+                    <h4 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Enhancing Data Integration and Performance using Talend</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">Artha Solutions optimized data integration, improved performance, standardized processes, and enhanced monitoring, streamlining operations and preparing for...</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #dc2626;">Download Now! <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Bottom CTA -->
+<section class="section" style="text-align: center; background: linear-gradient(180deg, var(--bg-primary) 0%, rgba(220,38,38,0.05) 100%);">
+    <div class="container">
+        <h2 class="section-title">Initiate Your <span>Integration Journey</span></h2>
+        <p class="section-desc" style="max-width: 600px; margin: 0 auto 30px;">Artha Solutions helps you deploy, secure, and govern Data Sentinel privacy configurations at up to 40% savings.</p>
+        <a href="/contact-us" class="btn btn-primary btn-glow" style="background: linear-gradient(135deg, #dc2626, #eab308); border: none; box-shadow: 0 0 20px rgba(220,38,38,0.3);">Request a Joint Solution Demo</a>
+    </div>
+</section>
+{% endblock %}

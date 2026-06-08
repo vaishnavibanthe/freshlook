@@ -1,0 +1,30 @@
+# Python caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# SQLite databases
+*.db
+
+# macOS system files
+.DS_Store
+
+# Scratch / temporary directories
+scratch/
+.idea/
+.vscode/
+
+# Large Asset / Document Folders (OneDrive placeholder files causing timeouts)
+CaseStudies/
+Logos/
+WhitePapers/
+*.pdf
+
+# Backup and old files
+*copy.py
+*_copy.py
+*old.html
+*_old.html
+*copy.db
+*test.db

@@ -1,0 +1,639 @@
+{% extends "base.html" %}
+
+{% block title %}Master Data Management Platform | MDM Solutions{% endblock %}
+{% block extra_meta %}
+<meta name="description" content="Unify enterprise data, clean duplicate registries, and establish a single source of truth for customers and products with Artha MDM solutions.">
+{% endblock %}
+
+{% block content %}
+
+<!-- ══════════════════════════════════════════
+     HERO SECTION
+     ═════════════════════════════════════════════ -->
+<section class="sol-hero" id="sol-hero">
+    <div class="sol-bg-mesh" aria-hidden="true"></div>
+    <div class="hero-bg-glow hero-glow-1" style="opacity:0.45; background: radial-gradient(circle, rgba(16,185,129,0.3) 0%, transparent 70%);"></div>
+
+    <div class="container sol-hero-grid">
+        <div class="sol-hero-content">
+            <div class="hero-badge" style="margin-bottom:20px;">
+                <i class="fas fa-id-card"></i> Solutions · MDM
+            </div>
+            <h1 class="hero-title" style="font-size:clamp(38px,5vw,64px); line-height:1.1; margin-bottom:18px;">
+                Master Data<br><span>Management</span>
+            </h1>
+            <p class="hero-desc" style="font-size:17px; max-width:540px; line-height:1.75; margin-bottom:32px;">
+                Unify Your Enterprise Data for Improved Decision-making and Operational Efficiency. We help you de-duplicate customer profiles, purge redundant inventories, and establish a golden record.
+            </p>
+            <div style="display:flex; gap:14px; flex-wrap:wrap;">
+                <a href="/contact-us" class="btn btn-primary btn-glow" id="sol-hero-cta" style="background:linear-gradient(135deg,#10b981,#06b6d4); border:none;">
+                    Get in Touch <i class="fas fa-arrow-right btn-icon"></i>
+                </a>
+                <a href="#sol-pillars" class="btn btn-outline">
+                    Explore MDM
+                </a>
+            </div>
+
+            <!-- Tag pills -->
+            <div class="sol-tag-row">
+                <span class="sol-tag-pill"><i class="fas fa-database"></i> Golden Record</span>
+                <span class="sol-tag-pill"><i class="fas fa-shield"></i> PII Protection</span>
+                <span class="sol-tag-pill"><i class="fas fa-server"></i> Multi-Domain MDM</span>
+                <span class="sol-tag-pill"><i class="fas fa-shuffle"></i> 125+ Systems</span>
+            </div>
+        </div>
+
+        <!-- Right: Graphic Visualization -->
+        <div class="sol-hero-visual">
+            <div class="sol-visual-card">
+                <div class="sol-card-header">
+                    <div class="ds-card-dots"><span></span><span></span><span></span></div>
+                    <span style="font-size:12px; font-weight:600; color:var(--text-secondary);">Golden Record Sync Console</span>
+                    <div class="sol-header-badge" style="color:#10b981; background:rgba(16,185,129,0.1); border-color:rgba(16,185,129,0.2);"><i class="fas fa-circle" style="color:#10b981; font-size:7px;"></i> Synced</div>
+                </div>
+                <div class="sol-card-body">
+                    <div class="sol-metric-row">
+                        <div class="sol-metric" style="border-color:rgba(16,185,129,0.2);"><span class="num" style="color:#10b981;">98%</span><span class="lbl">Data Accuracy</span></div>
+                        <div class="sol-metric" style="border-color:rgba(16,185,129,0.2);"><span class="num" style="color:#10b981;">60%</span><span class="lbl">Steward Speedup</span></div>
+                        <div class="sol-metric" style="border-color:rgba(16,185,129,0.2);"><span class="num" style="color:#10b981;">125+</span><span class="lbl">Systems Connected</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     STATS BAND
+     ═════════════════════════════════════════════ -->
+<section class="sol-stats-band">
+    <div class="container sol-stats-grid">
+        <div class="sol-stat-item">
+            <div class="sol-stat-num" style="color:#10b981; background:linear-gradient(135deg,#34d399,#10b981); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">98%</div>
+            <div class="sol-stat-label">Data accuracy and consistency across multi-cloud databases</div>
+        </div>
+        <div class="sol-stat-sep"></div>
+        <div class="sol-stat-item">
+            <div class="sol-stat-num" style="color:#10b981; background:linear-gradient(135deg,#34d399,#10b981); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">60%</div>
+            <div class="sol-stat-label">Stewardship speedup using custom de-duplication rules</div>
+        </div>
+        <div class="sol-stat-sep"></div>
+        <div class="sol-stat-item">
+            <div class="sol-stat-num" style="color:#10b981; background:linear-gradient(135deg,#34d399,#10b981); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">125+</div>
+            <div class="sol-stat-label">Enterprise data sources integrated into the master repository</div>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     MDM PILLARS
+     ═════════════════════════════════════════════ -->
+<section class="section sol-pillars-section" id="sol-pillars">
+    <div class="container">
+        <div class="section-header" style="text-align:center; margin-bottom:56px;">
+            <span class="section-subtitle-badge">Platform Focus</span>
+            <h2 class="section-title" style="margin-top:16px;">Unify Your <span>Enterprise Data</span></h2>
+            <p class="section-desc" style="max-width:600px; margin:16px auto 0;">Establish data quality, consistency, and operational speed through a singular source of truth for critical enterprise entities.</p>
+        </div>
+
+        <div class="sol-pillars-grid">
+            <div class="sol-pillar-card" style="--pc:#10b981; --pcg:rgba(16,185,129,0.1);">
+                <div class="sol-pillar-icon"><i class="fas fa-broom"></i></div>
+                <h3 class="sol-pillar-title">Data Quality and Consistency</h3>
+                <p class="sol-pillar-desc">MDM cleanses and standardizes data across systems, reducing duplication and errors. This ensures that business decisions are based on accurate and reliable information.</p>
+            </div>
+            <div class="sol-pillar-card" style="--pc:#06b6d4; --pcg:rgba(6,182,212,0.1);">
+                <div class="sol-pillar-icon"><i class="fas fa-bolt"></i></div>
+                <h3 class="sol-pillar-title">Streamlined Operations</h3>
+                <p class="sol-pillar-desc">A single source of truth for critical entities like customers and products eliminates database mismatches, accelerating sales cycles and support resolutions.</p>
+            </div>
+            <div class="sol-pillar-card" style="--pc:#3b82f6; --pcg:rgba(59,130,246,0.1);">
+                <div class="sol-pillar-icon"><i class="fas fa-chart-pie"></i></div>
+                <h3 class="sol-pillar-title">Enhanced Analytics</h3>
+                <p class="sol-pillar-desc">Integrate master data profiles with analytics engines to feed dashboards with accurate attributes, discovering hidden patterns and predicting market trends.</p>
+            </div>
+            <div class="sol-pillar-card" style="--pc:#ef4444; --pcg:rgba(239,68,68,0.1);">
+                <div class="sol-pillar-icon"><i class="fas fa-shield-halved"></i></div>
+                <h3 class="sol-pillar-title">Improved Compliance</h3>
+                <p class="sol-pillar-desc">GDPR, HIPAA, and industry audits require strict control over customer PII. MDM provides governed, lineage-backed records to minimize compliance risk.</p>
+            </div>
+            <div class="sol-pillar-card" style="--pc:#8b5cf6; --pcg:rgba(139,92,246,0.1);">
+                <div class="sol-pillar-icon"><i class="fas fa-microchip"></i></div>
+                <h3 class="sol-pillar-title">Foundation of AI/ML Initiatives</h3>
+                <p class="sol-pillar-desc">Clean master data inputs are critical to train machine learning models. MDM ensures data schemas are standardized for model ingestion.</p>
+            </div>
+            <div class="sol-pillar-card" style="--pc:#f59e0b; --pcg:rgba(245,158,11,0.1);">
+                <div class="sol-pillar-icon"><i class="fas fa-star"></i></div>
+                <h3 class="sol-pillar-title">Single Source of Truth</h3>
+                <p class="sol-pillar-desc">Establish a golden customer profile, product ledger, or supplier record across CRM, ERP, and billing systems dynamically.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     CASE STUDY SPOTLIGHT 1
+     ═════════════════════════════════════════════ -->
+<section class="sol-cs-section" id="sol-case-study">
+    <div class="container sol-cs-grid">
+        <div class="sol-cs-content">
+            <div class="hero-badge" style="margin-bottom:16px; border-color:rgba(16,185,129,0.3); color:#10b981;"><i class="fas fa-file-invoice"></i> Insurance Success</div>
+            <h2 style="font-size:clamp(22px,3vw,36px); font-weight:800; color:var(--text-primary); line-height:1.3; margin-bottom:16px;">
+                Enhancing Financial Transparency for IFRS 17 Implementation
+            </h2>
+            <p style="font-size:15px; color:var(--text-secondary); line-height:1.75; margin-bottom:28px;">
+                Artha Solutions implemented an enterprise MDM and data governance strategy to compile policy data across legacy insurance lines, achieving total compliance with IFRS 17 guidelines.
+            </p>
+            <a href="/case-studies" class="btn btn-primary" style="padding:13px 26px; background:linear-gradient(135deg,#10b981,#06b6d4); border:none;">
+                Download Case Study <i class="fas fa-download btn-icon"></i>
+            </a>
+        </div>
+        <div class="sol-cs-visual">
+            <div class="sol-cs-card" style="border-color:rgba(16,185,129,0.2);">
+                <div class="sol-cs-icon-ring" style="background:rgba(16,185,129,0.1);">
+                    <i class="fas fa-shield-heart" style="font-size:38px; color:#10b981;"></i>
+                </div>
+                <div class="sol-cs-stats">
+                    <div class="sol-cs-stat"><span class="sol-cs-num" style="color:#10b981;">100%</span><span>IFRS 17 Audited</span></div>
+                    <div class="sol-cs-stat"><span class="sol-cs-num" style="color:#10b981;">12+ Wk</span><span>Go-Live Speed</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     DEFINING MDM (CAPABILITIES)
+     ═════════════════════════════════════════════ -->
+<section class="section" id="sol-capabilities" style="background:var(--bg-secondary); padding:90px 0;">
+    <div class="container">
+        <div class="section-header" style="text-align:center; margin-bottom:56px;">
+            <span class="section-subtitle-badge">Platform Pillars</span>
+            <h2 class="section-title" style="margin-top:16px;">The Cornerstone of <span>Business Success</span></h2>
+        </div>
+
+        <div class="sol-cap-layout">
+            <div class="sol-cap-visual">
+                <div class="sol-cap-gears">
+                    <div class="gear gear-1" style="color:rgba(16,185,129,0.15);"><i class="fas fa-cog"></i></div>
+                    <div class="gear gear-2" style="color:rgba(16,185,129,0.15); font-size:74px; animation-duration:15s; animation-direction:reverse;"><i class="fas fa-cog"></i></div>
+                    <div class="gear-center" style="color:#10b981; background:rgba(16,185,129,0.08); border-color:rgba(16,185,129,0.15);"><i class="fas fa-id-card"></i></div>
+                </div>
+            </div>
+
+            <div class="sol-cap-list">
+                <div class="sol-cap-item" style="--ci:#10b981;">
+                    <div class="sol-cap-num">01</div>
+                    <div class="sol-cap-body">
+                        <h3>Data Integration</h3>
+                        <p>Extract, clean, and load records from diverse cloud applications, databases, and on-premises logs into a centralized MDM warehouse.</p>
+                    </div>
+                </div>
+                <div class="sol-cap-item" style="--ci:#06b6d4;">
+                    <div class="sol-cap-num">02</div>
+                    <div class="sol-cap-body">
+                        <h3>Data Quality</h3>
+                        <p>Deploy automated profiling rules, address validations, and de-duplication heuristics to maintain standard data hygiene.</p>
+                    </div>
+                </div>
+                <div class="sol-cap-item" style="--ci:#3b82f6;">
+                    <div class="sol-cap-num">03</div>
+                    <div class="sol-cap-body">
+                        <h3>Golden Record Creation</h3>
+                        <p>Establish custom matching and merging rules to resolve profile fragments into a singular, verified master profile.</p>
+                    </div>
+                </div>
+                <div class="sol-cap-item" style="--ci:#f59e0b;">
+                    <div class="sol-cap-num">04</div>
+                    <div class="sol-cap-body">
+                        <h3>Democratization of Data</h3>
+                        <p>Provide search portals, steward consoles, and REST APIs so different departments can securely consume governed master data.</p>
+                    </div>
+                </div>
+                <div class="sol-cap-item" style="--ci:#a855f7;">
+                    <div class="sol-cap-num">05</div>
+                    <div class="sol-cap-body">
+                        <h3>Multi-Domain Master Data</h3>
+                        <p>Unify records across multiple dimensions including customer registries, supplier catalogs, material indices, and financial GL codes.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     CASE STUDY SPOTLIGHT 2
+     ═════════════════════════════════════════════ -->
+<section class="sol-cs2-section" style="background:var(--bg-primary); padding:70px 0;">
+    <div class="container">
+        <div class="sol-cs2-card">
+            <div class="sol-cs2-icon" style="background:rgba(16,185,129,0.1); color:#10b981;"><i class="fas fa-arrows-rotate"></i></div>
+            <div class="sol-cs2-body">
+                <div class="hero-badge" style="margin-bottom:12px; color:#10b981; background:rgba(16,185,129,0.1); border-color:rgba(16,185,129,0.2);">Data Consolidation</div>
+                <h4>From Fragmented Data to Unified Insights</h4>
+                <p>Read our retail banking case study on consolidating customer records across credit card, retail banking, and mortgage lending databases to feed unified profiles directly into central CRM systems.</p>
+            </div>
+            <div class="sol-cs2-action">
+                <a href="/case-studies" class="btn btn-outline" style="border-color:#10b981; color:#10b981;">Read Story <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     TESTIMONIALS SECTION
+     ═════════════════════════════════════════════ -->
+<section class="section" style="background:var(--bg-secondary); padding:80px 0;">
+    <div class="container">
+        <div class="section-header" style="text-align:center; margin-bottom:48px;">
+            <span class="section-subtitle-badge">Success Stories</span>
+            <h2 class="section-title" style="margin-top:16px;">Trusted by <span>Industry Leaders</span></h2>
+        </div>
+        <div class="sol-testimonials-grid">
+            <div class="sol-testimonial">
+                <div class="sol-quote-icon"><i class="fas fa-quote-left"></i></div>
+                <p class="sol-quote-text">
+                    "Cleansing and consolidating consumer data enables us to deliver the kind of personalized experience today's consumers deserve and expect."
+                </p>
+                <div class="sol-quote-author">
+                    <div class="sol-avatar">SB</div>
+                    <div>
+                        <strong>Steve Brennan</strong>
+                        <span>Vice President, Data Strategy &amp; Analytics</span>
+                        <span class="sol-company">Carhartt</span>
+                    </div>
+                </div>
+            </div>
+            <div class="sol-testimonial">
+                <div class="sol-quote-icon"><i class="fas fa-quote-left"></i></div>
+                <p class="sol-quote-text">
+                    "We are very happy that we worked with Artha Solutions on our Upgrade project. Right from the 1st initial communication, the entire team was dedicated to success."
+                </p>
+                <div class="sol-quote-author">
+                    <div class="sol-avatar">VM</div>
+                    <div>
+                        <strong>Vivek Makan</strong>
+                        <span>Director, Data &amp; Analytics</span>
+                        <span class="sol-company">Managed Healthcare Associates, Inc.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     BOTTOM CTA BAND
+     ═════════════════════════════════════════════ -->
+<section class="sol-cta-band" style="background: linear-gradient(135deg, #064e3b 0%, #0f172a 60%, #0c4a6e 100%);">
+    <div class="sol-cta-glow sol-cta-glow-l" style="background:#10b981;"></div>
+    <div class="sol-cta-glow sol-cta-glow-r" style="background:#06b6d4;"></div>
+    <div class="container" style="text-align:center; position:relative; z-index:1;">
+        <div class="hero-badge" style="display:inline-flex; margin:0 auto 20px; background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.15); color:#e2e8f0;">
+            <i class="fas fa-rocket"></i> Unify Registries
+        </div>
+        <h2 style="font-size:clamp(26px,4vw,48px); font-weight:800; color:#f8fafc; margin-bottom:16px; line-height:1.2;">
+            Ready to establish a golden record?
+        </h2>
+        <p style="font-size:17px; color:#94a3b8; max-width:560px; margin:0 auto 40px; line-height:1.7;">
+            Connect with our MDM engineers to see how pre-built converting schemas can de-duplicate your database in under 45 days.
+        </p>
+        <div style="display:flex; gap:16px; justify-content:center; flex-wrap:wrap;">
+            <a href="/contact-us" class="btn btn-primary btn-glow" style="padding:15px 32px; font-size:15px; background:linear-gradient(135deg,#10b981,#06b6d4); border:none;">
+                Book a Demonstration <i class="fas fa-calendar btn-icon"></i>
+            </a>
+            <a href="/solutions" class="btn" style="padding:15px 32px; font-size:15px; background:rgba(255,255,255,0.08); color:#e2e8f0; border:1px solid rgba(255,255,255,0.15);">
+                Explore All Solutions
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     STYLES
+     ═════════════════════════════════════════════ -->
+<style>
+/* ── Hero ─────────────────────────────────── */
+.sol-hero {
+    min-height: 80vh;
+    padding-top: calc(var(--nav-height) + 80px);
+    padding-bottom: 80px;
+    position: relative;
+    overflow: hidden;
+}
+.sol-bg-mesh {
+    position: absolute;
+    inset: 0;
+    background-image:
+        radial-gradient(circle at 1px 1px, rgba(16,185,129,0.06) 1px, transparent 0);
+    background-size: 40px 40px;
+    pointer-events: none;
+}
+.sol-hero-grid {
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 60px;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+}
+@media (max-width:900px) {
+    .sol-hero-grid { grid-template-columns: 1fr; }
+    .sol-hero-visual { display: none; }
+}
+.sol-tag-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 28px;
+}
+.sol-tag-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+.sol-tag-pill i { color: #10b981; font-size: 11px; }
+
+/* ── Visual Card ──────────────────────────── */
+.sol-visual-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 24px;
+    overflow: hidden;
+    backdrop-filter: blur(12px);
+    animation: solFloat 5s ease-in-out infinite;
+}
+@keyframes solFloat {
+    0%,100% { transform: translateY(0); }
+    50%      { transform: translateY(-8px); }
+}
+.sol-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 20px;
+    background: rgba(255,255,255,0.02);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.sol-header-badge {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 700;
+}
+.sol-card-body { padding: 24px 20px; display: flex; flex-direction: column; gap: 20px; }
+.sol-metric-row { display: flex; gap: 10px; }
+.sol-metric {
+    flex: 1;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    padding: 14px 8px;
+    text-align: center;
+}
+.sol-metric .num { display: block; font-size: 22px; font-weight: 900; }
+.sol-metric .lbl { display: block; font-size: 9px; color: var(--text-muted); margin-top: 4px; text-transform: uppercase; }
+
+/* ── Stats Band ───────────────────────────── */
+.sol-stats-band {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    padding: 48px 0;
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+}
+.sol-stats-grid {
+    display: flex;
+    align-items: flex-start;
+}
+@media (max-width:768px) {
+    .sol-stats-grid { flex-direction: column; gap: 30px; }
+    .sol-stat-sep { display: none; }
+}
+.sol-stat-item { flex: 1; text-align: center; padding: 0 24px; }
+.sol-stat-num {
+    font-size: 48px;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 10px;
+}
+.sol-stat-label { font-size: 13.5px; color: var(--text-secondary); line-height: 1.5; }
+.sol-stat-sep { width: 1px; background: rgba(255,255,255,0.08); align-self: stretch; }
+
+/* ── Pillars Grid ─────────────────────────── */
+.sol-pillars-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+@media (max-width:960px) { .sol-pillars-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width:640px)  { .sol-pillars-grid { grid-template-columns: 1fr; } }
+.sol-pillar-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 30px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.sol-pillar-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--pc);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+.sol-pillar-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: var(--pcg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: var(--pc);
+    transition: transform 0.3s ease;
+}
+.sol-pillar-card:hover .sol-pillar-icon { transform: scale(1.1) rotate(-4deg); }
+.sol-pillar-title { font-size: 15px; font-weight: 800; color: var(--text-primary); }
+.sol-pillar-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+
+/* ── Case Study ───────────────────────────── */
+.sol-cs-section {
+    background: var(--bg-secondary);
+    padding: 80px 0;
+    position: relative;
+    overflow: hidden;
+}
+.sol-cs-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 60px;
+    align-items: center;
+}
+@media (max-width:900px) { .sol-cs-grid { grid-template-columns: 1fr; } .sol-cs-visual { display: none; } }
+.sol-cs-card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 24px;
+    padding: 36px 28px;
+    text-align: center;
+}
+.sol-cs-icon-ring {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+.sol-cs-stats { display: flex; gap: 16px; justify-content: center; margin-top: 16px; }
+.sol-cs-stat { display: flex; flex-direction: column; gap: 4px; }
+.sol-cs-num { font-size: 28px; font-weight: 900; }
+.sol-cs-stat span:last-child { font-size: 11px; color: var(--text-muted); }
+
+/* ── Capabilities Layout ──────────────────── */
+.sol-cap-layout {
+    display: grid;
+    grid-template-columns: 0.75fr 1.25fr;
+    gap: 60px;
+    align-items: center;
+}
+@media (max-width:900px) { .sol-cap-layout { grid-template-columns: 1fr; } .sol-cap-visual { display: none; } }
+
+.sol-cap-gears {
+    width: 260px;
+    height: 260px;
+    position: relative;
+    margin: 0 auto;
+}
+.gear { position: absolute; font-size: 54px; animation: dsSpin 10s linear infinite; }
+.gear-1 { top: 20px; left: 40px; }
+.gear-2 { bottom: 40px; right: 40px; font-size: 74px; animation-duration: 15s; animation-direction: reverse; }
+.gear-center {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    top: 90px;
+    left: 90px;
+    z-index: 2;
+}
+@keyframes dsSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+.sol-cap-list { display: flex; flex-direction: column; gap: 30px; }
+.sol-cap-item { display: flex; gap: 20px; }
+.sol-cap-num {
+    font-size: 18px;
+    font-weight: 900;
+    color: var(--ci);
+    background: rgba(16,185,129,0.06);
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.sol-cap-body h3 { font-size: 16px; font-weight: 800; color: var(--text-primary); margin-bottom: 6px; }
+.sol-cap-body p { font-size: 13.5px; color: var(--text-secondary); line-height: 1.6; }
+
+/* ── Case Study 2 ─────────────────────────── */
+.sol-cs2-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 30px;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+@media (max-width:768px) {
+    .sol-cs2-card { flex-direction: column; text-align: center; }
+    .sol-cs2-action { width: 100%; }
+    .sol-cs2-action a { width: 100%; justify-content: center; }
+}
+.sol-cs2-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 16px;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.sol-cs2-body { flex: 1; }
+.sol-cs2-body h4 { font-size: 18px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px; }
+.sol-cs2-body p { font-size: 13.5px; color: var(--text-secondary); margin: 0; line-height: 1.6; }
+
+/* ── Testimonials ─────────────────────────── */
+.sol-testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+}
+@media (max-width:768px) { .sol-testimonials-grid { grid-template-columns: 1fr; } }
+.sol-testimonial {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.sol-quote-icon { font-size: 24px; color: #10b981; opacity: 0.3; }
+.sol-quote-text { font-size: 14.5px; color: var(--text-secondary); line-height: 1.7; font-style: italic; flex: 1; }
+.sol-quote-author { display: flex; gap: 14px; align-items: center; }
+.sol-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #10b981, #06b6d4);
+    color: white;
+    font-weight: 700;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.sol-quote-author strong { display: block; font-size: 14px; color: var(--text-primary); }
+.sol-quote-author span { display: block; font-size: 11px; color: var(--text-muted); }
+.sol-quote-author .sol-company { color: #10b981; font-weight: 600; margin-top: 2px; }
+
+/* ── Bottom CTA Band ──────────────────────── */
+.sol-cta-band {
+    position: relative;
+    padding: 100px 0;
+    overflow: hidden;
+    border-top: 1px solid var(--border-color);
+}
+.sol-cta-glow {
+    position: absolute;
+    width: 350px;
+    height: 350px;
+    border-radius: 50%;
+    filter: blur(100px);
+    pointer-events: none;
+    opacity: 0.25;
+}
+</style>
+
+{% endblock %}

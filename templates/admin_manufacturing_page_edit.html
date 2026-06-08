@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Manufacturing Page - Control Center{% endblock %}
+
+{% block content %}
+<div style="height: var(--nav-height); background-color: var(--bg-secondary);"></div>
+
+<section class="section" style="min-height: 90vh; background-color: var(--bg-secondary); padding: 40px 0;">
+    <div class="container" style="display: grid; grid-template-columns: 260px 1fr; gap: 40px; align-items: start;">
+        
+        <!-- Sidebar Navigation -->
+        {% include 'admin_sidebar.html' %}
+        
+        <!-- Main Content -->
+        <div>
+            <!-- Header -->
+            <div style="margin-bottom: 32px;">
+                <a href="/admin/industries/manufacturing/pages" style="color: #ea580c; font-size: 14px; text-decoration: none; font-weight: 600;"><i class="fas fa-arrow-left"></i> Back to Pages</a>
+                <h2 style="font-size: 28px; font-weight: 800; letter-spacing: -0.5px; color: var(--text-primary); margin-top: 10px;">Edit Page: {{ page.title }}</h2>
+                <p style="font-size: 13px; color: var(--text-tertiary); margin-top: 4px;">Update copy structures, SEO parameters, and GenAI answer schemas below.</p>
+            </div>
+            
+            <!-- Form Card -->
+            <div style="background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); padding: 32px; box-shadow: var(--card-shadow);">
+                <form method="POST" action="/admin/industries/manufacturing/pages/{{ page.id }}" onsubmit="return validateJSONFields();">
+                    
+                    <!-- Section 1: Core Details -->
+                    <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 20px; border-bottom: 2px solid #ffedd5; padding-bottom: 8px; color: #ea580c;"><i class="fas fa-circle-info"></i> Page Core Details</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px;">
+                        <div>
+                            <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">Page Admin Title</label>
+                            <input type="text" name="title" value="{{ page.title }}" required style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px;">
+                        </div>
+                        <div>
+                            <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">Page Key (Unique Identifier)</label>
+                            <input type="text" value="{{ page.page_key }}" readonly style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px; background: #f3f4f6; cursor: not-allowed; font-family: monospace;">
+                        </div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px;">
+                        <div>
+                            <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">Slug (URL Path)</label>
+                            <input type="text" value="{{ page.slug }}" readonly style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px; background: #f3f4f6; cursor: not-allowed; font-family: monospace;">
+                        </div>
+                        <div>
+                            <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">Canonical URL</label>
+                            <input type="text" name="canonical_url" value="{{ page.canonical_url or '' }}" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px; font-family: monospace;">
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 25px;">
+                        <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">Hero Banner Title</label>
+                        <input type="text" name="hero_title" value="{{ page.hero_title or '' }}" required style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px;">
+                    </div>
+                    
+                    <div style="margin-bottom: 35px;">
+                        <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">Hero Banner Subtitle</label>
+                        <textarea name="hero_subtitle" rows="2" required style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px; font-family: inherit; resize: vertical;">{{ page.hero_subtitle or '' }}</textarea>
+                    </div>
+                    
+                    <!-- Section 2: JSON Page Content -->
+                    <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 20px; border-bottom: 2px solid #ffedd5; padding-bottom: 8px; color: #ea580c;"><i class="fas fa-code"></i> Page Copy & Component Blocks (JSON format)</h3>
+                    
+                    <div style="margin-bottom: 25px;">
+                        <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">Body Sections Copy JSON</label>
+                        <p style="font-size: 11px; color: var(--text-tertiary); margin-bottom: 6px;">Contains paragraph blocks, bullet lists, challenge structures, audience matrix, or use cases.</p>
+                        <textarea id="body_sections_json" name="body_sections_json" rows="12" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 13px; font-family: monospace; resize: vertical;">{{ page.body_sections_json }}</textarea>
+                        <span class="json-err-msg" id="body_sections_json_err" style="color: #dc2626; font-size: 12px; display: none;">Invalid JSON format. Please verify your keys and commas.</span>
+                    </div>
+
+                    <div style="margin-bottom: 25px;">
+                        <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">CTA Button Action JSON</label>
+                        <textarea id="cta_json" name="cta_json" rows="4" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 13px; font-family: monospace; resize: vertical;">{{ page.cta_json }}</textarea>
+                        <span class="json-err-msg" id="cta_json_err" style="color: #dc2626; font-size: 12px; display: none;">Invalid JSON format.</span>
+                    </div>
+
+                    <div style="margin-bottom: 25px;">
+                        <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">FAQ Accordion JSON (Array of Q & A)</label>
+                        <textarea id="faq_json" name="faq_json" rows="8" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 13px; font-family: monospace; resize: vertical;">{{ page.faq_json }}</textarea>
+                        <span class="json-err-msg" id="faq_json_err" style="color: #dc2626; font-size: 12px; display: none;">Invalid JSON format. Expected an array of objects e.g., [{"q": "...", "a": "..."}].</span>
+                    </div>
+
+                    <div style="margin-bottom: 35px;">
+                        <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">Related Service / Solutions Links JSON</label>
+                        <textarea id="related_services_json" name="related_services_json" rows="4" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 13px; font-family: monospace; resize: vertical;">{{ page.related_services_json }}</textarea>
+                        <span class="json-err-msg" id="related_services_json_err" style="color: #dc2626; font-size: 12px; display: none;">Invalid JSON format.</span>
+                    </div>
+
+                    <!-- Section 3: Standard SEO Metadata -->
+                    <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 20px; border-bottom: 2px solid #ffedd5; padding-bottom: 8px; color: #ea580c;"><i class="fas fa-magnifying-glass"></i> Standard Search SEO & Open Graph</h3>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px;">
+                        <div>
+                            <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">SEO Title Tag</label>
+                            <input type="text" name="seo_title" value="{{ page.seo_title or '' }}" required style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px;">
+                        </div>
+                        <div>
+                            <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">SEO Keywords</label>
+                            <input type="text" name="seo_keywords" value="{{ page.seo_keywords or '' }}" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px;">
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 25px;">
+                        <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">SEO Meta Description</label>
+                        <textarea name="seo_description" rows="3" required style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px; font-family: inherit; resize: vertical;">{{ page.seo_description or '' }}</textarea>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px;">
+                        <div>
+                            <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">Open Graph Title</label>
+                            <input type="text" name="og_title" value="{{ page.og_title or '' }}" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px;">
+                        </div>
+                        <div>
+                            <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">Open Graph Image Path</label>
+                            <input type="text" name="og_image" value="{{ page.og_image or '' }}" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px; font-family: monospace;">
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 25px;">
+                        <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">Open Graph Description</label>
+                        <textarea name="og_description" rows="2" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px; font-family: inherit; resize: vertical;">{{ page.og_description or '' }}</textarea>
+                    </div>
+
+                    <div style="margin-bottom: 35px;">
+                        <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">JSON-LD Schema Script</label>
+                        <textarea id="schema_json" name="schema_json" rows="6" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 13px; font-family: monospace; resize: vertical;">{{ page.schema_json or '' }}</textarea>
+                        <span class="json-err-msg" id="schema_json_err" style="color: #dc2626; font-size: 12px; display: none;">Invalid JSON format.</span>
+                    </div>
+
+                    <!-- Section 4: GenAI SEO (AEO / GEO) -->
+                    <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 20px; border-bottom: 2px solid #ffedd5; padding-bottom: 8px; color: #ea580c;"><i class="fas fa-robot"></i> GenAI SEO (AEO / GEO Optimization)</h3>
+                    
+                    <div style="margin-bottom: 25px;">
+                        <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">AI Summary (Page context for answers)</label>
+                        <p style="font-size: 11px; color: var(--text-tertiary); margin-bottom: 6px;">Concise, factual answer summary matching AI engine context demands.</p>
+                        <textarea name="ai_summary" rows="4" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px; font-family: inherit; resize: vertical;">{{ page.ai_summary or '' }}</textarea>
+                    </div>
+
+                    <div style="margin-bottom: 35px;">
+                        <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">GenAI Entity Mappings JSON (Array of Strings)</label>
+                        <textarea id="genai_entities_json" name="genai_entities_json" rows="4" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 13px; font-family: monospace; resize: vertical;">{{ page.genai_entities_json or '[]' }}</textarea>
+                        <span class="json-err-msg" id="genai_entities_json_err" style="color: #dc2626; font-size: 12px; display: none;">Invalid JSON format. Expected list of entities e.g., ["Entity1", "Entity2"].</span>
+                    </div>
+
+                    <!-- Section 5: Status Controls -->
+                    <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 20px; border-bottom: 2px solid #ffedd5; padding-bottom: 8px; color: #ea580c;"><i class="fas fa-sliders"></i> Page Indexing & Status</h3>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 35px;">
+                        <div>
+                            <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">Page Publication Status</label>
+                            <select name="status" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px; background: white;">
+                                <option value="Published" {% if page.status == 'Published' %}selected{% endif %}>Published</option>
+                                <option value="Draft" {% if page.status == 'Draft' %}selected{% endif %}>Draft (Hidden)</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; align-items: center; padding-top: 25px;">
+                            <input type="checkbox" id="noindex" name="noindex" value="1" {% if page.noindex %}checked{% endif %} style="width: 18px; height: 18px; cursor: pointer; margin-right: 10px;">
+                            <label for="noindex" style="font-size: 13.5px; font-weight: 600; color: var(--text-primary); cursor: pointer;">
+                                Apply Noindex Tag (Exclude from search engines & sitemaps)
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Form Action buttons -->
+                    <div style="display: flex; gap: 15px; border-top: 1px solid var(--border-color); padding-top: 30px;">
+                        <button type="submit" class="btn btn-primary" style="padding: 12px 30px; font-size: 15px;">
+                            Save Changes <i class="fas fa-save" style="margin-left: 6px;"></i>
+                        </button>
+                        <a href="/admin/industries/manufacturing/pages" class="btn btn-outline" style="padding: 12px 30px; font-size: 15px; border-color: #d1d5db; color: var(--text-secondary); text-decoration: none; text-align: center;">
+                            Cancel
+                        </a>
+                    </div>
+                    
+                </form>
+            </div>
+            
+        </div>
+    </div>
+</section>
+
+<script>
+    function validateJSONFields() {
+        let isValid = true;
+        const jsonFields = [
+            'body_sections_json',
+            'cta_json',
+            'faq_json',
+            'related_services_json',
+            'schema_json',
+            'genai_entities_json'
+        ];
+        
+        // Clear all errors
+        document.querySelectorAll('.json-err-msg').forEach(el => el.style.display = 'none');
+        
+        jsonFields.forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            if (!field) return;
+            const val = field.value.trim();
+            if (!val) {
+                // Empty is fine if allowed, but schema_json is optional
+                if (fieldId === 'schema_json') return;
+            }
+            try {
+                JSON.parse(val || (fieldId === 'genai_entities_json' || fieldId === 'faq_json' ? '[]' : '{}'));
+            } catch (e) {
+                const errMsg = document.getElementById(`${fieldId}_err`);
+                if (errMsg) errMsg.style.display = 'block';
+                field.focus();
+                isValid = false;
+            }
+        });
+        
+        return isValid;
+    }
+</script>
+{% endblock %}

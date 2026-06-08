@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}{% if post %}Edit Post: {{ post.title }}{% else %}Write New Post{% endif %} - Artha Control Center{% endblock %}
+
+{% block content %}
+<!-- Subpage Spacer -->
+<div style="height: var(--nav-height); background-color: var(--bg-secondary);"></div>
+
+<section class="section-alt" style="padding-top: 40px; min-height: 90vh;">
+    <div class="container" style="display: grid; grid-template-columns: 280px 1fr; gap: 40px; align-items: start;">
+        
+        <!-- Admin Sidebar Nav (Active: Write Post) -->
+        {% include 'admin_sidebar.html' %}
+        
+        <!-- Main Form & SEO split grid -->
+        <div style="display: grid; grid-template-columns: 1.6fr 1.4fr; gap: 40px; align-items: start;">
+            <!-- Left Column: Form Details -->
+            <div class="contact-card" style="padding: 40px;">
+                <h3 style="font-size: 24px; margin-bottom: 24px;">{% if post %}Edit Article{% else %}Compose Article{% endif %}</h3>
+                
+                {% if error %}
+                <div style="background-color: #fef2f2; border: 1px solid #fee2e2; padding: 12px 16px; border-radius: var(--border-radius-sm); color: #dc2626; font-size: 13px; margin-bottom: 20px;">
+                    <i class="fas fa-exclamation-triangle"></i> {{ error }}
+                </div>
+                {% endif %}
+                
+                <form id="blog-editor-form" method="POST" action="{% if post %}/admin/post/edit/{{ post.id }}{% else %}/admin/post/new{% endif %}">
+                    <!-- Title -->
+                    <div class="form-group">
+                        <label for="post-title" class="form-label">Post Title *</label>
+                        <input type="text" id="post-title" name="title" class="form-control" placeholder="A Strategic Guide for CIOs..." value="{{ post.title if post else '' }}" required style="font-size: 15px; font-weight: 600;">
+                    </div>
+                    
+                    <!-- Slug -->
+                    <div class="form-group">
+                        <label for="post-slug" class="form-label">URL Slug *</label>
+                        <input type="text" id="post-slug" name="slug" class="form-control" placeholder="guide-for-cios" value="{{ post.slug if post else '' }}" required style="font-family: monospace; font-size: 13px;">
+                    </div>
+                    
+                    <!-- Date & Category -->
+                    <div class="form-group half-width">
+                        <div>
+                            <label for="post-date" class="form-label">Publish Date</label>
+                            <input type="text" id="post-date" name="date" class="form-control" placeholder="May 30, 2026" value="{{ post.date if post else 'May 30, 2026' }}">
+                        </div>
+                        <div>
+                            <label for="post-category" class="form-label">Category *</label>
+                            <select id="post-category" name="category" class="form-control" required>
+                                <option value="Data Solutions" {% if post and post.category == 'Data Solutions' %}selected{% endif %}>Data Solutions</option>
+                                <option value="AI & ML" {% if post and post.category == 'AI & ML' %}selected{% endif %}>AI & ML</option>
+                                <option value="Cloud Services" {% if post and post.category == 'Cloud Services' %}selected{% endif %}>Cloud Services</option>
+                                <option value="SAP Modernization" {% if post and post.category == 'SAP Modernization' %}selected{% endif %}>SAP Modernization</option>
+                                <option value="ServiceNow" {% if post and post.category == 'ServiceNow' %}selected{% endif %}>ServiceNow</option>
+                                <option value="Oracle Services" {% if post and post.category == 'Oracle Services' %}selected{% endif %}>Oracle Services</option>
+                                <option value="Healthcare" {% if post and post.category == 'Healthcare' %}selected{% endif %}>Healthcare</option>
+                                <option value="Retail" {% if post and post.category == 'Retail' %}selected{% endif %}>Retail</option>
+                                <option value="Manufacturing" {% if post and post.category == 'Manufacturing' %}selected{% endif %}>Manufacturing</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Content -->
+                    <div class="form-group">
+                        <label for="post-content" class="form-label">Content *</label>
+                        <textarea id="post-content" name="content" class="form-control" placeholder="Write paragraphs separated by double spaces..." required style="min-height: 400px; font-family: inherit; font-size: 14px; line-height: 1.6;">{{ post.content if post else '' }}</textarea>
+                    </div>
+                    
+                    <!-- Publish Status -->
+                    <div class="form-group">
+                        <label for="post-status" class="form-label">Publish Status</label>
+                        <select id="post-status" name="status" class="form-control">
+                            <option value="Published" {% if post and post.status == 'Published' %}selected{% endif %}>Published</option>
+                            <option value="Draft" {% if not post or post.status == 'Draft' %}selected{% endif %}>Draft</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Hidden SEO inputs updated by JS -->
+                    <input type="hidden" id="post-seo-score" name="seo_score" value="{{ post.seo_score if post else 0 }}">
+                    
+                    <!-- Sidebar Inputs mapped to main submit form -->
+                    <input type="hidden" id="post-meta-title" name="meta_title" value="{{ post.meta_title if post else '' }}">
+                    <input type="hidden" id="post-meta-desc" name="meta_desc" value="{{ post.meta_desc if post else '' }}">
+                    <input type="hidden" id="post-keywords" name="keywords" value="{{ post.keywords if post else '' }}">
+                    
+                    <button type="submit" class="btn btn-primary btn-glow" style="width: 100%; margin-top: 10px;">
+                        Save Post & Update Database <i class="fas fa-save btn-icon"></i>
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Right Column: AI & SEO Helper Panel -->
+            <div class="contact-card" style="padding: 40px; border-color: rgba(6,182,212,0.25); background: var(--bg-primary);">
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding-bottom:16px; margin-bottom:24px;">
+                    <h3 style="font-size: 20px; font-weight: 700;"><i class="fas fa-robot" style="color: var(--accent-cyan); margin-right: 8px;"></i> AI & SEO Assistant</h3>
+                    <!-- Score Dial -->
+                    <div style="display:flex; flex-direction:column; align-items:center;">
+                        <span id="seo-score-badge" style="width: 50px; height: 50px; border-radius: 50%; border: 3px solid #16a34a; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px; color: #16a34a; box-shadow: 0 0 10px rgba(22,163,74,0.15);">{{ post.seo_score if post else 0 }}</span>
+                        <span style="font-size: 9px; font-weight: 700; color: var(--text-tertiary); margin-top: 4px; text-transform: uppercase;">SEO Score</span>
+                    </div>
+                </div>
+                
+                <!-- Keyword input -->
+                <div class="form-group">
+                    <label for="seo-focus-keyword" class="form-label">Focus Target Keyword</label>
+                    <input type="text" id="seo-focus-keyword" class="form-control" placeholder="e.g. data governance" value="{% if post %}{{ post.keywords.split(',')[0] if post.keywords else '' }}{% endif %}" style="padding: 10px 14px; font-size: 13px;">
+                </div>
+                
+                <div style="display:flex; gap: 8px; margin-bottom: 24px;">
+                    <button type="button" id="btn-ai-keywords" class="btn btn-secondary" style="flex:1; padding: 10px; font-size: 12px; border-radius: 8px;"><i class="fas fa-wand-magic-sparkles" style="color: var(--accent-indigo); margin-right: 6px;"></i> Extract Keywords</button>
+                    <button type="button" id="btn-ai-meta" class="btn btn-secondary" style="flex:1; padding: 10px; font-size: 12px; border-radius: 8px;"><i class="fas fa-brain" style="color: var(--accent-cyan); margin-right: 6px;"></i> Suggest Meta</button>
+                </div>
+                
+                <!-- Meta Title SEO Counter -->
+                <div class="form-group">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                        <label for="seo-meta-title" class="form-label" style="margin:0;">SEO Meta Title</label>
+                        <span id="title-char-count" style="font-size:11px; color:var(--text-tertiary);">0 / 60 chars</span>
+                    </div>
+                    <input type="text" id="seo-meta-title-input" class="form-control" placeholder="Optimizing Customer Identity..." value="{{ post.meta_title if post else '' }}" style="padding: 10px 14px; font-size: 13px;">
+                    <!-- Counter progress line -->
+                    <div style="height:3px; background-color:var(--bg-tertiary); margin-top:6px; border-radius:2px; overflow:hidden;">
+                        <div id="title-progress-bar" style="height:100%; width:0%; background-color:#ea580c; transition:var(--transition-fast);"></div>
+                    </div>
+                </div>
+                
+                <!-- Meta Description SEO Counter -->
+                <div class="form-group" style="margin-bottom: 32px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                        <label for="seo-meta-desc" class="form-label" style="margin:0;">SEO Meta Description</label>
+                        <span id="desc-char-count" style="font-size:11px; color:var(--text-tertiary);">0 / 160 chars</span>
+                    </div>
+                    <textarea id="seo-meta-desc-input" class="form-control" placeholder="A brief, punchy summary containing keywords..." style="padding: 12px 14px; font-size: 13px; min-height: 80px; resize: none;">{{ post.meta_desc if post else '' }}</textarea>
+                    <!-- Counter progress line -->
+                    <div style="height:3px; background-color:var(--bg-tertiary); margin-top:6px; border-radius:2px; overflow:hidden;">
+                        <div id="desc-progress-bar" style="height:100%; width:0%; background-color:#ea580c; transition:var(--transition-fast);"></div>
+                    </div>
+                </div>
+                
+                <!-- Live Checklist checklist -->
+                <div style="border-top: 1px solid var(--border-color); padding-top: 24px;">
+                    <h4 style="font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-secondary); margin-bottom: 16px;">SEO Checklist</h4>
+                    
+                    <ul style="list-style:none; display:flex; flex-direction:column; gap:12px; font-size:13px; color:var(--text-secondary);">
+                        <li id="chk-title" style="display:flex; align-items:center; gap:10px;"><i class="far fa-circle" style="color:var(--text-tertiary);"></i> Keyword is in Title</li>
+                        <li id="chk-desc" style="display:flex; align-items:center; gap:10px;"><i class="far fa-circle" style="color:var(--text-tertiary);"></i> Keyword in Meta Description</li>
+                        <li id="chk-length" style="display:flex; align-items:center; gap:10px;"><i class="far fa-circle" style="color:var(--text-tertiary);"></i> Article length is optimal (>300 words)</li>
+                        <li id="chk-density" style="display:flex; align-items:center; gap:10px;"><i class="far fa-circle" style="color:var(--text-tertiary);"></i> Keyword density (1-2.5%)</li>
+                        <li id="chk-meta-len" style="display:flex; align-items:center; gap:10px;"><i class="far fa-circle" style="color:var(--text-tertiary);"></i> Meta description length (120-160 chars)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</section>
+{% endblock %}

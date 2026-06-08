@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}{{ data.title }} - Artha Advantage{% endblock %}
+
+{% block content %}
+<!-- Subpage Spacer -->
+<div style="height: var(--nav-height); background-color: var(--bg-secondary);"></div>
+
+<!-- Detail Hero -->
+<section class="hero" style="min-height: 50vh; padding-top: 60px; padding-bottom: 60px;">
+    <div class="hero-bg-glow hero-glow-1"></div>
+    <div class="container hero-grid" style="grid-template-columns: 1.2fr 0.8fr;">
+        <div class="hero-content">
+            <div class="hero-badge"><i class="fas fa-rocket"></i> Artha Advantage Accelerator</div>
+            <h1 class="hero-title" style="font-size: 48px;">
+                {{ data.title }}
+            </h1>
+            <p class="hero-desc">
+                {{ data.tagline }}
+            </p>
+            <div class="hero-buttons">
+                <a href="/contact-us" class="btn btn-primary btn-glow">Request Technical Briefing</a>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="ai-graphic-container" style="max-width: 260px; height: 260px;">
+                <div class="ai-node-circle circle-sm"></div>
+                <div class="ai-core" style="width: 70px; height: 70px; background: var(--grad-primary);">
+                    <i class="fas fa-{{ data.icon or 'toolbox' }}" style="font-size: 22px;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Strip (Dynamic if exists) -->
+{% if data.stats %}
+<section class="stats-section" style="padding: 40px 0; background: var(--grad-cyan-blue);">
+    <div class="container stats-grid">
+        {% for stat in data.stats %}
+        <div class="stat-item">
+            <span class="stat-number">{{ stat.val }}</span>
+            <span class="stat-label">{{ stat.label }}</span>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- Features & Core Offerings Grid -->
+<section class="section" id="advantage-details">
+    <div class="container">
+        <div class="section-header" style="margin-bottom: 50px;">
+            <span class="section-subtitle">Scope of Framework</span>
+            <h2 class="section-title">Functional <span>Capabilities</span></h2>
+            <p class="section-desc">{{ data.description }}</p>
+        </div>
+        
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));">
+            {% for feature in data.features %}
+            <div class="card">
+                <div class="card-icon-box">
+                    <i class="fas fa-check-circle" style="color: var(--accent-blue);"></i>
+                </div>
+                <h3 class="card-title">{{ feature.title }}</h3>
+                <p class="card-desc">{{ feature.desc }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Bottom Banner -->
+<section class="section-alt" style="text-align: center;">
+    <div class="container">
+        <h2 class="section-title">Scale Your <span>Data Pipelines Today</span></h2>
+        <p class="section-desc" style="max-width: 600px; margin: 0 auto 30px;">Artha Solutions helps you deploy, clean, and govern enterprise database systems using pre-built accelerators.</p>
+        <a href="/contact-us" class="btn btn-primary btn-glow">Schedule an Architecture Review</a>
+    </div>
+</section>
+{% endblock %}

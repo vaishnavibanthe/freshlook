@@ -1,0 +1,173 @@
+{% extends "ai_base.html" %}
+
+{% block ai_hero %}
+<!-- Custom ROI Hero -->
+<section class="ai-hero">
+    <div class="ai-hero-glow"></div>
+    <div class="container ai-hero-grid" style="grid-template-columns: 1.1fr 0.9fr;">
+        <div class="ai-hero-content">
+            <div class="ai-badge" style="background: rgba(16, 185, 129, 0.1); color: #059669;"><i class="fas fa-sack-dollar"></i> Outcome Focused</div>
+            <h1 class="ai-hero-title">
+                AI built around<br><span>your ROI. Not ours.</span>
+            </h1>
+            <p class="ai-hero-subtitle">
+                It’s not about the models we build. It’s about the value they generate. We partner with you to deploy scalable, outcome-driven solutions with guaranteed payback.
+            </p>
+            <div class="ai-hero-ctas" style="margin-top: 30px;">
+                <a href="javascript:void(0);" onclick="openLeadModal('Hero CTA: AI ROI Solutions');" class="btn btn-primary btn-glow">Start your AI ROI journey <i class="fas fa-chevron-right" style="font-size: 11px; margin-left: 5px;"></i></a>
+                <a href="#roi-process" class="btn btn-secondary">See the 4-Step Process</a>
+            </div>
+        </div>
+        <div class="ai-hero-visual">
+            <div class="ai-vis-container">
+                <div class="ai-core-node" style="background: linear-gradient(135deg, #10b981, #059669); color: white;">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <div class="ai-orbit-circle orbit-1"></div>
+                <div class="ai-orbit-circle orbit-2"></div>
+                <div class="ai-satellite node-a"><i class="fas fa-hand-holding-dollar"></i></div>
+                <div class="ai-satellite node-b"><i class="fas fa-arrow-trend-up"></i></div>
+                <div class="ai-satellite node-c"><i class="fas fa-chart-pie"></i></div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block ai_content %}
+<!-- Intro Teaser -->
+<section class="ai-section section-alt">
+    <div class="container feature-split" style="display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;">
+        <div>
+            <span class="ai-subtitle">Operational Efficiency</span>
+            <h2 class="ai-title" style="font-size: 32px; margin-bottom: 20px;">Most AI budgets are <span>bigger than they need to be</span></h2>
+            <p style="color: var(--text-secondary); font-size: 15px; line-height: 1.6;">
+                Many consulting firms sell multi-million dollar pilots that take months to ship and fail to show measurable outcomes. We believe in building what you need to start, validate, and scale with minimal friction.
+            </p>
+        </div>
+        <div class="ai-card" style="border-left: 5px solid var(--ai-purple); padding: 30px; box-shadow: var(--card-shadow); background: white;">
+            <p style="font-size: 15px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 0; font-style: italic;">
+                "From the first idea to measurable outcomes, we stay with you the whole way. Our framework is built on accelerating time-to-value while ensuring your security, data structure, and governance controls scale seamlessly."
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Core Framework & Components -->
+<section class="ai-section">
+    <div class="container">
+        <div class="ai-section-header text-center">
+            <span class="ai-subtitle">Accelerators</span>
+            <h2 class="ai-title">Framework Components <span>& Middleware</span></h2>
+            <p class="ai-desc">Certified software blocks and architectural blueprints that cut implementation time and cost.</p>
+        </div>
+        
+        <div class="ai-card-grid grid-3">
+            <!-- Pillar 1: AI SniffGuard -->
+            <div class="ai-card">
+                <div class="ai-card-icon" style="background: rgba(239, 68, 68, 0.05); color: #ef4444;"><i class="fas fa-shield-halved"></i></div>
+                <h3 class="ai-card-title">AI SniffGuard</h3>
+                <p class="ai-card-desc">
+                    Middleware security layer that blocks prompt injections, filters out toxicity, and dynamically masks PII before data hits models.
+                </p>
+            </div>
+            
+            <!-- Pillar 2: AI Solutions Frameworks -->
+            <div class="ai-card">
+                <div class="ai-card-icon" style="background: rgba(124, 58, 237, 0.05); color: var(--ai-purple);"><i class="fas fa-cubes"></i></div>
+                <h3 class="ai-card-title">AI Solutions Frameworks</h3>
+                <p class="ai-card-desc">
+                    Standardized interfaces, API controllers, and ingestion logic blocks that connect databases to models with zero custom coding.
+                </p>
+            </div>
+            
+            <!-- Pillar 3: MAAC Framework -->
+            <div class="ai-card">
+                <div class="ai-card-icon" style="background: rgba(6, 182, 212, 0.05); color: #06b6d4;"><i class="fas fa-folder-tree"></i></div>
+                <h3 class="ai-card-title">The MAAC Framework</h3>
+                <p class="ai-card-desc">
+                    <strong>Master Agents & App Catalog</strong>. A curated catalog of certified connector blueprints, agent behaviors, and role rules.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Payback Metrics Section -->
+<section class="ai-section section-alt">
+    <div class="container">
+        <div class="ai-section-header text-center">
+            <span class="ai-subtitle">Performance</span>
+            <h2 class="ai-title">In weeks, <span>not years.</span></h2>
+            <p class="ai-desc">Accelerate implementation times and lower costs using pre-built MAAC connectors.</p>
+        </div>
+        
+        <div class="ai-card-grid grid-3" style="margin-top: 40px;">
+            {% for metric in body_sections.metrics %}
+            <div class="ai-card text-center" style="padding: 40px 30px; box-shadow: var(--card-shadow); background: white; border-radius: 8px;">
+                <div style="font-size: 48px; font-weight: 800; color: var(--ai-purple); font-family: var(--font-heading); margin-bottom: 10px;">
+                    {{ metric.val }}
+                </div>
+                <div style="font-size: 13px; font-weight: 700; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px;">
+                    {{ metric.unit }}
+                </div>
+                <p style="font-size: 14.5px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0;">
+                    {{ metric.label }}
+                </p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Timeline / Process Section -->
+<section class="ai-section" id="roi-process">
+    <div class="container">
+        <div class="ai-section-header text-center">
+            <span class="ai-subtitle">Roadmap</span>
+            <h2 class="ai-title">Our 4-Step <span>Value Journey</span></h2>
+            <p class="ai-desc">How we partner with you to identify, prototype, deliver, and audit AI outcomes.</p>
+        </div>
+        
+        <div class="timeline-container" style="max-width: 900px; margin: 50px auto 0; position: relative;">
+            <!-- Timeline Center Line -->
+            <div class="timeline-line" style="position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: var(--border-color); transform: translateX(-50%);"></div>
+            
+            {% for step in body_sections.steps %}
+            <div class="timeline-item" style="display: grid; grid-template-columns: 1fr 1fr; gap: 60px; margin-bottom: 40px; position: relative;">
+                <!-- Left/Right alignment check -->
+                {% if loop.index is odd %}
+                <div style="text-align: right; padding-right: 20px;">
+                    <div style="font-size: 13px; font-weight: 700; color: var(--ai-purple); text-transform: uppercase; margin-bottom: 6px;">Step {{ step.step }}</div>
+                    <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 10px; color: var(--text-primary);">{{ step.title }}</h3>
+                    <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0;">{{ step.desc }}</p>
+                </div>
+                <div></div>
+                {% else %}
+                <div></div>
+                <div style="text-align: left; padding-left: 20px;">
+                    <div style="font-size: 13px; font-weight: 700; color: var(--ai-purple); text-transform: uppercase; margin-bottom: 6px;">Step {{ step.step }}</div>
+                    <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 10px; color: var(--text-primary);">{{ step.title }}</h3>
+                    <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0;">{{ step.desc }}</p>
+                </div>
+                {% endif %}
+                
+                <!-- Timeline Dot -->
+                <div class="timeline-dot" style="position: absolute; left: 50%; top: 10px; width: 16px; height: 16px; border-radius: 50%; background: white; border: 3px solid var(--ai-purple); transform: translateX(-50%); z-index: 2;"></div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Outcome CTA section -->
+<section class="ai-bottom-cta" style="background: linear-gradient(135deg, #10b981, #059669);">
+    <div class="container" style="position: relative; z-index: 2; max-width: 700px; margin: 0 auto; text-align: center;">
+        <h2 class="ai-title" style="color: white; margin-bottom: 20px;">We win when you win. <span>Not before.</span></h2>
+        <p style="color: rgba(255,255,255,0.9); font-size: 16px; line-height: 1.6; margin-bottom: 30px;">
+            {{ body_sections.philosophy }} Start your value-linked implementation with a complimentary assessments.
+        </p>
+        <a href="javascript:void(0);" onclick="openLeadModal('ROI Philosophy CTA');" class="btn btn-primary btn-glow" style="background: white; color: #059669; border-color: white;">Start Your AI ROI Journey <i class="fas fa-arrow-right" style="margin-left: 8px;"></i></a>
+    </div>
+</section>
+{% endblock %}

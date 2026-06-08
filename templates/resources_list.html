@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - ThinkArtha Resources{% endblock %}
+
+{% block content %}
+<!-- Subpage Spacer -->
+<div style="height: var(--nav-height); background-color: var(--bg-secondary);"></div>
+
+<section class="hero" style="min-height: 40vh; padding-top: 60px; padding-bottom: 60px;">
+    <div class="hero-bg-glow hero-glow-1"></div>
+    <div class="container hero-grid" style="grid-template-columns: 1.2fr 0.8fr;">
+        <div class="hero-content">
+            <div class="hero-badge"><i class="fas {% if type == 'Event' %}fa-calendar-days{% elif type == 'Webinar' %}fa-video{% else %}fa-file-pdf{% endif %}"></i> {{ type }} List</div>
+            <h1 class="hero-title" style="font-size: 48px;">
+                {{ title }}
+            </h1>
+            <p class="hero-desc">
+                {% if type == 'Event' %}
+                Discover upcoming summits, reality tours, and offline data masterclasses where you can connect with our certified integration consultants.
+                {% elif type == 'Webinar' %}
+                Watch dynamic on-demand video presentations detailing migration strategies, active stewardship catalog setups, and compliance checklists.
+                {% else %}
+                Download Accountable Care Organization reports, IDC Analyst Connect papers, and blueprints detailing AI data readiness methodologies.
+                {% endif %}
+            </p>
+        </div>
+        <div class="hero-visual">
+            <div class="ai-graphic-container" style="max-width: 200px; height: 200px;">
+                <div class="ai-node-circle circle-sm"></div>
+                <div class="ai-core" style="width: 60px; height: 60px; background: var(--grad-primary);">
+                    <i class="fas {% if type == 'Event' %}fa-map-location-dot{% elif type == 'Webinar' %}fa-circle-play{% else %}fa-download{% endif %}" style="font-size: 20px;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Items Grid Section -->
+<section class="section-alt">
+    <div class="container">
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));">
+            {% for slug, item in items.items() %}
+            <div class="card" style="display: flex; flex-direction: column; justify-content: space-between; padding: 32px;">
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <span class="ai-card-tag ai-tag-existing" style="margin: 0; font-size: 10px; padding: 4px 10px;">{{ type }}</span>
+                        {% if type == 'Event' %}
+                        <span style="font-size: 11px; color: var(--text-tertiary); font-weight: 500;"><i class="far fa-calendar"></i> {{ item.date }}</span>
+                        {% elif type == 'Webinar' %}
+                        <span style="font-size: 11px; color: var(--text-tertiary); font-weight: 500;"><i class="far fa-clock"></i> {{ item.duration }}</span>
+                        {% else %}
+                        <span style="font-size: 11px; color: var(--text-tertiary); font-weight: 500;"><i class="far fa-file"></i> {{ item.pages }}</span>
+                        {% endif %}
+                    </div>
+                    <h3 class="card-title" style="font-size: 20px; line-height: 1.4; margin-bottom: 12px;">{{ item.title }}</h3>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.6; margin-bottom: 20px;">{{ item.summary }}</p>
+                    
+                    {% if type == 'Event' %}
+                    <div style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 20px;">
+                        <i class="fas fa-location-dot" style="margin-right: 6px;"></i> <strong>Location:</strong> {{ item.location }}
+                    </div>
+                    {% elif type == 'Webinar' %}
+                    <div style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 20px;">
+                        <i class="fas fa-user-tie" style="margin-right: 6px;"></i> <strong>Host:</strong> {{ item.host }}
+                    </div>
+                    {% else %}
+                    <div style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 20px;">
+                        <i class="fas fa-user-pen" style="margin-right: 6px;"></i> <strong>Publisher:</strong> {{ item.author }}
+                    </div>
+                    {% endif %}
+                </div>
+                <div>
+                    <div style="border-top: 1px solid var(--border-color); padding-top: 16px;">
+                        {% if type == 'Event' %}
+                        <a href="/event-view/{{ slug }}" class="card-link" style="font-size: 13px;">View Event Details <i class="fas fa-chevron-right"></i></a>
+                        {% elif type == 'Webinar' %}
+                        <a href="/webinar-view/{{ slug }}" class="card-link" style="font-size: 13px;">Watch Webinar <i class="fas fa-chevron-right"></i></a>
+                        {% else %}
+                        <a href="/white-papers/{{ slug }}" class="card-link" style="font-size: 13px;">Read Whitepaper <i class="fas fa-chevron-right"></i></a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

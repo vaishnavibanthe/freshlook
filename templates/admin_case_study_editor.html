@@ -1,0 +1,325 @@
+{% extends "base.html" %}
+
+{% block title %}{% if post %}Edit Case Study - {{ post.title }}{% else %}New Case Study{% endif %} - Control Center{% endblock %}
+
+{% block content %}
+<!-- Subpage Nav Spacer -->
+<div style="height: var(--nav-height); background-color: var(--bg-secondary);"></div>
+
+<section class="section" style="min-height: 90vh; background-color: var(--bg-secondary); padding: 40px 0;">
+    <div class="container" style="display: grid; grid-template-columns: 260px 1fr; gap: 40px; align-items: start;">
+        
+        <!-- Sidebar Navigation -->
+        {% include 'admin_sidebar.html' %}
+        
+        <!-- Editor Content -->
+        <div>
+            <!-- Breadcrumbs & Back link -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <ol style="display: flex; gap: 8px; list-style: none; font-size: 12px; color: var(--text-tertiary); font-weight: 500;">
+                    <li><a href="/admin/dashboard" style="hover: color: var(--accent-blue);">Dashboard</a></li>
+                    <li><span style="color: var(--border-color);">/</span></li>
+                    <li><a href="/admin/case-studies" style="hover: color: var(--accent-blue);">Case Studies</a></li>
+                    <li><span style="color: var(--border-color);">/</span></li>
+                    <li style="color: var(--text-secondary); font-weight: 700;">{% if post %}Edit{% else %}New{% endif %} Case Study</li>
+                </ol>
+                
+                <a href="/admin/case-studies" style="font-size: 13px; font-weight: 600; color: var(--text-secondary); display: flex; align-items: center; gap: 6px;">
+                    <i class="fas fa-chevron-left"></i> Back to Case Studies
+                </a>
+            </div>
+            
+            <!-- Editor Header -->
+            <div style="margin-bottom: 32px;">
+                <h2 style="font-size: 28px; font-weight: 800; color: var(--text-primary);">
+                    {% if post %}Edit Case Study{% else %}Create Case Study Draft{% endif %}
+                </h2>
+                <p style="font-size: 13px; color: var(--text-tertiary); margin-top: 4px;">
+                    {% if post %}Modify extracted text, optimize FAQs/schema, and manage publishing states for Study ID: {{ post.id }}{% else %}Manually upload a new client success document or create a custom entry{% endif %}
+                </p>
+            </div>
+            
+            {% if error %}
+            <div style="background-color: #fef2f2; border: 1px solid #fee2e2; border-radius: var(--border-radius-sm); padding: 12px 16px; margin-bottom: 24px; color: #dc2626; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 8px;">
+                <i class="fas fa-circle-exclamation"></i> {{ error }}
+            </div>
+            {% endif %}
+            
+            <!-- Form Workspace -->
+            <form action="{% if post %}/admin/case-studies/edit/{{ post.id }}{% else %}/admin/case-studies/new{% endif %}" method="POST" enctype="multipart/form-data">
+                
+                <!-- Main Form (Tabbed Panel) -->
+                <div>
+                    <!-- Tabs Nav -->
+                    <div style="display: flex; gap: 4px; border-bottom: 2px solid var(--border-color); margin-bottom: 24px;">
+                        <button type="button" onclick="switchTab('content-tab')" class="tab-btn active editor-tab-trigger" id="content-tab-btn" style="padding: 10px 20px; font-size: 13px; border-bottom: 2px solid transparent; border-radius: 0; background: none;">1. Core Content</button>
+                        <button type="button" onclick="switchTab('seo-tab')" class="tab-btn editor-tab-trigger" id="seo-tab-btn" style="padding: 10px 20px; font-size: 13px; border-bottom: 2px solid transparent; border-radius: 0; background: none;">2. SEO & GenAI</button>
+                        <button type="button" onclick="switchTab('schema-tab')" class="tab-btn editor-tab-trigger" id="schema-tab-btn" style="padding: 10px 20px; font-size: 13px; border-bottom: 2px solid transparent; border-radius: 0; background: none;">3. FAQ & Schema JSON</button>
+                    </div>
+                    
+                    <!-- Content Tab Panel -->
+                    <div id="content-tab" class="editor-tab-panel" style="background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); padding: 32px; box-shadow: var(--card-shadow); display: block;">
+                        
+                        <div class="form-group">
+                            <label for="title" class="form-label">Case Study Title *</label>
+                            <input type="text" id="title" name="title" value="{{ post.title if post else '' }}" required class="form-control" placeholder="e.g. Enterprise Data Governance and Master Data Management (MDM) with Talend" oninput="autoGenerateSlug(this.value)">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="slug" class="form-label">URL Slug *</label>
+                            <input type="text" id="slug" name="slug" value="{{ post.slug if post else '' }}" required class="form-control" placeholder="e.g. talend-data-governance-bfsi">
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div class="form-group">
+                                <label for="client_name" class="form-label">Client Name (Internal/Real)</label>
+                                <input type="text" id="client_name" name="client_name" value="{{ post.client_name if post else '' }}" class="form-control" placeholder="e.g. Lincoln Financial Group">
+                            </div>
+                            <div class="form-group">
+                                <label for="client_display_name" class="form-label">Display Name (Anonymized profile)</label>
+                                <input type="text" id="client_display_name" name="client_display_name" value="{{ post.client_display_name if post else '' }}" class="form-control" placeholder="e.g. Leading Commercial Bank in North America">
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+                            <div class="form-group">
+                                <label for="industry" class="form-label">Industry</label>
+                                <input type="text" id="industry" name="industry" value="{{ post.industry if post else '' }}" class="form-control" placeholder="e.g. BFSI, Manufacturing, Healthcare">
+                            </div>
+                            <div class="form-group">
+                                <label for="region" class="form-label">Region</label>
+                                <input type="text" id="region" name="region" value="{{ post.region if post else '' }}" class="form-control" placeholder="e.g. North America, Global / Europe">
+                            </div>
+                            <div class="form-group">
+                                <label for="solution_area" class="form-label">Solution Area</label>
+                                <input type="text" id="solution_area" name="solution_area" value="{{ post.solution_area if post else '' }}" class="form-control" placeholder="e.g. Data Modernization, AI Engineering">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="technologies" class="form-label">Technologies (comma-separated)</label>
+                            <input type="text" id="technologies" name="technologies" value="{{ post.technologies if post else '' }}" class="form-control" placeholder="e.g. Talend Data Fabric, Snowflake, AWS S3, Apache Spark">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="tags" class="form-label">Tags (comma-separated)</label>
+                            <input type="text" id="tags" name="tags" value="{{ study_tags if post else 'case-study' }}" class="form-control" placeholder="e.g. case-study, talend, data-governance">
+                        </div>
+
+                        <div class="form-group" style="background-color: var(--bg-secondary); padding: 20px; border-radius: var(--border-radius-md); border: 1px solid var(--border-color); margin-bottom: 20px;">
+                            <label class="form-label" style="font-weight: 800; color: var(--text-primary); margin-bottom: 12px; display: block;">Case Study Cover Image</label>
+                            
+                            {% if post %}
+                            <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
+                                <div style="width: 80px; height: 105px; border-radius: 6px; border: 1px solid var(--border-color); overflow: hidden; background: #ffffff; flex-shrink: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.1); position: relative;">
+                                    <img src="{{ post.thumbnail_path or '/static/img/case-studies/' ~ post.slug ~ '-cover.png' }}" 
+                                         alt="Current Cover" 
+                                         style="width: 100%; height: 100%; object-fit: cover;"
+                                         onerror="this.src='/static/img/hero-video-placeholder.png';">
+                                </div>
+                                <div>
+                                    <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 2px;">Current Cover Image</span>
+                                    <span style="font-size: 11px; color: var(--text-tertiary); display: block; word-break: break-all;">
+                                        {{ post.thumbnail_path or '(Default Generated PDF Snapshot)' }}
+                                    </span>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            <div style="display: grid; grid-template-columns: 1fr; gap: 12px;">
+                                <div>
+                                    <label for="cover_image_file" style="font-size: 11px; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 6px;">Upload Custom Image (PNG/JPG)</label>
+                                    <input type="file" id="cover_image_file" name="cover_image_file" accept="image/*" class="form-control" style="padding: 8px 10px; font-size: 12px;">
+                                    <span style="font-size: 11px; color: var(--text-tertiary); margin-top: 4px; display: block;">Uploading a file will automatically overwrite the case study's cover image.</span>
+                                </div>
+                                <div style="margin-top: 8px;">
+                                    <label for="thumbnail_path" style="font-size: 11px; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 6px;">Or Specify Image Path/URL</label>
+                                    <input type="text" id="thumbnail_path" name="thumbnail_path" value="{{ post.thumbnail_path if post and post.thumbnail_path else '' }}" class="form-control" placeholder="e.g., /static/img/case-studies/custom-cover.png" style="font-size: 13px;">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="executive_summary" class="form-label">Executive Summary</label>
+                            <textarea id="executive_summary" name="executive_summary" class="form-control" style="min-height: 80px;" placeholder="Brief high-level summary of the project.">{{ post.executive_summary if post else '' }}</textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="business_challenge" class="form-label">Problem Statement</label>
+                            <textarea id="business_challenge" name="business_challenge" class="form-control" style="min-height: 100px;" placeholder="What was the problem?">{{ post.business_challenge if post else '' }}</textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="solution_summary" class="form-label">Solution Delivered</label>
+                            <textarea id="solution_summary" name="solution_summary" class="form-control" style="min-height: 100px;" placeholder="What did Artha build?">{{ post.solution_summary if post else '' }}</textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="implementation_approach" class="form-label">Implementation Approach</label>
+                            <textarea id="implementation_approach" name="implementation_approach" class="form-control" style="min-height: 80px;" placeholder="How was it implemented?">{{ post.implementation_approach if post else '' }}</textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="business_outcomes" class="form-label">Business Outcomes</label>
+                            <textarea id="business_outcomes" name="business_outcomes" class="form-control" style="min-height: 80px;" placeholder="What results did the client achieve?">{{ post.business_outcomes if post else '' }}</textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="key_metrics" class="form-label">Key Metrics (JSON Array list of stats) *</label>
+                            <textarea id="key_metrics" name="key_metrics" class="form-control" style="min-height: 80px; font-family: monospace;" required placeholder='[{"value": "40%", "label": "Reduction in reporting time"}]'>{{ post.key_metrics if post else '[]' }}</textarea>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="quote" class="form-label">Executive Quote</label>
+                            <textarea id="quote" name="quote" class="form-control" style="min-height: 60px;" placeholder="Quote from the PDF or client sponsor...">{{ post.quote if post else '' }}</textarea>
+                        </div>
+                        
+                    </div>
+                    
+                    <!-- SEO & GenAI Tab Panel -->
+                    <div id="seo-tab" class="editor-tab-panel" style="background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); padding: 32px; box-shadow: var(--card-shadow); display: none;">
+                        
+                        <div class="form-group">
+                            <label for="seo_title" class="form-label">SEO Page Title</label>
+                            <input type="text" id="seo_title" name="seo_title" value="{{ post.seo_title if post else '' }}" class="form-control" placeholder="Defaults to title formatting">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="seo_description" class="form-label">Meta Description</label>
+                            <textarea id="seo_description" name="seo_description" class="form-control" style="min-height: 80px;" placeholder="Used for search engine description snips...">{{ post.seo_description if post else '' }}</textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="seo_keywords" class="form-label">SEO Focus Keywords</label>
+                            <input type="text" id="seo_keywords" name="seo_keywords" value="{{ post.seo_keywords if post else '' }}" class="form-control" placeholder="e.g. data quality, master data, Talend governance">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="ai_summary" class="form-label">AI Summary (GenAI Search Engine Answer Overview) *</label>
+                            <textarea id="ai_summary" name="ai_summary" class="form-control" style="min-height: 100px;" required placeholder="Summary optimized for ChatGPT, Gemini, Copilot, and Google AI Overviews...">{{ post.ai_summary if post else '' }}</textarea>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label for="og_title" class="form-label">Open Graph (Social) Title</label>
+                                <input type="text" id="og_title" name="og_title" value="{{ post.og_title if post else '' }}" class="form-control">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label for="og_description" class="form-label">Open Graph Description</label>
+                                <input type="text" id="og_description" name="og_description" value="{{ post.og_description if post else '' }}" class="form-control">
+                            </div>
+                        </div>
+                        
+                    </div>
+                    
+                    <!-- Schema Tab Panel -->
+                    <div id="schema-tab" class="editor-tab-panel" style="background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); padding: 32px; box-shadow: var(--card-shadow); display: none;">
+                        
+                        <div class="form-group">
+                            <label for="faq_json" class="form-label">Suggested FAQs (JSON format)</label>
+                            <textarea id="faq_json" name="faq_json" class="form-control" style="min-height: 200px; font-family: monospace;" placeholder='[{"question": "What is the challenge?", "answer": "Decentralized data sources"}]'>{{ post.faq_json if post else '[]' }}</textarea>
+                        </div>
+                        
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="schema_json" class="form-label">JSON-LD Schema Markup</label>
+                            <textarea id="schema_json" name="schema_json" class="form-control" style="min-height: 250px; font-family: monospace;" placeholder='{"@context": "https://schema.org", "@type": "TechArticle"}'>{{ post.schema_json if post else '{}' }}</textarea>
+                        </div>
+                        
+                    </div>
+                    
+                    <!-- Publishing & Status Section -->
+                    <div style="background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); padding: 32px; box-shadow: var(--card-shadow); margin-top: 24px;">
+                        <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 20px; border-bottom: 2px solid var(--border-color); padding-bottom: 8px; color: var(--accent-blue);">
+                            <i class="fas fa-sliders"></i> Publish Options & Metadata
+                        </h3>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 24px;">
+                            <div>
+                                <label for="status" class="form-label" style="font-weight: 700;">Publish Status</label>
+                                <select id="status" name="status" class="form-control" style="background-color: var(--bg-primary); color: var(--text-primary); border: 1px solid var(--border-color); height: auto;">
+                                    <option value="Published" {% if post and post.status == 'Published' %}selected{% endif %}>Published</option>
+                                    <option value="Needs Review" {% if post and post.status == 'Needs Review' %}selected{% endif %}>Needs Review</option>
+                                    <option value="Draft" {% if not post or post.status == 'Draft' %}selected{% endif %}>Draft</option>
+                                </select>
+                            </div>
+                            
+                            <div style="display: flex; align-items: center; padding-top: 20px;">
+                                <input type="checkbox" id="featured" name="featured" value="1" {% if post and post.featured %}checked{% endif %} style="width: 18px; height: 18px; cursor: pointer; margin-right: 10px;">
+                                <label for="featured" class="form-label" style="margin: 0; cursor: pointer; font-weight: 700; color: var(--text-primary);">
+                                    <i class="fas fa-star" style="color: #ea580c; margin-right: 4px;"></i> Featured Case Study
+                                </label>
+                            </div>
+                            
+                            <div style="display: flex; align-items: center; padding-top: 20px;">
+                                <input type="checkbox" id="is_client_anonymized" name="is_client_anonymized" value="1" {% if post and post.is_client_anonymized %}checked{% endif %} style="width: 18px; height: 18px; cursor: pointer; margin-right: 10px;">
+                                <label for="is_client_anonymized" class="form-label" style="margin: 0; cursor: pointer; font-weight: 700; color: var(--text-primary);">
+                                    <i class="fas fa-user-secret" style="color: var(--text-secondary); margin-right: 4px;"></i> Anonymize Client Profile
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group" style="margin-bottom: 20px;">
+                            <label for="card_summary" class="form-label">Search Card Summary (Optional, overrides auto-excerpt)</label>
+                            <textarea id="card_summary" name="card_summary" class="form-control" style="min-height: 80px;" placeholder="Optional excerpt for the case study list card. Defaults to executive summary...">{{ post.card_summary if post else '' }}</textarea>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 20px;">
+                            <label for="detail_content" class="form-label">Detailed Content Markdown (Optional, for extra details)</label>
+                            <textarea id="detail_content" name="detail_content" class="form-control" style="min-height: 120px;" placeholder="Any additional paragraphs, deep-dive logs, technical charts...">{{ post.detail_content if post else '' }}</textarea>
+                        </div>
+
+                        <!-- Actions -->
+                        <div style="display: flex; gap: 16px; border-top: 1px solid var(--border-color); padding-top: 24px;">
+                            <button type="submit" class="btn btn-primary btn-glow" style="padding: 12px 32px; font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                                <i class="fas fa-save"></i> Save Case Study
+                            </button>
+                            <a href="/admin/case-studies" class="btn" style="padding: 12px 32px; font-size: 14px; font-weight: 700; background-color: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); text-decoration: none; text-align: center;">
+                                Cancel
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<script>
+function switchTab(tabId) {
+    // Hide all tab panels
+    const panels = document.querySelectorAll('.editor-tab-panel');
+    panels.forEach(p => p.style.display = 'none');
+    
+    // Deactivate all triggers
+    const triggers = document.querySelectorAll('.editor-tab-trigger');
+    triggers.forEach(t => {
+        t.style.borderBottomColor = 'transparent';
+        t.style.color = 'var(--text-secondary)';
+    });
+    
+    // Show active panel
+    document.getElementById(tabId).style.display = 'block';
+    
+    // Activate trigger
+    const activeBtn = document.getElementById(tabId + '-btn');
+    activeBtn.style.borderBottomColor = 'var(--accent-blue)';
+    activeBtn.style.color = 'var(--accent-blue)';
+}
+
+function autoGenerateSlug(title) {
+    const slugInput = document.getElementById('slug');
+    // Generate slug only if manual edit has not occurred (or if slug is empty)
+    if (slugInput.value === '' || slugInput.getAttribute('data-auto') === 'true') {
+        let slug = title.toLowerCase();
+        slug = slug.replace(/[^a-z0-9\s-]/g, ''); // Remove special characters
+        slug = slug.replace(/[\s-]+/g, '-'); // Replace spaces/hyphens with a single hyphen
+        slugInput.value = slug.replace(/^-+|-+$/g, ''); // Strip leading/trailing hyphens
+        slugInput.setAttribute('data-auto', 'true');
+    }
+}
+
+document.getElementById('slug').addEventListener('input', function() {
+    this.setAttribute('data-auto', 'false'); // Mark slug as manually modified
+});
+</script>
+{% endblock %}

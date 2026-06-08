@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Enterprise Applications - ServiceNow & Oracle Integration{% endblock %}
+
+{% block content %}
+<!-- Subpage Spacer -->
+<div style="height: var(--nav-height); background-color: var(--bg-secondary);"></div>
+
+<section class="hero" style="min-height: 50vh; padding-top: 60px; padding-bottom: 60px;">
+    <div class="hero-bg-glow hero-glow-1"></div>
+    <div class="container hero-grid" style="grid-template-columns: 1.2fr 0.8fr;">
+        <div class="hero-content">
+            <div class="hero-badge"><i class="fas fa-cubes"></i> Enterprise Application Practice</div>
+            <h1 class="hero-title" style="font-size: 48px;">
+                Unifying <span>Enterprise Applications</span>
+            </h1>
+            <p class="hero-desc">
+                Connect ServiceNow IT operations and transactional Oracle database records to central data warehouses for full workflow visibility.
+            </p>
+            <div class="hero-buttons">
+                <a href="/contact-us" class="btn btn-primary btn-glow">Consult Application Architect</a>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="ai-graphic-container" style="max-width: 260px; height: 260px;">
+                <div class="ai-node-circle circle-sm"></div>
+                <div class="ai-core" style="width: 70px; height: 70px; background: var(--grad-cyan-blue);">
+                    <i class="fas fa-sliders" style="font-size: 22px;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Offerings Grid Section -->
+<section class="section-alt" id="enterprise-apps">
+    <div class="container">
+        <div class="section-header" style="margin-bottom: 50px;">
+            <span class="section-subtitle">Integration Services</span>
+            <h2 class="section-title">Application <span>Portfolios</span></h2>
+            <p class="section-desc">We design Talend ETL pipelines and REST API integrations to audit SLA compliance, stabilize databases, and automate incidents routing.</p>
+        </div>
+        
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));">
+            {% for slug, page in nav_enterprise_apps.items() %}
+            <div class="card">
+                <div class="card-icon-box">
+                    <i class="fas fa-{{ page.icon }}"></i>
+                </div>
+                <h3 class="card-title">{{ page.title }}</h3>
+                <p class="card-desc">{{ page.tagline }}</p>
+                <a href="/enterprise-application/{{ slug }}" class="card-link">View Details <i class="fas fa-chevron-right"></i></a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Bottom CTA -->
+<section class="section" style="text-align: center;">
+    <div class="container">
+        <h2 class="section-title">Establish End-To-End <span>Workflow Insights</span></h2>
+        <p class="section-desc" style="max-width: 600px; margin: 0 auto 30px;">Artha Solutions helps you design stable enterprise application connectors and ETL loaders.</p>
+        <a href="/contact-us" class="btn btn-primary btn-glow">Get a Custom Integration Estimate</a>
+    </div>
+</section>
+{% endblock %}

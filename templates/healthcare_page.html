@@ -1,0 +1,383 @@
+{% extends "healthcare_base.html" %}
+
+{% block healthcare_hero %}
+<!-- Hero Section -->
+<section class="healthcare-hero">
+    <div class="healthcare-hero-glow"></div>
+    <div class="container healthcare-hero-grid">
+        <div class="healthcare-hero-content">
+            <span class="healthcare-badge"><i class="fas fa-heart-pulse"></i> {{ page.title }}</span>
+            <h1 class="healthcare-hero-title">
+                {{ page.hero_title }}
+            </h1>
+            <p class="healthcare-hero-subtitle">
+                {{ page.hero_subtitle }}
+            </p>
+            
+            <div class="healthcare-hero-ctas">
+                <button onclick="openLeadModal('{{ page.title }} Hero CTA');" class="btn btn-primary btn-lg">
+                    {{ cta.primary_cta_text or 'Talk to a Healthcare Data Expert' }} <i class="fas fa-arrow-right btn-icon"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="healthcare-hero-visual">
+            <div class="healthcare-vis-container">
+                <div class="tech-grid-bg"></div>
+                <div class="tech-circle pulsate-slow">
+                    <i class="fas {% if active_subpage == 'providers' %}fa-hospital{% elif active_subpage == 'payers' %}fa-file-invoice-dollar{% elif active_subpage == 'data-governance' %}fa-shield-halved{% elif active_subpage == 'interoperability' %}fa-network-wired{% elif active_subpage == 'analytics-ai' %}fa-brain{% else %}fa-database{% endif %} text-purple"></i>
+                    <div class="tech-ring ring-1"></div>
+                    <div class="tech-ring ring-2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block healthcare_content %}
+<!-- Challenge / Value Prop Section -->
+<section class="healthcare-section section-alt">
+
+    <div class="container">
+        <!-- Providers & Payers Challenge List -->
+        {% if body_sections.challenges %}
+        <div class="healthcare-section-header text-center">
+            <span class="healthcare-subtitle">Operational Hurdles</span>
+            <h2 class="healthcare-title">{{ body_sections.challenges_title or 'Data Silos & Fragmentation Challenges' }}</h2>
+            <p class="healthcare-desc">Without a modern data platform, healthcare organizations suffer from inefficient reporting, compliance exposures, and delayed insights.</p>
+        </div>
+        <div class="challenges-list-grid">
+            {% for chal in body_sections.challenges %}
+            <div class="challenge-list-item">
+                <span class="challenge-icon"><i class="fas fa-xmark"></i></span>
+                <span class="challenge-text">{{ chal }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Governance / MDM Value Proposition -->
+        {% if body_sections.value_proposition %}
+        <div class="value-prop-block">
+            <div class="healthcare-section-header">
+                <span class="healthcare-subtitle">The Imperative</span>
+                <h2 class="healthcare-title">{{ body_sections.value_proposition }}</h2>
+                <p class="healthcare-desc">{{ body_sections.value_desc }}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Interoperability Challenge -->
+        {% if body_sections.integration_challenge_title %}
+        <div class="value-prop-block">
+            <div class="healthcare-section-header">
+                <span class="healthcare-subtitle">Connecting Silos</span>
+                <h2 class="healthcare-title">{{ body_sections.integration_challenge_title }}</h2>
+                <p class="healthcare-desc">{{ body_sections.integration_challenge_desc }}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Analytics AI Ingest/Trust -->
+        {% if body_sections.ai_data_trust_title %}
+        <div class="value-prop-block">
+            <div class="healthcare-section-header">
+                <span class="healthcare-subtitle">Data Foundations</span>
+                <h2 class="healthcare-title">{{ body_sections.ai_data_trust_title }}</h2>
+                <p class="healthcare-desc">{{ body_sections.ai_data_trust_desc }}</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Solution Areas / Capabilities Section -->
+<section class="healthcare-section">
+    <div class="container">
+        <!-- Providers & Payers Solution Cards -->
+        {% if body_sections.solutions %}
+        <div class="healthcare-section-header text-center">
+            <span class="healthcare-subtitle">Solutions</span>
+            <h2 class="healthcare-title">{{ body_sections.solutions_title or 'Artha Data Solutions' }}</h2>
+            <p class="healthcare-desc">Tailored pipelines and architecture patterns to resolve siloed systems and streamline delivery.</p>
+        </div>
+        <div class="healthcare-card-grid grid-4">
+            {% for sol in body_sections.solutions %}
+            <div class="healthcare-card hover-card">
+                <div class="card-icon-circle"><i class="fas fa-check"></i></div>
+                <h3 class="card-title">{{ sol.title }}</h3>
+                <p class="card-desc">{{ sol.desc }}</p>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Governance / Interoperability / MDM / Analytics Capabilities -->
+        {% if body_sections.capabilities %}
+        <div class="healthcare-section-header text-center">
+            <span class="healthcare-subtitle">Capabilities</span>
+            <h2 class="healthcare-title">{{ body_sections.capabilities_title or 'Our Engineering Capabilities' }}</h2>
+            <p class="healthcare-desc">We build enterprise-grade frameworks to ensure your data is clean, secure, and ready for deployment.</p>
+        </div>
+        <div class="healthcare-card-grid grid-3">
+            {% for cap in body_sections.capabilities %}
+            <div class="healthcare-card hover-card">
+                <div class="card-icon-circle accent-purple"><i class="fas fa-cog"></i></div>
+                <h3 class="card-title">{{ cap.title }}</h3>
+                <p class="card-desc">{{ cap.desc }}</p>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Analytics Modernization Capabilities -->
+        {% if body_sections.analytics_capabilities %}
+        <div class="healthcare-section-header text-center">
+            <span class="healthcare-subtitle">Analytics Modernization</span>
+            <h2 class="healthcare-title">{{ body_sections.analytics_capabilities_title }}</h2>
+            <p class="healthcare-desc">Upgrade your reporting legacy to high-concurrency cloud environments.</p>
+        </div>
+        <div class="healthcare-card-grid grid-4">
+            {% for cap in body_sections.analytics_capabilities %}
+            <div class="healthcare-card hover-card">
+                <div class="card-icon-circle"><i class="fas fa-chart-bar"></i></div>
+                <h3 class="card-title">{{ cap.title }}</h3>
+                <p class="card-desc">{{ cap.desc }}</p>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- AI Readiness Items -->
+        {% if body_sections.ai_readiness_items %}
+        <div class="healthcare-section-header text-center" style="margin-top: 60px;">
+            <span class="healthcare-subtitle">AI & GenAI Readiness</span>
+            <h2 class="healthcare-title">{{ body_sections.ai_readiness_title or 'Data Foundations for AI' }}</h2>
+            <p class="healthcare-desc">Structure, clean, and mask clinical data products to ground algorithms safely.</p>
+        </div>
+        <div class="healthcare-card-grid grid-4">
+            {% for read in body_sections.ai_readiness_items %}
+            <div class="healthcare-card hover-card">
+                <div class="card-icon-circle"><i class="fas fa-brain"></i></div>
+                <h3 class="card-title">{{ read.title }}</h3>
+                <p class="card-desc">{{ read.desc }}</p>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Domains Section (MDM specific or Governance specific) -->
+{% if body_sections.domains %}
+<section class="healthcare-section section-alt">
+    <div class="container">
+        <div class="healthcare-section-header text-center">
+            <span class="healthcare-subtitle">Data Assets</span>
+            <h2 class="healthcare-title">{{ body_sections.domains_title or 'Healthcare Data Domains Covered' }}</h2>
+            <p class="healthcare-desc">We clean, merge, and govern vital data entities across key healthcare structures.</p>
+        </div>
+        <div class="healthcare-card-grid grid-4">
+            {% for dom in body_sections.domains %}
+            <div class="outcome-card">
+                <div class="outcome-icon"><i class="fas fa-folder-open"></i></div>
+                {% if dom is string %}
+                <h4 class="outcome-title">{{ dom }}</h4>
+                <p class="outcome-text">Governed database tables with custom privacy checks and role accessibility rules.</p>
+                {% else %}
+                <h4 class="outcome-title">{{ dom.title }}</h4>
+                <p class="outcome-text">{{ dom.desc }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Operating Model Block (Governance specific) -->
+{% if body_sections.operating_model_title %}
+<section class="healthcare-section">
+    <div class="container">
+        <div class="feature-split">
+            <div class="feature-content" style="max-width: 100%;">
+                <span class="healthcare-badge"><i class="fas fa-sitemap"></i> Governance Architecture</span>
+                <h2 class="feature-title">{{ body_sections.operating_model_title }}</h2>
+                <p class="feature-desc">{{ body_sections.operating_model_desc }}</p>
+                <div class="roles-grid" style="margin-top: 30px; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px;">
+                    <div class="role-item" style="background: var(--bg-secondary); padding: 15px; border-radius: 8px; border-left: 4px solid var(--primary-color);">
+                        <strong>Data Owner:</strong> Approves metadata, accessibility levels, and business terms.
+                    </div>
+                    <div class="role-item" style="background: var(--bg-secondary); padding: 15px; border-radius: 8px; border-left: 4px solid var(--primary-color);">
+                        <strong>Data Steward:</strong> Handles active deduplication reviews and profiling rules.
+                    </div>
+                    <div class="role-item" style="background: var(--bg-secondary); padding: 15px; border-radius: 8px; border-left: 4px solid var(--primary-color);">
+                        <strong>IT & Engineers:</strong> Builds dynamic masking, pipeline checks, and secure repositories.
+                    </div>
+                    <div class="role-item" style="background: var(--bg-secondary); padding: 15px; border-radius: 8px; border-left: 4px solid var(--primary-color);">
+                        <strong>Consumers:</strong> Query clean databases directly for BI reports and AI engines.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Architecture Block (Providers & Interoperability specific) -->
+{% if body_sections.architecture_flow %}
+<section class="healthcare-section {% if not body_sections.domains %}section-alt{% endif %}">
+    <div class="container">
+        <div class="healthcare-section-header text-center">
+            <span class="healthcare-subtitle">Integration Flow</span>
+            <h2 class="healthcare-title">Healthcare Data Architecture</h2>
+            <p class="healthcare-desc">How data moves securely from operational databases to trusted clinical/claims analytics products.</p>
+        </div>
+        
+        <div class="architecture-flow-diagram">
+            {% for step in body_sections.architecture_flow %}
+            <div class="flow-step">
+                <div class="flow-step-number">{{ loop.index }}</div>
+                <div class="flow-step-text">{{ step }}</div>
+            </div>
+            {% if not loop.last %}
+            <div class="flow-arrow"><i class="fas fa-chevron-down"></i></div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Use Cases (For subpages that list them) -->
+{% if body_sections.use_cases %}
+<section class="healthcare-section {% if body_sections.architecture_flow %}section{% else %}section-alt{% endif %}">
+    <div class="container">
+        <div class="healthcare-section-header text-center">
+            <span class="healthcare-subtitle">Key Use Cases</span>
+            <h2 class="healthcare-title">Featured Business Scenarios</h2>
+            <p class="healthcare-desc">Practical implementations delivering value for healthcare operations and compliance groups.</p>
+        </div>
+        <div class="healthcare-card-grid grid-3">
+            {% for uc in body_sections.use_cases %}
+            <div class="healthcare-card">
+                <div class="card-icon-circle accent-purple"><i class="fas fa-lightbulb"></i></div>
+                <h3 class="card-title" style="margin-top: 15px; font-size: 18px;">{{ uc }}</h3>
+                <p class="card-desc">Modernized data pipeline matching schemas, scrubbing files, and feeding dashboards securely.</p>
+                <a href="/industries/healthcare/use-cases" class="btn-text" style="margin-top: auto; padding-top: 15px; display: block;">Explore Use Cases <i class="fas fa-arrow-right"></i></a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Outcomes Section -->
+{% if body_sections.outcomes %}
+<section class="healthcare-section {% if not body_sections.use_cases and not body_sections.architecture_flow %}section-alt{% endif %}">
+    <div class="container">
+        <div class="healthcare-section-header text-center">
+            <span class="healthcare-subtitle">Outcomes</span>
+            <h2 class="healthcare-title">Business Outcomes & Value</h2>
+            <p class="healthcare-desc">We deliver verified improvements in database speeds, compliance controls, and profiles accuracy.</p>
+        </div>
+        
+        <div class="outcomes-checklist-grid">
+            {% for out in body_sections.outcomes %}
+            <div class="outcome-checklist-item">
+                <i class="fas fa-circle-check text-purple"></i>
+                <span>{{ out }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Related Services Links -->
+{% if related_services %}
+<section class="healthcare-section section-alt" style="padding: 40px 0; border-top: 1px solid var(--border-color);">
+    <div class="container text-center">
+        <h4 style="margin-bottom: 20px; font-size: 16px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-secondary);">Related Solution Services</h4>
+        <div class="related-services-flex" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px;">
+            {% for service in related_services %}
+            <a href="{{ service.url }}" class="btn btn-outline" style="font-size: 14px; padding: 8px 18px;">{{ service.title }}</a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- FAQs Section -->
+<section class="healthcare-section">
+    <div class="container">
+        <div class="healthcare-section-header text-center">
+            <span class="healthcare-subtitle">FAQ</span>
+            <h2 class="healthcare-title">Frequently Asked Questions</h2>
+            <p class="healthcare-desc">Get answers to common questions about {{ page.title }}.</p>
+        </div>
+
+        <div class="faq-accordion-container">
+            {% if faqs %}
+                {% for faq in faqs %}
+                <div class="faq-accordion-item">
+                    <button class="faq-accordion-trigger" onclick="toggleFaqAccordion(this)">
+                        {{ faq.q }} <i class="fas fa-plus icon-plus"></i>
+                    </button>
+                    <div class="faq-accordion-panel">
+                        <p>{{ faq.a }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="faq-accordion-item">
+                    <button class="faq-accordion-trigger" onclick="toggleFaqAccordion(this)">
+                        How does Artha help solve healthcare data challenges? <i class="fas fa-plus icon-plus"></i>
+                    </button>
+                    <div class="faq-accordion-panel">
+                        <p>Artha implements modern database schemas, automated cleansing rules, and metadata cataloging systems to streamline clinical and administrative data pipelines.</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Bottom CTA Section -->
+<section class="healthcare-bottom-cta">
+    <div class="container text-center">
+        <h2 class="cta-title">Ready to Upgrade Your {{ page.title }}?</h2>
+        <p class="cta-subtitle">Talk with our senior healthcare data advisors to map a secure, compliant path for your data assets.</p>
+        <div class="cta-actions" style="justify-content: center;">
+            <button onclick="openLeadModal('Bottom {{ page.title }} CTA');" class="btn btn-primary btn-lg btn-glow">
+                {{ cta.primary_cta_text or 'Talk to a Healthcare Data Expert' }}
+            </button>
+        </div>
+    </div>
+</section>
+
+<script>
+    // Toggle FAQ Accordion
+    function toggleFaqAccordion(btn) {
+        btn.classList.toggle('active');
+        const icon = btn.querySelector('i');
+        if (btn.classList.contains('active')) {
+            icon.classList.remove('fa-plus');
+            icon.classList.add('fa-minus');
+        } else {
+            icon.classList.remove('fa-minus');
+            icon.classList.add('fa-plus');
+        }
+        
+        const panel = btn.nextElementSibling;
+        if (panel.style.maxHeight) {
+            panel.style.maxHeight = null;
+            panel.style.padding = '0 20px';
+        } else {
+            panel.style.maxHeight = panel.scrollHeight + "px";
+            panel.style.padding = '15px 20px';
+        }
+    }
+</script>
+{% endblock %}

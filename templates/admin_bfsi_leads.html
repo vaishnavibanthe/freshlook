@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}BFSI Captured Leads - Control Center{% endblock %}
+
+{% block content %}
+<div style="height: var(--nav-height); background-color: var(--bg-secondary);"></div>
+
+<section class="section" style="min-height: 90vh; background-color: var(--bg-secondary); padding: 40px 0;">
+    <div class="container" style="display: grid; grid-template-columns: 260px 1fr; gap: 40px; align-items: start;">
+        
+        <!-- Sidebar Navigation -->
+        {% include 'admin_sidebar.html' %}
+        
+        <!-- Main Content -->
+        <div>
+            <!-- Header -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
+                <div>
+                    <h2 style="font-size: 28px; font-weight: 800; letter-spacing: -0.5px; color: var(--text-primary);">BFSI B2B Leads</h2>
+                    <p style="font-size: 13px; color: var(--text-tertiary); margin-top: 4px;">Review and manage inquiries captured from the BFSI microsite forms.</p>
+                </div>
+                
+                <a href="/admin/industries/bfsi/export-leads" class="btn btn-primary btn-glow" style="padding: 10px 22px; font-size: 13px; border-radius: 8px; display: flex; align-items: center; gap: 6px; background-color: var(--bfsi-blue, #2563eb);">
+                    <i class="fas fa-download"></i> Export CSV
+                </a>
+            </div>
+            
+            <!-- Leads List Table -->
+            <div style="background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); padding: 32px; box-shadow: var(--card-shadow);">
+                {% if leads %}
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 12.5px;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid var(--border-color); color: var(--text-secondary); font-weight: 700;">
+                                <th style="padding: 12px 10px;">ID</th>
+                                <th style="padding: 12px 10px;">Contact</th>
+                                <th style="padding: 12px 10px;">Business Email</th>
+                                <th style="padding: 12px 10px;">Company</th>
+                                <th style="padding: 12px 10px;">Job Title</th>
+                                <th style="padding: 12px 10px;">Phone</th>
+                                <th style="padding: 12px 10px;">Location</th>
+                                <th style="padding: 12px 10px;">CTA / Page Source</th>
+                                <th style="padding: 12px 10px;">Message Detail</th>
+                                <th style="padding: 12px 10px;">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for lead in leads %}
+                            <tr style="border-bottom: 1px solid var(--border-color); vertical-align: top;" onmouseover="this.style.backgroundColor='var(--bg-secondary)'" onmouseout="this.style.backgroundColor='transparent'">
+                                <td style="padding: 14px 10px; color: var(--text-tertiary);">{{ lead.id }}</td>
+                                <td style="padding: 14px 10px; font-weight: 600; white-space: nowrap;">{{ lead.first_name }} {{ lead.last_name }}</td>
+                                <td style="padding: 14px 10px; font-family: monospace;">{{ lead.business_email }}</td>
+                                <td style="padding: 14px 10px; font-weight: 500;">{{ lead.company }}</td>
+                                <td style="padding: 14px 10px; color: var(--text-secondary);">{{ lead.job_title }}</td>
+                                <td style="padding: 14px 10px; white-space: nowrap; color: var(--text-secondary);">{{ lead.phone or '-' }}</td>
+                                <td style="padding: 14px 10px; color: var(--text-secondary);">{{ lead.country }}</td>
+                                <td style="padding: 14px 10px;">
+                                    <span class="tag-pill" style="font-size: 10px; display: block; margin-bottom: 4px; text-align: center;">{{ lead.source_page }}</span>
+                                    <span style="font-size: 9.5px; color: var(--text-tertiary); display: block; line-height: 1.2;">{{ lead.cta_clicked }}</span>
+                                </td>
+                                <td style="padding: 14px 10px; color: var(--text-color); max-width: 250px; line-height: 1.4;">
+                                    <div style="max-height: 80px; overflow-y: auto;">{{ lead.message or '-' }}</div>
+                                </td>
+                                <td style="padding: 14px 10px; color: var(--text-tertiary); white-space: nowrap;">{{ lead.created_at }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div style="text-align: center; padding: 40px 0;">
+                    <i class="fas fa-address-book" style="font-size: 40px; color: var(--text-tertiary); margin-bottom: 12px;"></i>
+                    <p style="color: var(--text-secondary); font-size: 14px;">No B2B leads have been captured yet.</p>
+                </div>
+                {% endif %}
+            </div>
+            
+        </div>
+    </div>
+</section>
+{% endblock %}

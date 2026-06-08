@@ -1,0 +1,317 @@
+{% extends "base.html" %}
+
+{% block title %}Qlik Consulting Services{% endblock %}
+
+{% block extra_meta %}
+<meta name="description" content="Transform complex data into actionable insights with Qlik Consulting Services. Leverage Qlik Sense, QlikView, Replicate, and Compose to drive active intelligence.">
+{% endblock %}
+
+{% block content %}
+<style>
+:root {
+    --brand-color: #00a651;
+    --brand-color-rgb: 0, 166, 81;
+    --brand-glow: rgba(0, 166, 81, 0.15);
+}
+@keyframes spinOrbit {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+@keyframes spinOrbitReverse {
+    0% { transform: rotate(360deg); }
+    100% { transform: rotate(0deg); }
+}
+.brand-orbit-node {
+    position: absolute;
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--brand-color);
+}
+.card-brand-hover {
+    transition: all 0.3s ease;
+}
+.card-brand-hover:hover {
+    border-color: var(--brand-color) !important;
+    box-shadow: 0 10px 30px var(--brand-glow) !important;
+    transform: translateY(-5px);
+}
+.badge-brand {
+    background: var(--brand-glow);
+    color: var(--brand-color);
+    border: 1px solid rgba(0, 166, 81, 0.3);
+}
+</style>
+
+<!-- Detail Hero -->
+<section class="hero" style="min-height: 60vh; padding-top: calc(var(--nav-height) + 60px); padding-bottom: 60px;">
+    <div class="hero-bg-glow hero-glow-1" style="background: radial-gradient(circle, rgba(0,166,81,0.2) 0%, transparent 70%);"></div>
+    <div class="container hero-grid" style="grid-template-columns: 1.2fr 0.8fr;">
+        <div class="hero-content">
+            <div class="hero-badge badge-brand"><i class="fas fa-handshake"></i> Strategic Partners &middot; Qlik</div>
+            <h1 class="hero-title" style="font-size: clamp(34px, 4.5vw, 46px); line-height: 1.15; margin-bottom: 18px;">
+                Qlik <span>Consulting Services</span>
+            </h1>
+            <p class="hero-desc">
+                Our Qlik consultants provide advanced data visualization, transforming complex data into actionable insights for global businesses. Leveraging Qlik Sense and QlikView, we empower startups, SMEs, and enterprises to make data-driven decisions, unlocking data’s full value.
+            </p>
+            <div class="hero-buttons" style="display:flex; gap:14px; flex-wrap:wrap;">
+                <a href="/contact-us" class="btn btn-primary btn-glow" style="background: linear-gradient(135deg, #00a651, #0ea5e9); border: none;">Consult Partner Architect <i class="fas fa-chevron-right btn-icon"></i></a>
+                <a href="#benefits" class="btn btn-outline">Key Benefits</a>
+            </div>
+            
+            <div class="sol-tag-row" style="margin-top: 30px; display: flex; gap: 10px; flex-wrap: wrap;">
+                <span class="sol-tag-pill" style="font-size: 12px; background: rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);"><i class="fas fa-award" style="color: #00a651; margin-right: 6px;"></i> Best Enabled Partner</span>
+                <span class="sol-tag-pill" style="font-size: 12px; background: rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);"><i class="fas fa-bolt" style="color: #00a651; margin-right: 6px;"></i> Active Intelligence</span>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="brand-graphic" style="position: relative; width: 100%; height: 350px; display: flex; justify-content: center; align-items: center;">
+                <div style="position: absolute; width: 280px; height: 280px; border-radius: 50%; background: radial-gradient(circle, rgba(0,166,81,0.15) 0%, transparent 70%); filter: blur(20px);"></div>
+                <div style="position: absolute; width: 260px; height: 260px; border: 1px dashed rgba(0,166,81,0.2); border-radius: 50%; animation: spinOrbit 25s linear infinite;"></div>
+                <div style="position: absolute; width: 180px; height: 180px; border: 1px dashed rgba(14,165,233,0.3); border-radius: 50%; animation: spinOrbitReverse 15s linear infinite;"></div>
+                <div class="ai-core" style="width: 90px; height: 90px; background: linear-gradient(135deg, #00a651, #0ea5e9); box-shadow: 0 0 30px rgba(0,166,81,0.4); z-index: 2; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-bolt" style="font-size: 32px; color: #fff;"></i>
+                </div>
+                <!-- Nodes -->
+                <div class="brand-orbit-node" style="width: 12px; height: 12px; background: #00a651; top: 60px; left: 140px;"></div>
+                <div class="brand-orbit-node" style="width: 8px; height: 8px; background: #34d399; bottom: 70px; left: 80px;"></div>
+                <div class="brand-orbit-node" style="width: 10px; height: 10px; background: #38bdf8; top: 160px; right: 40px;"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Key Benefits -->
+<section class="section-alt" id="benefits">
+    <div class="container">
+        <div class="section-header" style="text-align: center; margin-bottom: 50px;">
+            <span class="section-subtitle">Values</span>
+            <h2 class="section-title">Key <span>Benefits</span></h2>
+            <p class="section-desc">Qlik Development Services for Powerful, Data-Driven Insights. Maximize your investment, driving impactful insights and smarter decisions.</p>
+        </div>
+        
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px;">
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(0,166,81,0.1); color: #00a651;">
+                    <i class="fas fa-chart-pie"></i>
+                </div>
+                <h3 class="card-title">Advanced & Self-service Analytics</h3>
+                <p class="card-desc">Users can build reports and dashboards independently, minimizing IT reliance. This empowers them to explore data freely, gain insights, and cultivate a data-driven culture across the organization.</p>
+            </div>
+            
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(0,166,81,0.1); color: #00a651;">
+                    <i class="fas fa-sync-alt"></i>
+                </div>
+                <h3 class="card-title">Change Data Capture</h3>
+                <p class="card-desc">Qlik's real-time data tracking optimizes analytics with only updated data, reducing resource use and boosting integration speed for timely insights, better decisions, and minimal system impact.</p>
+            </div>
+            
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(0,166,81,0.1); color: #00a651;">
+                    <i class="fas fa-th-large"></i>
+                </div>
+                <h3 class="card-title">Interactive Dashboards</h3>
+                <p class="card-desc">QlikView provides interactive, customizable dashboards that visually display data, helping users easily spot trends and patterns. This intuitive design enhances data discovery and storytelling.</p>
+            </div>
+            
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(0,166,81,0.1); color: #00a651;">
+                    <i class="fas fa-compress-arrows-alt"></i>
+                </div>
+                <h3 class="card-title">Robust Data Integration</h3>
+                <p class="card-desc">QlikView combines data from various sources—databases, spreadsheets, and web services—offering businesses a unified view of their operations and performance metrics.</p>
+            </div>
+            
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(0,166,81,0.1); color: #00a651;">
+                    <i class="fas fa-eye"></i>
+                </div>
+                <h3 class="card-title">Advanced Data Visualization</h3>
+                <p class="card-desc">QlikView offers diverse chart types and visualization options, allowing users to present data in impactful ways. Advanced visuals enhance communication, making insights clearer for stakeholders.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Years of Partnership spotlight -->
+<section class="section" style="background: linear-gradient(180deg, var(--bg-primary) 0%, rgba(0,166,81,0.03) 50%, var(--bg-primary) 100%);">
+    <div class="container" style="text-align: center; max-width: 800px; padding: 60px 20px;">
+        <div style="font-size: 64px; font-weight: 800; color: #00a651; line-height: 1; margin-bottom: 20px;">12 Years</div>
+        <h3 style="font-size: 24px; color: var(--text-primary); margin-bottom: 15px;">Partnership with Qlik</h3>
+        <p style="font-size: 18px; color: var(--text-secondary); line-height: 1.6; margin: 0 auto 30px;">
+            Recognized as Qlik's Partner of the Year within different categories <strong>6 times in a row since 2018</strong>, including Best Enabled Partner of the Year 2023.
+        </p>
+        <a href="/contact-us" class="btn btn-primary btn-glow" style="background: linear-gradient(135deg, #00a651, #0ea5e9); border: none;">Consult Partner Architect</a>
+    </div>
+</section>
+
+<!-- Our Qlik Services -->
+<section class="section-alt" id="services">
+    <div class="container">
+        <div class="section-header" style="text-align: center; margin-bottom: 50px;">
+            <span class="section-subtitle">Solutions Catalog</span>
+            <h2 class="section-title">Qlik <span>Consulting Services</span></h2>
+            <p class="section-desc">Design active intelligence environments, automate data replication, and set up dynamic analytics pipelines.</p>
+        </div>
+        
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-cloud" style="color: #00a651;"></i> Qlik Cloud Data Integration
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">Qlik Cloud Data Integration offers powerful SaaS tools for analytics and data engineers to streamline enterprise data integration and transformation. At Artha Solutions, we unify and transform data in real-time, supporting analytics, machine learning, and digital transformation.</p>
+            </div>
+            
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-copy" style="color: #00a651;"></i> Qlik Replicate
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">Artha Solutions accelerates data replication, ingestion, and streaming across databases and data platforms with Qlik Replicate. This advanced tool automates replication, eliminating complex ETL coding and specialized expertise, ensuring efficiency and scalability.</p>
+            </div>
+            
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-magic" style="color: #00a651;"></i> Qlik Compose
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">Qlik Compose automates building, managing, and updating data warehouses and lakes, delivering reliable data to big data platforms. Artha Solutions streamlines data environments by automating multi-source ingestion, creating agile data warehouses, and efficiently managing data lakes with speed and precision.</p>
+            </div>
+            
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-tasks" style="color: #00a651;"></i> Qlik Enterprise Manager
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">Qlik Enterprise Manager provides a central hub to configure, execute, and monitor Qlik Replicate and Compose tasks. Artha Solutions streamlines multi-environment management with unified interface for task design, endpoint creation, and real-time replication monitoring.</p>
+            </div>
+            
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-cogs" style="color: #00a651;"></i> Qlik Application Automation
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">Artha Solutions enables organizations to build automated analytics and workflows with ease using Qlik Application Automation’s no-code, drag-and-drop interface. Create dynamic processes that respond to business events, triggering actions across SaaS applications for streamlined IT management.</p>
+            </div>
+            
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-brain" style="color: #00a651;"></i> Qlik AutoML
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">Qlik AutoML empowers data scientists and engineers to build, train, and deploy machine learning models quickly, with no coding required. Artha Solutions helps you leverage its capabilities to make predictions, test scenarios, and drive smarter decisions with AI-driven insights, maximizing efficiency.</p>
+            </div>
+            
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-search-plus" style="color: #00a651;"></i> Qlik Sense
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">Qlik Sense is a self-service platform for data discovery and visualization, enhancing data literacy with augmented analytics. Artha Solutions leverages AI insights, natural language interaction, and predictive analytics to empower teams with intuitive tools for data-driven decisions.</p>
+            </div>
+            
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-window-maximize" style="color: #00a651;"></i> QlikView
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">QlikView, powered by the Associative Engine, is a foundational analytics tool. Artha Solutions helps organizations build guided analytics and dashboards, leveraging QlikView's in-memory technology for fast, data compression, multi-user access, and immediate, actionable insights.</p>
+            </div>
+            
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-arrow-alt-circle-right" style="color: #00a651;"></i> Migrate to Qlik
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">Quickly and seamlessly migrate from your legacy BI platform to Qlik with our consulting services. We develop a tailored migration plan to ensure you avoid unnecessary content transfer, saving both time and costs.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Resources section -->
+<section class="section" id="resources">
+    <div class="container">
+        <div class="section-header" style="text-align: center; margin-bottom: 50px;">
+            <span class="section-subtitle">Insights</span>
+            <h2 class="section-title">Partner <span>Resources</span></h2>
+            <p class="section-desc">Explore our announcements, sponsorships, and technical event updates.</p>
+        </div>
+        
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
+            <!-- Resource 1 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #00a651; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Data Governance, Data Integration, Data Solutions, Healthcare</span>
+                    <h4 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Transforming Healthcare Insurance Operations: A Data Governance Journey for MOOP Compliance</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">Learn how we addressed critical data integration challenges and enhanced policyholder expense management, ensured accurate claims</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #00a651;">Download Now! <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <!-- Resource 2 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #00a651; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Manufacturing, Retail</span>
+                    <h4 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Happy Hour with Talend & Artha Solutions</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">We invite you to join us at the seminar and learn how Artha can help you to...</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #00a651;">Learn more <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <!-- Resource 3 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #00a651; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Manufacturing, Retail</span>
+                    <h4 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Phoenix Data Conference 2018</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">Artha Solutions sponsors PHX Data Conference 2018, the premier big data event in Phoenix. Technology leaders share...</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #00a651;">Learn more <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <!-- Resource 4 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #00a651; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Manufacturing, Retail</span>
+                    <h4 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Artha & Qlik are Proud Silver Sponsors for Data Engineering Summit 2023</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">Focused on data engineering innovation, this 2-day conference will give attendees direct access to top engineers &...</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #00a651;">Learn more <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <!-- Resource 5 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #00a651; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Manufacturing, Retail</span>
+                    <h4 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">QlikWorld Tour North America</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">At Dallas, learn how data drives growth in 2023. Explore Qlik's latest innovations for data management, integration,...</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #00a651;">Learn more <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <!-- Resource 6 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #00a651; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Manufacturing, Retail</span>
+                    <h4 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Artha Solutions is proud sponsor of QlikWorld, New York</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">At QlikWorld New York, discover strategies to build a robust data foundation, unlock business value with AI-powered...</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #00a651;">Learn more <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Bottom CTA -->
+<section class="section-alt" style="text-align: center; background: linear-gradient(180deg, var(--bg-secondary) 0%, rgba(0,166,81,0.05) 100%);">
+    <div class="container">
+        <h2 class="section-title">Initiate Your <span>Integration Journey</span></h2>
+        <p class="section-desc" style="max-width: 600px; margin: 0 auto 30px;">Artha Solutions helps you deploy, clean, and govern Qlik Active Intelligence at up to 40% savings.</p>
+        <a href="/contact-us" class="btn btn-primary btn-glow" style="background: linear-gradient(135deg, #00a651, #0ea5e9); border: none; box-shadow: 0 0 20px rgba(0,166,81,0.3);">Request a Joint Solution Demo</a>
+    </div>
+</section>
+{% endblock %}

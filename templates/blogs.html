@@ -1,0 +1,1238 @@
+{% extends "base.html" %}
+
+{% block title %}Resources - Blogs & Data Modernization Insights{% endblock %}
+
+{% block content %}
+<!-- Subpage Header Section -->
+
+<style>
+    /* Scope all styles to avoid global spills */
+    #blogs-portal {
+        --accent-coral: #ff7a59;
+        --accent-coral-glow: rgba(255, 122, 89, 0.25);
+        --bg-white: #ffffff;
+        --border-color-light: #e5e7eb;
+        --text-dark: #1f2937;
+        --text-gray: #4b5563;
+        --text-muted: #9ca3af;
+        background-color: #fbfbfb;
+        padding: 50px 0;
+        font-family: var(--font-body);
+    }
+
+    #blogs-portal .portal-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    /* Section Squiggly Heading styling */
+    .portal-section-header {
+        margin-bottom: 30px;
+        position: relative;
+    }
+
+    .portal-section-title {
+        font-size: 24px;
+        font-weight: 800;
+        color: var(--text-dark);
+        margin: 0 0 6px 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .squiggly-svg {
+        display: block;
+        margin-top: 4px;
+    }
+
+    /* Main layout grid */
+    .portal-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 40px;
+        align-items: start;
+    }
+
+    @media (min-width: 1024px) {
+        .portal-grid {
+            grid-template-columns: 2.1fr 0.9fr;
+        }
+    }
+
+    /* Featured / Trending cards */
+    .trending-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 30px;
+        margin-bottom: 40px;
+    }
+
+    @media (min-width: 640px) {
+        .trending-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    .featured-card {
+        background: var(--bg-white);
+        border: 1px solid var(--border-color-light);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.015);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .featured-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.05);
+    }
+
+    .card-image-wrapper {
+        position: relative;
+        height: 230px;
+        overflow: hidden;
+    }
+
+    .card-image-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .featured-card:hover .card-image-wrapper img {
+        transform: scale(1.06);
+    }
+
+    .card-tag {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        background: var(--accent-coral);
+        color: white;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 4px 12px;
+        border-radius: 20px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 4px 10px rgba(255, 122, 89, 0.35);
+        z-index: 2;
+    }
+
+    .card-format-badge {
+        position: absolute;
+        bottom: -18px;
+        right: 20px;
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: var(--accent-coral);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        box-shadow: 0 4px 10px var(--accent-coral-glow);
+        z-index: 3;
+        transition: transform 0.3s ease;
+        border: 2px solid white;
+    }
+
+    .featured-card:hover .card-format-badge {
+        transform: scale(1.1) rotate(15deg);
+    }
+
+    .card-info {
+        padding: 30px 25px 25px 25px;
+    }
+
+    .author-meta-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12.5px;
+        color: var(--text-gray);
+        margin-bottom: 12px;
+    }
+
+    .author-avatar-img {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .author-meta-name {
+        font-weight: 600;
+        color: var(--text-dark);
+    }
+
+    .card-post-title {
+        font-size: 19px;
+        line-height: 1.4;
+        font-weight: 750;
+        margin: 0 0 12px 0;
+    }
+
+    .card-post-title a {
+        color: var(--text-dark);
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+
+    .card-post-title a:hover {
+        color: var(--accent-coral);
+    }
+
+    .card-post-summary {
+        font-size: 14px;
+        line-height: 1.6;
+        color: var(--text-gray);
+        margin: 0;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    /* Sub-card grid lists (Image 1 style) */
+    .sub-trending-list {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 20px;
+        margin-top: 25px;
+        border-top: 1px solid var(--border-color-light);
+        padding-top: 20px;
+    }
+
+    .sub-trending-item {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .sub-trending-thumb {
+        width: 75px;
+        height: 55px;
+        border-radius: 6px;
+        overflow: hidden;
+        flex-shrink: 0;
+        border: 1px solid var(--border-color-light);
+    }
+
+    .sub-trending-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .sub-trending-item:hover .sub-trending-thumb img {
+        transform: scale(1.08);
+    }
+
+    .sub-trending-details {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .sub-trending-title {
+        font-size: 13.5px;
+        line-height: 1.4;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .sub-trending-title a {
+        color: var(--text-dark);
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+
+    .sub-trending-title a:hover {
+        color: var(--accent-coral);
+    }
+
+    .sub-trending-date {
+        font-size: 11px;
+        color: var(--text-muted);
+    }
+
+    /* Editor's Pick styling (Image 2 style) */
+    .pick-section-wrapper {
+        margin-top: 50px;
+    }
+
+    .editor-large-card {
+        background: var(--bg-white);
+        border: 1px solid var(--border-color-light);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.015);
+        display: grid;
+        grid-template-columns: 1fr;
+        margin-bottom: 30px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    @media (min-width: 768px) {
+        .editor-large-card {
+            grid-template-columns: 1.1fr 0.9fr;
+        }
+    }
+
+    .editor-large-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.04);
+    }
+
+    .editor-large-thumb {
+        height: 250px;
+        position: relative;
+    }
+
+    @media (min-width: 768px) {
+        .editor-large-thumb {
+            height: 100%;
+            min-height: 280px;
+        }
+    }
+
+    .editor-large-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .editor-large-info {
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    /* Sidebar Widgets */
+    .portal-sidebar {
+        display: grid;
+        gap: 30px;
+    }
+
+    .sidebar-widget {
+        background: var(--bg-white);
+        border: 1px solid var(--border-color-light);
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.01);
+    }
+
+    .widget-title {
+        font-size: 16px;
+        font-weight: 800;
+        color: var(--text-dark);
+        margin: 0 0 15px 0;
+        position: relative;
+        text-align: center;
+        letter-spacing: 0.3px;
+    }
+
+    .widget-divider {
+        display: block;
+        margin: 6px auto 20px auto;
+    }
+
+    /* About Widget */
+    .widget-about {
+        text-align: center;
+    }
+
+    .about-logo {
+        height: 28px;
+        object-fit: contain;
+        margin-bottom: 15px;
+    }
+
+    .about-text {
+        font-size: 13.5px;
+        line-height: 1.6;
+        color: var(--text-gray);
+        margin-bottom: 20px;
+        font-weight: 300;
+    }
+
+    .social-links {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+    }
+
+    .social-icon-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #f3f4f6;
+        color: var(--text-gray);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        text-decoration: none;
+        transition: background 0.2s, color 0.2s;
+    }
+
+    .social-icon-btn:hover {
+        background: var(--accent-coral);
+        color: white;
+    }
+
+    /* Tabbed Widget (Recent vs Popular) */
+    .tab-btn-group {
+        display: flex;
+        border: 1px solid var(--border-color-light);
+        border-radius: 25px;
+        padding: 2px;
+        margin-bottom: 20px;
+    }
+
+    .sidebar-tab-trigger {
+        flex: 1;
+        background: none;
+        border: none;
+        padding: 8px 0;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text-gray);
+        cursor: pointer;
+        border-radius: 20px;
+        transition: all 0.2s ease;
+    }
+
+    .sidebar-tab-trigger.active {
+        background: var(--accent-coral);
+        color: white;
+    }
+
+    .tab-list-panel {
+        display: none;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .tab-list-panel.active {
+        display: flex;
+    }
+
+    .sidebar-post-item {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .sidebar-post-thumb {
+        width: 55px;
+        height: 55px;
+        border-radius: 50%;
+        overflow: hidden;
+        flex-shrink: 0;
+        border: 1px solid var(--border-color-light);
+    }
+
+    .sidebar-post-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .sidebar-post-details {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .sidebar-post-title {
+        font-size: 13.5px;
+        line-height: 1.35;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .sidebar-post-title a {
+        color: var(--text-dark);
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+
+    .sidebar-post-title a:hover {
+        color: var(--accent-coral);
+    }
+
+    .sidebar-post-date {
+        font-size: 11px;
+        color: var(--text-muted);
+    }
+
+    /* Popular Posts widget (Numbered circle list) */
+    .popular-numbered-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .popular-num-item {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .num-circle-badge {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background: #fef2f2;
+        color: var(--accent-coral);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: 800;
+        flex-shrink: 0;
+        position: relative;
+    }
+
+    .popular-num-item:first-child .num-circle-badge {
+        background: var(--accent-coral);
+        color: white;
+    }
+
+    /* Explore Topics widget */
+    .topics-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        gap: 12px;
+    }
+
+    .topic-item-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px dashed var(--border-color-light);
+        padding-bottom: 8px;
+    }
+
+    .topic-item-row:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .topic-item-row a {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--text-dark);
+        text-decoration: none;
+        font-size: 13.5px;
+        font-weight: 700;
+        transition: all 0.2s;
+    }
+
+    .topic-item-row a:hover {
+        color: var(--accent-coral);
+        transform: translateX(3px);
+    }
+
+    .topic-item-row a i {
+        font-size: 9px;
+        color: var(--accent-coral);
+    }
+
+    .topic-item-count {
+        font-size: 12.5px;
+        color: var(--text-muted);
+        font-weight: 600;
+    }
+
+    /* Newsletter Widget */
+    .newsletter-box {
+        text-align: center;
+    }
+
+    .newsletter-sub-text {
+        font-size: 14.5px;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 15px;
+    }
+
+    .newsletter-form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .newsletter-input {
+        width: 100%;
+        padding: 10px 16px;
+        border: 1px solid var(--border-color-light);
+        border-radius: 20px;
+        outline: none;
+        font-size: 13.5px;
+        text-align: center;
+        transition: border-color 0.2s;
+    }
+
+    .newsletter-input:focus {
+        border-color: var(--accent-coral);
+    }
+
+    .newsletter-submit-btn {
+        background: var(--accent-coral);
+        color: white;
+        border: none;
+        padding: 11px 20px;
+        border-radius: 20px;
+        font-size: 13.5px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: 0 4px 10px var(--accent-coral-glow);
+    }
+
+    .newsletter-submit-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 14px var(--accent-coral-glow);
+    }
+
+    .newsletter-policy {
+        font-size: 11px;
+        color: var(--text-muted);
+        margin-top: 12px;
+    }
+
+    .newsletter-policy a {
+        color: var(--text-gray);
+        text-decoration: underline;
+    }
+
+    /* Modern Blogs Hero Header */
+    .blogs-hero-header {
+        position: relative;
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        border-bottom: 1px solid var(--border-color);
+        padding: calc(var(--nav-height) + 40px) 0 60px 0;
+        text-align: center;
+        overflow: hidden;
+    }
+
+    .blogs-hero-glow {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 600px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(124, 58, 237, 0.08) 0%, transparent 70%);
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .blogs-hero-container {
+        position: relative;
+        z-index: 2;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    .blogs-hero-subtitle-badge {
+        display: inline-block;
+        padding: 6px 14px;
+        background-color: rgba(124, 58, 237, 0.06);
+        border: 1px solid rgba(124, 58, 237, 0.15);
+        color: #7c3aed;
+        font-size: 11.5px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        border-radius: 20px;
+        margin-bottom: 20px;
+    }
+
+    .blogs-hero-title {
+        font-size: 40px;
+        font-weight: 800;
+        color: var(--text-primary);
+        margin-bottom: 16px;
+        line-height: 1.25;
+        letter-spacing: -1px;
+    }
+
+    .blogs-hero-title span {
+        background: var(--grad-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .blogs-hero-desc {
+        font-size: 15.5px;
+        line-height: 1.6;
+        color: var(--text-secondary);
+        max-width: 600px;
+        margin: 0 auto 35px auto;
+        font-weight: 300;
+    }
+
+    /* Centered Search Bar */
+    .blogs-search-form {
+        max-width: 580px;
+        margin: 0 auto;
+    }
+
+    .blogs-search-input-wrapper {
+        display: flex;
+        align-items: center;
+        background: #ffffff;
+        border: 1px solid rgba(124, 58, 237, 0.15);
+        border-radius: 50px;
+        padding: 6px 6px 6px 20px;
+        box-shadow: 0 10px 25px -5px rgba(124, 58, 237, 0.05), 0 0 1px 0 rgba(124, 58, 237, 0.1);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .blogs-search-input-wrapper:focus-within {
+        border-color: #7c3aed;
+        box-shadow: 0 12px 30px -5px rgba(124, 58, 237, 0.12), 0 0 0 3px rgba(124, 58, 237, 0.15);
+        transform: translateY(-1px);
+    }
+
+    .blogs-search-icon {
+        color: #94a3b8;
+        font-size: 16px;
+        margin-right: 12px;
+        flex-shrink: 0;
+        transition: color 0.3s ease;
+    }
+
+    .blogs-search-input-wrapper:focus-within .blogs-search-icon {
+        color: #7c3aed;
+    }
+
+    .blogs-search-input {
+        border: none;
+        outline: none;
+        background: transparent;
+        width: 100%;
+        font-size: 15px;
+        color: var(--text-primary);
+        font-family: var(--font-body);
+        font-weight: 300;
+    }
+
+    .blogs-search-input::placeholder {
+        color: #94a3b8;
+    }
+
+    .blogs-search-submit-btn {
+        background: var(--grad-primary);
+        color: #ffffff;
+        border: none;
+        outline: none;
+        padding: 12px 28px;
+        border-radius: 30px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(124, 58, 237, 0.2);
+    }
+
+    .blogs-search-submit-btn:hover {
+        transform: scale(1.02);
+        box-shadow: 0 6px 16px rgba(124, 58, 237, 0.3);
+    }
+
+    /* Active Filters tag & clear filter */
+    .blogs-active-filters {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 25px;
+        flex-wrap: wrap;
+    }
+
+    .filter-status-tag {
+        font-size: 13px;
+        color: var(--text-secondary);
+        background-color: rgba(15, 23, 42, 0.04);
+        padding: 6px 14px;
+        border-radius: 30px;
+        border: 1px solid rgba(15, 23, 42, 0.05);
+    }
+
+    .filter-status-tag strong {
+        color: #7c3aed;
+        font-weight: 600;
+    }
+
+    .blogs-clear-filters-btn {
+        font-size: 13px;
+        color: #64748b;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: color 0.2s ease;
+        text-decoration: none;
+    }
+
+    .blogs-clear-filters-btn:hover {
+        color: #ef4444;
+    }
+</style>
+
+<!-- Modern Centered Search Header Section -->
+<section class="blogs-hero-header">
+    <div class="blogs-hero-glow"></div>
+    <div class="container blogs-hero-container">
+        <span class="blogs-hero-subtitle-badge">Blogs & Articles</span>
+        <h1 class="blogs-hero-title">Stay Ahead in <span>Data & AI</span></h1>
+        <p class="blogs-hero-desc">Discover guides, research, and expert insights on master data management, cloud migration, and enterprise AI production pipelines.</p>
+        
+        <form action="/blogs" method="GET" class="blogs-search-form">
+            {% if selected_category %}
+            <input type="hidden" name="category" value="{{ selected_category }}">
+            {% endif %}
+            <div class="blogs-search-input-wrapper">
+                <i class="fas fa-search blogs-search-icon"></i>
+                <input type="text" name="q" class="blogs-search-input" placeholder="Search insights, articles, and guides..." value="{{ search_query or '' }}">
+                <button type="submit" class="blogs-search-submit-btn">Search</button>
+            </div>
+        </form>
+        
+        {% if search_query or selected_category %}
+        <div class="blogs-active-filters">
+            <span class="filter-status-tag">
+                {% if search_query %}
+                    Search: <strong>"{{ search_query }}"</strong>
+                {% endif %}
+                {% if search_query and selected_category %} &middot; {% endif %}
+                {% if selected_category %}
+                    Category: <strong>"{{ selected_category }}"</strong>
+                {% endif %}
+            </span>
+            <a href="/blogs" class="blogs-clear-filters-btn"><i class="fas fa-times-circle"></i> Clear Filters</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Main Blogs Portal Workspace -->
+<section id="blogs-portal">
+    <div class="portal-container">
+        
+        <!-- Define Author Mappings (Cover images pre-resolved by Flask backend) -->
+        {% set author_avatars = [
+            'https://randomuser.me/api/portraits/women/44.jpg',
+            'https://randomuser.me/api/portraits/men/32.jpg',
+            'https://randomuser.me/api/portraits/women/68.jpg',
+            'https://randomuser.me/api/portraits/men/85.jpg',
+            'https://randomuser.me/api/portraits/women/12.jpg'
+        ] %}
+        
+        {% set author_names = [
+            'Sarah Jenkins',
+            'David Miller',
+            'Elena Rostova',
+            'Marcus Thorne',
+            'Sophia Chen'
+        ] %}
+
+        <div class="portal-grid">
+            
+            <!-- Left Side: Main Blog Feed -->
+            <div>
+                
+                {% if posts %}
+                    {% if posts|length >= 2 and not selected_category and not search_query %}
+                        <!-- 1. Trending / Featured Grid Section (Image 1 style) -->
+                        <div class="portal-section-header">
+                            <h2 class="portal-section-title">Trending</h2>
+                            <svg class="squiggly-svg" width="30" height="8" viewBox="0 0 30 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M1 5.5C3.5 5.5 5.5 2.5 8 2.5C10.5 2.5 12.5 5.5 15 5.5C17.5 5.5 19.5 2.5 22 2.5C24.5 2.5 26.5 5.5 29 5.5" stroke="#ff7a59" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        
+                        <div class="trending-grid">
+                            
+                            <!-- Card 1 -->
+                            {% set p1 = posts[0] %}
+                            {% set a1_idx = (p1.id % 5) %}
+                            <div class="featured-card">
+                                <div class="card-image-wrapper">
+                                    <span class="card-tag">{{ p1.category }}</span>
+                                    <img src="{{ p1.image_url }}" alt="{{ p1.title }}">
+                                    <div class="card-format-badge">
+                                        <i class="fas fa-video"></i>
+                                    </div>
+                                </div>
+                                <div class="card-info">
+                                    <div class="author-meta-row">
+                                        <img src="{{ author_avatars[a1_idx] }}" class="author-avatar-img" alt="{{ author_names[a1_idx] }}">
+                                        <span class="author-meta-name">{{ author_names[a1_idx] }}</span>
+                                        <span>•</span>
+                                        <span>{{ p1.date }}</span>
+                                    </div>
+                                    <h3 class="card-post-title">
+                                        <a href="/blogs/{{ p1.slug }}">{{ p1.title }}</a>
+                                    </h3>
+                                    <p class="card-post-summary">{{ p1.summary }}</p>
+                                    
+                                    <!-- Embedded list below Featured Card 1 (Image 1 style) -->
+                                    <div class="sub-trending-list">
+                                        {% if posts|length >= 3 %}
+                                            {% set sub_p1 = posts[2] %}
+                                            <div class="sub-trending-item">
+                                                <div class="sub-trending-thumb">
+                                                    <img src="{{ sub_p1.image_url }}" alt="{{ sub_p1.title }}">
+                                                </div>
+                                                <div class="sub-trending-details">
+                                                    <h4 class="sub-trending-title"><a href="/blogs/{{ sub_p1.slug }}">{{ sub_p1.title }}</a></h4>
+                                                    <span class="sub-trending-date">{{ sub_p1.date }}</span>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                        
+                                        {% if posts|length >= 4 %}
+                                            {% set sub_p2 = posts[3] %}
+                                            <div class="sub-trending-item">
+                                                <div class="sub-trending-thumb">
+                                                    <img src="{{ sub_p2.image_url }}" alt="{{ sub_p2.title }}">
+                                                </div>
+                                                <div class="sub-trending-details">
+                                                    <h4 class="sub-trending-title"><a href="/blogs/{{ sub_p2.slug }}">{{ sub_p2.title }}</a></h4>
+                                                    <span class="sub-trending-date">{{ sub_p2.date }}</span>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Card 2 -->
+                            {% set p2 = posts[1] %}
+                            {% set a2_idx = (p2.id % 5) %}
+                            <div class="featured-card">
+                                <div class="card-image-wrapper">
+                                    <span class="card-tag" style="background-color: #10b981; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.35);">{{ p2.category }}</span>
+                                    <img src="{{ p2.image_url }}" alt="{{ p2.title }}">
+                                    <div class="card-format-badge" style="background-color: #10b981;">
+                                        <i class="fas fa-headphones"></i>
+                                    </div>
+                                </div>
+                                <div class="card-info">
+                                    <div class="author-meta-row">
+                                        <img src="{{ author_avatars[a2_idx] }}" class="author-avatar-img" alt="{{ author_names[a2_idx] }}">
+                                        <span class="author-meta-name">{{ author_names[a2_idx] }}</span>
+                                        <span>•</span>
+                                        <span>{{ p2.date }}</span>
+                                    </div>
+                                    <h3 class="card-post-title">
+                                        <a href="/blogs/{{ p2.slug }}">{{ p2.title }}</a>
+                                    </h3>
+                                    <p class="card-post-summary">{{ p2.summary }}</p>
+                                    
+                                    <!-- Embedded list below Featured Card 2 (Image 1 style) -->
+                                    <div class="sub-trending-list">
+                                        {% if posts|length >= 5 %}
+                                            {% set sub_p3 = posts[4] %}
+                                            <div class="sub-trending-item">
+                                                <div class="sub-trending-thumb">
+                                                    <img src="{{ sub_p3.image_url }}" alt="{{ sub_p3.title }}">
+                                                </div>
+                                                <div class="sub-trending-details">
+                                                    <h4 class="sub-trending-title"><a href="/blogs/{{ sub_p3.slug }}">{{ sub_p3.title }}</a></h4>
+                                                    <span class="sub-trending-date">{{ sub_p3.date }}</span>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                        
+                                        {% if posts|length >= 6 %}
+                                            {% set sub_p4 = posts[5] %}
+                                            {% set sub_p4_img = sub_p4.image_url %}
+                                            <div class="sub-trending-item">
+                                                <div class="sub-trending-thumb">
+                                                    <img src="{{ sub_p4_img }}" alt="{{ sub_p4.title }}">
+                                                </div>
+                                                <div class="sub-trending-details">
+                                                    <h4 class="sub-trending-title"><a href="/blogs/{{ sub_p4.slug }}">{{ sub_p4.title }}</a></h4>
+                                                    <span class="sub-trending-date">{{ sub_p4.date }}</span>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        
+                        <!-- 2. Editor's Pick / More Articles Section (Image 2 style) -->
+                        <div class="pick-section-wrapper">
+                            <div class="portal-section-header">
+                                <h2 class="portal-section-title">Editor's Pick</h2>
+                                <svg class="squiggly-svg" width="30" height="8" viewBox="0 0 30 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M1 5.5C3.5 5.5 5.5 2.5 8 2.5C10.5 2.5 12.5 5.5 15 5.5C17.5 5.5 19.5 2.5 22 2.5C24.5 2.5 26.5 5.5 29 5.5" stroke="#ff7a59" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            
+                            {% if posts|length >= 7 %}
+                                <!-- Large Hero Row Post (Left column / Large Card style) -->
+                                {% set ep = posts[6] %}
+                                {% set ep_img = ep.image_url %}
+                                {% set ae_idx = (ep.id % 5) %}
+                                <div class="editor-large-card">
+                                    <div class="editor-large-thumb">
+                                        <span class="card-tag" style="background-color: #3b82f6; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.35);">{{ ep.category }}</span>
+                                        <img src="{{ ep_img }}" alt="{{ ep.title }}">
+                                    </div>
+                                    <div class="editor-large-info">
+                                        <div class="author-meta-row">
+                                            <img src="{{ author_avatars[ae_idx] }}" class="author-avatar-img" alt="{{ author_names[ae_idx] }}">
+                                            <span class="author-meta-name">{{ author_names[ae_idx] }}</span>
+                                            <span>•</span>
+                                            <span>{{ ep.date }}</span>
+                                        </div>
+                                        <h3 class="card-post-title" style="font-size: 21px;">
+                                            <a href="/blogs/{{ ep.slug }}">{{ ep.title }}</a>
+                                        </h3>
+                                        <p class="card-post-summary">{{ ep.summary }}</p>
+                                    </div>
+                                </div>
+                            {% endif %}
+                            
+                            <!-- Remaining Articles standard list -->
+                            {% if posts|length >= 8 %}
+                                <div style="display: grid; gap: 20px;">
+                                    {% for post in posts[7:] %}
+                                        {% set rem_img = post.image_url %}
+                                        <div class="featured-card" style="display: grid; grid-template-columns: 1fr; border-radius: 8px;">
+                                            <div style="display: flex; gap: 20px; padding: 20px; align-items: center; flex-wrap: wrap;">
+                                                <div style="width: 110px; height: 80px; border-radius: 6px; overflow: hidden; flex-shrink: 0; position: relative;">
+                                                    <img src="{{ rem_img }}" style="width:100%; height:100%; object-fit:cover;" alt="{{ post.title }}">
+                                                </div>
+                                                <div style="flex: 1; min-width: 250px;">
+                                                    <span style="font-size: 10px; font-weight: 750; color: var(--accent-coral); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 5px;">{{ post.category }}</span>
+                                                    <h4 style="font-size: 15.5px; margin: 0 0 6px 0; font-weight: 750; line-height: 1.45;"><a href="/blogs/{{ post.slug }}" style="color: var(--text-dark); text-decoration: none; hover: color: var(--accent-coral);">{{ post.title }}</a></h4>
+                                                    <span style="font-size: 11px; color: var(--text-muted);"><i class="far fa-calendar" style="margin-right: 4px;"></i> {{ post.date }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            
+                        </div>
+                    {% else %}
+                        <!-- fallback simple listing when search or categories filter is active -->
+                        <div class="portal-section-header">
+                            <h2 class="portal-section-title">
+                                {% if selected_category %}{{ selected_category }}{% elif search_query %}Search Results{% else %}All Insights{% endif %}
+                            </h2>
+                            <svg class="squiggly-svg" width="30" height="8" viewBox="0 0 30 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M1 5.5C3.5 5.5 5.5 2.5 8 2.5C10.5 2.5 12.5 5.5 15 5.5C17.5 5.5 19.5 2.5 22 2.5C24.5 2.5 26.5 5.5 29 5.5" stroke="#ff7a59" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr; gap: 25px;">
+                            {% for post in posts %}
+                                        {% set f_img = post.image_url %}
+                                {% set f_idx = (post.id % 5) %}
+                                <div class="featured-card" style="display: grid; grid-template-columns: 1fr;">
+                                    <div style="display: grid; grid-template-columns: 1fr; align-items: stretch; border: none;">
+                                        <div style="display: flex; flex-direction: row; flex-wrap: wrap; gap: 25px; padding: 25px;">
+                                            <div style="width: 160px; height: 110px; border-radius: 8px; overflow: hidden; flex-shrink: 0; position: relative;">
+                                                <span style="position: absolute; top: 10px; left: 10px; background: var(--accent-coral); color: white; font-size: 8px; font-weight: 700; padding: 2px 8px; border-radius: 12px; text-transform: uppercase;">{{ post.category }}</span>
+                                                <img src="{{ f_img }}" style="width: 100%; height: 100%; object-fit: cover;" alt="{{ post.title }}">
+                                            </div>
+                                            
+                                            <div style="flex: 1; min-width: 280px; display: flex; flex-direction: column; justify-content: center;">
+                                                <div class="author-meta-row" style="margin-bottom: 6px;">
+                                                    <img src="{{ author_avatars[f_idx] }}" class="author-avatar-img" alt="{{ author_names[f_idx] }}">
+                                                    <span class="author-meta-name" style="font-size: 11.5px;">{{ author_names[f_idx] }}</span>
+                                                    <span>•</span>
+                                                    <span style="font-size: 11.5px;">{{ post.date }}</span>
+                                                </div>
+                                                <h3 style="font-size: 17.5px; font-weight: 750; margin: 0 0 8px 0; line-height: 1.4;"><a href="/blogs/{{ post.slug }}" style="color: var(--text-dark); text-decoration: none;">{{ post.title }}</a></h3>
+                                                <p style="font-size: 13.5px; line-height: 1.5; color: var(--text-gray); margin: 0 0 10px 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ post.summary }}</p>
+                                                <a href="/blogs/{{ post.slug }}" style="font-size: 12.5px; color: var(--accent-coral); font-weight: 750; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">Read Article <i class="fas fa-chevron-right" style="font-size: 10px;"></i></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <!-- No posts state -->
+                    <div style="text-align: center; padding: 60px 0; border: 1px dashed var(--border-color-light); border-radius: 12px; background-color: var(--bg-white);">
+                        <i class="fas fa-folder-open" style="font-size: 48px; color: var(--text-muted); margin-bottom: 16px;"></i>
+                        <h3>No Insights Found</h3>
+                        <p style="color: var(--text-gray); margin-top: 8px;">Try clearing your filters or testing other search criteria.</p>
+                        <a href="/blogs" class="newsletter-submit-btn" style="margin-top: 20px; display: inline-block; text-decoration: none;">Show All Articles</a>
+                    </div>
+                {% endif %}
+                
+            </div>
+            
+            <!-- Right Side: Sidebar Panel -->
+            <aside class="portal-sidebar">
+                
+                <!-- Widget 1: About Publisher (Katen style) -->
+                <div class="sidebar-widget widget-about">
+                    <img src="{{ url_for('static', filename='img/artha-logo-main.png') }}" alt="ThinkArtha Logo" class="about-logo">
+                    <p class="about-text">
+                        ThinkArtha Insights deliver expert cloud analytics guidelines, master data modernization methodologies, governance automation blueprints, and strategy frameworks to build robust foundations for enterprise scaling.
+                    </p>
+                    <div class="social-links">
+                        <a href="https://linkedin.com" target="_blank" class="social-icon-btn"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="https://twitter.com" target="_blank" class="social-icon-btn"><i class="fab fa-twitter"></i></a>
+                        <a href="https://facebook.com" target="_blank" class="social-icon-btn"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://youtube.com" target="_blank" class="social-icon-btn"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                
+                <!-- Widget 2: Recent / Popular Tabbed Panel (Image 2 style) -->
+                <div class="sidebar-widget">
+                    <div class="tab-btn-group">
+                        <button class="sidebar-tab-trigger active" onclick="switchTabPanel(this, 'recent-tab')">Recent</button>
+                        <button class="sidebar-tab-trigger" onclick="switchTabPanel(this, 'popular-tab')">Popular</button>
+                    </div>
+                    
+                    <!-- Recent Panel -->
+                    <div id="recent-tab" class="tab-list-panel active">
+                        {% for post in recent_posts %}
+                            {% set r_img = post.image_url %}
+                            <div class="sidebar-post-item">
+                                <div class="sidebar-post-thumb">
+                                    <img src="{{ r_img }}" alt="{{ post.title }}">
+                                </div>
+                                <div class="sidebar-post-details">
+                                    <h4 class="sidebar-post-title"><a href="/blogs/{{ post.slug }}">{{ post.title }}</a></h4>
+                                    <span class="sidebar-post-date">{{ post.date }}</span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Popular Panel -->
+                    <div id="popular-tab" class="tab-list-panel">
+                        {% for post in popular_posts %}
+                            {% set p_img = post.image_url %}
+                            <div class="sidebar-post-item">
+                                <div class="sidebar-post-thumb">
+                                    <img src="{{ p_img }}" alt="{{ post.title }}">
+                                </div>
+                                <div class="sidebar-post-details">
+                                    <h4 class="sidebar-post-title"><a href="/blogs/{{ post.slug }}">{{ post.title }}</a></h4>
+                                    <span class="sidebar-post-date"><i class="far fa-eye" style="margin-right: 3px;"></i> {{ post.views }} views</span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Widget 3: Popular Numbered List (Image 2 style) -->
+                <div class="sidebar-widget">
+                    <h3 class="widget-title">Popular Posts</h3>
+                    <svg class="widget-divider" width="30" height="8" viewBox="0 0 30 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1 5.5C3.5 5.5 5.5 2.5 8 2.5C10.5 2.5 12.5 5.5 15 5.5C17.5 5.5 19.5 2.5 22 2.5C24.5 2.5 26.5 5.5 29 5.5" stroke="#ff7a59" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    
+                    <div class="popular-numbered-list">
+                        {% for post in popular_posts[:3] %}
+                            <div class="popular-num-item">
+                                <div class="num-circle-badge">
+                                    {{ loop.index }}
+                                </div>
+                                <div class="sidebar-post-details">
+                                    <h4 class="sidebar-post-title" style="font-size: 13.5px;"><a href="/blogs/{{ post.slug }}">{{ post.title }}</a></h4>
+                                    <span class="sidebar-post-date">{{ post.date }}</span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- Widget 4: Explore Topics (Image 1 style) -->
+                <div class="sidebar-widget">
+                    <h3 class="widget-title">Explore Topics</h3>
+                    <svg class="widget-divider" width="30" height="8" viewBox="0 0 30 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1 5.5C3.5 5.5 5.5 2.5 8 2.5C10.5 2.5 12.5 5.5 15 5.5C17.5 5.5 19.5 2.5 22 2.5C24.5 2.5 26.5 5.5 29 5.5" stroke="#ff7a59" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    
+                    <ul class="topics-list">
+                        {% for row in category_counts %}
+                        <li class="topic-item-row">
+                            <a href="/blogs?category={{ row['category'] }}">
+                                <i class="fas fa-chevron-right"></i>
+                                {{ row['category'] }}
+                            </a>
+                            <span class="topic-item-count">({{ row['count'] }})</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                
+                <!-- Widget 5: Newsletter Subscription (Image 1 style) -->
+                <div class="sidebar-widget newsletter-box">
+                    <h3 class="widget-title">Newsletter</h3>
+                    <svg class="widget-divider" width="30" height="8" viewBox="0 0 30 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1 5.5C3.5 5.5 5.5 2.5 8 2.5C10.5 2.5 12.5 5.5 15 5.5C17.5 5.5 19.5 2.5 22 2.5C24.5 2.5 26.5 5.5 29 5.5" stroke="#ff7a59" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    
+                    <div class="newsletter-sub-text">Join 70,000 subscribers!</div>
+                    <form class="newsletter-form-group" onsubmit="event.preventDefault(); alert('Thank you for subscribing!'); this.reset();">
+                        <input type="email" class="newsletter-input" placeholder="Email address..." required>
+                        <button type="submit" class="newsletter-submit-btn">Sign Up</button>
+                    </form>
+                    <p class="newsletter-policy">By signing up, you agree to our <a href="/privacy-policy">Privacy Policy</a></p>
+                </div>
+                
+            </aside>
+            
+        </div>
+        
+    </div>
+</section>
+
+<!-- Bottom Call-To-Action (ThinkArtha Custom) -->
+<section class="section-alt" style="text-align: center; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-top: 1px solid var(--border-color-light); padding: 70px 0;">
+    <div class="portal-container">
+        <h2 style="font-size: 30px; font-weight: 800; color: var(--text-dark); margin-bottom: 12px; letter-spacing: -0.5px;">Establish Your <span>AI & Data Foundation</span></h2>
+        <p style="font-size: 15px; color: var(--text-gray); max-width: 600px; margin: 0 auto 30px; line-height: 1.6; font-weight: 300;">Consult with our certified data engineers to optimize infrastructure and slash operational bottlenecks.</p>
+        <a href="/contact-us" class="btn btn-primary btn-glow" style="padding: 14px 32px; font-size: 14.5px; border-radius: 30px; font-weight: 700; text-decoration: none;">Request a Joint Assessment Audit</a>
+    </div>
+</section>
+
+<!-- Sidebar tab switching script -->
+<script>
+    function switchTabPanel(button, panelId) {
+        // Deactivate all triggers in the group
+        const container = button.closest('.sidebar-widget');
+        const triggers = container.querySelectorAll('.sidebar-tab-trigger');
+        triggers.forEach(tr => tr.classList.remove('active'));
+        
+        // Deactivate all panels in the group
+        const panels = container.querySelectorAll('.tab-list-panel');
+        panels.forEach(pn => pn.classList.remove('active'));
+        
+        // Activate target trigger and panel
+        button.classList.add('active');
+        container.querySelector('#' + panelId).classList.add('active');
+    }
+</script>
+{% endblock %}

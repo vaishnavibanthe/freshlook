@@ -1,0 +1,254 @@
+{% extends "manufacturing_base.html" %}
+
+{% block manufacturing_hero %}
+<!-- Case Studies Hero Section -->
+<section class="manufacturing-hero subpage-hero">
+    <div class="manufacturing-hero-glow"></div>
+    <div class="container manufacturing-hero-grid">
+        <div class="manufacturing-hero-content">
+            <span class="manufacturing-badge"><i class="fas fa-industry"></i> Success Stories</span>
+            <h1 class="manufacturing-hero-title">
+                {{ page.hero_title or 'Manufacturing Case Studies' }}
+            </h1>
+            <p class="manufacturing-hero-subtitle">
+                {{ page.hero_subtitle or 'Discover how Artha Solutions helps manufacturing leaders drive operational visibility, clean up product master data, and prepare databases for AI.' }}
+            </p>
+        </div>
+        
+        <div class="manufacturing-hero-visual">
+            <div class="manufacturing-vis-container">
+                <div class="tech-grid-bg"></div>
+                <div class="tech-circle pulsate-slow">
+                    <i class="fas fa-file-invoice text-orange"></i>
+                    <div class="tech-ring ring-1"></div>
+                    <div class="tech-ring ring-2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block manufacturing_content %}
+<!-- Case Studies List -->
+<section class="manufacturing-section">
+    <div class="container">
+        
+        <!-- Manufacturing Outcomes Dashboard -->
+        <div class="mfg-dashboard-banner" style="background: white; border: 1px solid var(--border-color); border-radius: 12px; padding: 25px; margin-bottom: 35px; box-shadow: 0 4px 20px rgba(0,0,0,0.015); display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px;">
+            <div style="text-align: center; border-right: 1px solid var(--border-color); padding-right: 10px;">
+                <div style="font-size: 32px; font-weight: 800; color: #ea580c; margin-bottom: 6px;">5X</div>
+                <h4 style="font-size: 13px; font-weight: 700; color: var(--text-color); margin: 0 0 4px 0;">Ingestion Speedup</h4>
+                <p style="font-size: 11.5px; color: var(--text-secondary); margin: 0; line-height: 1.3;">Talend metadata-driven dynamic framework</p>
+            </div>
+            <div style="text-align: center; border-right: 1px solid var(--border-color); padding-right: 10px;">
+                <div style="font-size: 32px; font-weight: 800; color: #ea580c; margin-bottom: 6px;">99%</div>
+                <h4 style="font-size: 13px; font-weight: 700; color: var(--text-color); margin: 0 0 4px 0;">Migration Confidence</h4>
+                <p style="font-size: 11.5px; color: var(--text-secondary); margin: 0; line-height: 1.3;">AWS & Snowflake cloud data lakehouse</p>
+            </div>
+            <div style="text-align: center; border-right: 1px solid var(--border-color); padding-right: 10px;">
+                <div style="font-size: 32px; font-weight: 800; color: #ea580c; margin-bottom: 6px;">12+</div>
+                <h4 style="font-size: 13px; font-weight: 700; color: var(--text-color); margin: 0 0 4px 0;">Siloed ERPs Linked</h4>
+                <p style="font-size: 11.5px; color: var(--text-secondary); margin: 0; line-height: 1.3;">Universal operational insights console</p>
+            </div>
+            <div style="text-align: center; padding-right: 10px;">
+                <div style="font-size: 32px; font-weight: 800; color: #ea580c; margin-bottom: 6px;">USD 1.2M</div>
+                <h4 style="font-size: 13px; font-weight: 700; color: var(--text-color); margin: 0 0 4px 0;">License Reductions</h4>
+                <p style="font-size: 11.5px; color: var(--text-secondary); margin: 0; line-height: 1.3;">By retiring redundant databases</p>
+            </div>
+        </div>
+        
+        <!-- Live Case Studies from Database -->
+        {% if case_studies %}
+        <div class="manufacturing-section-header">
+            <h2 style="font-size: 24px; font-weight: 600; margin-bottom: 10px; color: var(--text-primary);">Featured Success Stories</h2>
+            <p style="font-size: 15px; color: var(--text-secondary); font-weight: 300;">Published success stories from the Artha solutions index.</p>
+        </div>
+        
+        <div class="manufacturing-card-grid grid-3" style="margin-bottom: 50px;">
+            {% for cs in case_studies %}
+            <div class="manufacturing-card case-study-card" style="display: flex; flex-direction: column; justify-content: space-between; background: white; border: 1px solid #e5e7eb; border-radius: 6px; padding: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.01);">
+                <div class="card-content">
+                    <span class="case-study-tag" style="color: #ea580c; background: #fff7ed; border: 1px solid #ffedd5; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; display: inline-block; margin-bottom: 15px;">{{ cs.industry or 'Manufacturing' }}</span>
+                    <h3 class="card-title" style="font-size: 19px; font-weight: 600; margin-bottom: 12px; line-height: 1.4;">{{ cs.title }}</h3>
+                    <p class="card-desc" style="font-size: 14px; color: var(--text-secondary); font-weight: 300; line-height: 1.6; margin-bottom: 15px;">{{ cs.card_summary or cs.executive_summary[:150] + '...' }}</p>
+                    
+                    <!-- Tech Stack Badges -->
+                    {% if cs.technologies %}
+                    <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; align-items: center;">
+                        {% set tech_list = cs.technologies.split(',') %}
+                        {% for tech in tech_list[:4] %}
+                            {% if tech.strip() %}
+                            <span style="font-size: 10px; font-weight: 700; background: #fff7ed; color: #ea580c; border: 1px solid #ffedd5; padding: 3px 10px; border-radius: 20px;">{{ tech.strip() }}</span>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Key Result Metric -->
+                    {% if cs.key_metrics %}
+                    {% set study_metrics = load_json_helper(cs.key_metrics) %}
+                    {% if study_metrics and study_metrics|length > 0 %}
+                    <div class="study-metrics" style="padding-top: 15px; border-top: 1px solid #f3f4f6; margin-bottom: 20px; font-size: 13px; color: #ea580c; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-chart-line"></i> 
+                        <span><strong>{{ study_metrics[0].value }}</strong> {{ study_metrics[0].label }}</span>
+                    </div>
+                    {% endif %}
+                    {% endif %}
+                </div>
+                
+                <div style="border-top: 1px solid #f3f4f6; padding-top: 15px; display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+                    <a href="/case-studies/{{ cs.slug }}" class="btn-text" style="color: #f97316; font-weight: 600; font-size: 13.5px; display: inline-flex; align-items: center; gap: 5px;">Read Story <i class="fas fa-arrow-right"></i></a>
+                    {% if cs.pdf_file_path or cs.pdf_path %}
+                    <button onclick="openLeadModal('Download Case Study: {{ cs.title }}');" class="btn btn-outline" style="padding: 5px 12px; font-size: 12px; border-color: #d1d5db; background: transparent; cursor: pointer;"><i class="fas fa-download"></i> PDF</button>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Anonymized Corporate Placeholder/Consulting Case Studies -->
+        <div class="manufacturing-section-header">
+            <h2 style="font-size: 24px; font-weight: 600; margin-bottom: 10px; color: var(--text-primary);">Artha Manufacturing Engagements</h2>
+            <p style="font-size: 15px; color: var(--text-secondary); font-weight: 300;">Anonymized strategic briefs showcasing our work across core manufacturing domains.</p>
+        </div>
+        
+        <div class="manufacturing-card-grid grid-3">
+            <!-- Case Study 1 -->
+            <div class="manufacturing-card case-study-card" style="display: flex; flex-direction: column; justify-content: space-between; background: white; border: 1px solid #e5e7eb; border-radius: 6px; padding: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.01);">
+                <div class="card-content">
+                    <span class="case-study-tag" style="color: #ea580c; background: #fff7ed; border: 1px solid #ffedd5; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; display: inline-block; margin-bottom: 15px;">Data Modernization</span>
+                    <h3 class="card-title" style="font-size: 18px; font-weight: 600; margin-bottom: 12px; line-height: 1.4;">Fragmented Data to Unified Insights</h3>
+                    <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 10px;"><strong>Client Profile:</strong> Global Industrial Manufacturer</p>
+                    <p class="card-desc" style="font-size: 13.5px; color: var(--text-secondary); font-weight: 300; line-height: 1.6; margin-bottom: 10px;">
+                        <strong>Challenge:</strong> 12 siloed ERP systems and MES plants blocked unified dashboard performance, leaving leaders to compile weekly sheets manually.
+                    </p>
+                    <p class="card-desc" style="font-size: 13.5px; color: var(--text-secondary); font-weight: 300; line-height: 1.6;">
+                        <strong>Solution:</strong> Deployed a unified cloud data lakehouse with CDC ingestion to merge logs and shift histories dynamically.
+                    </p>
+                </div>
+                
+                <div style="border-top: 1px solid #f3f4f6; padding-top: 15px; display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+                    <button onclick="openLeadModal('Case Study: Fragmented Data to Unified Insights');" class="btn-text" style="background: none; border: none; color: #f97316; font-weight: 600; font-size: 13.5px; display: inline-flex; align-items: center; gap: 5px; cursor: pointer;">Request Details <i class="fas fa-arrow-right"></i></button>
+                    <button onclick="openLeadModal('Download Brief: Fragmented Data');" class="btn btn-outline" style="padding: 5px 12px; font-size: 12px; border-color: #d1d5db; background: transparent; cursor: pointer;"><i class="fas fa-download"></i> PDF</button>
+                </div>
+            </div>
+
+            <!-- Case Study 2 -->
+            <div class="manufacturing-card case-study-card" style="display: flex; flex-direction: column; justify-content: space-between; background: white; border: 1px solid #e5e7eb; border-radius: 6px; padding: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.01);">
+                <div class="card-content">
+                    <span class="case-study-tag" style="color: #ea580c; background: #fff7ed; border: 1px solid #ffedd5; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; display: inline-block; margin-bottom: 15px;">Master Data Management</span>
+                    <h3 class="card-title" style="font-size: 18px; font-weight: 600; margin-bottom: 12px; line-height: 1.4;">Manufacturing MDM Transformation</h3>
+                    <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 10px;"><strong>Client Profile:</strong> Multi-location Manufacturing Enterprise</p>
+                    <p class="card-desc" style="font-size: 13.5px; color: var(--text-secondary); font-weight: 300; line-height: 1.6; margin-bottom: 10px;">
+                        <strong>Challenge:</strong> Over 500,000 inconsistent material and vendor catalog items led to parts double-ordering and broken procurement logic.
+                    </p>
+                    <p class="card-desc" style="font-size: 13.5px; color: var(--text-secondary); font-weight: 300; line-height: 1.6;">
+                        <strong>Solution:</strong> Implemented MDM matching rules and stewardship workflows to consolidate duplicate catalogs into a golden record registry.
+                    </p>
+                </div>
+                
+                <div style="border-top: 1px solid #f3f4f6; padding-top: 15px; display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+                    <button onclick="openLeadModal('Case Study: MDM Transformation');" class="btn-text" style="background: none; border: none; color: #f97316; font-weight: 600; font-size: 13.5px; display: inline-flex; align-items: center; gap: 5px; cursor: pointer;">Request Details <i class="fas fa-arrow-right"></i></button>
+                    <button onclick="openLeadModal('Download Brief: MDM Transformation');" class="btn btn-outline" style="padding: 5px 12px; font-size: 12px; border-color: #d1d5db; background: transparent; cursor: pointer;"><i class="fas fa-download"></i> PDF</button>
+                </div>
+            </div>
+
+            <!-- Case Study 3 -->
+            <div class="manufacturing-card case-study-card" style="display: flex; flex-direction: column; justify-content: space-between; background: white; border: 1px solid #e5e7eb; border-radius: 6px; padding: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.01);">
+                <div class="card-content">
+                    <span class="case-study-tag" style="color: #ea580c; background: #fff7ed; border: 1px solid #ffedd5; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; display: inline-block; margin-bottom: 15px;">Data Governance</span>
+                    <h3 class="card-title" style="font-size: 18px; font-weight: 600; margin-bottom: 12px; line-height: 1.4;">Governance for a Leading Energy Producer</h3>
+                    <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 10px;"><strong>Client Profile:</strong> Global Energy Producer & Exporter</p>
+                    <p class="card-desc" style="font-size: 13.5px; color: var(--text-secondary); font-weight: 300; line-height: 1.6; margin-bottom: 10px;">
+                        <strong>Challenge:</strong> Strict compliance reviews and operational risk audits required instant proof of pipeline lineage and user data controls.
+                    </p>
+                    <p class="card-desc" style="font-size: 13.5px; color: var(--text-secondary); font-weight: 300; line-height: 1.6;">
+                        <strong>Solution:</strong> Designed metadata logging, automated compliance reports, and established clear data cataloging policies.
+                    </p>
+                </div>
+                
+                <div style="border-top: 1px solid #f3f4f6; padding-top: 15px; display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+                    <button onclick="openLeadModal('Case Study: Energy Governance');" class="btn-text" style="background: none; border: none; color: #f97316; font-weight: 600; font-size: 13.5px; display: inline-flex; align-items: center; gap: 5px; cursor: pointer;">Request Details <i class="fas fa-arrow-right"></i></button>
+                    <button onclick="openLeadModal('Download Brief: Energy Governance');" class="btn btn-outline" style="padding: 5px 12px; font-size: 12px; border-color: #d1d5db; background: transparent; cursor: pointer;"><i class="fas fa-download"></i> PDF</button>
+                </div>
+            </div>
+
+            <!-- Case Study 4 -->
+            <div class="manufacturing-card case-study-card" style="display: flex; flex-direction: column; justify-content: space-between; background: white; border: 1px solid #e5e7eb; border-radius: 6px; padding: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.01);">
+                <div class="card-content">
+                    <span class="case-study-tag" style="color: #ea580c; background: #fff7ed; border: 1px solid #ffedd5; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; display: inline-block; margin-bottom: 15px;">AI Readiness</span>
+                    <h3 class="card-title" style="font-size: 18px; font-weight: 600; margin-bottom: 12px; line-height: 1.4;">Predictive Maintenance Data Foundation</h3>
+                    <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 10px;"><strong>Client Profile:</strong> Leading Industrial Equipment Supplier</p>
+                    <p class="card-desc" style="font-size: 13.5px; color: var(--text-secondary); font-weight: 300; line-height: 1.6; margin-bottom: 10px;">
+                        <strong>Challenge:</strong> Machine failure prediction pilots were stalled because real-time IoT sensor telemetry lacked structured context.
+                    </p>
+                    <p class="card-desc" style="font-size: 13.5px; color: var(--text-secondary); font-weight: 300; line-height: 1.6;">
+                        <strong>Solution:</strong> Formatted sensor feeds and repair files into unified feature stores, feeding predictive models successfully.
+                    </p>
+                </div>
+                
+                <div style="border-top: 1px solid #f3f4f6; padding-top: 15px; display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+                    <button onclick="openLeadModal('Case Study: Predictive Maintenance');" class="btn-text" style="background: none; border: none; color: #f97316; font-weight: 600; font-size: 13.5px; display: inline-flex; align-items: center; gap: 5px; cursor: pointer;">Request Details <i class="fas fa-arrow-right"></i></button>
+                    <button onclick="openLeadModal('Download Brief: Predictive Maintenance');" class="btn btn-outline" style="padding: 5px 12px; font-size: 12px; border-color: #d1d5db; background: transparent; cursor: pointer;"><i class="fas fa-download"></i> PDF</button>
+                </div>
+            </div>
+
+            <!-- Case Study 5 -->
+            <div class="manufacturing-card case-study-card" style="display: flex; flex-direction: column; justify-content: space-between; background: white; border: 1px solid #e5e7eb; border-radius: 6px; padding: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.01);">
+                <div class="card-content">
+                    <span class="case-study-tag" style="color: #ea580c; background: #fff7ed; border: 1px solid #ffedd5; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; display: inline-block; margin-bottom: 15px;">Quality Analytics</span>
+                    <h3 class="card-title" style="font-size: 18px; font-weight: 600; margin-bottom: 12px; line-height: 1.4;">Quality Analytics Modernization</h3>
+                    <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 10px;"><strong>Client Profile:</strong> Global Workwear Brand</p>
+                    <p class="card-desc" style="font-size: 13.5px; color: var(--text-secondary); font-weight: 300; line-height: 1.6; margin-bottom: 10px;">
+                        <strong>Challenge:</strong> Disconnected plant inspections and scrap logs hid assembly defects, causing reactive client-side returns.
+                    </p>
+                    <p class="card-desc" style="font-size: 13.5px; color: var(--text-secondary); font-weight: 300; line-height: 1.6;">
+                        <strong>Solution:</strong> Consolidated inspection files and manufacturing state logs, allowing automated defect root-cause dashboards.
+                    </p>
+                </div>
+                
+                <div style="border-top: 1px solid #f3f4f6; padding-top: 15px; display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+                    <button onclick="openLeadModal('Case Study: Quality Analytics');" class="btn-text" style="background: none; border: none; color: #f97316; font-weight: 600; font-size: 13.5px; display: inline-flex; align-items: center; gap: 5px; cursor: pointer;">Request Details <i class="fas fa-arrow-right"></i></button>
+                    <button onclick="openLeadModal('Download Brief: Quality Analytics');" class="btn btn-outline" style="padding: 5px 12px; font-size: 12px; border-color: #d1d5db; background: transparent; cursor: pointer;"><i class="fas fa-download"></i> PDF</button>
+                </div>
+            </div>
+
+            <!-- Case Study 6 -->
+            <div class="manufacturing-card case-study-card" style="display: flex; flex-direction: column; justify-content: space-between; background: white; border: 1px solid #e5e7eb; border-radius: 6px; padding: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.01);">
+                <div class="card-content">
+                    <span class="case-study-tag" style="color: #ea580c; background: #fff7ed; border: 1px solid #ffedd5; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; display: inline-block; margin-bottom: 15px;">ERP Modernization</span>
+                    <h3 class="card-title" style="font-size: 18px; font-weight: 600; margin-bottom: 12px; line-height: 1.4;">SAP/ERP Migration Data Readiness</h3>
+                    <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 10px;"><strong>Client Profile:</strong> Global Manufacturing Group</p>
+                    <p class="card-desc" style="font-size: 13.5px; color: var(--text-secondary); font-weight: 300; line-height: 1.6; margin-bottom: 10px;">
+                        <strong>Challenge:</strong> Migrating legacy materials, BOMs, and asset records to S/4HANA risked severe delays due to inconsistent database schema formats.
+                    </p>
+                    <p class="card-desc" style="font-size: 13.5px; color: var(--text-secondary); font-weight: 300; line-height: 1.6;">
+                        <strong>Solution:</strong> Deployed pre-migration profiles and data cleaning dashboards to harmonize reference structures before loading ERP data.
+                    </p>
+                </div>
+                
+                <div style="border-top: 1px solid #f3f4f6; padding-top: 15px; display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+                    <button onclick="openLeadModal('Case Study: SAP Data Readiness');" class="btn-text" style="background: none; border: none; color: #f97316; font-weight: 600; font-size: 13.5px; display: inline-flex; align-items: center; gap: 5px; cursor: pointer;">Request Details <i class="fas fa-arrow-right"></i></button>
+                    <button onclick="openLeadModal('Download Brief: SAP Data Readiness');" class="btn btn-outline" style="padding: 5px 12px; font-size: 12px; border-color: #d1d5db; background: transparent; cursor: pointer;"><i class="fas fa-download"></i> PDF</button>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</section>
+
+<!-- Bottom CTA -->
+<section class="manufacturing-bottom-cta">
+    <div class="container text-center">
+        <h2 class="cta-title">Want to Know More About a Specific Case Study?</h2>
+        <p class="cta-subtitle">Contact our engagement team to read the complete technical architectures, migration paths, and outcomes.</p>
+        <div class="cta-actions">
+            <button onclick="openLeadModal('Bottom Case Studies CTA');" class="btn btn-primary btn-lg btn-glow">
+                Talk to a Manufacturing Data Expert
+            </button>
+        </div>
+    </div>
+</section>
+{% endblock %}

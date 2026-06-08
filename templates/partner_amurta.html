@@ -1,0 +1,292 @@
+{% extends "base.html" %}
+
+{% block title %}Amurta Data Insights Platform{% endblock %}
+
+{% block extra_meta %}
+<meta name="description" content="Unlock deeper data insights with Amurta AI-Driven Data Governance Platform. Establish business glossary controls, onboarding automation, and data quality check validation.">
+{% endblock %}
+
+{% block content %}
+<style>
+:root {
+    --brand-color: #8b5cf6;
+    --brand-color-rgb: 139, 92, 246;
+    --brand-glow: rgba(139, 92, 246, 0.15);
+}
+@keyframes spinOrbit {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+@keyframes spinOrbitReverse {
+    0% { transform: rotate(360deg); }
+    100% { transform: rotate(0deg); }
+}
+.brand-orbit-node {
+    position: absolute;
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--brand-color);
+}
+.card-brand-hover {
+    transition: all 0.3s ease;
+}
+.card-brand-hover:hover {
+    border-color: var(--brand-color) !important;
+    box-shadow: 0 10px 30px var(--brand-glow) !important;
+    transform: translateY(-5px);
+}
+.badge-brand {
+    background: var(--brand-glow);
+    color: var(--brand-color);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+}
+</style>
+
+<!-- Detail Hero -->
+<section class="hero" style="min-height: 60vh; padding-top: calc(var(--nav-height) + 60px); padding-bottom: 60px;">
+    <div class="hero-bg-glow hero-glow-1" style="background: radial-gradient(circle, rgba(139,92,246,0.15) 0%, transparent 70%);"></div>
+    <div class="container hero-grid" style="grid-template-columns: 1.2fr 0.8fr;">
+        <div class="hero-content">
+            <div class="hero-badge badge-brand"><i class="fas fa-database"></i> Strategic Partners &middot; Amurta</div>
+            <h1 class="hero-title" style="font-size: clamp(34px, 4.5vw, 46px); line-height: 1.15; margin-bottom: 18px;">
+                Amurta <span>Data Insights Platform</span>
+            </h1>
+            <p class="hero-desc">
+                Amurta's Data Insights Platform (DIP) is a comprehensive platform for data governance, master data management, and insights. It offers features like real-time collaboration, data quality checks, and policy automation to ensure data accuracy and reliability.
+            </p>
+            <div class="hero-buttons" style="display:flex; gap:14px; flex-wrap:wrap;">
+                <a href="/contact-us" class="btn btn-primary btn-glow" style="background: linear-gradient(135deg, #8b5cf6, #ec4899); border: none;">Consult Partner Architect <i class="fas fa-chevron-right btn-icon"></i></a>
+                <a href="#governance" class="btn btn-outline">Data Governance</a>
+            </div>
+            
+            <div class="sol-tag-row" style="margin-top: 30px; display: flex; gap: 10px; flex-wrap: wrap;">
+                <span class="sol-tag-pill" style="font-size: 12px; background: rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);"><i class="fas fa-shield-alt" style="color: #8b5cf6; margin-right: 6px;"></i> AI-Driven Governance</span>
+                <span class="sol-tag-pill" style="font-size: 12px; background: rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);"><i class="fas fa-compress" style="color: #8b5cf6; margin-right: 6px;"></i> Master Data / MDM</span>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="brand-graphic" style="position: relative; width: 100%; height: 350px; display: flex; justify-content: center; align-items: center;">
+                <div style="position: absolute; width: 280px; height: 280px; border-radius: 50%; background: radial-gradient(circle, rgba(139,92,246,0.1) 0%, transparent 70%); filter: blur(20px);"></div>
+                <div style="position: absolute; width: 260px; height: 260px; border: 1px dashed rgba(139,92,246,0.2); border-radius: 50%; animation: spinOrbit 25s linear infinite;"></div>
+                <div style="position: absolute; width: 180px; height: 180px; border: 1px dashed rgba(236,72,153,0.3); border-radius: 50%; animation: spinOrbitReverse 15s linear infinite;"></div>
+                <div class="ai-core" style="width: 90px; height: 90px; background: linear-gradient(135deg, #8b5cf6, #ec4899); box-shadow: 0 0 30px rgba(139,92,246,0.4); z-index: 2; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-chart-line" style="font-size: 32px; color: #fff;"></i>
+                </div>
+                <!-- Nodes -->
+                <div class="brand-orbit-node" style="width: 12px; height: 12px; background: #8b5cf6; top: 50px; left: 100px;"></div>
+                <div class="brand-orbit-node" style="width: 8px; height: 8px; background: #c084fc; bottom: 50px; right: 100px;"></div>
+                <div class="brand-orbit-node" style="width: 10px; height: 10px; background: #f472b6; top: 180px; left: 60px;"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Empowering Businesses Through Data Governance -->
+<section class="section-alt" id="governance">
+    <div class="container">
+        <div class="section-header" style="text-align: center; margin-bottom: 50px;">
+            <span class="section-subtitle">Governance Values</span>
+            <h2 class="section-title">Empowering Businesses <span>Through Data Governance</span></h2>
+            <p class="section-desc">Establish a clean, governed, and secure repository environment supporting sophisticated data analytics.</p>
+        </div>
+        
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 30px;">
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(139,92,246,0.1); color: #8b5cf6;">
+                    <i class="fas fa-check-double"></i>
+                </div>
+                <h3 class="card-title">Improved Data Quality</h3>
+                <p class="card-desc">Enhance data accuracy, consistency, and reliability across your organization, enabling trusted insights for business decisions.</p>
+            </div>
+            
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(139,92,246,0.1); color: #8b5cf6;">
+                    <i class="fas fa-lightbulb"></i>
+                </div>
+                <h3 class="card-title">Enhanced Decision Making</h3>
+                <p class="card-desc">Empower leaders with high-quality, accessible data to make informed, timely decisions that drive growth and innovation.</p>
+            </div>
+            
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(139,92,246,0.1); color: #8b5cf6;">
+                    <i class="fas fa-gavel"></i>
+                </div>
+                <h3 class="card-title">Regulatory Compliance</h3>
+                <p class="card-desc">Ensure compliance with industry standards and regulations, reducing risk and maintaining a strong governance framework.</p>
+            </div>
+            
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(139,92,246,0.1); color: #8b5cf6;">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3 class="card-title">Better Data Security</h3>
+                <p class="card-desc">Protect sensitive information through robust access controls and security measures, safeguarding data against unauthorized access.</p>
+            </div>
+            
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(139,92,246,0.1); color: #8b5cf6;">
+                    <i class="fas fa-cogs"></i>
+                </div>
+                <h3 class="card-title">Operational Efficiency</h3>
+                <p class="card-desc">Streamline data management processes, reduce redundancies, and increase productivity with well-governed, organized data.</p>
+            </div>
+            
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(139,92,246,0.1); color: #8b5cf6;">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <h3 class="card-title">Advanced Analytics</h3>
+                <p class="card-desc">Enable sophisticated analytics and data science by providing clean, structured data that fuels actionable insights and strategic initiatives.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Data Insights Platform Features for Enhanced Governance -->
+<section class="section" id="features">
+    <div class="container">
+        <div class="section-header" style="text-align: center; margin-bottom: 50px;">
+            <span class="section-subtitle">Features</span>
+            <h2 class="section-title">Data Insights Platform <span>Features for Enhanced Governance</span></h2>
+            <p class="section-desc">Explore built-in functionalities covering onboarding pipelines, business glossaries, and curations.</p>
+        </div>
+        
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;">
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-sign-in-alt" style="color: #8b5cf6;"></i> Data Onboarding
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">DIP’s built-in dynamic ingestion framework helps handle high volume, complex data structures to onboard data and drive the data discovery process.</p>
+            </div>
+            
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-book" style="color: #8b5cf6;"></i> Business Glossary
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">Define complex technical terms, rules, and regulations critical to your business processes to ensure everyone in your organization operates from a shared language.</p>
+            </div>
+            
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-id-card" style="color: #8b5cf6;"></i> Master / Reference Data
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">Drive the standardization and optimization of data with Reference Data Management (RDM) and create a single-view-of-the-customer using the Master Data Management (MDM) capabilities.</p>
+            </div>
+            
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-project-diagram" style="color: #8b5cf6;"></i> Policy Engine & Automation
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">Easily automate governance and compliance tasks by adopting international privacy standards with our easy to define, user-friendly UI.</p>
+            </div>
+            
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-user-friends" style="color: #8b5cf6;"></i> Governance Stewardship
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">Review, curate, control the data, and engage with data owners to operationalize the governance process.</p>
+            </div>
+            
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-shield-alt" style="color: #8b5cf6;"></i> Data Quality & Trust
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">Enables automation, validation, workflow, data reconciliations and controls where appropriate in the curation process.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Resources section -->
+<section class="section-alt" id="resources">
+    <div class="container">
+        <div class="section-header" style="text-align: center; margin-bottom: 50px;">
+            <span class="section-subtitle">Insights</span>
+            <h2 class="section-title">Partner <span>Resources</span></h2>
+            <p class="section-desc">Explore whitepapers, case studies, and insights from Artha Solutions.</p>
+        </div>
+        
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
+            <!-- Resource 1 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #8b5cf6; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Artificial Intelligence, BFSI, MDM</span>
+                    <h4 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Strengthening Customer Data Accuracy in the Banking Sector with ML-Based Deduplication</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">Discover how AI & ML enhanced Data Accuracy with advanced Banking MDM and Customer Data Deduplication, reducing...</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #8b5cf6;">Download Now <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <!-- Resource 2 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #8b5cf6; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Artificial Intelligence, Healthcare, MDM</span>
+                    <h4 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Optimizing Patient Record Deduplication in Diabetes Care with AI & ML</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">Discover how AI & ML improved Healthcare Data Management with advanced Healthcare Data Deduplication, reducing duplicate records...</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #8b5cf6;">Download Now <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <!-- Resource 3 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #8b5cf6; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Artificial Intelligence, BFSI</span>
+                    <h4 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Enhancing Policyholder Data Accuracy in the Insurance Industry with ML-Based Deduplication</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">Discover how Artificial Intelligence & ML improved Data Accuracy through Banking MDM and Customer Data Deduplication, reducing...</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #8b5cf6;">Download Now <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <!-- Resource 4 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #8b5cf6; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Artificial Intelligence, Healthcare</span>
+                    <h4 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Accelerating AI Adoption with a Quick-Start AI/ML Lab</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">Learn how a global healthcare distributor accelerated AI adoption by 40% using a Quick-Start AI/ML Lab, improving...</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #8b5cf6;">Download Now! <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <!-- Resource 5 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #8b5cf6; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Artificial Intelligence, Healthcare</span>
+                    <h4 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Optimizing Healthcare Staffing with AI-Driven Predictive Forecasting</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">A leading American healthcare provider faced challenges in managing staffing levels, fluctuating patient demand, and operational inefficiencies...</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #8b5cf6;">Download Now! <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <!-- Resource 6 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #8b5cf6; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Artha Advantage, Banking</span>
+                    <h4 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Artha Solutions & Qlik as Associate Partners for ET BFSI CXO Conclave 2025, Mumbai</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">Artha Solutions and Qlik are proud to join as Associate Partners at the ET BFSI CXO Conclave...</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #8b5cf6;">Learn more <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Bottom CTA -->
+<section class="section" style="text-align: center; background: linear-gradient(180deg, var(--bg-primary) 0%, rgba(139,92,246,0.05) 100%);">
+    <div class="container">
+        <h2 class="section-title">Initiate Your <span>Integration Journey</span></h2>
+        <p class="section-desc" style="max-width: 600px; margin: 0 auto 30px;">Artha Solutions helps you deploy, secure, and govern Amurta platform structures at up to 40% savings.</p>
+        <a href="/contact-us" class="btn btn-primary btn-glow" style="background: linear-gradient(135deg, #8b5cf6, #ec4899); border: none; box-shadow: 0 0 20px rgba(139,92,246,0.3);">Request a Joint Solution Demo</a>
+    </div>
+</section>
+{% endblock %}

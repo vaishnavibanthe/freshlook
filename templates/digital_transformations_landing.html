@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+
+{% block title %}Digital Transformation Strategy & Services{% endblock %}
+{% block extra_meta %}
+<meta name="description" content="Explore Artha Solutions' digital transformation offerings. Design robust roadmaps with Digital Strategy or execute migrations with Transformation Solutions.">
+{% endblock %}
+
+{% block content %}
+
+<!-- ══════════════════════════════════════════
+     HERO LANDING SECTION
+     ═════════════════════════════════════════════ -->
+<section class="dt-hero" id="dt-hero">
+    <!-- Animated background element -->
+    <div class="dt-bg-mesh" aria-hidden="true"></div>
+    <div class="hero-bg-glow hero-glow-1" style="opacity:0.55;"></div>
+    <div class="hero-bg-glow hero-glow-2" style="opacity:0.35; right:-5%; top:20%;"></div>
+
+    <div class="container dt-hero-container">
+        <div class="section-header" style="text-align:center; margin-bottom:60px;">
+            <div class="hero-badge" style="display:inline-flex; margin-bottom:20px;">
+                <i class="fas fa-arrows-spin"></i> Artha Advantage · Digital Transformation
+            </div>
+            <h1 class="hero-title" style="font-size:clamp(36px,5vw,60px); line-height:1.15; margin-bottom:16px;">
+                Choose Your <span>Digital Path</span>
+            </h1>
+            <p class="section-desc" style="max-width:600px; margin:0 auto; font-size:16px; color:var(--text-secondary); line-height:1.75;">
+                Enterprises today must differentiate digitally to succeed. Explore Artha's core transformation frameworks designed to align technical capabilities with long-term business values.
+            </p>
+        </div>
+
+        <!-- Big Graphical Animated Cards -->
+        <div class="dt-landing-grid">
+            <!-- Option 1: Digital Strategy -->
+            <div class="dt-option-card card-strategy" style="--ac:#3b82f6; --acg:rgba(59,130,246,0.08);">
+                <div class="card-inner">
+                    <div class="card-icon"><i class="fas fa-chess-knight"></i></div>
+                    <h2 class="card-title">Digital Strategy</h2>
+                    <p class="card-tagline">Differentiate digitally, optimize, engage, and succeed</p>
+                    <p class="card-desc">
+                        Build a robust, actionable technical roadmap to resolve performance bottlenecks, optimize software licensing costs, and architect agile system frameworks aligned with your business scaling goals.
+                    </p>
+                    <ul class="card-features">
+                        <li><i class="fas fa-check"></i> Comprehensive digital roadmap design</li>
+                        <li><i class="fas fa-check"></i> Tech stack and licensing audits</li>
+                        <li><i class="fas fa-check"></i> Data-driven business model innovation</li>
+                    </ul>
+                    <a href="/artha-advantage/digital-transformation/digital-strategy" class="btn btn-primary btn-glow card-cta">
+                        Explore Digital Strategy <i class="fas fa-arrow-right btn-icon"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Option 2: Transformation Solutions & Services -->
+            <div class="dt-option-card card-services" style="--ac:#8b5cf6; --acg:rgba(139,92,246,0.08);">
+                <div class="card-inner">
+                    <div class="card-icon"><i class="fas fa-cogs"></i></div>
+                    <h2 class="card-title">Transformation Solutions &amp; Services</h2>
+                    <p class="card-tagline">Unlock digital potential with innovative solutions and ongoing support</p>
+                    <p class="card-desc">
+                        Execute complex system integrations, cloud application engineering, big data governance, and legacy code migrations with deep agility. We provide end-to-end data lifecycle support and resource scaling.
+                    </p>
+                    <ul class="card-features">
+                        <li><i class="fas fa-check"></i> Cloud application engineering &amp; APIs</li>
+                        <li><i class="fas fa-check"></i> Legacy code modernization (COBOL, Java)</li>
+                        <li><i class="fas fa-check"></i> 24/7 managed data operations</li>
+                    </ul>
+                    <a href="/artha-advantage/digital-transformation/digital-transformation-services" class="btn btn-primary btn-glow card-cta" style="background:linear-gradient(135deg,#8b5cf6,#ec4899);">
+                        Explore Solutions &amp; Services <i class="fas fa-arrow-right btn-icon"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     STYLES
+     ═════════════════════════════════════════════ -->
+<style>
+.dt-hero {
+    min-height: 85vh;
+    padding-top: calc(var(--nav-height) + 60px);
+    padding-bottom: 80px;
+    position: relative;
+    overflow: hidden;
+}
+.dt-bg-mesh {
+    position: absolute;
+    inset: 0;
+    background-image:
+        radial-gradient(circle at 1px 1px, rgba(59,130,246,0.06) 1px, transparent 0);
+    background-size: 40px 40px;
+    pointer-events: none;
+}
+.dt-hero-container {
+    position: relative;
+    z-index: 1;
+}
+
+/* ── Landing Grid & Big Cards ──────────────── */
+.dt-landing-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-top: 20px;
+}
+@media (max-width: 768px) {
+    .dt-landing-grid { grid-template-columns: 1fr; gap: 30px; }
+}
+
+.dt-option-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 28px;
+    padding: 40px;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1),
+                border-color 0.4s ease,
+                box-shadow 0.4s ease;
+}
+.dt-option-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at top left, var(--acg), transparent 55%);
+    pointer-events: none;
+    opacity: 0.5;
+    transition: opacity 0.4s ease;
+}
+.dt-option-card:hover {
+    transform: translateY(-8px);
+    border-color: var(--ac);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.35);
+}
+.dt-option-card:hover::before {
+    opacity: 1;
+}
+
+.card-inner {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    position: relative;
+    z-index: 2;
+}
+.card-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    background: var(--acg);
+    border: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    color: var(--ac);
+    margin-bottom: 24px;
+    transition: transform 0.3s ease;
+}
+.dt-option-card:hover .card-icon {
+    transform: scale(1.1) rotate(-3deg);
+}
+
+.card-title {
+    font-size: 24px;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 8px;
+}
+.card-tagline {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ac);
+    margin-bottom: 16px;
+    line-height: 1.4;
+}
+.card-desc {
+    font-size: 14.5px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin-bottom: 24px;
+    flex: 1;
+}
+
+.card-features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 32px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.card-features li {
+    font-size: 13.5px;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.card-features li i {
+    color: var(--ac);
+    font-size: 12px;
+}
+
+.card-cta {
+    width: fit-content;
+    padding: 14px 28px;
+    font-size: 14px;
+}
+</style>
+
+{% endblock %}

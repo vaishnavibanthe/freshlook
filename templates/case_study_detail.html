@@ -1,0 +1,1139 @@
+{% extends "base.html" %}
+
+{% block title %}{{ post.seo_title or post.title }} | Artha Solutions{% endblock %}
+
+{% block extra_meta %}
+    <meta name="description" content="{{ post.seo_description or post.executive_summary[:150] }}">
+    <meta name="keywords" content="{{ post.seo_keywords or post.tags }}">
+    <!-- OpenGraph SEO -->
+    <meta property="og:title" content="{{ post.og_title or post.title }}">
+    <meta property="og:description" content="{{ post.og_description or post.executive_summary[:150] }}">
+    <meta property="og:type" content="article">
+    {% if post.canonical_url %}
+    <link rel="canonical" href="{{ post.canonical_url }}">
+    {% endif %}
+    <!-- Structured Data Schema -->
+    {% if post.schema_json %}
+    <script type="application/ld+json">
+        {{ post.schema_json|safe }}
+    </script>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<style>
+    /* Premium Glassmorphic / Gradient styles */
+    .metric-scorecard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 24px;
+        margin-bottom: 40px;
+    }
+    
+    .metric-scorecard-card {
+        background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(255, 255, 255, 0.02) 100%);
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius-lg);
+        padding: 28px 24px;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+        box-shadow: var(--card-shadow);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .metric-scorecard-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: var(--grad-primary);
+        opacity: 0.85;
+    }
+    
+    .metric-scorecard-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 16px 40px rgba(37, 99, 235, 0.08);
+        border-color: var(--accent-blue);
+    }
+    
+    /* SVG Circular/Radial Progress Gauges */
+    .gauge-circle-wrapper {
+        position: relative;
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .gauge-svg {
+        width: 100%;
+        height: 100%;
+    }
+    
+    .gauge-bg {
+        fill: none;
+        stroke: rgba(226, 232, 240, 0.06);
+    }
+    
+    body:not(.dark-mode) .gauge-bg {
+        stroke: rgba(226, 232, 240, 0.5);
+    }
+    
+    .gauge-fill {
+        fill: none;
+        stroke-linecap: round;
+        transition: stroke-dashoffset 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .gauge-value-text {
+        position: absolute;
+        font-size: 24px;
+        font-weight: 900;
+        color: var(--text-primary);
+        letter-spacing: -0.5px;
+    }
+    
+    .metric-label-text {
+        font-size: 13px;
+        line-height: 1.5;
+        color: var(--text-secondary);
+        font-weight: 600;
+        margin-top: 4px;
+    }
+    
+    /* Technology Badge styling */
+    .tech-stack-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 20px;
+    }
+    
+    .tech-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background-color: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        padding: 8px 16px;
+        border-radius: 30px;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--text-primary);
+        box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .tech-badge:hover {
+        background-color: rgba(37, 99, 235, 0.04);
+        border-color: var(--accent-blue);
+        color: var(--accent-blue);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(37, 99, 235, 0.08);
+    }
+    
+    .tech-icon-color {
+        font-size: 14px;
+    }
+
+    /* Graphical Section Blocks */
+    .graphical-card-block {
+        background-color: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius-lg);
+        padding: 35px;
+        margin-bottom: 35px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.015);
+        position: relative;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .graphical-card-block:hover {
+        border-color: rgba(37, 99, 235, 0.15);
+        box-shadow: 0 8px 30px rgba(0,0,0,0.03);
+    }
+    
+    .block-accent-blue {
+        border-left: 5px solid var(--accent-blue);
+    }
+    
+    .block-accent-red {
+        border-left: 5px solid #ef4444; /* Alert color */
+    }
+    
+    .block-accent-green {
+        border-left: 5px solid #10b981; /* Success color */
+    }
+    
+    .block-accent-purple {
+        border-left: 5px solid #8b5cf6; /* Process color */
+    }
+    
+    .block-header-with-icon {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 20px;
+    }
+    
+    .block-icon-circle {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        flex-shrink: 0;
+    }
+    
+    .icon-blue { background-color: rgba(37, 99, 235, 0.06); color: var(--accent-blue); }
+    .icon-red { background-color: rgba(239, 68, 68, 0.06); color: #ef4444; }
+    .icon-green { background-color: rgba(16, 185, 129, 0.06); color: #10b981; }
+    .icon-purple { background-color: rgba(139, 92, 246, 0.06); color: #8b5cf6; }
+    
+    .block-title {
+        font-size: 20px;
+        font-weight: 800;
+        color: var(--text-primary);
+        margin: 0;
+        letter-spacing: -0.3px;
+    }
+    
+    .block-body-text {
+        font-size: 15px;
+        line-height: 1.75;
+        color: var(--text-secondary);
+        margin: 0;
+    }
+
+    /* Implementation Step Styles */
+    .implementation-timeline-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-top: 24px;
+        position: relative;
+    }
+    
+    .timeline-step {
+        background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(255, 255, 255, 0.01) 100%);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 24px;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .timeline-step:hover {
+        border-color: rgba(139, 92, 246, 0.3);
+        transform: translateY(-4px);
+        box-shadow: 0 10px 30px rgba(139, 92, 246, 0.04);
+    }
+    
+    .step-number-circle {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: rgba(139, 92, 246, 0.08);
+        border: 1px solid rgba(139, 92, 246, 0.2);
+        color: #8b5cf6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: 800;
+    }
+    
+    .step-content {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+    
+    .step-title {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+    }
+    
+    .step-desc {
+        font-size: 12.5px;
+        line-height: 1.5;
+        color: var(--text-secondary);
+        margin: 0;
+    }
+    
+    /* Modernized Hero layout styles */
+    .case-study-modern-hero {
+        background: linear-gradient(135deg, #0b0f19 0%, #111827 100%);
+        color: #ffffff;
+        padding: 50px 0 50px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .case-study-modern-hero::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -20%;
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(circle, rgba(37, 99, 235, 0.15) 0%, rgba(37, 99, 235, 0) 70%);
+        z-index: 1;
+        pointer-events: none;
+    }
+    
+    .case-study-modern-hero::before {
+        content: '';
+        position: absolute;
+        bottom: -50%;
+        left: -10%;
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(circle, rgba(6, 182, 212, 0.1) 0%, rgba(6, 182, 212, 0) 70%);
+        z-index: 1;
+        pointer-events: none;
+    }
+    
+    .case-study-modern-hero .container {
+        position: relative;
+        z-index: 2;
+    }
+    
+    .hero-grid-container {
+        display: grid;
+        grid-template-columns: 260px 1fr 300px;
+        gap: 40px;
+        align-items: center;
+        margin-top: 20px;
+    }
+    
+    @media (max-width: 1024px) {
+        .hero-grid-container {
+            grid-template-columns: 220px 1fr;
+            gap: 30px;
+        }
+        .hero-col-right {
+            grid-column: span 2;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .hero-grid-container {
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+        .hero-col-left {
+            display: flex;
+            justify-content: center;
+        }
+        .hero-col-right {
+            grid-column: span 1;
+        }
+    }
+    
+    /* Cover page styling */
+    .case-study-cover-page {
+        width: 220px;
+        height: 290px;
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 5px 15px rgba(0, 0, 0, 0.2);
+        border-left: 8px solid rgba(0, 0, 0, 0.2);
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: stretch;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .case-study-cover-page:hover {
+        transform: translateY(-6px) rotate(-1deg);
+        box-shadow: 0 28px 48px rgba(0, 0, 0, 0.5), 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* Center Column */
+    .hero-col-center {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+    
+    .hero-col-center .hero-title {
+        font-size: 30px;
+        line-height: 1.25;
+        font-weight: 800;
+        color: #ffffff;
+        margin: 0;
+        letter-spacing: -0.5px;
+    }
+    
+    .hero-col-center .hero-description {
+        font-size: 15px;
+        line-height: 1.6;
+        color: #94a3b8;
+        margin: 0;
+        font-weight: 300;
+    }
+    
+    .hero-actions {
+        margin-top: 8px;
+    }
+    
+    .btn-download-pdf-hero {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: linear-gradient(135deg, var(--accent-blue) 0%, #1d4ed8 100%);
+        color: #ffffff;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        transition: all 0.25s ease;
+        text-decoration: none;
+    }
+    
+    .btn-download-pdf-hero:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
+        background: linear-gradient(135deg, #3b82f6 0%, var(--accent-blue) 100%);
+    }
+    
+    .btn-download-pdf-hero:active {
+        transform: translateY(0);
+    }
+    
+    /* Right Column (Key Highlights Card) */
+    .highlights-card {
+        background: rgba(255, 255, 255, 0.02);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
+    }
+    
+    .highlights-header {
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+        color: var(--accent-blue);
+        margin-bottom: 16px;
+        text-transform: uppercase;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        padding-bottom: 6px;
+    }
+    
+    .highlights-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .highlights-list li {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+    
+    .highlight-label {
+        font-size: 10px;
+        font-weight: 700;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .highlight-value {
+        font-size: 13px;
+        font-weight: 600;
+        color: #e2e8f0;
+    }
+    
+    .highlight-tech-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        margin-top: 3px;
+    }
+    
+    .highlight-tech-tag {
+        font-size: 9px;
+        font-weight: 700;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        color: #94a3b8;
+        padding: 2px 6px;
+        border-radius: 4px;
+    }
+    
+    .metric-scorecard-card-hero {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: var(--border-radius-lg);
+        padding: 24px 20px;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .metric-scorecard-card-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
+        opacity: 0.85;
+    }
+    
+    .metric-scorecard-card-hero:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 30px rgba(37, 99, 235, 0.12);
+        border-color: var(--accent-blue);
+    }
+</style>
+
+<!-- Subpage Nav Spacer -->
+<div style="height: var(--nav-height); background-color: var(--bg-secondary);"></div>
+
+<!-- Case Study Header / Hero -->
+<section class="case-study-modern-hero">
+    <div class="container">
+        <!-- Breadcrumbs -->
+        <nav aria-label="breadcrumb" style="margin-bottom: 24px;">
+            <ol style="display: flex; gap: 8px; list-style: none; font-size: 12px; color: #94a3b8; font-weight: 500; padding: 0; margin: 0; flex-wrap: wrap;">
+                <li><a href="/" style="color: #94a3b8; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#3b82f6'" onmouseout="this.style.color='#94a3b8'">Home</a></li>
+                <li><span style="color: rgba(255,255,255,0.25);">/</span></li>
+                <li><a href="/case-studies" style="color: #94a3b8; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#3b82f6'" onmouseout="this.style.color='#94a3b8'">Case Studies</a></li>
+                <li><span style="color: rgba(255,255,255,0.25);">/</span></li>
+                <li style="color: #ffffff; font-weight: 700;">{{ post.title }}</li>
+            </ol>
+        </nav>
+        
+        <div class="hero-grid-container">
+            <!-- Left Column: Case Study Cover Page (Dynamic 3D CSS Card) -->
+            <div class="hero-col-left">
+                <div class="case-study-cover-page">
+                    <img src="{{ post.thumbnail_path or '/static/img/case-studies/' ~ post.slug ~ '-cover.png' }}" 
+                         alt="{{ post.title }}" 
+                         style="width: 100%; height: 100%; object-fit: cover;" 
+                         onerror="this.style.display='none'; document.getElementById('css-cover-fallback').style.display='flex';">
+                    <div id="css-cover-fallback" style="display: none; width: 100%; height: 100%; background: linear-gradient(135deg, #1e40af 0%, #0891b2 100%); padding: 20px; flex-direction: column; justify-content: space-between; color: #ffffff; box-sizing: border-box;">
+                        <div class="cover-eyebrow" style="font-size: 8px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255, 255, 255, 0.9); background: rgba(255, 255, 255, 0.15); padding: 3px 8px; border-radius: 20px; align-self: flex-start;">CASE STUDY</div>
+                        <div class="cover-title" style="font-size: 15px; font-weight: 800; line-height: 1.35; color: #ffffff; margin-top: 15px; text-shadow: 0 1px 3px rgba(0,0,0,0.15); display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; width: 100%;">{{ post.title }}</div>
+                        <div class="cover-tech" style="font-size: 10px; font-weight: 500; color: rgba(255, 255, 255, 0.8); margin-top: auto; margin-bottom: 15px;">
+                            {% if post.technologies %}
+                                {% set tech_items = post.technologies.split(',') %}
+                                {% if tech_items|length >= 2 %}
+                                    {{ tech_items[0].strip() }} &amp; {{ tech_items[1].strip() }}
+                                {% else %}
+                                    {{ tech_items[0].strip() }}
+                                {% endif %}
+                            {% else %}
+                                Enterprise Modernization
+                            {% endif %}
+                        </div>
+                        <div class="cover-footer" style="border-top: 1px solid rgba(255, 255, 255, 0.15); padding-top: 10px; display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                            <span class="cover-brand" style="font-size: 9px; font-weight: 700; letter-spacing: 1px; color: rgba(255, 255, 255, 0.9);">ARTHA SOLUTIONS</span>
+                        </div>
+                    </div>
+                    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; box-shadow: inset 10px 0 15px -5px rgba(0,0,0,0.4); pointer-events: none;"></div>
+                </div>
+            </div>
+            
+            <!-- Center Column: Title, Description, and CTA Button -->
+            <div class="hero-col-center">
+                <h1 class="hero-title">{{ post.title }}</h1>
+                <p class="hero-description">
+                    {{ post.executive_summary }}
+                </p>
+                <div class="hero-actions">
+                    <button onclick="openDownloadModal('{{ post.slug }}', '{{ post.title }}')" class="btn-download-pdf-hero">
+                        <i class="fas fa-file-pdf"></i> Download PDF Case Study
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Right Column: Key Highlights -->
+            <div class="hero-col-right">
+                <div class="highlights-card">
+                    <div class="highlights-header">KEY HIGHLIGHTS</div>
+                    <ul class="highlights-list">
+                        <li>
+                            <span class="highlight-label">Industry</span>
+                            <span class="highlight-value">{{ post.industry }}</span>
+                        </li>
+                        <li>
+                            <span class="highlight-label">Focus Area</span>
+                            <span class="highlight-value">{{ post.solution_area }}</span>
+                        </li>
+                        <li>
+                            <span class="highlight-label">Client</span>
+                            <span class="highlight-value">{{ post.client_display_name }}</span>
+                        </li>
+                        <li>
+                            <span class="highlight-label">Region</span>
+                            <span class="highlight-value">{{ post.region }}</span>
+                        </li>
+                        {% if post.technologies %}
+                        <li>
+                            <span class="highlight-label">Technologies</span>
+                            <div class="highlight-tech-list">
+                                {% for tech in post.technologies.split(',') %}
+                                    <span class="highlight-tech-tag">{{ tech.strip() }}</span>
+                                {% endfor %}
+                            </div>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Metrics Scorecard (Business Impact) inside Hero Banner -->
+        {% set metrics = load_json_helper(post.key_metrics) %}
+        {% if metrics %}
+        <div style="margin-top: 50px; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 40px;">
+            <!-- SVG Defs for gradients -->
+            <svg style="width:0; height:0; position:absolute;" aria-hidden="true" focusable="false">
+                <defs>
+                    <linearGradient id="metric-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="var(--accent-blue)" />
+                        <stop offset="100%" stop-color="var(--accent-cyan)" />
+                    </linearGradient>
+                </defs>
+            </svg>
+            <h2 style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: var(--accent-blue); margin-bottom: 30px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                <i class="fas fa-chart-bar"></i> Key Results &amp; Business Impact
+            </h2>
+            <div class="metric-scorecard-grid">
+                {% for metric in metrics %}
+                <div class="metric-scorecard-card-hero">
+                    <div class="gauge-circle-wrapper">
+                        <svg class="gauge-svg" viewBox="0 0 100 100">
+                            <circle class="gauge-bg" cx="50" cy="50" r="42" stroke-width="8"></circle>
+                            <circle class="gauge-fill" cx="50" cy="50" r="42" stroke-width="8"
+                                    stroke="url(#metric-grad)"
+                                    stroke-dasharray="263.89" stroke-dashoffset="263.89"
+                                    data-value="{{ metric.value }}"
+                                    style="transform: rotate(-90deg); transform-origin: 50px 50px;"></circle>
+                        </svg>
+                        <div class="gauge-value-text" style="color: #ffffff;">{{ metric.value }}</div>
+                    </div>
+                    <div class="metric-label-text" style="color: #94a3b8;">
+                        {{ metric.label }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% if metrics %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const fills = document.querySelectorAll(".gauge-fill");
+        fills.forEach(fill => {
+            const valStr = fill.getAttribute("data-value") || "";
+            let percent = 0;
+            const numMatch = valStr.match(/\d+(\.\d+)?/);
+            if (numMatch) {
+                const num = parseFloat(numMatch[0]);
+                if (valStr.includes("%")) {
+                    percent = num;
+                } else if (valStr.toLowerCase().includes("x")) {
+                    percent = Math.min(100, num * 20);
+                } else if (num <= 100 && !valStr.includes("$") && !valStr.toLowerCase().includes("m") && !valStr.toLowerCase().includes("k")) {
+                    percent = num;
+                } else {
+                    percent = 85; 
+                }
+            } else {
+                percent = 90; 
+            }
+            percent = Math.max(0, Math.min(100, percent));
+            const circumference = 263.89;
+            const offset = circumference - (percent / 100) * circumference;
+            setTimeout(() => {
+                fill.style.strokeDashoffset = offset;
+            }, 150);
+        });
+    });
+</script>
+{% endif %}
+
+<!-- Case Study Main Layout -->
+<section class="section" style="padding: 40px 0 60px; background-color: var(--bg-primary);">
+    <div class="container" style="display: grid; grid-template-columns: 1fr 340px; gap: 50px; align-items: start;">
+        
+        <!-- Main Content Area -->
+        <article style="max-width: 800px;">
+            
+            <!-- GenAI AEO Concise Answer Summary -->
+            <div style="background: linear-gradient(135deg, rgba(6, 182, 212, 0.04) 0%, rgba(37, 99, 235, 0.04) 100%); border: 1px solid rgba(37, 99, 235, 0.12); border-radius: var(--border-radius-md); padding: 26px; margin-bottom: 40px; box-shadow: var(--card-shadow);">
+                <h4 style="font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--accent-blue); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-sparkles"></i> AI Overview & Impact Summary
+                </h4>
+                <p style="font-size: 14.5px; line-height: 1.65; color: var(--text-primary); font-weight: 500; font-style: italic; margin-bottom: 0;">
+                    {{ post.ai_summary or "In this case study, Artha Solutions deployed custom data and AI strategies to resolve pipeline constraints and accelerate reporting." }}
+                </p>
+            </div>
+            
+            <!-- Executive Summary -->
+            <div style="margin-bottom: 45px;">
+                <h2 style="font-size: 22px; font-weight: 800; margin-bottom: 16px; border-bottom: 2px solid var(--border-color); padding-bottom: 8px; color: var(--text-primary); letter-spacing: -0.3px;">Executive Summary</h2>
+                <p style="font-size: 15.5px; line-height: 1.75; color: var(--text-secondary);">
+                    {{ post.executive_summary }}
+                </p>
+            </div>
+
+            <!-- Client Background -->
+            <div style="margin-bottom: 45px;">
+                <h2 style="font-size: 22px; font-weight: 800; margin-bottom: 16px; border-bottom: 2px solid var(--border-color); padding-bottom: 8px; color: var(--text-primary); letter-spacing: -0.3px;">Client Profile & Context</h2>
+                <p style="font-size: 15.5px; line-height: 1.75; color: var(--text-secondary);">
+                    The client is {{ post.client_display_name }} operating in the **{{ post.industry }}** industry, primarily focused on scaling their logistics, customer integration, and internal compliance frameworks in the **{{ post.region }}** market.
+                </p>
+            </div>
+            
+            <!-- Problem Statement -->
+            <div class="graphical-card-block block-accent-red">
+                <div class="block-header-with-icon">
+                    <div class="block-icon-circle icon-red">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h2 class="block-title">Problem Statement</h2>
+                </div>
+                <p class="block-body-text" style="margin-bottom: 16px;">
+                    {{ post.business_challenge }}
+                </p>
+                <div style="background-color: rgba(239, 68, 68, 0.03); border: 1px solid rgba(239, 68, 68, 0.1); border-radius: var(--border-radius-md); padding: 18px;">
+                    <h4 style="font-size: 12px; font-weight: 800; text-transform: uppercase; color: #ef4444; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; letter-spacing: 0.5px;">
+                        <i class="fas fa-circle-question"></i> Critical Operational Vulnerability
+                    </h4>
+                    <p style="font-size: 13.5px; color: var(--text-secondary); margin: 0; line-height: 1.6;">
+                        Before Artha's modernization, delayed sync loops and manual data auditing loops created significant compliance vulnerabilities and reporting bottlenecks.
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Why It Mattered -->
+            <div style="margin-bottom: 45px; padding-left: 15px; border-left: 3px solid var(--border-color);">
+                <h2 style="font-size: 18px; font-weight: 800; margin-bottom: 10px; color: var(--text-primary);">Why It Mattered</h2>
+                <p style="font-size: 15px; line-height: 1.7; color: var(--text-secondary);">
+                    Without a cohesive and modernized data integration foundation, operations faced persistent sync delays, error-prone compliance auditing reporting loops, and manual reconciliation bottlenecks that constrained customer experience and operational decisions.
+                </p>
+            </div>
+            
+            <!-- Solution Delivered -->
+            <div class="graphical-card-block block-accent-blue">
+                <div class="block-header-with-icon">
+                    <div class="block-icon-circle icon-blue">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <h2 class="block-title">Solution Implemented</h2>
+                </div>
+                <p class="block-body-text">
+                    {{ post.solution_summary }}
+                </p>
+            </div>
+            
+            <!-- Implementation Approach -->
+            <div class="graphical-card-block block-accent-purple">
+                <div class="block-header-with-icon">
+                    <div class="block-icon-circle icon-purple">
+                        <i class="fas fa-route"></i>
+                    </div>
+                    <h2 class="block-title">Implementation Journey & Strategy</h2>
+                </div>
+                
+                {% if "outlined in the source" in post.implementation_approach or "Needs Review" in post.implementation_approach %}
+                <p class="block-body-text" style="margin-bottom: 24px;">
+                    For this engagement, Artha Solutions deployed its standardized enterprise framework, following a proven four-phase implementation methodology to de-risk migration and accelerate time-to-value:
+                </p>
+                {% else %}
+                <p class="block-body-text" style="margin-bottom: 24px;">
+                    {{ post.implementation_approach }}
+                </p>
+                {% endif %}
+
+                <!-- Graphical Timeline Stepper -->
+                <div class="implementation-timeline-container">
+                    <div class="timeline-step">
+                        <div class="step-number-circle">01</div>
+                        <div class="step-content">
+                            <h4 class="step-title">Discovery & Mapping</h4>
+                            <p class="step-desc">Auditing legacy databases, mapping metadata schemas, and identifying source anomalies.</p>
+                        </div>
+                    </div>
+                    <div class="timeline-step">
+                        <div class="step-number-circle">02</div>
+                        <div class="step-content">
+                            <h4 class="step-title">Pipelines & Rules</h4>
+                            <p class="step-desc">Developing Talend ETL jobs, configuring API endpoints, and implementing CDC sync.</p>
+                        </div>
+                    </div>
+                    <div class="timeline-step">
+                        <div class="step-number-circle">03</div>
+                        <div class="step-content">
+                            <h4 class="step-title">Governance & Quality</h4>
+                            <p class="step-desc">Applying de-duplication rules, cleansing data, and establishing golden record stewardship.</p>
+                        </div>
+                    </div>
+                    <div class="timeline-step">
+                        <div class="step-number-circle">04</div>
+                        <div class="step-content">
+                            <h4 class="step-title">Validation & Scale</h4>
+                            <p class="step-desc">Deploying real-time validation checks and scaling pipelines across cloud environments.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Business Outcomes -->
+            <div class="graphical-card-block block-accent-green">
+                <div class="block-header-with-icon">
+                    <div class="block-icon-circle icon-green">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h2 class="block-title">Business Outcomes & Results</h2>
+                </div>
+                <p class="block-body-text">
+                    {{ post.business_outcomes }}
+                </p>
+            </div>
+
+            <!-- Quote Block -->
+            {% if post.quote and "Needs Review" not in post.quote %}
+            <div style="border-left: 4px solid var(--accent-blue); padding: 22px 26px; background-color: var(--bg-secondary); border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0; margin: 40px 0; box-shadow: var(--card-shadow);">
+                <p style="font-size: 15.5px; line-height: 1.65; color: var(--text-primary); font-style: italic; font-weight: 500; margin-bottom: 12px;">
+                    "{{ post.quote }}"
+                </p>
+                <cite style="display: block; font-size: 12px; font-weight: 700; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.5px;">
+                    — Client Executive Sponsor
+                </cite>
+            </div>
+            {% endif %}
+
+            <!-- Related Solutions & Services -->
+            <div style="margin-top: 50px;">
+                <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 16px; color: var(--text-primary);">Related Accelerators & Solutions</h3>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                    <a href="/artha-advantage" style="font-size: 13px; background-color: var(--bg-secondary); border: 1px solid var(--border-color); padding: 8px 18px; border-radius: 30px; font-weight: 600; color: var(--text-secondary); transition: all 0.2s ease; hover: border-color: var(--accent-blue); hover: color: var(--accent-blue);">Artha Advantage Framework</a>
+                    <a href="/data-solutions" style="font-size: 13px; background-color: var(--bg-secondary); border: 1px solid var(--border-color); padding: 8px 18px; border-radius: 30px; font-weight: 600; color: var(--text-secondary); transition: all 0.2s ease; hover: border-color: var(--accent-blue); hover: color: var(--accent-blue);">Master Data Management</a>
+                    <a href="/artificial-intelligence" style="font-size: 13px; background-color: var(--bg-secondary); border: 1px solid var(--border-color); padding: 8px 18px; border-radius: 30px; font-weight: 600; color: var(--text-secondary); transition: all 0.2s ease; hover: border-color: var(--accent-blue); hover: color: var(--accent-blue);">Production AI Services</a>
+                </div>
+            </div>
+
+            <!-- FAQ Section -->
+            {% set faqs = load_json_helper(post.faq_json) %}
+            {% if faqs %}
+            <div style="margin-top: 60px; border-top: 1px solid var(--border-color); padding-top: 40px;">
+                <h2 style="font-size: 22px; font-weight: 800; margin-bottom: 28px; color: var(--text-primary); letter-spacing: -0.3px;">Frequently Asked Questions</h2>
+                <div class="faq-list" style="margin: 0;">
+                    {% for faq in faqs %}
+                    <div style="margin-bottom: 28px; border-bottom: 1px solid var(--border-color); padding-bottom: 24px;">
+                        <h4 style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; display: flex; gap: 10px; align-items: start;">
+                            <i class="far fa-circle-question" style="color: var(--accent-blue); margin-top: 3px; font-size: 16px;"></i>
+                            <span>{{ faq.question }}</span>
+                        </h4>
+                        <p style="font-size: 14.5px; line-height: 1.65; color: var(--text-secondary); padding-left: 26px; margin-bottom: 0;">
+                            {{ faq.answer }}
+                        </p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+        </article>
+        
+        <!-- Sidebar Summary & Gated CTA -->
+        <aside style="position: sticky; top: 100px; display: grid; gap: 30px;">
+            
+            <!-- Download Box -->
+            <div style="background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); padding: 30px; text-align: center; box-shadow: var(--card-shadow);">
+                <div class="card-icon-box" style="margin: 0 auto 20px; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background-color: #eff6ff; color: var(--accent-blue);">
+                    <i class="fas fa-file-pdf" style="font-size: 24px;"></i>
+                </div>
+                <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">Case Study PDF</h4>
+                <p style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 20px; line-height: 1.4;">
+                    Get access to the full offline technical document, including structural charts and deployment workflows.
+                </p>
+                <button onclick="openDownloadModal('{{ post.slug }}', '{{ post.title }}')" class="btn btn-primary btn-glow" style="width: 100%; border: none; padding: 12px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                    <i class="fas fa-download"></i> Gated PDF Download
+                </button>
+            </div>
+            
+            <!-- Technologies Leveraged Sidebar Widget -->
+            <div style="background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); padding: 30px;">
+                <h4 style="font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-primary); margin-bottom: 20px; border-bottom: 2px solid var(--border-color); padding-bottom: 8px;">Technologies Leveraged</h4>
+                {% if post.technologies %}
+                    {% set tech_list = post.technologies.split(',') %}
+                    <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 15px;">
+                        {% for tech in tech_list %}
+                            {% set tech_trimmed = tech.strip() %}
+                            <div style="display: flex; align-items: center; gap: 12px; font-size: 13.5px; font-weight: 600; color: var(--text-secondary);">
+                                <div style="width: 28px; height: 28px; border-radius: 50%; background-color: var(--bg-primary); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0;">
+                                    {% if 'talend' in tech_trimmed.lower() %}
+                                        <i class="fas fa-server tech-icon-color" style="color: #ff5f00;"></i>
+                                    {% elif 'aws' in tech_trimmed.lower() or 'amazon' in tech_trimmed.lower() %}
+                                        <i class="fab fa-aws tech-icon-color" style="color: #ff9900;"></i>
+                                    {% elif 'azure' in tech_trimmed.lower() or 'microsoft' in tech_trimmed.lower() %}
+                                        <i class="fab fa-microsoft tech-icon-color" style="color: #00a4ef;"></i>
+                                    {% elif 'gcp' in tech_trimmed.lower() or 'google' in tech_trimmed.lower() %}
+                                        <i class="fab fa-google tech-icon-color" style="color: #4285f4;"></i>
+                                    {% elif 'snowflake' in tech_trimmed.lower() %}
+                                        <i class="fas fa-snowflake tech-icon-color" style="color: #29b5e8;"></i>
+                                    {% elif 'salesforce' in tech_trimmed.lower() %}
+                                        <i class="fab fa-salesforce tech-icon-color" style="color: #00a1e0;"></i>
+                                    {% elif 'python' in tech_trimmed.lower() %}
+                                        <i class="fab fa-python tech-icon-color" style="color: #3776ab;"></i>
+                                    {% elif 'qlik' in tech_trimmed.lower() %}
+                                        <i class="fas fa-chart-pie tech-icon-color" style="color: #009845;"></i>
+                                    {% elif 'sap' in tech_trimmed.lower() %}
+                                        <i class="fas fa-database tech-icon-color" style="color: #008fd3;"></i>
+                                    {% else %}
+                                        <i class="fas fa-microchip tech-icon-color" style="color: var(--accent-blue);"></i>
+                                    {% endif %}
+                                </div>
+                                <span>{{ tech_trimmed }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p style="font-size: 13px; color: var(--text-tertiary);">Talend & Cloud Data Integrations</p>
+                {% endif %}
+            </div>
+
+            <!-- Relevant For Section -->
+            <div style="background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); padding: 30px;">
+                <h4 style="font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-primary); margin-bottom: 16px; border-bottom: 2px solid var(--border-color); padding-bottom: 8px;">Relevant For</h4>
+                <ul style="font-size: 13px; color: var(--text-secondary); line-height: 1.8; padding-left: 20px; display: grid; gap: 8px;">
+                    <li>CIOs modernizing legacy databases</li>
+                    <li>Enterprise architects migrating to cloud infrastructure</li>
+                    <li>Governance leaders auditing compliance workflows</li>
+                    <li>Operations teams seeking active operational intelligence</li>
+                </ul>
+            </div>
+            
+            <!-- Contact CTA -->
+            <div style="background: var(--grad-primary); border-radius: var(--border-radius-lg); padding: 30px; text-align: center; color: var(--bg-primary);">
+                <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 8px; color: #ffffff;">Need Similar Results?</h4>
+                <p style="font-size: 12px; color: rgba(255, 255, 255, 0.8); margin-bottom: 20px; line-height: 1.4;">
+                    Schedule a dynamic discovery workshop with our solutions architects to mapping your data ecosystem.
+                </p>
+                <a href="/contact-us" class="btn btn-secondary" style="display: block; padding: 12px; border-radius: 8px; font-size: 13px; font-weight: 600; text-align: center; background-color: #ffffff; color: var(--text-primary); border: none;">Talk to an Expert</a>
+            </div>
+            
+        </aside>
+        
+    </div>
+</section>
+
+<!-- Gated Download Lead Form Modal -->
+<div class="modal-overlay" id="gated-download-modal">
+    <div class="contact-card modal-content" style="max-width: 500px; width: 100%; padding: 40px; border-radius: var(--border-radius-lg); box-shadow: var(--glass-shadow); position: relative; z-index: 100;">
+        <button onclick="closeDownloadModal()" style="position: absolute; right: 20px; top: 20px; border: none; background: none; font-size: 18px; color: var(--text-tertiary); cursor: pointer;"><i class="fas fa-times"></i></button>
+        
+        <div style="text-align: center; margin-bottom: 24px;">
+            <div class="card-icon-box" style="margin: 0 auto 16px; background-color: #eff6ff; color: var(--accent-blue); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-file-pdf" style="font-size: 20px;"></i>
+            </div>
+            <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 8px;">Download Full Case Study</h3>
+            <p id="modal-study-title" style="font-size: 13px; color: var(--text-secondary); font-weight: 500;">{{ post.title }}</p>
+        </div>
+        
+        <!-- Error Alert -->
+        <div id="modal-error-alert" style="background-color: #fef2f2; border: 1px solid #fee2e2; border-radius: var(--border-radius-sm); padding: 12px 16px; margin-bottom: 20px; color: #dc2626; font-size: 13px; display: none; align-items: center; gap: 8px;">
+            <i class="fas fa-circle-exclamation"></i> <span id="modal-error-msg">Error message</span>
+        </div>
+        
+        <!-- Lead form -->
+        <form id="lead-download-form" onsubmit="handleGatedFormSubmit(event)">
+            <!-- Honeypot field to block spam bots -->
+            <input type="text" name="website_url_honeypot" style="display: none;" tabindex="-1" autocomplete="off">
+            <input type="hidden" name="case_study_slug" id="modal-study-slug" value="{{ post.slug }}">
+            
+            <div class="form-group">
+                <label for="business_email" class="form-label">Business Email <span style="color:#ef4444">*</span></label>
+                <input type="email" id="business_email" name="business_email" class="form-control" required placeholder="name@company.com" style="padding: 10px 12px; font-size: 13px;">
+                <span style="font-size: 11px; color: var(--text-tertiary); margin-top: 4px; display: block;">Gmail, Yahoo, Outlook, and personal domains are not accepted.</span>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="first_name" class="form-label">First Name</label>
+                    <input type="text" id="first_name" name="first_name" class="form-control" placeholder="John" style="padding: 10px 12px; font-size: 13px;">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="last_name" class="form-label">Last Name</label>
+                    <input type="text" id="last_name" name="last_name" class="form-control" placeholder="Doe" style="padding: 10px 12px; font-size: 13px;">
+                </div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="company" class="form-label">Company Name</label>
+                    <input type="text" id="company" name="company" class="form-control" placeholder="Acme Corp" style="padding: 10px 12px; font-size: 13px;">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="job_title" class="form-label">Job Title</label>
+                    <input type="text" id="job_title" name="job_title" class="form-control" placeholder="Director of IT" style="padding: 10px 12px; font-size: 13px;">
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="phone" class="form-label">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" class="form-control" placeholder="+1 (555) 019-2834" style="padding: 10px 12px; font-size: 13px;">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="country" class="form-label">Country</label>
+                    <input type="text" id="country" name="country" class="form-control" placeholder="United States" style="padding: 10px 12px; font-size: 13px;">
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 24px; display: flex; align-items: start; gap: 8px;">
+                <input type="checkbox" id="consent" name="consent" value="1" required style="margin-top: 4px; cursor: pointer;">
+                <label for="consent" style="font-size: 11px; line-height: 1.4; color: var(--text-secondary); cursor: pointer;">
+                    I consent to receive resource guides, newsletters, and promotional alerts from Artha Solutions in accordance with the <a href="#" style="color: var(--accent-blue); text-decoration: underline;">Privacy Policy</a>. *
+                </label>
+            </div>
+            
+            <button type="submit" id="modal-submit-btn" class="btn btn-primary btn-glow" style="width: 100%; padding: 12px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                Request Case Study PDF <i class="fas fa-paper-plane"></i>
+            </button>
+        </form>
+        
+        <!-- Thank you screen (success) -->
+        <div id="modal-success-screen" style="display: none; text-align: center; padding: 20px 0;">
+            <div class="card-icon-box" style="margin: 0 auto 20px; background-color: #ecfeff; color: var(--accent-cyan); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-circle-check" style="font-size: 28px;"></i>
+            </div>
+            <h4 style="font-size: 20px; font-weight: 700; margin-bottom: 12px;">Thank You!</h4>
+            <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 24px;">
+                Your request has been verified successfully. Your high-resolution PDF download will begin automatically. If it doesn't start, please click the button below.
+            </p>
+            <a id="modal-download-link" href="#" class="btn btn-primary btn-glow" style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px;">
+                <i class="fas fa-download"></i> Download PDF Document
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+function openDownloadModal(slug, title) {
+    // Reset form states
+    document.getElementById('lead-download-form').style.display = 'block';
+    document.getElementById('modal-success-screen').style.display = 'none';
+    document.getElementById('modal-error-alert').style.display = 'none';
+    document.getElementById('lead-download-form').reset();
+    
+    // Show modal overlay
+    const modal = document.getElementById('gated-download-modal');
+    modal.classList.add('active');
+}
+
+function closeDownloadModal() {
+    const modal = document.getElementById('gated-download-modal');
+    modal.classList.remove('active');
+}
+
+function handleGatedFormSubmit(e) {
+    e.preventDefault();
+    
+    const form = document.getElementById('lead-download-form');
+    const formData = new FormData(form);
+    const slug = formData.get('case_study_slug');
+    
+    const submitBtn = document.getElementById('modal-submit-btn');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing Request...';
+    
+    const alertBox = document.getElementById('modal-error-alert');
+    alertBox.style.display = 'none';
+    
+    // Collect UTM parameters from URL search params
+    const urlParams = new URLSearchParams(window.location.search);
+    formData.append('utm_source', urlParams.get('utm_source') || '');
+    formData.append('utm_medium', urlParams.get('utm_medium') || '');
+    formData.append('utm_campaign', urlParams.get('utm_campaign') || '');
+    formData.append('utm_term', urlParams.get('utm_term') || '');
+    formData.append('utm_content', urlParams.get('utm_content') || '');
+    formData.append('referrer', document.referrer || '');
+    formData.append('source_url', window.location.href);
+
+    fetch(`/api/case-studies/${slug}/download`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Request Case Study PDF <i class="fas fa-paper-plane"></i>';
+        
+        if (data.status === 'success') {
+            // Hide form and show success screen
+            form.style.display = 'none';
+            document.getElementById('modal-success-screen').style.display = 'block';
+            
+            // Set download token link
+            const downloadUrl = `/case-studies/download-pdf/${data.token}`;
+            const downloadLink = document.getElementById('modal-download-link');
+            downloadLink.href = downloadUrl;
+            
+            // Trigger automatic download
+            const tempLink = document.createElement('a');
+            tempLink.href = downloadUrl;
+            tempLink.download = `${slug}.pdf`;
+            document.body.appendChild(tempLink);
+            tempLink.click();
+            document.body.removeChild(tempLink);
+        } else {
+            document.getElementById('modal-error-msg').textContent = data.message;
+            alertBox.style.display = 'flex';
+        }
+    })
+    .catch(err => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Request Case Study PDF <i class="fas fa-paper-plane"></i>';
+        document.getElementById('modal-error-msg').textContent = 'A connection error occurred. Please try again.';
+        alertBox.style.display = 'flex';
+        console.error(err);
+    });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,180 @@
+<aside style="background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); padding: 24px; box-shadow: var(--glass-shadow); min-height: 80vh; display: flex; flex-direction: column; justify-content: space-between;">
+    <div>
+        <!-- Profile Header -->
+        <div style="text-align: center; margin-bottom: 24px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px;">
+            <div style="width: 50px; height: 50px; border-radius: 50%; background: var(--grad-primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; margin: 0 auto 12px; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);">
+                A
+            </div>
+            <h4 style="font-size: 15px; font-weight: 700; margin: 0 0 2px 0; color: var(--text-primary);">{{ session.username or 'Admin' }}</h4>
+            <span style="font-size: 10px; color: var(--text-tertiary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Control Center</span>
+        </div>
+
+        <!-- Navigation Groups -->
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+            
+            <!-- Group 1: General Settings -->
+            <div>
+                <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text-tertiary); letter-spacing: 1px; display: block; margin-bottom: 8px; padding-left: 12px;">General</span>
+                <ul style="list-style: none; display: flex; flex-direction: column; gap: 4px; padding: 0; margin: 0;">
+                    <li>
+                        <a href="/admin/dashboard" class="tab-btn {% if request.path == '/admin/dashboard' or request.path.startswith('/admin/post') %}active{% endif %}" style="display: flex; align-items: center; gap: 10px; font-size: 13px; padding: 8px 12px; border-radius: 6px; width: 100%; transition: all 0.2s; text-decoration: none; text-align: left; {% if request.path == '/admin/dashboard' or request.path.startswith('/admin/post') %}{% else %}background: none; color: var(--text-secondary);{% endif %}" onmouseover="if(!this.classList.contains('active')) this.style.color='var(--accent-blue)'" onmouseout="if(!this.classList.contains('active')) this.style.color='var(--text-secondary)'">
+                            <i class="fas fa-chart-line" style="width: 16px;"></i> Blog & Dashboard
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/admin/navigation" class="tab-btn {% if request.path.startswith('/admin/navigation') %}active{% endif %}" style="display: flex; align-items: center; gap: 10px; font-size: 13px; padding: 8px 12px; border-radius: 6px; width: 100%; transition: all 0.2s; text-decoration: none; text-align: left; {% if request.path.startswith('/admin/navigation') %}{% else %}background: none; color: var(--text-secondary);{% endif %}" onmouseover="if(!this.classList.contains('active')) this.style.color='var(--accent-blue)'" onmouseout="if(!this.classList.contains('active')) this.style.color='var(--text-secondary)'">
+                            <i class="fas fa-bars" style="width: 16px;"></i> Menu Settings
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Group 2: Content Modules -->
+            <div>
+                <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text-tertiary); letter-spacing: 1px; display: block; margin-bottom: 8px; padding-left: 12px;">Content Modules</span>
+                <ul style="list-style: none; display: flex; flex-direction: column; gap: 4px; padding: 0; margin: 0;">
+                    <li>
+                        <a href="/admin/case-studies" class="tab-btn {% if request.path.startswith('/admin/case-studies') %}active{% endif %}" style="display: flex; align-items: center; gap: 10px; font-size: 13px; padding: 8px 12px; border-radius: 6px; width: 100%; transition: all 0.2s; text-decoration: none; text-align: left; {% if request.path.startswith('/admin/case-studies') %}{% else %}background: none; color: var(--text-secondary);{% endif %}" onmouseover="if(!this.classList.contains('active')) this.style.color='var(--accent-blue)'" onmouseout="if(!this.classList.contains('active')) this.style.color='var(--text-secondary)'">
+                            <i class="fas fa-clipboard-list" style="width: 16px;"></i> Case Studies
+                        </a>
+                        {% if request.path.startswith('/admin/case-studies') %}
+                        <ul style="list-style: none; padding-left: 20px; display: flex; flex-direction: column; gap: 2px; margin-top: 4px;">
+                            <li>
+                                <a href="/admin/case-studies" style="font-size: 11px; color: {% if request.path == '/admin/case-studies' %}var(--accent-blue){% else %}var(--text-secondary){% endif %}; text-decoration: none; font-weight: 600; display: block; padding: 4px 6px;">All Case Studies</a>
+                            </li>
+                            <li>
+                                <a href="/admin/case-studies/leads" style="font-size: 11px; color: {% if '/case-studies/leads' in request.path %}var(--accent-blue){% else %}var(--text-secondary){% endif %}; text-decoration: none; font-weight: 600; display: block; padding: 4px 6px;">Captured Leads</a>
+                            </li>
+                        </ul>
+                        {% endif %}
+                    </li>
+                    <li>
+                        <a href="/admin/resources" class="tab-btn {% if request.path.startswith('/admin/resources') or request.path.startswith('/admin/event') or request.path.startswith('/admin/webinar') or request.path.startswith('/admin/resource') %}active{% endif %}" style="display: flex; align-items: center; gap: 10px; font-size: 13px; padding: 8px 12px; border-radius: 6px; width: 100%; transition: all 0.2s; text-decoration: none; text-align: left; {% if request.path.startswith('/admin/resources') or request.path.startswith('/admin/event') or request.path.startswith('/admin/webinar') or request.path.startswith('/admin/resource') %}{% else %}background: none; color: var(--text-secondary);{% endif %}" onmouseover="if(!this.classList.contains('active')) this.style.color='var(--accent-blue)'" onmouseout="if(!this.classList.contains('active')) this.style.color='var(--text-secondary)'">
+                            <i class="fas fa-video" style="width: 16px;"></i> Events & Webinars
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Group 3: Industry Portals -->
+            <div>
+                <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text-tertiary); letter-spacing: 1px; display: block; margin-bottom: 8px; padding-left: 12px;">Industry Portals</span>
+                <ul style="list-style: none; display: flex; flex-direction: column; gap: 4px; padding: 0; margin: 0;">
+                    <li>
+                        <a href="/admin/industries/healthcare" class="tab-btn {% if request.path.startswith('/admin/industries/healthcare') %}active{% endif %}" style="display: flex; align-items: center; gap: 10px; font-size: 13px; padding: 8px 12px; border-radius: 6px; width: 100%; transition: all 0.2s; text-decoration: none; text-align: left; {% if request.path.startswith('/admin/industries/healthcare') %}{% else %}background: none; color: var(--text-secondary);{% endif %}" onmouseover="if(!this.classList.contains('active')) this.style.color='var(--accent-blue)'" onmouseout="if(!this.classList.contains('active')) this.style.color='var(--text-secondary)'">
+                            <i class="fas fa-heart-pulse" style="width: 16px;"></i> Healthcare Admin
+                        </a>
+                        {% if request.path.startswith('/admin/industries/healthcare') %}
+                        <ul style="list-style: none; padding-left: 20px; display: flex; flex-direction: column; gap: 2px; margin-top: 4px;">
+                            <li>
+                                <a href="/admin/industries/healthcare" style="font-size: 11px; color: {% if request.path == '/admin/industries/healthcare' %}var(--accent-blue){% else %}var(--text-secondary){% endif %}; text-decoration: none; font-weight: 600; display: block; padding: 4px 6px;">Dashboard</a>
+                            </li>
+                            <li>
+                                <a href="/admin/industries/healthcare/pages" style="font-size: 11px; color: {% if '/healthcare/pages' in request.path %}var(--accent-blue){% else %}var(--text-secondary){% endif %}; text-decoration: none; font-weight: 600; display: block; padding: 4px 6px;">Microsite Pages</a>
+                            </li>
+                            <li>
+                                <a href="/admin/industries/healthcare/use-cases" style="font-size: 11px; color: {% if '/healthcare/use-cases' in request.path %}var(--accent-blue){% else %}var(--text-secondary){% endif %}; text-decoration: none; font-weight: 600; display: block; padding: 4px 6px;">Use Cases</a>
+                            </li>
+                            <li>
+                                <a href="/admin/industries/healthcare/leads" style="font-size: 11px; color: {% if '/healthcare/leads' in request.path %}var(--accent-blue){% else %}var(--text-secondary){% endif %}; text-decoration: none; font-weight: 600; display: block; padding: 4px 6px;">Captured Leads</a>
+                            </li>
+                        </ul>
+                        {% endif %}
+                    </li>
+                    <li>
+                        <a href="/admin/artificial-intelligence" class="tab-btn {% if request.path.startswith('/admin/artificial-intelligence') %}active{% endif %}" style="display: flex; align-items: center; gap: 10px; font-size: 13px; padding: 8px 12px; border-radius: 6px; width: 100%; transition: all 0.2s; text-decoration: none; text-align: left; {% if request.path.startswith('/admin/artificial-intelligence') %}{% else %}background: none; color: var(--text-secondary);{% endif %}" onmouseover="if(!this.classList.contains('active')) this.style.color='var(--accent-blue)'" onmouseout="if(!this.classList.contains('active')) this.style.color='var(--text-secondary)'">
+                            <i class="fas fa-brain" style="width: 16px;"></i> AI Admin
+                        </a>
+                        {% if request.path.startswith('/admin/artificial-intelligence') %}
+                        <ul style="list-style: none; padding-left: 20px; display: flex; flex-direction: column; gap: 2px; margin-top: 4px;">
+                            <li>
+                                <a href="/admin/artificial-intelligence" style="font-size: 11px; color: {% if request.path == '/admin/artificial-intelligence' %}var(--accent-blue){% else %}var(--text-secondary){% endif %}; text-decoration: none; font-weight: 600; display: block; padding: 4px 6px;">Dashboard</a>
+                            </li>
+                            <li>
+                                <a href="/admin/artificial-intelligence/pages" style="font-size: 11px; color: {% if '/artificial-intelligence/pages' in request.path %}var(--accent-blue){% else %}var(--text-secondary){% endif %}; text-decoration: none; font-weight: 600; display: block; padding: 4px 6px;">Microsite Pages</a>
+                            </li>
+                            <li>
+                                <a href="/admin/artificial-intelligence/leads" style="font-size: 11px; color: {% if '/artificial-intelligence/leads' in request.path %}var(--accent-blue){% else %}var(--text-secondary){% endif %}; text-decoration: none; font-weight: 600; display: block; padding: 4px 6px;">Captured Leads</a>
+                            </li>
+                        </ul>
+                        {% endif %}
+                    </li>
+                    <li>
+                        <a href="/admin/industries/manufacturing" class="tab-btn {% if request.path.startswith('/admin/industries/manufacturing') %}active{% endif %}" style="display: flex; align-items: center; gap: 10px; font-size: 13px; padding: 8px 12px; border-radius: 6px; width: 100%; transition: all 0.2s; text-decoration: none; text-align: left; {% if request.path.startswith('/admin/industries/manufacturing') %}{% else %}background: none; color: var(--text-secondary);{% endif %}" onmouseover="if(!this.classList.contains('active')) this.style.color='var(--accent-blue)'" onmouseout="if(!this.classList.contains('active')) this.style.color='var(--text-secondary)'">
+                            <i class="fas fa-industry" style="width: 16px;"></i> Manufacturing Admin
+                        </a>
+                        {% if request.path.startswith('/admin/industries/manufacturing') %}
+                        <ul style="list-style: none; padding-left: 20px; display: flex; flex-direction: column; gap: 2px; margin-top: 4px;">
+                            <li>
+                                <a href="/admin/industries/manufacturing" style="font-size: 11px; color: {% if request.path == '/admin/industries/manufacturing' %}var(--accent-blue){% else %}var(--text-secondary){% endif %}; text-decoration: none; font-weight: 600; display: block; padding: 4px 6px;">Dashboard</a>
+                            </li>
+                            <li>
+                                <a href="/admin/industries/manufacturing/pages" style="font-size: 11px; color: {% if '/manufacturing/pages' in request.path %}var(--accent-blue){% else %}var(--text-secondary){% endif %}; text-decoration: none; font-weight: 600; display: block; padding: 4px 6px;">Microsite Pages</a>
+                            </li>
+                            <li>
+                                <a href="/admin/industries/manufacturing/use-cases" style="font-size: 11px; color: {% if '/manufacturing/use-cases' in request.path %}var(--accent-blue){% else %}var(--text-secondary){% endif %}; text-decoration: none; font-weight: 600; display: block; padding: 4px 6px;">Use Cases</a>
+                            </li>
+                            <li>
+                                <a href="/admin/industries/manufacturing/leads" style="font-size: 11px; color: {% if '/manufacturing/leads' in request.path %}var(--accent-blue){% else %}var(--text-secondary){% endif %}; text-decoration: none; font-weight: 600; display: block; padding: 4px 6px;">Captured Leads</a>
+                            </li>
+                        </ul>
+                        {% endif %}
+                    </li>
+                    <li>
+                        <a href="/admin/industries/bfsi" class="tab-btn {% if request.path.startswith('/admin/industries/bfsi') %}active{% endif %}" style="display: flex; align-items: center; gap: 10px; font-size: 13px; padding: 8px 12px; border-radius: 6px; width: 100%; transition: all 0.2s; text-decoration: none; text-align: left; {% if request.path.startswith('/admin/industries/bfsi') %}{% else %}background: none; color: var(--text-secondary);{% endif %}" onmouseover="if(!this.classList.contains('active')) this.style.color='var(--accent-blue)'" onmouseout="if(!this.classList.contains('active')) this.style.color='var(--text-secondary)'">
+                            <i class="fas fa-building-columns" style="width: 16px;"></i> BFSI Admin
+                        </a>
+                        {% if request.path.startswith('/admin/industries/bfsi') %}
+                        <ul style="list-style: none; padding-left: 20px; display: flex; flex-direction: column; gap: 2px; margin-top: 4px;">
+                            <li>
+                                <a href="/admin/industries/bfsi" style="font-size: 11px; color: {% if request.path == '/admin/industries/bfsi' %}var(--accent-blue){% else %}var(--text-secondary){% endif %}; text-decoration: none; font-weight: 600; display: block; padding: 4px 6px;">Dashboard</a>
+                            </li>
+                            <li>
+                                <a href="/admin/industries/bfsi/pages" style="font-size: 11px; color: {% if '/bfsi/pages' in request.path %}var(--accent-blue){% else %}var(--text-secondary){% endif %}; text-decoration: none; font-weight: 600; display: block; padding: 4px 6px;">Microsite Pages</a>
+                            </li>
+                            <li>
+                                <a href="/admin/industries/bfsi/use-cases" style="font-size: 11px; color: {% if '/bfsi/use-cases' in request.path %}var(--accent-blue){% else %}var(--text-secondary){% endif %}; text-decoration: none; font-weight: 600; display: block; padding: 4px 6px;">Use Cases</a>
+                            </li>
+                            <li>
+                                <a href="/admin/industries/bfsi/leads" style="font-size: 11px; color: {% if '/bfsi/leads' in request.path %}var(--accent-blue){% else %}var(--text-secondary){% endif %}; text-decoration: none; font-weight: 600; display: block; padding: 4px 6px;">Captured Leads</a>
+                            </li>
+                        </ul>
+                        {% endif %}
+                    </li>
+                    <li>
+                        <a href="/admin/industries/retail" class="tab-btn {% if request.path.startswith('/admin/industries/retail') %}active{% endif %}" style="display: flex; align-items: center; gap: 10px; font-size: 13px; padding: 8px 12px; border-radius: 6px; width: 100%; transition: all 0.2s; text-decoration: none; text-align: left; {% if request.path.startswith('/admin/industries/retail') %}{% else %}background: none; color: var(--text-secondary);{% endif %}" onmouseover="if(!this.classList.contains('active')) this.style.color='var(--accent-blue)'" onmouseout="if(!this.classList.contains('active')) this.style.color='var(--text-secondary)'">
+                            <i class="fas fa-shop" style="width: 16px;"></i> Retail Admin
+                        </a>
+                        {% if request.path.startswith('/admin/industries/retail') %}
+                        <ul style="list-style: none; padding-left: 20px; display: flex; flex-direction: column; gap: 2px; margin-top: 4px;">
+                            <li>
+                                <a href="/admin/industries/retail" style="font-size: 11px; color: {% if request.path == '/admin/industries/retail' %}var(--accent-blue){% else %}var(--text-secondary){% endif %}; text-decoration: none; font-weight: 600; display: block; padding: 4px 6px;">Dashboard</a>
+                            </li>
+                            <li>
+                                <a href="/admin/industries/retail/pages" style="font-size: 11px; color: {% if '/retail/pages' in request.path %}var(--accent-blue){% else %}var(--text-secondary){% endif %}; text-decoration: none; font-weight: 600; display: block; padding: 4px 6px;">Microsite Pages</a>
+                            </li>
+                            <li>
+                                <a href="/admin/industries/retail/use-cases" style="font-size: 11px; color: {% if '/retail/use-cases' in request.path %}var(--accent-blue){% else %}var(--text-secondary){% endif %}; text-decoration: none; font-weight: 600; display: block; padding: 4px 6px;">Use Cases</a>
+                            </li>
+                            <li>
+                                <a href="/admin/industries/retail/leads" style="font-size: 11px; color: {% if '/retail/leads' in request.path %}var(--accent-blue){% else %}var(--text-secondary){% endif %}; text-decoration: none; font-weight: 600; display: block; padding: 4px 6px;">Captured Leads</a>
+                            </li>
+                        </ul>
+                        {% endif %}
+                    </li>
+                </ul>
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- Bottom Actions -->
+    <div style="margin-top: 24px; border-top: 1px solid var(--border-color); padding-top: 16px; display: flex; flex-direction: column; gap: 8px;">
+        <a href="/" target="_blank" class="tab-btn" style="display: flex; align-items: center; gap: 10px; font-size: 13px; padding: 8px 12px; border-radius: 6px; width: 100%; background: none; color: var(--text-secondary); text-decoration: none;" onmouseover="this.style.color='var(--accent-blue)'" onmouseout="this.style.color='var(--text-secondary)'">
+            <i class="fas fa-globe" style="width: 16px;"></i> View Frontend
+        </a>
+        <a href="/admin/logout" class="tab-btn" style="display: flex; align-items: center; gap: 10px; font-size: 13px; padding: 8px 12px; border-radius: 6px; width: 100%; background: #fef2f2; color: #dc2626; border: 1px solid #fee2e2; text-decoration: none; text-align: left;">
+            <i class="fas fa-right-from-bracket" style="width: 16px;"></i> Sign Out
+        </a>
+    </div>
+</aside>

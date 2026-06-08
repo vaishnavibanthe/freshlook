@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Retail Pages - Control Center{% endblock %}
+
+{% block content %}
+<div style="height: var(--nav-height); background-color: var(--bg-secondary);"></div>
+
+<section class="section" style="min-height: 90vh; background-color: var(--bg-secondary); padding: 40px 0;">
+    <div class="container" style="display: grid; grid-template-columns: 260px 1fr; gap: 40px; align-items: start;">
+        
+        <!-- Sidebar Navigation -->
+        {% include 'admin_sidebar.html' %}
+        
+        <!-- Main Content -->
+        <div>
+            <!-- Header -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
+                <div>
+                    <h2 style="font-size: 28px; font-weight: 800; letter-spacing: -0.5px; color: var(--text-primary);">Retail Microsite Pages</h2>
+                    <p style="font-size: 13px; color: var(--text-tertiary); margin-top: 4px;">Select any subpage to update its hero text, B2B copy grids, FAQ accordion lists, or SEO schema fields.</p>
+                </div>
+            </div>
+            
+            <!-- Pages Grid/Table -->
+            <div style="background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); padding: 32px; box-shadow: var(--card-shadow);">
+                {% if pages %}
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13.5px;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid var(--border-color); color: var(--text-secondary); font-weight: 700;">
+                                <th style="padding: 14px 16px;">Page Name</th>
+                                <th style="padding: 14px 16px;">Key</th>
+                                <th style="padding: 14px 16px;">Public URL</th>
+                                <th style="padding: 14px 16px; text-align: center;">Index Settings</th>
+                                <th style="padding: 14px 16px; text-align: center;">Status</th>
+                                <th style="padding: 14px 16px; text-align: center;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for pg in pages %}
+                            <tr style="border-bottom: 1px solid var(--border-color); transition: var(--transition-fast);" onmouseover="this.style.backgroundColor='var(--bg-secondary)'" onmouseout="this.style.backgroundColor='transparent'">
+                                <td style="padding: 16px; font-weight: 600; color: var(--text-primary);">{{ pg.title }}</td>
+                                <td style="padding: 16px; font-family: monospace; font-size: 12.5px;">{{ pg.page_key }}</td>
+                                <td style="padding: 16px; font-family: monospace; font-size: 12.5px;">
+                                    <a href="{{ pg.url }}" target="_blank" style="color: var(--retail-color, #0ea5e9);">{{ pg.url }} <i class="fas fa-up-right-from-square" style="font-size: 10px; margin-left: 2px;"></i></a>
+                                </td>
+                                <td style="padding: 16px; text-align: center;">
+                                    {% if pg.noindex %}
+                                    <span style="font-size: 11px; background-color: #fef2f2; color: #dc2626; padding: 2px 8px; border-radius: 4px; font-weight: 600;">Noindex</span>
+                                    {% else %}
+                                    <span style="font-size: 11px; background-color: #f0fdf4; color: #16a34a; padding: 2px 8px; border-radius: 4px; font-weight: 600;">Index</span>
+                                    {% endif %}
+                                </td>
+                                <td style="padding: 16px; text-align: center;">
+                                    <span style="margin: 0; font-size: 10.5px; padding: 2px 8px; border-radius: 4px; font-weight: 600; background-color: {% if pg.status == 'Published' %}#ecfdf5{% else %}#fff7ed{% endif %}; color: {% if pg.status == 'Published' %}#047857{% else %}#c2410c{% endif %}; border: 1px solid transparent;">
+                                        {{ pg.status }}
+                                    </span>
+                                </td>
+                                <td style="padding: 16px; text-align: center;">
+                                    <a href="/admin/industries/retail/pages/{{ pg.id }}" class="btn btn-secondary" style="padding: 8px 14px; font-size: 12px; border-radius: 6px;">
+                                        <i class="fas fa-edit"></i> Edit Content
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div style="text-align: center; padding: 40px 0;">
+                    <i class="fas fa-file-invoice" style="font-size: 40px; color: var(--text-tertiary); margin-bottom: 12px;"></i>
+                    <p style="color: var(--text-secondary);">No pages exist in the database.</p>
+                </div>
+                {% endif %}
+            </div>
+            
+        </div>
+    </div>
+</section>
+{% endblock %}

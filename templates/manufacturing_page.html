@@ -1,0 +1,402 @@
+{% extends "manufacturing_base.html" %}
+
+{% block manufacturing_hero %}
+<!-- Subpage Hero Section -->
+<section class="manufacturing-hero subpage-hero">
+    <div class="manufacturing-hero-glow"></div>
+    <div class="container manufacturing-hero-grid">
+        <div class="manufacturing-hero-content">
+            <span class="manufacturing-badge"><i class="fas fa-industry"></i> Manufacturing Solutions</span>
+            <h1 class="manufacturing-hero-title">
+                {{ page.hero_title }}
+            </h1>
+            <p class="manufacturing-hero-subtitle">
+                {{ page.hero_subtitle }}
+            </p>
+            
+            <div class="manufacturing-hero-ctas">
+                <button onclick="openLeadModal('Hero Primary CTA');" class="btn btn-primary btn-lg">
+                    {{ cta.primary_cta_text or 'Talk to a Manufacturing Data Expert' }} <i class="fas fa-arrow-right btn-icon"></i>
+                </button>
+                {% if cta.secondary_cta_url %}
+                <a href="{{ cta.secondary_cta_url }}" class="btn btn-outline btn-lg" style="border-color: #f97316; color: #ea580c; margin-left: 15px;">
+                    {{ cta.secondary_cta_text or 'Learn More' }}
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="manufacturing-hero-visual">
+            <div class="manufacturing-vis-container">
+                <div class="tech-grid-bg"></div>
+                <div class="tech-circle pulsate-slow">
+                    <i class="fas fa-network-wired text-orange"></i>
+                    <div class="tech-ring ring-1"></div>
+                    <div class="tech-ring ring-2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block manufacturing_content %}
+<!-- Introduction Block -->
+{% if body_sections.intro_p %}
+<section class="manufacturing-section">
+    <div class="container">
+        <div class="mfg-intro-card" style="background: #fff7ed; border-left: 5px solid #f97316; padding: 30px; border-radius: 4px; max-width: 900px; margin: 0 auto;">
+            <h3 style="font-size: 20px; font-weight: 600; color: #ea580c; margin-bottom: 12px;"><i class="fas fa-circle-info"></i> Modern Solution Brief</h3>
+            <p style="font-size: 16px; line-height: 1.7; color: var(--text-primary); font-weight: 300; margin: 0;">
+                {{ body_sections.intro_p }}
+            </p>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Challenges Grid -->
+{% if body_sections.challenges %}
+<section class="manufacturing-section section-alt">
+    <div class="container">
+        <div class="manufacturing-section-header text-center">
+            <span class="manufacturing-subtitle">Industry Barriers</span>
+            <h2 class="manufacturing-title">Core Challenges We Address</h2>
+            <p class="manufacturing-desc">Fragmented schemas and legacy systems introduce severe hurdles for manufacturing teams.</p>
+        </div>
+        <div class="manufacturing-card-grid grid-2">
+            {% for chal in body_sections.challenges %}
+            <div class="manufacturing-card challenge-card">
+                <div class="card-icon-circle"><i class="fas fa-triangle-exclamation"></i></div>
+                <h3 class="card-title">{{ chal.title }}</h3>
+                <p class="card-desc">{{ chal.desc }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- General Solution Areas -->
+{% if body_sections.solution_areas %}
+<section class="manufacturing-section">
+    <div class="container">
+        <div class="manufacturing-section-header text-center">
+            <span class="manufacturing-subtitle">Key Disciplines</span>
+            <h2 class="manufacturing-title">Our Solutions</h2>
+            <p class="manufacturing-desc">We structure deep data engineering pipelines to unify systems and drive analytics.</p>
+        </div>
+        <div class="manufacturing-card-grid grid-2">
+            {% for sol in body_sections.solution_areas %}
+            <div class="manufacturing-card hover-card">
+                <div class="card-icon-circle accent-orange"><i class="fas fa-circle-check"></i></div>
+                <h3 class="card-title">{{ sol.title }}</h3>
+                <p class="card-desc">{{ sol.desc }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Quality, Asset & Energy Solutions (Specialized layout) -->
+{% if body_sections.quality_solutions or body_sections.asset_solutions or body_sections.energy_solutions %}
+<section class="manufacturing-section">
+    <div class="container">
+        <div class="manufacturing-section-header text-center">
+            <span class="manufacturing-subtitle">Integrated Pillars</span>
+            <h2 class="manufacturing-title">Domain Specific Platforms</h2>
+            <p class="manufacturing-desc">Unifying sensor feeds, repair archives, and energy logs into structured registries.</p>
+        </div>
+        
+        <div class="mfg-three-columns" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
+            <!-- Column 1: Quality -->
+            {% if body_sections.quality_solutions %}
+            <div class="mfg-domain-col" style="background: white; border: 1px solid #e5e7eb; border-radius: 6px; padding: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.01);">
+                <h3 style="font-size: 20px; font-weight: 600; margin-bottom: 20px; color: #ea580c; border-bottom: 2px solid #ffedd5; padding-bottom: 10px;"><i class="fas fa-clipboard-check"></i> Quality Data</h3>
+                <ul style="list-style: none; padding: 0; margin: 0;">
+                    {% for item in body_sections.quality_solutions %}
+                    <li style="margin-bottom: 15px;">
+                        <strong style="display: block; font-size: 15px; color: var(--text-primary);">{{ item.title }}</strong>
+                        <span style="font-size: 13.5px; color: var(--text-secondary); font-weight: 300;">{{ item.desc }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            <!-- Column 2: Asset -->
+            {% if body_sections.asset_solutions %}
+            <div class="mfg-domain-col" style="background: white; border: 1px solid #e5e7eb; border-radius: 6px; padding: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.01);">
+                <h3 style="font-size: 20px; font-weight: 600; margin-bottom: 20px; color: #ea580c; border-bottom: 2px solid #ffedd5; padding-bottom: 10px;"><i class="fas fa-screwdriver-wrench"></i> Asset Uptime</h3>
+                <ul style="list-style: none; padding: 0; margin: 0;">
+                    {% for item in body_sections.asset_solutions %}
+                    <li style="margin-bottom: 15px;">
+                        <strong style="display: block; font-size: 15px; color: var(--text-primary);">{{ item.title }}</strong>
+                        <span style="font-size: 13.5px; color: var(--text-secondary); font-weight: 300;">{{ item.desc }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            <!-- Column 3: Energy -->
+            {% if body_sections.energy_solutions %}
+            <div class="mfg-domain-col" style="background: white; border: 1px solid #e5e7eb; border-radius: 6px; padding: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.01);">
+                <h3 style="font-size: 20px; font-weight: 600; margin-bottom: 20px; color: #ea580c; border-bottom: 2px solid #ffedd5; padding-bottom: 10px;"><i class="fas fa-bolt"></i> Energy & ESG</h3>
+                <ul style="list-style: none; padding: 0; margin: 0;">
+                    {% for item in body_sections.energy_solutions %}
+                    <li style="margin-bottom: 15px;">
+                        <strong style="display: block; font-size: 15px; color: var(--text-primary);">{{ item.title }}</strong>
+                        <span style="font-size: 13.5px; color: var(--text-secondary); font-weight: 300;">{{ item.desc }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Data Domains Detailed (MDM domains etc.) -->
+{% if body_sections.domains and body_sections.domains is iterable and body_sections.domains[0] is mapping %}
+<section class="manufacturing-section section-alt">
+    <div class="container">
+        <div class="manufacturing-section-header text-center">
+            <span class="manufacturing-subtitle">Scope</span>
+            <h2 class="manufacturing-title">Master Data Domains Managed</h2>
+            <p class="manufacturing-desc">Standardizing core entities across plants, warehouses, and partner channels.</p>
+        </div>
+        <div class="manufacturing-card-grid grid-3">
+            {% for dom in body_sections.domains %}
+            <div class="manufacturing-card hover-card" style="background: white;">
+                <div class="card-icon-circle accent-orange"><i class="fas fa-cubes"></i></div>
+                <h3 class="card-title">{{ dom.title }}</h3>
+                <p class="card-desc">{{ dom.desc }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Capabilities Section -->
+{% if body_sections.capabilities %}
+<section class="manufacturing-section">
+    <div class="container">
+        <div class="manufacturing-section-header text-center">
+            <span class="manufacturing-subtitle">Implementation Specs</span>
+            <h2 class="manufacturing-title">Technical & Platform Capabilities</h2>
+            <p class="manufacturing-desc">Engineered processes built to align physical inputs with executive data structures.</p>
+        </div>
+        <div class="manufacturing-card-grid grid-2">
+            {% for cap in body_sections.capabilities %}
+            <div class="manufacturing-card hover-card">
+                <div class="card-icon-circle accent-orange"><i class="fas fa-gears"></i></div>
+                <h3 class="card-title">{{ cap.title }}</h3>
+                <p class="card-desc">{{ cap.desc }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- AI-Enabled Features / Capabilities -->
+{% if body_sections.ai_features %}
+<section class="manufacturing-section section-alt" style="background: #fffbf7;">
+    <div class="container">
+        <div class="manufacturing-section-header text-center">
+            <span class="manufacturing-subtitle">AI & ML Automation</span>
+            <h2 class="manufacturing-title">AI-Assisted Operations and Governance</h2>
+            <p class="manufacturing-desc">Automate deduplication, classification, and anomalies checks with human stewardship oversight.</p>
+        </div>
+        <div class="manufacturing-card-grid grid-3">
+            {% for ai in body_sections.ai_features %}
+            <div class="manufacturing-card" style="background: white; border-top: 3px solid #f97316;">
+                <div class="card-icon-circle accent-orange"><i class="fas fa-robot"></i></div>
+                <h3 class="card-title">{{ ai.title }}</h3>
+                <p class="card-desc">{{ ai.desc }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Subpage Use Cases List -->
+{% if body_sections.use_cases %}
+<section class="manufacturing-section section-alt">
+    <div class="container">
+        <div class="manufacturing-section-header text-center">
+            <span class="manufacturing-subtitle">Specific Scenarios</span>
+            <h2 class="manufacturing-title">Common Domain Use Cases</h2>
+            <p class="manufacturing-desc">Operational applications that deliver business value using clean datasets.</p>
+        </div>
+        <div class="manufacturing-card-grid grid-2">
+            {% for uc in body_sections.use_cases %}
+            <div class="manufacturing-card hover-card" style="background: white;">
+                <div class="card-icon-circle accent-orange"><i class="fas fa-magnifying-glass-chart"></i></div>
+                <h3 class="card-title">{{ uc.title }}</h3>
+                <p class="card-desc">{{ uc.desc }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Governance & Security Mappings -->
+{% if body_sections.governance %}
+<section class="manufacturing-section" style="background: #fafafa;">
+    <div class="container">
+        <div class="manufacturing-section-header text-center">
+            <span class="manufacturing-subtitle">Security & Controls</span>
+            <h2 class="manufacturing-title">Responsible Model and Data Governance</h2>
+            <p class="manufacturing-desc">Ensuring full traceability, access boundaries, and audit logging across operational data loops.</p>
+        </div>
+        <div class="manufacturing-card-grid grid-3">
+            {% for gov in body_sections.governance %}
+            <div class="outcome-card" style="background: white; padding: 25px; border: 1px solid #e5e7eb; border-radius: 4px;">
+                <div class="outcome-icon" style="color: #ea580c; font-size: 20px; margin-bottom: 12px;"><i class="fas fa-shield-halved"></i></div>
+                <h4 class="outcome-title" style="font-weight: 600; margin-bottom: 8px;">{{ gov.title }}</h4>
+                <p class="outcome-text" style="font-size: 13.5px; color: var(--text-secondary); line-height: 1.6; font-weight: 300;">{{ gov.desc }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- KPIs & Metrics Dashboard block -->
+{% if body_sections.kpis %}
+<section class="manufacturing-section" style="background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);">
+    <div class="container text-center">
+        <div class="manufacturing-section-header text-center">
+            <span class="manufacturing-subtitle" style="color: #ea580c;">Performance Benchmarks</span>
+            <h2 class="manufacturing-title" style="color: #431407;">Standardized Manufacturing KPIs Enabled</h2>
+            <p class="manufacturing-desc" style="color: #7c2d12;">Consolidating real-time telemetry and ERP data allows organizations to accurately track global operational indicators.</p>
+        </div>
+        
+        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; max-width: 900px; margin: 0 auto 30px;">
+            {% for kpi in body_sections.kpis %}
+            <div style="background: white; color: #431407; padding: 12px 25px; border-radius: 30px; font-weight: 600; border: 1px solid #fed7aa; font-size: 14.5px; display: inline-flex; align-items: center; gap: 8px;">
+                <i class="fas fa-circle-nodes" style="color: #f97316;"></i> {{ kpi }}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Badges/Cloud list of Data Domains Covered (flat string list) -->
+{% if body_sections.domains and body_sections.domains[0] is string %}
+<section class="manufacturing-section section-alt">
+    <div class="container text-center">
+        <div class="manufacturing-section-header text-center">
+            <span class="manufacturing-subtitle">Enterprise Scope</span>
+            <h2 class="manufacturing-title">Data Domains Covered</h2>
+            <p class="manufacturing-desc">We ingest, map, and standardize critical assets across physical and corporate databases.</p>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; max-width: 900px; margin: 0 auto;">
+            {% for dom in body_sections.domains %}
+            <span style="background: white; border: 1px solid #e5e7eb; color: var(--text-primary); padding: 10px 20px; border-radius: 4px; font-size: 14.5px; font-weight: 300; display: inline-block;"><i class="fas fa-database" style="color: #f97316; margin-right: 8px;"></i> {{ dom }}</span>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Dynamic Outcomes Section -->
+{% if body_sections.outcomes %}
+<section class="manufacturing-section section-alt">
+    <div class="container">
+        <div class="manufacturing-section-header text-center">
+            <span class="manufacturing-subtitle">Business Value</span>
+            <h2 class="manufacturing-title">Modernization Outcomes</h2>
+            <p class="manufacturing-desc">Driving strategic efficiency and clean systems post-migration.</p>
+        </div>
+        <div class="manufacturing-card-grid grid-3">
+            {% for outcome in body_sections.outcomes %}
+            <div class="outcome-card" style="background: white; padding: 25px; border: 1px solid #e5e7eb; border-radius: 4px;">
+                <div class="outcome-icon" style="color: #ea580c; font-size: 22px; margin-bottom: 12px;"><i class="fas fa-gauge-high"></i></div>
+                {% if outcome is mapping %}
+                <h4 class="outcome-title" style="font-weight: 600; margin-bottom: 8px;">{{ outcome.title }}</h4>
+                <p class="outcome-text" style="font-size: 13.5px; color: var(--text-secondary); line-height: 1.6; font-weight: 300;">{{ outcome.desc }}</p>
+                {% else %}
+                <p class="outcome-text" style="font-size: 14px; color: var(--text-primary); line-height: 1.6; font-weight: 300; margin: 0;">{{ outcome }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- FAQs Section -->
+{% if faqs %}
+<section class="manufacturing-section section-alt">
+    <div class="container">
+        <div class="manufacturing-section-header text-center">
+            <span class="manufacturing-subtitle">FAQ</span>
+            <h2 class="manufacturing-title">Frequently Asked Questions</h2>
+            <p class="manufacturing-desc">Get answers to questions regarding this solution area.</p>
+        </div>
+
+        <div class="faq-accordion-container" style="max-width: 800px; margin: 0 auto;">
+            {% for faq in faqs %}
+            <div class="faq-accordion-item" style="border-bottom: 1px solid #e5e7eb; padding: 15px 0;">
+                <button class="faq-accordion-trigger" onclick="toggleFaqAccordion(this)" style="width: 100%; display: flex; justify-content: space-between; align-items: center; background: none; border: none; text-align: left; font-size: 16.5px; font-weight: 600; color: var(--text-primary); cursor: pointer; padding: 10px 0;">
+                    {{ faq.q }} <i class="fas fa-plus icon-plus" style="font-size: 14px; color: #9ca3af;"></i>
+                </button>
+                <div class="faq-accordion-panel" style="max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out, padding 0.3s ease-out; padding: 0 10px;">
+                    <p style="font-size: 14.5px; line-height: 1.6; color: var(--text-secondary); font-weight: 300; padding-top: 10px; margin: 0;">{{ faq.a }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Bottom CTA Section -->
+<section class="manufacturing-bottom-cta">
+    <div class="container text-center">
+        <h2 class="cta-title">Ready to Begin?</h2>
+        <p class="cta-subtitle">Connect with our data integration and enterprise platform specialists to scope your project.</p>
+        <div class="cta-actions">
+            <button onclick="openLeadModal('Bottom Subpage CTA');" class="btn btn-primary btn-lg btn-glow">
+                Talk to an Expert
+            </button>
+            <button onclick="openLeadModal('Bottom Subpage Assessment');" class="btn btn-outline btn-lg" style="color: white; border-color: white; background: transparent; margin-left: 15px;">
+                Request Assessment
+            </button>
+        </div>
+    </div>
+</section>
+
+<script>
+    // Toggle FAQ Accordion
+    function toggleFaqAccordion(btn) {
+        btn.classList.toggle('active');
+        const icon = btn.querySelector('i');
+        if (btn.classList.contains('active')) {
+            icon.classList.remove('fa-plus');
+            icon.classList.add('fa-minus');
+        } else {
+            icon.classList.remove('fa-minus');
+            icon.classList.add('fa-plus');
+        }
+        
+        const panel = btn.nextElementSibling;
+        if (panel.style.maxHeight && panel.style.maxHeight !== '0px') {
+            panel.style.maxHeight = '0px';
+            panel.style.padding = '0 10px';
+        } else {
+            panel.style.maxHeight = panel.scrollHeight + "px";
+            panel.style.padding = '10px 10px';
+        }
+    }
+</script>
+{% endblock %}

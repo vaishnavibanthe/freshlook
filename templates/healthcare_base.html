@@ -1,0 +1,274 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page.seo_title or 'Healthcare Data Solutions | Artha Solutions' }}{% endblock %}
+
+{% block extra_meta %}
+    <meta name="description" content="{{ page.seo_description }}">
+    <meta name="keywords" content="{{ page.seo_keywords }}">
+    <link rel="canonical" href="{{ page.canonical_url or request.url }}">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:title" content="{{ page.og_title or page.seo_title }}">
+    <meta property="og:description" content="{{ page.og_description or page.seo_description }}">
+    {% if page.og_image %}<meta property="og:image" content="{{ page.og_image }}">{% endif %}
+    
+    <!-- Structured Schema JSON-LD -->
+    {% if page.schema_json %}
+    <script type="application/ld+json">
+        {{ page.schema_json|safe }}
+    </script>
+    {% endif %}
+{% endblock %}
+
+{% block body_class %}healthcare-microsite{% endblock %}
+
+{% block content %}
+<!-- Spacer to offset sticky header -->
+<div class="healthcare-navbar-spacer" style="height: var(--nav-height, 80px); background-color: var(--bg-secondary);"></div>
+
+<!-- Dynamic Hero/Banner Block -->
+{% block healthcare_hero %}{% endblock %}
+
+<!-- Healthcare Sticky Subnavigation Bar -->
+<div class="healthcare-subnav-container">
+    <div class="container healthcare-subnav-flex">
+        <div class="healthcare-subnav-brand">
+            <i class="fas fa-heart-pulse"></i> Healthcare Data Hub
+        </div>
+        <button class="healthcare-subnav-toggle" aria-label="Toggle Subnavigation">
+            Menu <i class="fas fa-bars"></i>
+        </button>
+        <ul class="healthcare-subnav-list">
+            <li><a href="/industries/healthcare" class="healthcare-subnav-link {% if active_subpage == 'overview' %}active{% endif %}">Overview</a></li>
+            
+            <li class="healthcare-subnav-dropdown">
+                <a href="javascript:void(0);" class="healthcare-subnav-link {% if active_subpage in ['providers', 'payers'] %}active{% endif %}">
+                    Care Delivery <i class="fas fa-chevron-down dropdown-caret"></i>
+                </a>
+                <ul class="healthcare-dropdown-menu">
+                    <li><a href="/industries/healthcare/providers" class="{% if active_subpage == 'providers' %}active{% endif %}"><i class="fas fa-hospital"></i> Providers</a></li>
+                    <li><a href="/industries/healthcare/payers" class="{% if active_subpage == 'payers' %}active{% endif %}"><i class="fas fa-hand-holding-usd"></i> Payers</a></li>
+                </ul>
+            </li>
+            
+            <li class="healthcare-subnav-dropdown">
+                <a href="javascript:void(0);" class="healthcare-subnav-link {% if active_subpage in ['data-governance', 'interoperability', 'analytics-ai', 'mdm'] %}active{% endif %}">
+                    Data & Core Solutions <i class="fas fa-chevron-down dropdown-caret"></i>
+                </a>
+                <ul class="healthcare-dropdown-menu">
+                    <li><a href="/industries/healthcare/data-governance" class="{% if active_subpage == 'data-governance' %}active{% endif %}"><i class="fas fa-shield-halved"></i> Data Governance</a></li>
+                    <li><a href="/industries/healthcare/interoperability" class="{% if active_subpage == 'interoperability' %}active{% endif %}"><i class="fas fa-network-wired"></i> Interoperability</a></li>
+                    <li><a href="/industries/healthcare/analytics-ai" class="{% if active_subpage == 'analytics-ai' %}active{% endif %}"><i class="fas fa-brain"></i> Analytics & AI</a></li>
+                    <li><a href="/industries/healthcare/mdm" class="{% if active_subpage == 'mdm' %}active{% endif %}"><i class="fas fa-database"></i> MDM</a></li>
+                </ul>
+            </li>
+            
+            <li class="healthcare-subnav-dropdown">
+                <a href="javascript:void(0);" class="healthcare-subnav-link {% if active_subpage in ['use-cases', 'case-studies'] %}active{% endif %}">
+                    Resources & Proof <i class="fas fa-chevron-down dropdown-caret"></i>
+                </a>
+                <ul class="healthcare-dropdown-menu">
+                    <li><a href="/industries/healthcare/use-cases" class="{% if active_subpage == 'use-cases' %}active{% endif %}"><i class="fas fa-lightbulb"></i> Use Cases</a></li>
+                    <li><a href="/industries/healthcare/case-studies" class="{% if active_subpage == 'case-studies' %}active{% endif %}"><i class="fas fa-file-alt"></i> Case Studies</a></li>
+                </ul>
+            </li>
+            
+            <li class="cta-item"><a href="javascript:void(0);" onclick="openLeadModal('Header CTA');" class="btn btn-primary btn-subnav-cta">Talk to an Expert</a></li>
+        </ul>
+    </div>
+</div>
+
+<!-- Dynamic Subpage Content -->
+{% block healthcare_content %}{% endblock %}
+
+<!-- AEO Summary Bar (For AI Search Engines & Executive Scannability - Moved to bottom) -->
+{% if page.ai_summary %}
+<section class="aeo-summary-bar" style="border-top: 1px solid #f3e8ff; border-bottom: none; background: #fafafa;">
+    <div class="container">
+        <div class="aeo-summary-inner" style="background: white; border: 1px solid #e9d5ff; border-left: 5px solid #7c3aed; box-shadow: 0 4px 15px rgba(124, 58, 237, 0.02);">
+            <div class="aeo-summary-badge"><i class="fas fa-robot"></i> {{ page.title }} AI Overview</div>
+            <p class="aeo-summary-text"><strong>Executive Overview:</strong> {{ page.ai_summary }}</p>
+            {% if page.genai_entities_json %}
+            <div class="aeo-entities">
+                <strong>Key Entities:</strong> 
+                {% for entity in load_json_helper(page.genai_entities_json) %}
+                <span class="aeo-entity-tag">{{ entity }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+
+<!-- Reusable Modal/Form Lead Capture Component -->
+<div id="healthcare-lead-modal" class="healthcare-modal">
+    <div class="healthcare-modal-content">
+        <span class="healthcare-modal-close">&times;</span>
+        <div class="healthcare-modal-header">
+            <h3>Talk to a Healthcare Data Expert</h3>
+            <p>Accelerate your clinical, claims, and operational data modernization programs.</p>
+        </div>
+        <form id="healthcare-lead-form" method="POST" action="/industries/healthcare/submit-lead">
+            <!-- Honeypot spam protection -->
+            <input type="text" name="website_url_honeypot" style="display:none !important" tabindex="-1" autocomplete="off">
+            <input type="hidden" name="source_page" value="{{ active_subpage }}">
+            <input type="hidden" name="cta_clicked" id="form-cta-clicked" value="General Contact">
+            
+            <div class="form-grid-2">
+                <div class="form-field">
+                    <label for="first_name">First Name</label>
+                    <input type="text" id="first_name" name="first_name" placeholder="John" required class="form-input">
+                </div>
+                <div class="form-field">
+                    <label for="last_name">Last Name</label>
+                    <input type="text" id="last_name" name="last_name" placeholder="Doe" required class="form-input">
+                </div>
+            </div>
+            
+            <div class="form-field">
+                <label for="business_email">Business Email <span class="required-star">*</span></label>
+                <input type="email" id="business_email" name="business_email" placeholder="john.doe@hospital.org" required class="form-input">
+                <span class="form-error-msg" id="email-error-msg" style="color: #dc2626; font-size: 12px; display: none; margin-top: 4px;">
+                    <i class="fas fa-circle-exclamation"></i> Please use your official company business email address. Personal email domains are not accepted.
+                </span>
+            </div>
+            
+            <div class="form-grid-2">
+                <div class="form-field">
+                    <label for="company">Company / Organization</label>
+                    <input type="text" id="company" name="company" placeholder="Healthcare Health Network" required class="form-input">
+                </div>
+                <div class="form-field">
+                    <label for="job_title">Job Title</label>
+                    <input type="text" id="job_title" name="job_title" placeholder="CIO / CDO / Head of Data" required class="form-input">
+                </div>
+            </div>
+
+            <div class="form-grid-2">
+                <div class="form-field">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" placeholder="+1 (555) 019-2834" class="form-input">
+                </div>
+                <div class="form-field">
+                    <label for="country">Country</label>
+                    <input type="text" id="country" name="country" placeholder="United States" required class="form-input">
+                </div>
+            </div>
+            
+            <div class="form-field">
+                <label for="message">Area of Interest / Message</label>
+                <textarea id="message" name="message" placeholder="Describe your data migration, interoperability, governance, or AI goals..." class="form-input" style="height: 80px; resize: vertical;"></textarea>
+            </div>
+            
+            <div class="form-checkbox">
+                <input type="checkbox" id="consent" name="consent" value="1" required>
+                <label for="consent" style="font-size: 12px; color: var(--text-secondary); cursor: pointer;">
+                    I consent to receiving data consulting insights and outreach from Artha Solutions. <span class="required-star">*</span>
+                </label>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-block" style="margin-top: 15px; width: 100%;">Submit Request <i class="fas fa-paper-plane btn-icon"></i></button>
+            <div id="form-response-msg" style="margin-top: 12px; padding: 10px; border-radius: 6px; display: none; font-size: 13.5px;"></div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Sticky subnav toggle for mobile
+    document.querySelector('.healthcare-subnav-toggle').addEventListener('click', function() {
+        document.querySelector('.healthcare-subnav-list').classList.toggle('show');
+    });
+
+    // Toggle dropdowns on mobile
+    document.querySelectorAll('.healthcare-subnav-dropdown > a').forEach(link => {
+        link.addEventListener('click', function(e) {
+            if (window.innerWidth <= 991) {
+                e.preventDefault();
+                const parent = this.parentElement;
+                parent.classList.toggle('open');
+                
+                // Close other dropdowns
+                document.querySelectorAll('.healthcare-subnav-dropdown').forEach(p => {
+                    if (p !== parent) {
+                        p.classList.remove('open');
+                    }
+                });
+            }
+        });
+    });
+
+    // Lead Capture Modal controls
+    const modal = document.getElementById('healthcare-lead-modal');
+    const closeBtn = document.querySelector('.healthcare-modal-close');
+    
+    function openLeadModal(ctaText) {
+        document.getElementById('form-cta-clicked').value = ctaText || 'General Contact';
+        modal.style.display = 'flex';
+        responseMsg.style.display = 'none';
+        leadForm.reset();
+    }
+
+    closeBtn.addEventListener('click', () => { modal.style.display = 'none'; });
+    window.addEventListener('click', (e) => { if (e.target == modal) modal.style.display = 'none'; });
+
+    // Handle B2B form submission
+    const leadForm = document.getElementById('healthcare-lead-form');
+    const responseMsg = document.getElementById('form-response-msg');
+    const emailInput = document.getElementById('business_email');
+    const emailError = document.getElementById('email-error-msg');
+
+    leadForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        responseMsg.style.display = 'none';
+        emailError.style.display = 'none';
+
+        // Business Email Validation
+        const email = emailInput.value.trim().toLowerCase();
+        const personalDomains = [
+            'gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'rediffmail.com',
+            'protonmail.com', 'icloud.com', 'aol.com', 'mail.com', 'gmx.com',
+            'yandex.com', 'zoho.com', 'proton.me', 'live.com', 'yahoo.co.in', 'hotmail.co.uk'
+        ];
+        const domain = email.split('@')[1];
+        if (personalDomains.includes(domain)) {
+            emailError.style.display = 'block';
+            return;
+        }
+
+        const formData = new FormData(leadForm);
+        fetch('/industries/healthcare/submit-lead', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            responseMsg.style.display = 'block';
+            if (data.status === 'success') {
+                responseMsg.style.backgroundColor = 'rgba(16, 185, 129, 0.1)';
+                responseMsg.style.color = '#10b981';
+                responseMsg.style.border = '1px solid rgba(16, 185, 129, 0.2)';
+                responseMsg.innerText = data.message;
+                leadForm.reset();
+                setTimeout(() => { modal.style.display = 'none'; responseMsg.style.display = 'none'; }, 4000);
+            } else {
+                responseMsg.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
+                responseMsg.style.color = '#ef4444';
+                responseMsg.style.border = '1px solid rgba(239, 68, 68, 0.2)';
+                responseMsg.innerText = data.message;
+            }
+        })
+        .catch(err => {
+            responseMsg.style.display = 'block';
+            responseMsg.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
+            responseMsg.style.color = '#ef4444';
+            responseMsg.style.border = '1px solid rgba(239, 68, 68, 0.2)';
+            responseMsg.innerText = 'Something went wrong. Please try again.';
+        });
+    });
+</script>
+{% endblock %}

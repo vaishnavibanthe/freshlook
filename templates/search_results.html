@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}Search Results for "{{ q }}" | Artha Solutions{% endblock %}
+
+{% block content %}
+<!-- Subpage Nav Spacer -->
+<div style="height: var(--nav-height); background-color: var(--bg-secondary);"></div>
+
+<!-- Search Results Hero -->
+<section class="section" style="padding: 60px 0 40px; background-color: var(--bg-secondary); border-bottom: 1px solid var(--border-color);">
+    <div class="container">
+        <div style="max-width: 800px;">
+            <div class="hero-badge" style="margin-bottom: 16px;"><i class="fas fa-search"></i> Universal Search Option</div>
+            <h1 class="hero-title" style="font-size: 36px; line-height: 1.25; margin-bottom: 16px; color: var(--text-primary); font-weight: 800;">
+                Search Results for: <span>"{{ q }}"</span>
+            </h1>
+            <p style="font-size: 14px; color: var(--text-secondary); font-weight: 500;">
+                We found <strong>{{ total_count }}</strong> matching results across our solutions, client success documents, and articles.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Results Main Section -->
+<section class="section" style="padding: 60px 0; min-height: 60vh; background-color: var(--bg-primary);">
+    <div class="container">
+        
+        <!-- Search bar inside results page for refining query -->
+        <div style="max-width: 600px; margin-bottom: 50px;">
+            <form action="/search" method="GET" style="display: flex; gap: 12px; margin: 0;">
+                <input type="text" name="q" value="{{ q }}" required placeholder="Type keyword to search again..." class="form-control" style="font-size: 14px; padding: 14px 18px; border-radius: 30px;">
+                <button type="submit" class="btn btn-primary btn-glow" style="padding: 12px 28px; border-radius: 30px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                    Search <i class="fas fa-search"></i>
+                </button>
+            </form>
+        </div>
+
+        {% if total_count > 0 %}
+            <div style="display: grid; gap: 48px;">
+                
+                <!-- Category 1: Services & Solutions -->
+                {% if results.services %}
+                <div>
+                    <h2 style="font-size: 20px; font-weight: 800; color: var(--text-primary); margin-bottom: 20px; padding-bottom: 8px; border-bottom: 2px solid var(--border-color); display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-gears" style="color: var(--accent-blue);"></i> Services & Solutions ({{ results.services|length }})
+                    </h2>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px;">
+                        {% for svc in results.services %}
+                        <div class="card" style="padding: 30px; display: flex; flex-direction: column; justify-content: space-between; transition: var(--transition-normal);">
+                            <div>
+                                <span class="ai-card-tag ai-tag-existing" style="margin-bottom: 12px; font-size: 9px; padding: 3px 8px;">{{ svc.type }}</span>
+                                <h3 style="font-size: 17px; font-weight: 700; margin-bottom: 10px; line-height: 1.4;">{{ svc.title }}</h3>
+                                <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 20px;">{{ svc.summary[:150] }}...</p>
+                            </div>
+                            <a href="{{ svc.url }}" style="font-size: 12px; font-weight: 700; color: var(--accent-blue); display: flex; align-items: center; gap: 4px; hover: underline;">
+                                Learn More <i class="fas fa-arrow-right" style="font-size: 10px;"></i>
+                            </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Category 2: Success Stories / Case Studies -->
+                {% if results.case_studies %}
+                <div>
+                    <h2 style="font-size: 20px; font-weight: 800; color: var(--text-primary); margin-bottom: 20px; padding-bottom: 8px; border-bottom: 2px solid var(--border-color); display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-clipboard-list-check" style="color: var(--accent-cyan);"></i> Case Studies & Success Stories ({{ results.case_studies|length }})
+                    </h2>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px;">
+                        {% for study in results.case_studies %}
+                        <div class="card" style="padding: 30px; display: flex; flex-direction: column; justify-content: space-between; transition: var(--transition-normal);">
+                            <div>
+                                <span class="ai-card-tag ai-tag-new" style="margin-bottom: 12px; font-size: 9px; padding: 3px 8px; background: rgba(6,182,212,0.06); color: var(--accent-cyan); border-color: rgba(6,182,212,0.15);">{{ study.solution_area }}</span>
+                                <h3 style="font-size: 17px; font-weight: 700; margin-bottom: 10px; line-height: 1.4;">{{ study.title }}</h3>
+                                <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 20px;">
+                                    {{ study.card_summary or study.executive_summary[:150] }}...
+                                </p>
+                            </div>
+                            <a href="/case-studies/{{ study.slug }}" style="font-size: 12px; font-weight: 700; color: var(--accent-blue); display: flex; align-items: center; gap: 4px; hover: underline;">
+                                Read Success Story <i class="fas fa-arrow-right" style="font-size: 10px;"></i>
+                            </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Category 3: Blog Posts -->
+                {% if results.blogs %}
+                <div>
+                    <h2 style="font-size: 20px; font-weight: 800; color: var(--text-primary); margin-bottom: 20px; padding-bottom: 8px; border-bottom: 2px solid var(--border-color); display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-newspaper" style="color: var(--accent-indigo);"></i> Articles & Insights ({{ results.blogs|length }})
+                    </h2>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px;">
+                        {% for post in results.blogs %}
+                        <div class="card" style="padding: 30px; display: flex; flex-direction: column; justify-content: space-between; transition: var(--transition-normal);">
+                            <div>
+                                <span class="ai-card-tag" style="margin-bottom: 12px; font-size: 9px; padding: 3px 8px; background-color: var(--bg-tertiary); color: var(--text-secondary); border-color: var(--border-color);">{{ post.category }}</span>
+                                <h3 style="font-size: 17px; font-weight: 700; margin-bottom: 10px; line-height: 1.4;">{{ post.title }}</h3>
+                                <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 20px;">{{ post.summary[:150] }}...</p>
+                            </div>
+                            <a href="/blogs/{{ post.slug }}" style="font-size: 12px; font-weight: 700; color: var(--accent-blue); display: flex; align-items: center; gap: 4px; hover: underline;">
+                                Read Article <i class="fas fa-arrow-right" style="font-size: 10px;"></i>
+                            </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+            </div>
+        {% else %}
+            <!-- No results view -->
+            <div style="text-align: center; padding: 80px 0; border: 1px dashed var(--border-color); border-radius: var(--border-radius-lg); background-color: var(--bg-secondary); max-width: 700px; margin: 0 auto;">
+                <i class="fas fa-magnifying-glass-chart" style="font-size: 52px; color: var(--text-tertiary); margin-bottom: 20px;"></i>
+                <h3 style="font-size: 20px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px;">No Matching Results Found</h3>
+                <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.6; max-width: 480px; margin: 0 auto 30px;">
+                    We couldn't find any resources or solutions matching your query. Try broadening your keywords, checking spelling, or browsing our primary sections.
+                </p>
+                <div style="display: flex; gap: 12px; justify-content: center;">
+                    <a href="/solutions" class="btn btn-secondary" style="font-size: 13px; padding: 10px 20px; border-radius: 8px;">Explore Solutions</a>
+                    <a href="/case-studies" class="btn btn-primary btn-glow" style="font-size: 13px; padding: 10px 20px; border-radius: 8px;">Browse Case Studies</a>
+                </div>
+            </div>
+        {% endif %}
+        
+    </div>
+</section>
+{% endblock %}

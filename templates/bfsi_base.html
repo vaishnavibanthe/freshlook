@@ -1,0 +1,275 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page.seo_title or 'BFSI Data, AI, Governance, MDM & Analytics Solutions | Artha Solutions' }}{% endblock %}
+
+{% block extra_meta %}
+    <meta name="description" content="{{ page.seo_description }}">
+    <meta name="keywords" content="{{ page.seo_keywords }}">
+    <link rel="canonical" href="{{ page.canonical_url or request.url }}">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:title" content="{{ page.og_title or page.seo_title }}">
+    <meta property="og:description" content="{{ page.og_description or page.seo_description }}">
+    {% if page.og_image %}<meta property="og:image" content="{{ page.og_image }}">{% endif %}
+    
+    <!-- Structured Schema JSON-LD -->
+    {% if page.schema_json %}
+    <script type="application/ld+json">
+        {{ page.schema_json|safe }}
+    </script>
+    {% endif %}
+{% endblock %}
+
+{% block body_class %}bfsi-microsite{% endblock %}
+
+{% block content %}
+<!-- Spacer to offset sticky header -->
+<div class="bfsi-navbar-spacer" style="height: var(--nav-height, 80px); background-color: var(--bg-secondary);"></div>
+
+<!-- Dynamic Hero/Banner Block -->
+{% block bfsi_hero %}{% endblock %}
+
+<!-- BFSI Sticky Subnavigation Bar -->
+<div class="bfsi-subnav-container">
+    <div class="container bfsi-subnav-flex">
+        <div class="bfsi-subnav-brand">
+            <i class="fas fa-landmark"></i> BFSI Data Hub
+        </div>
+        <button class="bfsi-subnav-toggle" aria-label="Toggle Subnavigation">
+            Menu <i class="fas fa-bars"></i>
+        </button>
+        <ul class="bfsi-subnav-list">
+            <li><a href="/industries/bfsi" class="bfsi-subnav-link {% if active_subpage == 'overview' %}active{% endif %}">Overview</a></li>
+            
+            <li class="bfsi-subnav-dropdown">
+                <a href="javascript:void(0);" class="bfsi-subnav-link {% if active_subpage in ['banking', 'insurance'] %}active{% endif %}">
+                    Sector Solutions <i class="fas fa-chevron-down dropdown-caret"></i>
+                </a>
+                <ul class="bfsi-dropdown-menu">
+                    <li><a href="/industries/bfsi/banking" class="{% if active_subpage == 'banking' %}active{% endif %}"><i class="fas fa-university"></i> Banking</a></li>
+                    <li><a href="/industries/bfsi/insurance" class="{% if active_subpage == 'insurance' %}active{% endif %}"><i class="fas fa-car-crash"></i> Insurance</a></li>
+                </ul>
+            </li>
+            
+            <li class="bfsi-subnav-dropdown">
+                <a href="javascript:void(0);" class="bfsi-subnav-link {% if active_subpage in ['data-solutions', 'data-governance-compliance', 'mdm-customer-360', 'analytics-risk', 'ai-readiness', 'data-modernization'] %}active{% endif %}">
+                    Data & Analytics Core <i class="fas fa-chevron-down dropdown-caret"></i>
+                </a>
+                <ul class="bfsi-dropdown-menu">
+                    <li><a href="/industries/bfsi/data-solutions" class="{% if active_subpage == 'data-solutions' %}active{% endif %}"><i class="fas fa-database"></i> Data Solutions</a></li>
+                    <li><a href="/industries/bfsi/data-governance-compliance" class="{% if active_subpage == 'data-governance-compliance' %}active{% endif %}"><i class="fas fa-shield-halved"></i> Governance & Compliance</a></li>
+                    <li><a href="/industries/bfsi/mdm-customer-360" class="{% if active_subpage == 'mdm-customer-360' %}active{% endif %}"><i class="fas fa-id-card-alt"></i> MDM & Customer 360</a></li>
+                    <li><a href="/industries/bfsi/analytics-risk" class="{% if active_subpage == 'analytics-risk' %}active{% endif %}"><i class="fas fa-chart-line"></i> Analytics & Risk</a></li>
+                    <li><a href="/industries/bfsi/ai-readiness" class="{% if active_subpage == 'ai-readiness' %}active{% endif %}"><i class="fas fa-robot"></i> AI Readiness</a></li>
+                    <li><a href="/industries/bfsi/data-modernization" class="{% if active_subpage == 'data-modernization' %}active{% endif %}"><i class="fas fa-server"></i> Data Modernization</a></li>
+                </ul>
+            </li>
+            
+            <li class="bfsi-subnav-dropdown">
+                <a href="javascript:void(0);" class="bfsi-subnav-link {% if active_subpage in ['use-cases', 'case-studies'] %}active{% endif %}">
+                    Resources & Proof <i class="fas fa-chevron-down dropdown-caret"></i>
+                </a>
+                <ul class="bfsi-dropdown-menu">
+                    <li><a href="/industries/bfsi/use-cases" class="{% if active_subpage == 'use-cases' %}active{% endif %}"><i class="fas fa-lightbulb"></i> Use Cases</a></li>
+                    <li><a href="/industries/bfsi/case-studies" class="{% if active_subpage == 'case-studies' %}active{% endif %}"><i class="fas fa-file-alt"></i> Case Studies</a></li>
+                </ul>
+            </li>
+            
+            <li class="cta-item"><a href="javascript:void(0);" onclick="openLeadModal('Header CTA');" class="btn btn-primary btn-subnav-cta">Talk to an Expert</a></li>
+        </ul>
+    </div>
+</div>
+
+<!-- Dynamic Subpage Content -->
+{% block bfsi_content %}{% endblock %}
+
+<!-- AEO Summary Bar (For AI Search Engines & Executive Scannability - at bottom) -->
+{% if page.ai_summary %}
+<section class="aeo-summary-bar" style="border-top: 1px solid #eff6ff; border-bottom: none; background: #fafafa; padding: 40px 0;">
+    <div class="container">
+        <div class="aeo-summary-inner" style="background: white; border: 1px solid #bfdbfe; border-left: 5px solid #2563eb; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.02); padding: 30px; border-radius: 4px;">
+            <div class="aeo-summary-badge" style="display: inline-block; padding: 4px 12px; background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; font-size: 12px; font-weight: 600; text-transform: uppercase; border-radius: 20px; margin-bottom: 15px;"><i class="fas fa-robot"></i> {{ page.title }} AI Overview</div>
+            <p class="aeo-summary-text" style="font-size: 15px; line-height: 1.6; color: var(--text-primary); margin-bottom: 20px;"><strong>Executive Overview:</strong> {{ page.ai_summary }}</p>
+            {% if page.genai_entities_json %}
+            <div class="aeo-entities" style="font-size: 13.5px;">
+                <strong>Key Entities:</strong> 
+                {% for entity in load_json_helper(page.genai_entities_json) %}
+                <span class="aeo-entity-tag" style="display: inline-block; background: #f3f4f6; color: #4b5563; padding: 2px 8px; border-radius: 4px; font-size: 12.5px; margin: 2px 4px 2px 0;">{{ entity }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Reusable Modal/Form Lead Capture Component -->
+<div id="bfsi-lead-modal" class="bfsi-modal">
+    <div class="bfsi-modal-content">
+        <span class="bfsi-modal-close">&times;</span>
+        <div class="bfsi-modal-header">
+            <h3>Talk to a BFSI Data Expert</h3>
+            <p>Accelerate your core banking, insurance claims, compliance data governance, and Customer 360 modernization programs.</p>
+        </div>
+        <form id="bfsi-lead-form" method="POST" action="/industries/bfsi/submit-lead">
+            <!-- Honeypot spam protection -->
+            <input type="text" name="website_url_honeypot" style="display:none !important" tabindex="-1" autocomplete="off">
+            <input type="hidden" name="source_page" value="{{ active_subpage }}">
+            <input type="hidden" name="cta_clicked" id="form-cta-clicked" value="General Contact">
+            
+            <div class="form-grid-2">
+                <div class="form-field">
+                    <label for="first_name">First Name</label>
+                    <input type="text" id="first_name" name="first_name" placeholder="John" required class="form-input">
+                </div>
+                <div class="form-field">
+                    <label for="last_name">Last Name</label>
+                    <input type="text" id="last_name" name="last_name" placeholder="Doe" required class="form-input">
+                </div>
+            </div>
+            
+            <div class="form-field">
+                <label for="business_email">Business Email <span class="required-star">*</span></label>
+                <input type="email" id="business_email" name="business_email" placeholder="john.doe@bank.com" required class="form-input">
+                <span class="form-error-msg" id="email-error-msg" style="color: #dc2626; font-size: 12px; display: none; margin-top: 4px;">
+                    <i class="fas fa-circle-exclamation"></i> Please use your official company business email address. Personal email domains are not accepted.
+                </span>
+            </div>
+            
+            <div class="form-grid-2">
+                <div class="form-field">
+                    <label for="company">Company / Organization</label>
+                    <input type="text" id="company" name="company" placeholder="Financial Institution" required class="form-input">
+                </div>
+                <div class="form-field">
+                    <label for="job_title">Job Title</label>
+                    <input type="text" id="job_title" name="job_title" placeholder="CIO / CRO / CDO / VP Data" required class="form-input">
+                </div>
+            </div>
+
+            <div class="form-grid-2">
+                <div class="form-field">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" placeholder="+1 (555) 019-2834" class="form-input">
+                </div>
+                <div class="form-field">
+                    <label for="country">Country</label>
+                    <input type="text" id="country" name="country" placeholder="United States" required class="form-input">
+                </div>
+            </div>
+            
+            <div class="form-field">
+                <label for="message">Area of Interest / Message</label>
+                <textarea id="message" name="message" placeholder="Describe your data migration, Customer 360, governance, analytics, or AI readiness goals..." class="form-input" style="height: 80px; resize: vertical;"></textarea>
+            </div>
+            
+            <div class="form-checkbox">
+                <input type="checkbox" id="consent" name="consent" value="1" required>
+                <label for="consent" style="font-size: 12px; color: var(--text-secondary); cursor: pointer;">
+                    I consent to receiving data consulting insights and outreach from Artha Solutions. <span class="required-star">*</span>
+                </label>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-block" style="margin-top: 15px; width: 100%;">Submit Request <i class="fas fa-paper-plane btn-icon"></i></button>
+            <div id="form-response-msg" style="margin-top: 12px; padding: 10px; border-radius: 6px; display: none; font-size: 13.5px;"></div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Sticky subnav toggle for mobile
+    document.querySelector('.bfsi-subnav-toggle').addEventListener('click', function() {
+        document.querySelector('.bfsi-subnav-list').classList.toggle('show');
+    });
+
+    // Toggle dropdowns on mobile
+    document.querySelectorAll('.bfsi-subnav-dropdown > a').forEach(link => {
+        link.addEventListener('click', function(e) {
+            if (window.innerWidth <= 991) {
+                e.preventDefault();
+                const parent = this.parentElement;
+                parent.classList.toggle('open');
+                
+                // Close other dropdowns
+                document.querySelectorAll('.bfsi-subnav-dropdown').forEach(p => {
+                    if (p !== parent) {
+                        p.classList.remove('open');
+                    }
+                });
+            }
+        });
+    });
+
+    // Lead Capture Modal controls
+    const modal = document.getElementById('bfsi-lead-modal');
+    const closeBtn = document.querySelector('.bfsi-modal-close');
+    
+    function openLeadModal(ctaText) {
+        document.getElementById('form-cta-clicked').value = ctaText || 'General Contact';
+        modal.style.display = 'flex';
+        responseMsg.style.display = 'none';
+        leadForm.reset();
+    }
+
+    closeBtn.addEventListener('click', () => { modal.style.display = 'none'; });
+    window.addEventListener('click', (e) => { if (e.target == modal) modal.style.display = 'none'; });
+
+    // Handle B2B form submission
+    const leadForm = document.getElementById('bfsi-lead-form');
+    const responseMsg = document.getElementById('form-response-msg');
+    const emailInput = document.getElementById('business_email');
+    const emailError = document.getElementById('email-error-msg');
+
+    leadForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        responseMsg.style.display = 'none';
+        emailError.style.display = 'none';
+
+        // Business Email Validation
+        const email = emailInput.value.trim().toLowerCase();
+        const personalDomains = [
+            'gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'rediffmail.com',
+            'protonmail.com', 'icloud.com', 'aol.com', 'mail.com', 'gmx.com',
+            'yandex.com', 'zoho.com', 'proton.me', 'live.com', 'yahoo.co.in', 'hotmail.co.uk'
+        ];
+        const domain = email.split('@')[1];
+        if (personalDomains.includes(domain)) {
+            emailError.style.display = 'block';
+            return;
+        }
+
+        const formData = new FormData(leadForm);
+        fetch('/industries/bfsi/submit-lead', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            responseMsg.style.display = 'block';
+            if (data.status === 'success') {
+                responseMsg.style.backgroundColor = 'rgba(16, 185, 129, 0.1)';
+                responseMsg.style.color = '#10b981';
+                responseMsg.style.border = '1px solid rgba(16, 185, 129, 0.2)';
+                responseMsg.innerText = data.message;
+                leadForm.reset();
+                setTimeout(() => { modal.style.display = 'none'; responseMsg.style.display = 'none'; }, 4000);
+            } else {
+                responseMsg.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
+                responseMsg.style.color = '#ef4444';
+                responseMsg.style.border = '1px solid rgba(239, 68, 68, 0.2)';
+                responseMsg.innerText = data.message;
+            }
+        })
+        .catch(err => {
+            responseMsg.style.display = 'block';
+            responseMsg.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
+            responseMsg.style.color = '#ef4444';
+            responseMsg.style.border = '1px solid rgba(239, 68, 68, 0.2)';
+            responseMsg.innerText = 'Something went wrong. Please try again.';
+        });
+    });
+</script>
+{% endblock %}

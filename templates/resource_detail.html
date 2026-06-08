@@ -1,0 +1,1626 @@
+{% extends "base.html" %}
+
+{% block title %}{{ data.title }} - Artha Solutions{% endblock %}
+
+{% block content %}
+<!-- Google Fonts & Scoped CSS -->
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
+    
+    /* Layout Variables */
+    :root {
+        --font-title: 'Outfit', sans-serif;
+        --font-body: 'Inter', sans-serif;
+        --color-primary: #2e1065;
+        --color-subtitle: #6d28d9;
+        --color-accent-cyan: #06b6d4;
+        --color-cta: #00f0c0;
+        --color-cta-hover: #05d6ac;
+        --color-badge-bg: #e0fcf6;
+        --color-badge-text: #0f766e;
+        --border-radius-xl: 24px;
+        --border-radius-lg: 16px;
+        
+        /* In-Person Light Theme variables */
+        --color-ip-bg: #f8fafc;
+        --color-ip-text-primary: #0f172a;
+        --color-ip-text-secondary: #475569;
+        --color-ip-accent: #2563eb;
+        --color-ip-accent-hover: #1d4ed8;
+    }
+    
+    /* ==========================================================================
+       1. Standard Webinar & Virtual Event Theme Styles (Violet Background)
+       ========================================================================== */
+    .resource-hero-section {
+        position: relative;
+        background: radial-gradient(circle at 10% 20%, rgba(243, 232, 255, 0.4) 0%, rgba(255, 255, 255, 1) 90%);
+        padding: 100px 0 80px 0;
+        overflow: hidden;
+        border-bottom: 1px solid rgba(109, 40, 217, 0.05);
+    }
+    
+    .hero-bg-waves {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 1;
+    }
+    
+    .resource-container {
+        position: relative;
+        max-width: 1240px;
+        margin: 0 auto;
+        padding: 0 30px;
+        z-index: 2;
+    }
+    
+    .breadcrumbs {
+        display: flex;
+        gap: 8px;
+        font-family: var(--font-body);
+        font-size: 13px;
+        color: #7c3aed;
+        margin-bottom: 32px;
+        font-weight: 500;
+        letter-spacing: 0.3px;
+    }
+    .breadcrumbs a {
+        color: #6b7280;
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+    .breadcrumbs a:hover {
+        color: #2e1065;
+    }
+    
+    .hero-grid {
+        display: grid;
+        grid-template-columns: 1.25fr 1fr;
+        gap: 80px;
+        align-items: center;
+    }
+    
+    @media (max-width: 991px) {
+        .hero-grid {
+            grid-template-columns: 1fr;
+            gap: 50px;
+        }
+    }
+    
+    /* Category Pill */
+    .pill-badge {
+        display: inline-block;
+        background-color: #f1f5f9;
+        color: #475569;
+        padding: 6px 18px;
+        border-radius: 9999px;
+        font-family: var(--font-body);
+        font-weight: 600;
+        font-size: 13px;
+        letter-spacing: 0.5px;
+        margin-bottom: 24px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+    }
+    .pill-badge.conference {
+        background-color: #e0f2fe;
+        color: #0369a1;
+    }
+    .pill-badge.webinar {
+        background-color: #f3e8ff;
+        color: #6b21a8;
+    }
+    .pill-badge.whitepaper {
+        background-color: #ffedd5;
+        color: #c2410c;
+    }
+    
+    /* Hero Left Text */
+    .hero-title {
+        font-family: var(--font-title);
+        font-weight: 800;
+        font-size: 52px;
+        line-height: 1.15;
+        color: var(--color-primary);
+        margin-bottom: 20px;
+        letter-spacing: -1.5px;
+    }
+    
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 40px;
+            letter-spacing: -1px;
+        }
+    }
+    
+    .hero-subtitle {
+        font-family: var(--font-body);
+        font-size: 20px;
+        line-height: 1.6;
+        color: #4b5563;
+        margin-bottom: 40px;
+        font-weight: 400;
+        max-width: 560px;
+    }
+    
+    /* Green/Teal Date Badge Box */
+    .timezone-badge-box {
+        background-color: var(--color-badge-bg);
+        border: 1px solid rgba(6, 182, 212, 0.15);
+        border-radius: 16px;
+        padding: 24px 32px;
+        display: inline-flex;
+        flex-direction: column;
+        gap: 8px;
+        max-width: 440px;
+        box-shadow: 0 10px 30px rgba(6, 182, 212, 0.04);
+    }
+    
+    .timezone-date {
+        font-family: var(--font-title);
+        font-weight: 700;
+        font-size: 24px;
+        color: var(--color-badge-text);
+        letter-spacing: -0.5px;
+    }
+    
+    .timezone-times {
+        font-family: var(--font-body);
+        font-weight: 500;
+        font-size: 15px;
+        color: var(--color-badge-text);
+        opacity: 0.9;
+        word-spacing: 0.5px;
+    }
+    
+    /* Glassmorphic Registration Card */
+    .glass-card {
+        background: rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        border-radius: var(--border-radius-xl);
+        padding: 48px;
+        box-shadow: 0 25px 60px rgba(46, 16, 101, 0.08);
+        position: relative;
+        transition: transform 0.3s ease;
+    }
+    
+    @media (max-width: 576px) {
+        .glass-card {
+            padding: 30px 20px;
+        }
+    }
+    
+    .card-title {
+        font-family: var(--font-title);
+        font-size: 32px;
+        font-weight: 700;
+        color: var(--color-primary);
+        margin-bottom: 30px;
+        letter-spacing: -0.5px;
+    }
+    
+    .input-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+    
+    @media (max-width: 480px) {
+        .input-row {
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+    }
+    
+    .input-group {
+        margin-bottom: 16px;
+        width: 100%;
+    }
+    
+    .form-input {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.6);
+        border: 1px solid rgba(46, 16, 101, 0.15);
+        border-radius: 12px;
+        padding: 14px 20px;
+        font-family: var(--font-body);
+        font-size: 15px;
+        color: var(--color-primary);
+        outline: none;
+        transition: all 0.3s ease;
+    }
+    
+    .form-input::placeholder {
+        color: #94a3b8;
+        opacity: 0.9;
+    }
+    
+    .form-input:focus {
+        border-color: var(--color-accent-cyan);
+        background: #ffffff;
+        box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.15);
+    }
+    
+    .terms-text {
+        font-family: var(--font-body);
+        font-size: 13px;
+        color: #4c1d95;
+        opacity: 0.9;
+        margin: 8px 0 28px 0;
+        line-height: 1.4;
+    }
+    
+    .register-btn {
+        background-color: var(--color-cta);
+        color: #022c22;
+        font-family: var(--font-body);
+        font-weight: 700;
+        font-size: 16px;
+        padding: 14px 36px;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        display: block;
+        margin: 0 auto;
+        min-width: 180px;
+        text-align: center;
+        box-shadow: 0 4px 14px rgba(0, 240, 192, 0.3);
+        transition: all 0.3s ease;
+        outline: none;
+    }
+    
+    .register-btn:hover {
+        background-color: var(--color-cta-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 240, 192, 0.5);
+    }
+    
+    /* AJAX Alert Window */
+    .form-alert {
+        padding: 12px 18px;
+        border-radius: 10px;
+        font-family: var(--font-body);
+        font-size: 13px;
+        font-weight: 500;
+        margin-bottom: 20px;
+        display: none;
+        line-height: 1.5;
+    }
+    .form-alert.alert-error {
+        background-color: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fca5a5;
+    }
+    
+    /* Success Panel */
+    .success-pane {
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 20px 0;
+    }
+    
+    .success-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background-color: #ccfbf1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #0d9488;
+        font-size: 28px;
+        margin-bottom: 24px;
+        box-shadow: 0 8px 20px rgba(13, 148, 136, 0.15);
+    }
+    
+    .success-title {
+        font-family: var(--font-title);
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--color-primary);
+        margin-bottom: 16px;
+    }
+    
+    .success-msg {
+        font-family: var(--font-body);
+        font-size: 15px;
+        color: #4b5563;
+        line-height: 1.6;
+        margin-bottom: 30px;
+    }
+    
+    .calendar-btn {
+        background-color: var(--color-primary);
+        color: #ffffff;
+        padding: 12px 24px;
+        border-radius: 10px;
+        font-family: var(--font-body);
+        font-weight: 600;
+        font-size: 14px;
+        text-decoration: none;
+        box-shadow: 0 4px 12px rgba(46, 16, 101, 0.15);
+        transition: all 0.3s ease;
+    }
+    .calendar-btn:hover {
+        background-color: #4c1d95;
+        transform: translateY(-2px);
+    }
+    
+    /* Speakers Grid */
+    .speakers-section {
+        background-color: #ffffff;
+        padding: 100px 0 80px 0;
+    }
+    
+    .section-title {
+        font-family: var(--font-title);
+        font-size: 40px;
+        font-weight: 700;
+        color: var(--color-primary);
+        margin-bottom: 48px;
+        letter-spacing: -1px;
+    }
+    
+    .speakers-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 40px;
+    }
+    
+    .speaker-card {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+    }
+    
+    .speaker-img-wrapper {
+        position: relative;
+        width: 130px;
+        height: 130px;
+        margin-bottom: 24px;
+    }
+    
+    .speaker-img-frame {
+        position: absolute;
+        top: -6px;
+        left: 6px;
+        width: 100%;
+        height: 100%;
+        border: 2px solid var(--accent-color);
+        border-radius: 16px;
+        pointer-events: none;
+        z-index: 1;
+        transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    
+    .speaker-img {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 16px;
+        z-index: 2;
+        background-color: #f1f5f9;
+        box-shadow: 0 10px 25px rgba(46, 16, 101, 0.06);
+    }
+    
+    .speaker-card:hover .speaker-img-frame {
+        transform: translate(-5px, 5px);
+    }
+    
+    .speaker-name {
+        font-family: var(--font-title);
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--color-primary);
+        margin-bottom: 8px;
+    }
+    
+    .speaker-role {
+        font-family: var(--font-body);
+        font-size: 14px;
+        color: #64748b;
+        line-height: 1.5;
+        margin-bottom: 16px;
+        min-height: 42px;
+    }
+    
+    .speaker-learn-more {
+        font-family: var(--font-body);
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--color-subtitle);
+        text-decoration: none;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s ease;
+    }
+    
+    .speaker-learn-more:hover {
+        color: var(--color-accent-cyan);
+    }
+    
+    /* Bottom Info Section */
+    .details-section {
+        background-color: #fafaf9;
+        padding: 90px 0 110px 0;
+        border-top: 1px solid #f3f3f2;
+    }
+    
+    .details-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 80px;
+        align-items: start;
+    }
+    
+    @media (max-width: 991px) {
+        .details-grid {
+            grid-template-columns: 1fr;
+            gap: 50px;
+        }
+    }
+    
+    /* Purple Container Box */
+    .purple-highlight-box {
+        background: linear-gradient(135deg, #4c1d95 0%, #701a75 100%);
+        border-radius: var(--border-radius-xl);
+        padding: 48px;
+        color: #ffffff;
+        box-shadow: 0 20px 40px rgba(76, 29, 149, 0.15);
+    }
+    
+    @media (max-width: 576px) {
+        .purple-highlight-box {
+            padding: 30px 24px;
+        }
+    }
+    
+    .highlight-title {
+        font-family: var(--font-title);
+        font-size: 26px;
+        font-weight: 600;
+        line-height: 1.35;
+        color: #ffffff;
+        margin-bottom: 24px;
+    }
+    
+    .highlight-text {
+        font-family: var(--font-body);
+        font-size: 15px;
+        line-height: 1.7;
+        color: rgba(255, 255, 255, 0.88);
+        margin-bottom: 24px;
+        font-weight: 400;
+    }
+    
+    .highlight-link {
+        font-family: var(--font-body);
+        font-size: 15px;
+        font-weight: 600;
+        color: #ffffff;
+        text-decoration: underline;
+        display: inline-block;
+        transition: opacity 0.2s ease;
+    }
+    
+    .highlight-link:hover {
+        opacity: 0.8;
+    }
+    
+    /* Bullet takeaways on right */
+    .takeaways-list {
+        display: flex;
+        flex-direction: column;
+        gap: 28px;
+    }
+    
+    .takeaway-item {
+        display: flex;
+        gap: 18px;
+        align-items: start;
+    }
+    
+    .checkmark-icon {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background-color: var(--color-subtitle);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ffffff;
+        font-size: 11px;
+        flex-shrink: 0;
+        margin-top: 3px;
+        box-shadow: 0 4px 10px rgba(109, 40, 217, 0.15);
+    }
+    
+    .takeaway-text {
+        font-family: var(--font-body);
+        font-size: 16px;
+        line-height: 1.6;
+        color: #4b5563;
+        font-weight: 400;
+    }
+
+    /* ==========================================================================
+       2. In-Person Light Theme Specific Styles
+       ========================================================================== */
+    .ip-hero-section {
+        position: relative;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        padding: 90px 0 150px 0; /* extra padding for overlapping cards */
+        overflow: hidden;
+        border-bottom: 1px solid rgba(15, 23, 42, 0.05);
+    }
+    
+    .ip-hero-title {
+        font-family: var(--font-title);
+        font-weight: 800;
+        font-size: 54px;
+        line-height: 1.15;
+        color: var(--color-ip-text-primary);
+        margin-bottom: 24px;
+        letter-spacing: -1.5px;
+    }
+    
+    @media (max-width: 768px) {
+        .ip-hero-title {
+            font-size: 42px;
+            letter-spacing: -1px;
+        }
+    }
+    
+    .ip-meta-tagline {
+        font-family: var(--font-body);
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--color-ip-accent);
+        margin-bottom: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .ip-info-block {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        font-family: var(--font-body);
+        font-size: 16px;
+        color: var(--color-ip-text-secondary);
+        margin-bottom: 40px;
+        font-weight: 500;
+    }
+    .ip-info-block i {
+        color: var(--color-ip-accent);
+        margin-right: 8px;
+    }
+    
+    .ip-register-btn {
+        background-color: var(--color-ip-accent);
+        color: #ffffff;
+        font-family: var(--font-body);
+        font-weight: 700;
+        font-size: 16px;
+        padding: 16px 44px;
+        border: none;
+        border-radius: 9999px; /* Pill shaped button */
+        cursor: pointer;
+        display: inline-block;
+        box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25);
+        transition: all 0.3s ease;
+        text-decoration: none;
+        outline: none;
+    }
+    
+    .ip-register-btn:hover {
+        background-color: var(--color-ip-accent-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 12px 30px rgba(37, 99, 235, 0.4);
+    }
+    
+    /* Countdown Timer Card */
+    .ip-timer-card {
+        background: rgba(255, 255, 255, 0.45);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        border-radius: var(--border-radius-xl);
+        padding: 40px;
+        box-shadow: 0 20px 40px rgba(15, 23, 42, 0.05);
+        text-align: center;
+    }
+    
+    .ip-timer-title {
+        font-family: var(--font-body);
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--color-ip-text-primary);
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin-bottom: 24px;
+        opacity: 0.8;
+    }
+    
+    .ip-timer-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+    }
+    
+    .ip-timer-unit {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .ip-timer-val {
+        font-family: var(--font-title);
+        font-size: 42px;
+        font-weight: 700;
+        color: var(--color-ip-text-primary);
+        line-height: 1;
+        margin-bottom: 6px;
+    }
+    
+    @media (max-width: 480px) {
+        .ip-timer-val {
+            font-size: 32px;
+        }
+    }
+    
+    .ip-timer-label {
+        font-family: var(--font-body);
+        font-size: 12px;
+        color: var(--color-ip-text-secondary);
+        font-weight: 600;
+        text-transform: uppercase;
+        opacity: 0.8;
+    }
+    
+    /* Overlapping Speaker section styles */
+    .ip-speakers-section {
+        background-color: #ffffff;
+        padding: 0 0 100px 0;
+        margin-top: -80px; /* Overlap hero */
+        position: relative;
+        z-index: 10;
+    }
+    
+    .ip-speakers-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 30px;
+    }
+    
+    .ip-speaker-card {
+        background-color: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: var(--border-radius-lg);
+        padding: 24px;
+        box-shadow: 0 10px 25px rgba(15, 23, 42, 0.04);
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    
+    .ip-speaker-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 35px rgba(15, 23, 42, 0.08);
+        border-color: #cbd5e1;
+    }
+    
+    .ip-speaker-img {
+        width: 100%;
+        height: 220px;
+        object-fit: cover;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        background-color: #f1f5f9;
+        /* Custom image filter effect like mockup */
+        filter: grayscale(10%) contrast(102%);
+    }
+    
+    .ip-speaker-name {
+        font-family: var(--font-title);
+        font-size: 19px;
+        font-weight: 700;
+        color: var(--color-ip-text-primary);
+        margin-bottom: 6px;
+    }
+    
+    .ip-speaker-role {
+        font-family: var(--font-body);
+        font-size: 14px;
+        color: var(--color-ip-text-secondary);
+        margin-bottom: 20px;
+        min-height: 40px;
+    }
+    
+    .ip-speaker-btn {
+        background-color: #e2e8f0;
+        color: #334155;
+        font-family: var(--font-body);
+        font-weight: 600;
+        font-size: 13px;
+        padding: 10px 24px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        width: 100%;
+        text-align: center;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+    
+    .ip-speaker-card:hover .ip-speaker-btn {
+        background-color: var(--color-ip-accent);
+        color: #ffffff;
+    }
+    
+    /* Schedule & Agenda */
+    .ip-agenda-section {
+        background-color: #fafaf9;
+        padding: 100px 0 120px 0;
+        border-top: 1px solid #f1f1f0;
+    }
+    
+    .ip-agenda-grid {
+        display: grid;
+        grid-template-columns: 1fr 1.3fr;
+        gap: 80px;
+        align-items: start;
+    }
+    
+    @media (max-width: 991px) {
+        .ip-agenda-grid {
+            grid-template-columns: 1fr;
+            gap: 60px;
+        }
+    }
+    
+    /* Left Overlapping Images */
+    .ip-overlapping-images {
+        position: relative;
+        width: 100%;
+        height: 380px;
+        margin-top: 40px;
+    }
+    
+    .ip-img-1 {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 72%;
+        height: 240px;
+        object-fit: cover;
+        border-radius: 20px;
+        box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+        z-index: 1;
+    }
+    
+    .ip-img-2 {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 62%;
+        height: 220px;
+        object-fit: cover;
+        border-radius: 20px;
+        border: 6px solid #fafaf9; /* acts as gap */
+        box-shadow: 0 15px 35px rgba(15, 23, 42, 0.15);
+        z-index: 2;
+    }
+    
+    /* Schedule Day tabs */
+    .ip-agenda-tabs {
+        display: flex;
+        border-bottom: 2px solid #e2e8f0;
+        gap: 32px;
+        margin-bottom: 40px;
+    }
+    
+    .ip-agenda-tab {
+        background: none;
+        border: none;
+        padding: 0 0 16px 0;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        font-family: var(--font-body);
+        text-align: left;
+        position: relative;
+    }
+    
+    .ip-tab-label {
+        font-family: var(--font-title);
+        font-size: 20px;
+        font-weight: 700;
+        color: #94a3b8;
+        margin-bottom: 4px;
+        transition: color 0.2s ease;
+    }
+    
+    .ip-tab-date {
+        font-size: 13px;
+        color: #94a3b8;
+        font-weight: 500;
+        transition: color 0.2s ease;
+    }
+    
+    .ip-agenda-tab::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background-color: var(--color-ip-accent);
+        transition: width 0.3s ease;
+    }
+    
+    .ip-agenda-tab.active .ip-tab-label {
+        color: var(--color-ip-text-primary);
+    }
+    
+    .ip-agenda-tab.active .ip-tab-date {
+        color: var(--color-ip-accent);
+    }
+    
+    .ip-agenda-tab.active::after {
+        width: 100%;
+    }
+    
+    /* Sessions timeline */
+    .ip-sessions-timeline {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 36px;
+    }
+    
+    /* Left timeline line */
+    .ip-sessions-timeline::before {
+        content: '';
+        position: absolute;
+        top: 6px;
+        left: 104px;
+        bottom: 6px;
+        width: 2px;
+        background-color: #e2e8f0;
+    }
+    
+    @media (max-width: 480px) {
+        .ip-sessions-timeline::before {
+            display: none;
+        }
+    }
+    
+    .ip-session-item {
+        display: flex;
+        gap: 32px;
+        position: relative;
+    }
+    
+    @media (max-width: 480px) {
+        .ip-session-item {
+            flex-direction: column;
+            gap: 8px;
+        }
+    }
+    
+    .ip-session-time {
+        width: 104px;
+        font-family: var(--font-body);
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--color-ip-text-secondary);
+        flex-shrink: 0;
+        padding-top: 2px;
+    }
+    
+    /* Timeline indicator dot */
+    .ip-session-dot {
+        position: absolute;
+        left: 100px;
+        top: 6px;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: #cbd5e1;
+        border: 2px solid #fafaf9;
+        z-index: 5;
+        transition: background-color 0.2s ease;
+    }
+    
+    @media (max-width: 480px) {
+        .ip-session-dot {
+            display: none;
+        }
+    }
+    
+    .ip-session-item:hover .ip-session-dot {
+        background-color: var(--color-ip-accent);
+    }
+    
+    .ip-session-details {
+        padding-left: 12px;
+    }
+    
+    @media (max-width: 480px) {
+        .ip-session-details {
+            padding-left: 0;
+        }
+    }
+    
+    .ip-session-title {
+        font-family: var(--font-title);
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--color-ip-text-primary);
+        margin-bottom: 6px;
+    }
+    
+    .ip-session-desc {
+        font-family: var(--font-body);
+        font-size: 14px;
+        line-height: 1.6;
+        color: var(--color-ip-text-secondary);
+    }
+    
+    /* Modal / Overlay Gated Registration Popup */
+    .ip-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(15, 23, 42, 0.4);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        z-index: 9999;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .ip-modal-content {
+        position: relative;
+        width: 100%;
+        max-width: 580px;
+        padding: 10px;
+        transform: translateY(20px);
+        transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    
+    .ip-modal-close {
+        position: absolute;
+        top: 24px;
+        right: 32px;
+        background: none;
+        border: none;
+        font-size: 28px;
+        color: var(--color-primary);
+        cursor: pointer;
+        z-index: 10;
+        opacity: 0.7;
+        transition: opacity 0.2s ease;
+    }
+    .ip-modal-close:hover {
+        opacity: 1;
+    }
+</style>
+
+<!-- Subpage Spacer -->
+<div style="height: var(--nav-height); background-color: var(--bg-secondary);"></div>
+
+{% if data.is_in_person %}
+<!-- ==========================================================================
+     IN-PERSON EVENT LAYOUT (LIGHT THEME)
+     ========================================================================== -->
+<section class="ip-hero-section">
+    <div class="resource-container">
+        <!-- Breadcrumbs -->
+        <div class="breadcrumbs">
+            <a href="/">Home</a> <span>/</span>
+            <a href="/resources/events">Resources</a> <span>/</span>
+            <span style="color: var(--color-ip-text-primary); font-weight: 600;">Event Detail</span>
+        </div>
+
+        <div class="hero-grid">
+            <!-- Left Hero info -->
+            <div>
+                <span class="pill-badge conference">In-Person Conference</span>
+                <div class="ip-meta-tagline">Artha Enterprise Summit 2026</div>
+                <h1 class="ip-hero-title">{{ data.title }}</h1>
+                
+                <div class="ip-info-block">
+                    <div><i class="far fa-calendar-days"></i> {{ data.date }}</div>
+                    <div><i class="fas fa-location-dot"></i> {{ data.location }}</div>
+                    <div><i class="far fa-clock"></i> 8:00 AM PST • 11:00 AM EST • 4:00 PM BST</div>
+                </div>
+
+                <button class="ip-register-btn" id="modal-trigger-btn">
+                    Register for Event
+                </button>
+            </div>
+
+            <!-- Right Hero countdown timer card -->
+            <div>
+                <div class="ip-timer-card">
+                    <h3 class="ip-timer-title">Time Remaining</h3>
+                    <div class="ip-timer-grid">
+                        <div class="ip-timer-unit">
+                            <div class="ip-timer-val" id="timer-days">00</div>
+                            <div class="ip-timer-label">Days</div>
+                        </div>
+                        <div class="ip-timer-unit">
+                            <div class="ip-timer-val" id="timer-hours">00</div>
+                            <div class="ip-timer-label">Hours</div>
+                        </div>
+                        <div class="ip-timer-unit">
+                            <div class="ip-timer-val" id="timer-minutes">00</div>
+                            <div class="ip-timer-label">Min</div>
+                        </div>
+                        <div class="ip-timer-unit">
+                            <div class="ip-timer-val" id="timer-seconds">00</div>
+                            <div class="ip-timer-label">Sec</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Overlapping Speakers Section -->
+{% if data.speakers %}
+<section class="ip-speakers-section">
+    <div class="resource-container">
+        <h2 class="section-title">Featured Speakers</h2>
+        <div class="ip-speakers-grid">
+            {% for speaker in data.speakers %}
+            <div class="ip-speaker-card">
+                <img src="{{ speaker.image_url }}" alt="{{ speaker.name }}" class="ip-speaker-img">
+                <h3 class="ip-speaker-name">{{ speaker.name }}</h3>
+                <p class="ip-speaker-role">{{ speaker.role }}</p>
+                <button class="ip-speaker-btn" onclick="alert('Detailed speaker profiles are loaded in enterprise brochures. Contact our expert team for bio info.'); return false;">
+                    Profile
+                </button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Agenda and Schedule timeline section -->
+{% if data.agenda_days %}
+<section class="ip-agenda-section">
+    <div class="resource-container">
+        <div class="ip-agenda-grid">
+            <!-- Left Info Block with Overlapping images -->
+            <div>
+                <span class="pill-badge" style="background-color: #eff6ff; color: #2563eb; margin-bottom: 16px;">Schedule</span>
+                <h2 class="section-title" style="margin-bottom: 24px;">Schedule And Agenda</h2>
+                <p class="hero-subtitle" style="font-size: 16px; line-height: 1.7; color: #475569; margin-bottom: 24px;">
+                    Stay informed with our detailed schedule and agenda for this conference. This section provides a comprehensive rundown of all events, sessions, and activities from the first day to the last.
+                </p>
+                <a href="#" class="speaker-learn-more" style="color: var(--color-ip-accent);" onclick="document.getElementById('modal-trigger-btn').click(); return false;">
+                    Learn More <i class="fas fa-chevron-right" style="font-size: 10px;"></i>
+                </a>
+                
+                <div class="ip-overlapping-images">
+                    <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=600&q=80" alt="Summit Hall Audience" class="ip-img-1">
+                    <img src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&w=600&q=80" alt="Tech Conference Session" class="ip-img-2">
+                </div>
+            </div>
+
+            <!-- Right Schedule Day Toggles & Timeline -->
+            <div>
+                <div class="ip-agenda-tabs">
+                    {% for day in data.agenda_days %}
+                    <button class="ip-agenda-tab {% if loop.first %}active{% endif %}" id="agenda-tab-{{ loop.index0 }}" onclick="switchAgendaDay({{ loop.index0 }})">
+                        <span class="ip-tab-label">{{ day.label }}</span>
+                        <span class="ip-tab-date">{{ day.date_str }}</span>
+                    </button>
+                    {% endfor %}
+                </div>
+
+                {% for day in data.agenda_days %}
+                <div class="agenda-day-content" id="agenda-day-{{ loop.index0 }}" style="{% if not loop.first %}display: none;{% endif %}">
+                    <div class="ip-sessions-timeline">
+                        {% for session in day.sessions %}
+                        <div class="ip-session-item">
+                            <div class="ip-session-time">{{ session.time_range }}</div>
+                            <div class="ip-session-dot"></div>
+                            <div class="ip-session-details">
+                                <h4 class="ip-session-title">{{ session.title }}</h4>
+                                <p class="ip-session-desc">{{ session.description }}</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Gated Modal Dialog Form -->
+<div class="ip-modal-overlay" id="registration-modal">
+    <div class="ip-modal-content">
+        <button class="ip-modal-close" id="modal-close-btn">&times;</button>
+        <div class="glass-card" style="background: rgba(255, 255, 255, 0.95); box-shadow: 0 30px 70px rgba(15, 23, 42, 0.25);">
+            <!-- Default Form state -->
+            <div id="registration-form-container">
+                <h2 class="card-title">Register for Conferences</h2>
+                
+                <!-- AJAX Warning Alert -->
+                <div class="form-alert alert-error" id="form-error-alert"></div>
+                
+                <form id="resource-registration-form">
+                    <input type="text" name="website_url_honeypot" style="display:none !important;" tabindex="-1" autocomplete="off">
+                    <input type="hidden" name="resource_type" value="{{ type }}">
+                    <input type="hidden" name="resource_slug" value="{{ slug }}">
+                    <input type="hidden" name="resource_title" value="{{ data.title }}">
+
+                    <div class="input-row">
+                        <input type="text" name="first_name" required class="form-input" placeholder="First Name">
+                        <input type="text" name="last_name" required class="form-input" placeholder="Last Name">
+                    </div>
+
+                    <div class="input-group">
+                        <input type="email" name="business_email" required class="form-input" placeholder="Business Email">
+                    </div>
+
+                    <div class="input-group">
+                        <input type="text" name="company" required class="form-input" placeholder="What company do you work for?">
+                    </div>
+
+                    <div class="input-group">
+                        <input type="text" name="source_info" required class="form-input" placeholder="How did you hear about us?">
+                    </div>
+
+                    <p class="terms-text">By submitting your details, you agree to our Terms</p>
+
+                    <button type="submit" class="register-btn" id="submit-btn-element" style="background-color: var(--color-ip-accent); color: #ffffff; border-radius: 9999px;">
+                        Register Now
+                    </button>
+                </form>
+            </div>
+
+            <!-- Success state -->
+            <div class="success-pane" id="registration-success-container">
+                <div class="success-icon" style="background-color: #dbeafe; color: #2563eb;">
+                    <i class="fas fa-check"></i>
+                </div>
+                <h2 class="success-title">Successfully Registered!</h2>
+                <p class="success-msg" id="success-message-text">
+                    Thank you! Your registration has been processed successfully. We've sent details to your inbox.
+                </p>
+                <a href="#" class="calendar-btn" style="background-color: var(--color-ip-accent);" onclick="alert('Adding to calendar... (demonstration)'); return false;">
+                    <i class="far fa-calendar-plus" style="margin-right: 6px;"></i> Add to Calendar
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Day switcher tab logic
+    function switchAgendaDay(dayIndex) {
+        document.querySelectorAll('.agenda-day-content').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('.ip-agenda-tab').forEach(el => el.classList.remove('active'));
+        
+        document.getElementById(`agenda-day-${dayIndex}`).style.display = 'block';
+        document.getElementById(`agenda-tab-${dayIndex}`).classList.add('active');
+    }
+
+    // Modal popup triggers
+    document.addEventListener('DOMContentLoaded', function() {
+        const modal = document.getElementById('registration-modal');
+        const trigger = document.getElementById('modal-trigger-btn');
+        const closeBtn = document.getElementById('modal-close-btn');
+
+        if (trigger && modal) {
+            trigger.addEventListener('click', function() {
+                modal.style.display = 'flex';
+                setTimeout(() => {
+                    modal.style.opacity = '1';
+                    modal.querySelector('.ip-modal-content').style.transform = 'translateY(0)';
+                }, 50);
+            });
+        }
+
+        function closeModal() {
+            if (modal) {
+                modal.querySelector('.ip-modal-content').style.transform = 'translateY(20px)';
+                modal.style.opacity = '0';
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                }, 300);
+            }
+        }
+
+        if (closeBtn) {
+            closeBtn.addEventListener('click', closeModal);
+        }
+
+        if (modal) {
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+        }
+
+        // Countdown Timer Logic
+        const targetDateStr = "{{ data.date }}";
+        let targetDate = new Date(targetDateStr);
+        if (isNaN(targetDate.getTime()) || targetDate.getTime() < Date.now()) {
+            targetDate = new Date(Date.now() + 15 * 24 * 60 * 60 * 1000);
+        }
+        
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = targetDate.getTime() - now;
+            
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            
+            const dEl = document.getElementById('timer-days');
+            const hEl = document.getElementById('timer-hours');
+            const mEl = document.getElementById('timer-minutes');
+            const sEl = document.getElementById('timer-seconds');
+            
+            if (dEl && hEl && mEl && sEl) {
+                dEl.innerText = String(days).padStart(2, '0');
+                hEl.innerText = String(hours).padStart(2, '0');
+                mEl.innerText = String(minutes).padStart(2, '0');
+                sEl.innerText = String(seconds).padStart(2, '0');
+            }
+        }
+        
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+    });
+</script>
+
+{% else %}
+<!-- ==========================================================================
+     STANDARD VIRTUAL EVENT & WEBINAR LAYOUT (VIOLET THEME)
+     ========================================================================== -->
+<section class="resource-hero-section">
+    <!-- Curved thin lines background matching mockup -->
+    <svg class="hero-bg-waves" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 800" preserveAspectRatio="none">
+        <path d="M 0,200 C 300,150 600,450 900,300 C 1200,150 1350,350 1440,250" fill="none" stroke="rgba(109, 40, 217, 0.05)" stroke-width="2"/>
+        <path d="M 0,250 C 400,200 700,500 1000,350 C 1300,200 1400,400 1440,300" fill="none" stroke="rgba(109, 40, 217, 0.03)" stroke-width="1.5"/>
+        <path d="M 0,300 C 500,250 800,550 1100,400 C 1400,250 1420,450 1440,350" fill="none" stroke="rgba(109, 40, 217, 0.03)" stroke-width="1.5"/>
+        <path d="M 0,150 C 200,100 500,400 800,250 C 1100,100 1300,300 1440,200" fill="none" stroke="rgba(109, 40, 217, 0.06)" stroke-width="2.5"/>
+        <path d="M 0,100 C 150,50 400,350 700,200 C 1000,50 1200,250 1440,150" fill="none" stroke="rgba(6, 182, 212, 0.04)" stroke-width="2"/>
+        <path d="M 0,50 C 100,20 300,300 600,150 C 900,0 1100,200 1440,100" fill="none" stroke="rgba(6, 182, 212, 0.03)" stroke-width="1.5"/>
+    </svg>
+
+    <div class="resource-container">
+        <!-- Breadcrumbs -->
+        <div class="breadcrumbs">
+            <a href="/">Home</a> <span>/</span>
+            <a href="/resources/events">Resources</a> <span>/</span>
+            <span style="color: var(--color-primary); font-weight: 600;">{{ type }} Detail</span>
+        </div>
+
+        <div class="hero-grid">
+            <!-- Hero Left: Description -->
+            <div>
+                <!-- Category badge -->
+                <span class="pill-badge {% if type == 'Event' %}conference{% elif type == 'Webinar' %}webinar{% else %}whitepaper{% endif %}">
+                    {% if type == 'Event' %}Conference{% else %}{{ type }}{% endif %}
+                </span>
+
+                <!-- Title -->
+                <h1 class="hero-title">{{ data.title }}</h1>
+
+                <!-- Subtitle / Tagline -->
+                <p class="hero-subtitle">
+                    {% if data.summary %}
+                        {{ data.summary }}
+                    {% else %}
+                        By leveraging innovative engineering processes and strategic architecture loops.
+                    {% endif %}
+                </p>
+
+                <!-- Green timezone card -->
+                <div class="timezone-badge-box">
+                    <div class="timezone-date">
+                        {{ data.timezone_date }}
+                    </div>
+                    <div class="timezone-times">
+                        {{ data.timezone_times }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hero Right: Registration Form -->
+            <div>
+                <div class="glass-card">
+                    <!-- Default Form State -->
+                    <div id="registration-form-container">
+                        <h2 class="card-title">
+                            {% if type == 'Whitepaper' %}Download Whitepaper{% else %}Register for {% if type == 'Event' %}Conferences{% else %}Webinar{% endif %}{% endif %}
+                        </h2>
+
+                        <!-- AJAX Warning Alert -->
+                        <div class="form-alert alert-error" id="form-error-alert"></div>
+
+                        <form id="resource-registration-form">
+                            <!-- Honeypot -->
+                            <input type="text" name="website_url_honeypot" style="display:none !important;" tabindex="-1" autocomplete="off">
+                            <input type="hidden" name="resource_type" value="{{ type }}">
+                            <input type="hidden" name="resource_slug" value="{{ slug }}">
+                            <input type="hidden" name="resource_title" value="{{ data.title }}">
+
+                            <!-- First & Last Name row -->
+                            <div class="input-row">
+                                <input type="text" name="first_name" required class="form-input" placeholder="First Name">
+                                <input type="text" name="last_name" required class="form-input" placeholder="Last Name">
+                            </div>
+
+                            <!-- Business Email -->
+                            <div class="input-group">
+                                <input type="email" name="business_email" required class="form-input" placeholder="Business Email">
+                            </div>
+
+                            <!-- Company -->
+                            <div class="input-group">
+                                <input type="text" name="company" required class="form-input" placeholder="What company do you work for?">
+                            </div>
+
+                            <!-- How did you hear about us? -->
+                            <div class="input-group">
+                                <input type="text" name="source_info" required class="form-input" placeholder="How did you hear about us?">
+                            </div>
+
+                            <p class="terms-text">By submitting your details, you agree to our Terms</p>
+
+                            <button type="submit" class="register-btn" id="submit-btn-element">
+                                {% if type == 'Whitepaper' %}Download Now{% else %}Register Now{% endif %}
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Success State -->
+                    <div class="success-pane" id="registration-success-container">
+                        <div class="success-icon">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <h2 class="success-title">
+                            {% if type == 'Whitepaper' %}Ready for Download!{% else %}Successfully Registered!{% endif %}
+                        </h2>
+                        <p class="success-msg" id="success-message-text">
+                            Thank you! Your registration has been processed successfully. We've sent details to your inbox.
+                        </p>
+                        {% if type == 'Whitepaper' %}
+                            {% if data.pdf_url %}
+                                <a href="{{ data.pdf_url }}" download class="calendar-btn" style="background-color: var(--color-accent-cyan);">
+                                    <i class="fas fa-file-download" style="margin-right: 6px;"></i> Download PDF Document
+                                </a>
+                            {% else %}
+                                <a href="#" class="calendar-btn" style="background-color: var(--color-accent-cyan);" onclick="alert('Starting Whitepaper PDF download... (demonstration)'); return false;">
+                                    <i class="fas fa-file-download" style="margin-right: 6px;"></i> Download PDF Document
+                                </a>
+                            {% endif %}
+                        {% else %}
+                            {% if data.video_url %}
+                                <div class="webcast-video-wrapper" style="width: 100%; margin-top: 15px; border-radius: 12px; overflow: hidden; aspect-ratio: 16/9; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+                                    <iframe src="{{ data.video_url }}?autoplay=1" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+                                </div>
+                            {% else %}
+                                <a href="#" class="calendar-btn" onclick="alert('Adding to calendar... (demonstration)'); return false;">
+                                    <i class="far fa-calendar-plus" style="margin-right: 6px;"></i> Add to Calendar
+                                </a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Speakers Block -->
+{% if type != 'Whitepaper' and data.speakers %}
+<section class="speakers-section">
+    <div class="resource-container">
+        <h2 class="section-title">Speakers</h2>
+
+        <div class="speakers-grid">
+            {% for speaker in data.speakers %}
+            <div class="speaker-card">
+                <div class="speaker-img-wrapper accent-{{ speaker.accent_class }}" style="{% if speaker.accent_class == 'cyan' %}--accent-color: #06b6d4;{% elif speaker.accent_class == 'yellow' %}--accent-color: #eab308;{% elif speaker.accent_class == 'orange' %}--accent-color: #f97316;{% else %}--accent-color: #8b5cf6;{% endif %}">
+                    <div class="speaker-img-frame"></div>
+                    <img src="{{ speaker.image_url }}" alt="{{ speaker.name }}" class="speaker-img">
+                </div>
+
+                <h3 class="speaker-name">{{ speaker.name }}</h3>
+                <p class="speaker-role">{{ speaker.role }} at {{ speaker.company }}</p>
+                <a href="#" class="speaker-learn-more" onclick="alert('Detailed speaker profiles are loaded in enterprise brochures. Contact our expert team for bio info.'); return false;">
+                    Learn More <i class="fas fa-chevron-right" style="font-size: 10px;"></i>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Detail Info Block -->
+<section class="details-section">
+    <div class="resource-container">
+        <div class="details-grid">
+            <!-- Left: Rounded Purple Highlight Container -->
+            <div>
+                <div class="purple-highlight-box">
+                    <h3 class="highlight-title">
+                        {% if data.highlight_title %}
+                            {{ data.highlight_title }}
+                        {% else %}
+                            Unraveling critical concepts through data-driven contextual intelligence
+                        {% endif %}
+                    </h3>
+                    <p class="highlight-text">
+                        {% if data.highlight_text %}
+                            {{ data.highlight_text }}
+                        {% else %}
+                            {{ data.description }}
+                        {% endif %}
+                    </p>
+                    <a href="{% if data.highlight_link and (data.highlight_link.startswith('http') or data.highlight_link.startswith('/')) %}{{ data.highlight_link }}{% else %}https://{{ data.highlight_link|default('www.thinkartha.com') }}{% endif %}" {% if not data.highlight_link or not data.highlight_link.startswith('/') %}target="_blank"{% endif %} class="highlight-link">
+                        {{ data.highlight_link|default('www.thinkartha.com') }}
+                    </a>
+                </div>
+            </div>
+
+            <!-- Right: Checkmark Key Takeaways list -->
+            <div>
+                <h3 class="section-title" style="font-size: 32px; margin-bottom: 32px; letter-spacing: -0.5px;">Key Takeaways</h3>
+                <div class="takeaways-list">
+                    {% if data.takeaways %}
+                        {% for point in data.takeaways %}
+                        <div class="takeaway-item">
+                            <div class="checkmark-icon">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <p class="takeaway-text">{{ point }}</p>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="takeaway-item">
+                            <div class="checkmark-icon">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <p class="takeaway-text">Understand how enterprise data governance models accelerate technology conversion loops.</p>
+                        </div>
+                        <div class="takeaway-item">
+                            <div class="checkmark-icon">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <p class="takeaway-text">Identify system bottlenecks, redundant databases, and obsolete master records before migrating pipelines.</p>
+                        </div>
+                        <div class="takeaway-item">
+                            <div class="checkmark-icon">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <p class="takeaway-text">Establish compliance checkpoints to keep databases audit-ready, secure, and fully de-duplicated.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- COMMON AJAX Submission Script -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const registrationForm = document.getElementById('resource-registration-form');
+        const formContainer = document.getElementById('registration-form-container');
+        const successContainer = document.getElementById('registration-success-container');
+        const errorAlert = document.getElementById('form-error-alert');
+        const submitBtn = document.getElementById('submit-btn-element');
+        const successMessage = document.getElementById('success-message-text');
+
+        if (registrationForm) {
+            registrationForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Hide existing errors
+                errorAlert.style.display = 'none';
+                
+                // Disable button and update text
+                submitBtn.disabled = true;
+                const originalBtnText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right: 6px;"></i> Processing...';
+
+                // Collect form data
+                const formData = new FormData(registrationForm);
+
+                // Send request
+                fetch('/submit-resource-lead', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json().then(data => ({ status: response.status, body: data })))
+                .then(res => {
+                    if (res.status === 200 && res.body.status === 'success') {
+                        // Success transition
+                        successMessage.innerText = res.body.message;
+                        
+                        // Fade out form and fade in success container
+                        formContainer.style.opacity = '0';
+                        formContainer.style.transition = 'opacity 0.4s ease';
+                        
+                        setTimeout(() => {
+                            formContainer.style.display = 'none';
+                            successContainer.style.display = 'flex';
+                            successContainer.style.opacity = '0';
+                            successContainer.style.transition = 'opacity 0.4s ease';
+                            
+                            setTimeout(() => {
+                                successContainer.style.opacity = '1';
+                                {% if type == 'Whitepaper' and data.pdf_url %}
+                                    // Trigger download automatically
+                                    const autoDownloadLink = document.createElement('a');
+                                    autoDownloadLink.href = "{{ data.pdf_url }}";
+                                    autoDownloadLink.download = "";
+                                    document.body.appendChild(autoDownloadLink);
+                                    autoDownloadLink.click();
+                                    document.body.removeChild(autoDownloadLink);
+                                {% endif %}
+                            }, 50);
+                        }, 400);
+                    } else {
+                        // Error handling
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalBtnText;
+                        
+                        errorAlert.innerText = res.body.message || 'An error occurred during submission. Please try again.';
+                        errorAlert.style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    console.error('Submission error:', error);
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnText;
+                    
+                    errorAlert.innerText = 'Network error: Unable to submit registration. Please check your internet connection and try again.';
+                    errorAlert.style.display = 'block';
+                });
+            });
+        }
+    });
+</script>
+{% endblock %}

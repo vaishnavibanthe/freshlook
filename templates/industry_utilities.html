@@ -1,0 +1,342 @@
+{% extends "base.html" %}
+
+{% block title %}Unlock the Power of Data for Utilities | Utilities Industry Solutions{% endblock %}
+
+{% block extra_meta %}
+<meta name="description" content="Streamline data governance, ensure grid reliability, and automate compliance for utilities. Discover predictive maintenance, outage detection, and data integration.">
+{% endblock %}
+
+{% block content %}
+<style>
+:root {
+    --brand-color: #06b6d4;
+    --brand-color-rgb: 6, 182, 212;
+    --brand-glow: rgba(6, 182, 212, 0.15);
+    --secondary-color: #f59e0b;
+}
+@keyframes pulseGrid {
+    0% { transform: scale(1); opacity: 0.2; }
+    50% { transform: scale(1.05); opacity: 0.4; }
+    100% { transform: scale(1); opacity: 0.2; }
+}
+@keyframes dashFlow {
+    to { stroke-dashoffset: -20; }
+}
+.brand-orbit-node {
+    position: absolute;
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--brand-color);
+}
+.card-brand-hover {
+    transition: all 0.3s ease;
+}
+.card-brand-hover:hover {
+    border-color: var(--brand-color) !important;
+    box-shadow: 0 10px 30px var(--brand-glow) !important;
+    transform: translateY(-5px);
+}
+.badge-brand {
+    background: var(--brand-glow);
+    color: var(--brand-color);
+    border: 1px solid rgba(6, 182, 212, 0.3);
+}
+.grid-mesh {
+    position: absolute;
+    width: 320px;
+    height: 320px;
+    background-size: 20px 20px;
+    background-image: linear-gradient(to right, rgba(6, 182, 212, 0.05) 1px, transparent 1px),
+                      linear-gradient(to bottom, rgba(6, 182, 212, 0.05) 1px, transparent 1px);
+    animation: pulseGrid 6s infinite ease-in-out;
+}
+</style>
+
+<!-- Hero Section -->
+<section class="hero" style="min-height: 60vh; padding-top: calc(var(--nav-height) + 60px); padding-bottom: 60px;">
+    <div class="hero-bg-glow hero-glow-1" style="background: radial-gradient(circle, rgba(6,182,212,0.15) 0%, transparent 70%);"></div>
+    <div class="container hero-grid" style="grid-template-columns: 1.2fr 0.8fr;">
+        <div class="hero-content">
+            <div class="hero-badge badge-brand"><i class="fas fa-tint"></i> Industry Verticals &middot; Utilities & Telecom</div>
+            <h1 class="hero-title" style="font-size: clamp(34px, 4.5vw, 46px); line-height: 1.15; margin-bottom: 18px;">
+                Unlock the Power of <span>Data for Utilities</span>
+            </h1>
+            <p class="hero-desc">
+                In an increasingly digital world, data is the foundation of operational excellence in the utilities sector. We streamline data & its governance, ensuring reliability, security, and compliance so you can leverage insights to optimize performance and deliver better services.
+            </p>
+            <div class="hero-buttons" style="display:flex; gap:14px; flex-wrap:wrap;">
+                <a href="/contact-us" class="btn btn-primary btn-glow" style="background: linear-gradient(135deg, #06b6d4, #f59e0b); border: none;">Consult Industry Architect <i class="fas fa-chevron-right btn-icon"></i></a>
+                <a href="#needs" class="btn btn-outline">Explore Needs</a>
+            </div>
+        </div>
+        
+        <div class="hero-visual">
+            <div class="brand-graphic" style="position: relative; width: 100%; height: 350px; display: flex; justify-content: center; align-items: center;">
+                <div class="grid-mesh"></div>
+                <!-- Central Core -->
+                <div class="ai-core" style="width: 90px; height: 90px; background: linear-gradient(135deg, #06b6d4, #f59e0b); box-shadow: 0 0 30px rgba(6, 182, 212, 0.4); z-index: 2; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-bolt" style="font-size: 36px; color: #fff;"></i>
+                </div>
+                <!-- Nodes -->
+                <div class="brand-orbit-node" style="width: 12px; height: 12px; background: #06b6d4; top: 80px; left: 80px; box-shadow: 0 0 10px #06b6d4;"></div>
+                <div class="brand-orbit-node" style="width: 8px; height: 8px; background: #f59e0b; bottom: 80px; right: 80px; box-shadow: 0 0 8px #f59e0b;"></div>
+                <div class="brand-orbit-node" style="width: 10px; height: 10px; background: #22d3ee; top: 180px; right: 60px; box-shadow: 0 0 10px #22d3ee;"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Strip -->
+<section class="stats-section" style="padding: 50px 0; background: linear-gradient(135deg, #002233 0%, #001122 100%); border-y: 1px solid rgba(6,182,212,0.1);">
+    <div class="container stats-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); text-align: center; gap: 30px;">
+        <div class="stat-item" style="display: flex; flex-direction: column; align-items: center;">
+            <span class="stat-number" style="font-size: 56px; font-weight: 800; color: #06b6d4; line-height: 1;">90%</span>
+            <span class="stat-label" style="font-size: 14px; color: var(--text-secondary); margin-top: 10px; max-width: 250px;">Achieve 90% data accuracy through real-time data validation and reconciliation</span>
+        </div>
+        <div class="stat-item" style="display: flex; flex-direction: column; align-items: center; border-x: 1px solid rgba(255,255,255,0.05);">
+            <span class="stat-number" style="font-size: 56px; font-weight: 800; color: #f59e0b; line-height: 1;">80%</span>
+            <span class="stat-label" style="font-size: 14px; color: var(--text-secondary); margin-top: 10px; max-width: 250px;">80% Reduction in Outages with Proactive outage prediction using data intelligence</span>
+        </div>
+        <div class="stat-item" style="display: flex; flex-direction: column; align-items: center;">
+            <span class="stat-number" style="font-size: 56px; font-weight: 800; color: #06b6d4; line-height: 1;">70%</span>
+            <span class="stat-label" style="font-size: 14px; color: var(--text-secondary); margin-top: 10px; max-width: 250px;">Reduced service downtime by 70% using predictive analytics</span>
+        </div>
+    </div>
+</section>
+
+<!-- Needs for Utilities Operators -->
+<section class="section-alt" id="needs">
+    <div class="container">
+        <div class="section-header" style="text-align: center; margin-bottom: 50px;">
+            <span class="section-subtitle">Operators Needs</span>
+            <h2 class="section-title">Create Stronger Data Processes by <span>Leveraging Artha’s Expertise</span></h2>
+            <p class="section-desc">Optimizing workflows, audit reports, and network grids for modern operators.</p>
+        </div>
+        
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 30px;">
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(6,182,212,0.1); color: #06b6d4;">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <h3 class="card-title">Personalized Utility Services</h3>
+                <p class="card-desc">Harness real-time data to provide customized energy solutions based on customer usage patterns and preferences, promoting energy efficiency and customer satisfaction.</p>
+            </div>
+            
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(6,182,212,0.1); color: #06b6d4;">
+                    <i class="fas fa-file-invoice"></i>
+                </div>
+                <h3 class="card-title">Regulatory Compliance Automation</h3>
+                <p class="card-desc">Stay ahead of ever-evolving regulatory frameworks by automating compliance reporting and tracking with our advanced data governance tools.</p>
+            </div>
+            
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(6,182,212,0.1); color: #06b6d4;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3 class="card-title">Outage Detection and Prevention</h3>
+                <p class="card-desc">Leverage predictive analytics and machine learning to detect system failures before they happen, reducing downtime and improving grid reliability.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Key Offerings for Utilities -->
+<section class="section" id="offerings">
+    <div class="container">
+        <div class="section-header" style="text-align: center; margin-bottom: 50px;">
+            <span class="section-subtitle">Offerings</span>
+            <h2 class="section-title">Key Offerings for <span>Utilities</span></h2>
+            <p class="section-desc">We deploy data pipelines, analytics portals, and diagnostic engines tailored for operators.</p>
+        </div>
+        
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;">
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-chart-line" style="color: #06b6d4;"></i> Customer Insights
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">We empower with tools to understand customer needs better, offering tailored services that increase engagement and satisfaction.</p>
+            </div>
+            
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-shield-alt" style="color: #06b6d4;"></i> Compliance Solutions
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">Our data governance solutions ensure that operators remain compliant with regulations by automating reporting and streamlining audit processes.</p>
+            </div>
+            
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-broadcast-tower" style="color: #06b6d4;"></i> Outage Detection
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">Using predictive models, we help utilities detect and prevent system failures before they disrupt service, protecting infrastructure and customer trust.</p>
+            </div>
+            
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-exchange-alt" style="color: #06b6d4;"></i> Data Management
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">We assist operators in managing, migrating, and integrating data with advanced tools to ensure data accuracy, security, and seamless transitions between platforms.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Success Story spotlight -->
+<section class="section-alt" id="case-study">
+    <div class="container feature-split">
+        <div class="feature-visual feature-visual-glow">
+            <img src="https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=800&q=80" alt="Electrical power grid tower structures at dusk symbolizing utilities operations">
+        </div>
+        <div class="feature-content">
+            <div class="hero-badge badge-brand"><i class="fas fa-book-open"></i> Success Story</div>
+            <h2 class="feature-title">Enhancing Data Ingestion and Integration: Success with Talend Data Hub</h2>
+            <p class="feature-desc">Empowering utilities worldwide to drive operational efficiency and regulatory compliance through advanced data governance.</p>
+            <p class="feature-desc">Artha Solutions deployed an enterprise Talend configuration to streamline high-volume log parsing and compliance validation pipelines.</p>
+            <a href="/contact-us" class="btn btn-primary" style="background: linear-gradient(135deg, #06b6d4, #f59e0b); border: none;">Read Full Story</a>
+        </div>
+    </div>
+</section>
+
+<!-- Customer Testimonial Spotlight -->
+<section class="section" style="background: linear-gradient(180deg, var(--bg-primary) 0%, rgba(6,182,212,0.03) 50%, var(--bg-primary) 100%);">
+    <div class="container" style="max-width: 900px; padding: 40px 20px;">
+        <div class="card" style="padding: 40px; border-left: 4px solid #06b6d4; background: rgba(255,255,255,0.02); display: flex; flex-direction: column; gap: 20px;">
+            <div style="font-size: 48px; color: rgba(6,182,212,0.2); line-height: 1; height: 20px;"><i class="fas fa-quote-left"></i></div>
+            <p style="font-size: 20px; color: var(--text-primary); line-height: 1.6; font-style: italic;">
+                "Cleansing and consolidating consumer data enables us to deliver the kind of personalized experience today's consumers deserve and expect."
+            </p>
+            <div style="display: flex; align-items: center; gap: 14px; margin-top: 10px;">
+                <div style="width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #06b6d4, #f59e0b); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
+                    SB
+                </div>
+                <div>
+                    <strong style="display: block; font-size: 16px; color: var(--text-primary);">Steve Brennan</strong>
+                    <span style="font-size: 13px; color: var(--text-muted);">Vice President, Data Strategy & Analytics</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Events & Blogs Section -->
+<section class="section-alt" id="resources">
+    <div class="container">
+        <div class="section-header" style="text-align: center; margin-bottom: 50px;">
+            <span class="section-subtitle">Resource Center</span>
+            <h2 class="section-title">Events & <span>Latest Insights</span></h2>
+            <p class="section-desc">Explore upcoming industry events and hot topics from the Artha Solutions team.</p>
+        </div>
+        
+        <!-- Events Column -->
+        <h3 style="font-size: 22px; color: var(--text-primary); margin-bottom: 24px; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-calendar-alt" style="color: #06b6d4;"></i> Upcoming Events & Webinars
+        </h3>
+        
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; margin-bottom: 50px;">
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #06b6d4; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Webinar &middot; May 31</span>
+                    <h4 style="font-size: 17px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Future Ready Data Foundation From AI Pilot to Production Value</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">Explores how organizations can overcome these challenges by building a future-ready data foundation that enables trusted, scalable, and AI-ready data.</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #06b6d4;">Watch Now <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #06b6d4; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Event &middot; Apr 13</span>
+                    <h4 style="font-size: 17px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Artha Solutions Proud Sponsor of Qlik Connect 2026</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">Gaylord Palms Resort & Convention Center, Kissimmee, Florida. Showcasing AI-ready data foundations, data integration, ETL modernization, and MDM solutions at Booth# SS15.</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #06b6d4;">Read More <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #06b6d4; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Event &middot; Nov 27</span>
+                    <h4 style="font-size: 17px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Artha Solutions to host Qlik AI Reality Tour 2025 – Bengaluru</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">An exclusive event designed to help you turn data, analytics, and AI initiatives into real business impact. Discover practical strategies, real-world use cases, and embedding intelligence.</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #06b6d4;">Read More <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Blogs Column -->
+        <h3 style="font-size: 22px; color: var(--text-primary); margin-bottom: 24px; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-blog" style="color: #06b6d4;"></i> From the ThinkArtha Blog
+        </h3>
+        
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #06b6d4; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Talend &middot; August 4, 2020</span>
+                    <h4 style="font-size: 17px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Quick Start Guide: Talend and Docker</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">Enterprise deployment work is notorious for being hidebound and slow to react to change. With many organizations adopting Docker, learn the quick start details...</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/blogs" class="card-link" style="color: #06b6d4;">Read More <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #06b6d4; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Frameworks &middot; February 19, 2022</span>
+                    <h4 style="font-size: 17px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Digital Transformation Services: Company Transition Strategy and Framework</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">For a long time, Digital Transformation existed as a futuristic organizational fantasy but quickly transformed into a reality as the pandemic took over the world.</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/blogs" class="card-link" style="color: #06b6d4;">Read More <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #06b6d4; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Cloud Migration &middot; October 17, 2022</span>
+                    <h4 style="font-size: 17px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">6 Critical Challenges in Implementing Cloud Migration Solutions</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">Cloud computing has caught momentum with the rise in cloud providers and solutions over the past ten years. Studies show that companies around the world are migrating...</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/blogs" class="card-link" style="color: #06b6d4;">Read More <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #06b6d4; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Governance &middot; August 4, 2024</span>
+                    <h4 style="font-size: 17px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Strategic Data Governance in the Age of AI: A Bengaluru Masterclass</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">Bengaluru played host to a thought-provoking event, “Strategic Data Governance in the Age of AI,” jointly organized by Artha Solutions and industry leaders...</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/blogs" class="card-link" style="color: #06b6d4;">Read More <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #06b6d4; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Talend &middot; August 4, 2020</span>
+                    <h4 style="font-size: 17px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Lookup input option in Talend Spark Streaming</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">Talend provides two options to deal with lookup in Spark streaming Jobs: a simple input component (like tMongoDBInput) or an efficient lookup input component.</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/blogs" class="card-link" style="color: #06b6d4;">Read More <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Bottom CTA -->
+<section class="section" style="text-align: center; background: linear-gradient(180deg, var(--bg-primary) 0%, rgba(6,182,212,0.05) 100%);">
+    <div class="container">
+        <h2 class="section-title">Scale Your <span>Operations With Data</span></h2>
+        <p class="section-desc" style="max-width: 600px; margin: 0 auto 30px;">Speak with our certified systems architects to configure a secure, compliant utilities pathway.</p>
+        <a href="/contact-us" class="btn btn-primary btn-glow" style="background: linear-gradient(135deg, #06b6d4, #f59e0b); border: none; box-shadow: 0 0 20px rgba(6,182,212,0.3);">Consult With Our Architects</a>
+    </div>
+</section>
+{% endblock %}

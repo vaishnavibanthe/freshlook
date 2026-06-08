@@ -1,0 +1,276 @@
+{% extends "ai_base.html" %}
+
+{% block ai_hero %}
+<!-- Subpage Hero -->
+<section class="ai-hero">
+    <div class="ai-hero-glow"></div>
+    <div class="container ai-hero-grid">
+        <div class="ai-hero-content">
+            <div class="ai-badge"><i class="fas fa-microchip"></i> {{ page.title }}</div>
+            <h1 class="ai-hero-title">
+                {{ page.hero_title|safe }}
+            </h1>
+            <p class="ai-hero-subtitle">
+                {{ page.hero_subtitle }}
+            </p>
+            <div class="ai-hero-ctas">
+                <a href="javascript:void(0);" onclick="openLeadModal('Hero CTA: {{ page.title }}');" class="btn btn-primary btn-glow">{{ cta.primary_cta_text or 'Consult An Architect' }} <i class="fas fa-chevron-right" style="font-size: 11px; margin-left: 5px;"></i></a>
+                {% if cta.secondary_cta_text %}
+                <a href="{{ cta.secondary_cta_url }}" class="btn btn-secondary">{{ cta.secondary_cta_text }}</a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="ai-hero-visual">
+            <div class="ai-vis-container">
+                <div class="ai-core-node">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="ai-orbit-circle orbit-1"></div>
+                <div class="ai-orbit-circle orbit-2"></div>
+                <div class="ai-satellite node-a"><i class="fas fa-database"></i></div>
+                <div class="ai-satellite node-b"><i class="fas fa-shield-halved"></i></div>
+                <div class="ai-satellite node-c"><i class="fas fa-chart-line"></i></div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block ai_content %}
+<!-- Capabilities Grid Section -->
+{% if body_sections.pillars %}
+<section class="ai-section">
+    <div class="container">
+        <div class="ai-section-header text-center">
+            <span class="ai-subtitle">Capabilities</span>
+            <h2 class="ai-title">Core Services & <span>Frameworks</span></h2>
+            <p class="ai-desc">We deliver structured solutions aligned with enterprise governance standards.</p>
+        </div>
+        
+        <div class="ai-card-grid grid-3">
+            {% for pillar in body_sections.pillars %}
+            <div class="ai-card">
+                <div class="ai-card-icon"><i class="fas fa-check-double"></i></div>
+                <h3 class="ai-card-title">{{ pillar.title }}</h3>
+                <p class="ai-card-desc">{{ pillar.desc }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Role-Based/Audience Sections -->
+{% if body_sections.audiences %}
+<section class="ai-section section-alt">
+    <div class="container">
+        <div class="ai-section-header text-center">
+            <span class="ai-subtitle">Enterprise Focus</span>
+            <h2 class="ai-title">AI Readiness <span>Across Roles</span></h2>
+            <p class="ai-desc">How data and AI capabilities align across business, technology, and compliance functions.</p>
+        </div>
+        
+        <!-- Audience Tabs -->
+        <div class="audience-tabs-container">
+            <div class="audience-tabs">
+                {% for aud in body_sections.audiences %}
+                <button class="audience-tab-btn {% if loop.first %}active{% endif %}" onclick="switchAudienceTab(event, 'tab-{{ loop.index }}')">
+                    {{ aud.role }}
+                </button>
+                {% endfor %}
+            </div>
+            
+            <div class="audience-tab-contents">
+                {% for aud in body_sections.audiences %}
+                <div id="tab-{{ loop.index }}" class="audience-tab-pane {% if loop.first %}active{% endif %}">
+                    <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 25px; color: var(--text-primary); border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">
+                        Custom AI Enablement for the <span style="color: var(--ai-purple);">{{ aud.role }}</span>
+                    </h3>
+                    <div class="ai-card-grid grid-3">
+                        {% for feature in aud.features %}
+                        <div class="ai-card audience-card">
+                            <div class="ai-card-icon" style="background: rgba(124, 58, 237, 0.05); color: var(--ai-purple);"><i class="fas fa-circle-nodes"></i></div>
+                            <h4 class="ai-card-title" style="font-size: 16px; margin-top: 10px;">{{ feature.title }}</h4>
+                            <p class="ai-card-desc" style="font-size: 13.5px;">{{ feature.desc }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Shared Success Stories / Case Studies -->
+<section class="ai-section">
+    <div class="container">
+        <div class="ai-section-header text-center">
+            <span class="ai-subtitle">Case Studies</span>
+            <h2 class="ai-title">AI & Data <span>Success Stories</span></h2>
+            <p class="ai-desc">See how Artha Solutions drives measurable efficiency, sales lift, and cost savings across industries.</p>
+        </div>
+        
+        <div class="ai-card-grid grid-2">
+            <!-- Case 1 -->
+            <div class="ai-card success-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <span class="success-tag" style="background: rgba(59, 130, 246, 0.1); color: #2563eb;">BFSI</span>
+                    <span style="font-size: 12px; color: var(--text-tertiary); font-weight: 600;"><i class="fas fa-calendar"></i> 90-Day Release</span>
+                </div>
+                <h3 class="success-title">ML-Based Account Deduplication</h3>
+                <p class="success-desc">A leading US retail bank automated their audit workflow, resolving account metadata duplication and saving OPEX.</p>
+                <div class="success-metrics">
+                    <div class="metric-item">
+                        <span class="metric-val">80%</span>
+                        <span class="metric-lbl">Steps Automated</span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="metric-val">3×</span>
+                        <span class="metric-lbl">Faster Decisions</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Case 2 -->
+            <div class="ai-card success-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <span class="success-tag" style="background: rgba(16, 185, 129, 0.1); color: #059669;">Healthcare</span>
+                    <span style="font-size: 12px; color: var(--text-tertiary); font-weight: 600;"><i class="fas fa-clock"></i> 6-Week Setup</span>
+                </div>
+                <h3 class="success-title">AI Patient Record Matching</h3>
+                <p class="success-desc">Implemented a structured Quick-Start AI/ML Lab for a global distributor to validate and sync clinical records safely.</p>
+                <div class="success-metrics">
+                    <div class="metric-item">
+                        <span class="metric-val">25%</span>
+                        <span class="metric-lbl">Efficiency Lift</span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="metric-val">100%</span>
+                        <span class="metric-lbl">Audit Accuracy</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Case 3 -->
+            <div class="ai-card success-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <span class="success-tag" style="background: rgba(245, 158, 11, 0.1); color: #d97706;">Retail</span>
+                    <span style="font-size: 12px; color: var(--text-tertiary); font-weight: 600;"><i class="fas fa-chart-bar"></i> Inventory Optimization</span>
+                </div>
+                <h3 class="success-title">Assortment & Stock Forecasts</h3>
+                <p class="success-desc">Optimized shelf assortment levels at localized stores for a large retail network to meet fluctuating seasonal demand.</p>
+                <div class="success-metrics">
+                    <div class="metric-item">
+                        <span class="metric-val">+5%</span>
+                        <span class="metric-lbl">Sales Revenue</span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="metric-val">-15%</span>
+                        <span class="metric-lbl">Markdown Cost</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Case 4 -->
+            <div class="ai-card success-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <span class="success-tag" style="background: rgba(139, 92, 246, 0.1); color: #7c3aed;">Manufacturing</span>
+                    <span style="font-size: 12px; color: var(--text-tertiary); font-weight: 600;"><i class="fas fa-industry"></i> Predictive IoT</span>
+                </div>
+                <h3 class="success-title">IoT Predictive Maintenance</h3>
+                <p class="success-desc">AI predicts machine component failures on global factory floors, automating test triggers to avoid shutdown delays.</p>
+                <div class="success-metrics">
+                    <div class="metric-item">
+                        <span class="metric-val">-25%</span>
+                        <span class="metric-lbl">Machine Downtime</span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="metric-val">-10%</span>
+                        <span class="metric-lbl">Maintenance Cost</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQs Section -->
+{% if faqs %}
+<section class="ai-section section-alt">
+    <div class="container">
+        <div class="ai-section-header text-center">
+            <span class="ai-subtitle">FAQ</span>
+            <h2 class="ai-title">Common Questions <span>Answered</span></h2>
+        </div>
+        
+        <div class="faq-list" style="max-width: 800px; margin: 0 auto;">
+            {% for faq in faqs %}
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaqAccordion(event)">
+                    <span>{{ faq.q }}</span>
+                    <i class="fas fa-chevron-down faq-icon"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>{{ faq.a }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Bottom Banner -->
+<section class="ai-bottom-cta">
+    <div class="container" style="position: relative; z-index: 2; max-width: 700px; margin: 0 auto;">
+        <h2 class="ai-title" style="color: white; margin-bottom: 20px;">Start Your <span>AI Solutions Journey</span></h2>
+        <p style="color: rgba(255,255,255,0.85); font-size: 16px; line-height: 1.6; margin-bottom: 30px;">
+            Let's evaluate your database files, API endpoints, and model architecture. Schedule a complimentary data readiness audit with our certified architects today.
+        </p>
+        <a href="javascript:void(0);" onclick="openLeadModal('Bottom CTA: {{ page.title }}');" class="btn btn-primary btn-glow" style="background: white; color: var(--ai-purple); border-color: white;">Consult An Architect <i class="fas fa-arrow-right" style="margin-left: 8px;"></i></a>
+    </div>
+</section>
+
+<script>
+    // Tab switching utility
+    function switchAudienceTab(evt, tabId) {
+        // Hide all tab panes
+        const panes = document.querySelectorAll('.audience-tab-pane');
+        panes.forEach(pane => pane.classList.remove('active'));
+        
+        // Deactivate all tab buttons
+        const buttons = document.querySelectorAll('.audience-tab-btn');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        
+        // Show current pane and mark button active
+        document.getElementById(tabId).classList.add('active');
+        evt.currentTarget.classList.add('active');
+    }
+    
+    // FAQ Accordion toggle
+    function toggleFaqAccordion(evt) {
+        const item = evt.currentTarget.parentElement;
+        const answer = item.querySelector('.faq-answer');
+        const icon = item.querySelector('.faq-icon');
+        
+        // Check if currently open
+        const isOpen = item.classList.contains('active');
+        
+        // Close all other FAQs
+        document.querySelectorAll('.faq-item').forEach(faq => {
+            faq.classList.remove('active');
+            faq.querySelector('.faq-answer').style.maxHeight = null;
+            faq.querySelector('.faq-icon').style.transform = 'rotate(0deg)';
+        });
+        
+        // If it wasn't open, open it
+        if (!isOpen) {
+            item.classList.add('active');
+            answer.style.maxHeight = answer.scrollHeight + "px";
+            icon.style.transform = 'rotate(180deg)';
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,278 @@
+{% extends "base.html" %}
+
+{% block title %}Snowflake Consulting Services{% endblock %}
+
+{% block extra_meta %}
+<meta name="description" content="Modernize your data warehouse and enhance your data lake with Snowflake Consulting Services. Deploy a modern data cloud solution with Snowflake.">
+{% endblock %}
+
+{% block content %}
+<style>
+:root {
+    --brand-color: #00a2e2;
+    --brand-color-rgb: 0, 162, 226;
+    --brand-glow: rgba(0, 162, 226, 0.15);
+}
+@keyframes spinOrbit {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+@keyframes spinOrbitReverse {
+    0% { transform: rotate(360deg); }
+    100% { transform: rotate(0deg); }
+}
+.brand-orbit-node {
+    position: absolute;
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--brand-color);
+}
+.card-brand-hover {
+    transition: all 0.3s ease;
+}
+.card-brand-hover:hover {
+    border-color: var(--brand-color) !important;
+    box-shadow: 0 10px 30px var(--brand-glow) !important;
+    transform: translateY(-5px);
+}
+.badge-brand {
+    background: var(--brand-glow);
+    color: var(--brand-color);
+    border: 1px solid rgba(0, 162, 226, 0.3);
+}
+</style>
+
+<!-- Detail Hero -->
+<section class="hero" style="min-height: 60vh; padding-top: calc(var(--nav-height) + 60px); padding-bottom: 60px;">
+    <div class="hero-bg-glow hero-glow-1" style="background: radial-gradient(circle, rgba(0,162,226,0.2) 0%, transparent 70%);"></div>
+    <div class="container hero-grid" style="grid-template-columns: 1.2fr 0.8fr;">
+        <div class="hero-content">
+            <div class="hero-badge badge-brand"><i class="fas fa-snowflake"></i> Strategic Partners &middot; Snowflake</div>
+            <h1 class="hero-title" style="font-size: clamp(36px, 5vw, 48px); line-height: 1.15; margin-bottom: 18px;">
+                Snowflake <span>Consulting</span>
+            </h1>
+            <p class="hero-desc">
+                Transform your data landscape with our Snowflake consulting services. Modernize your data warehouse and enhance your data lake by deploying a modern data cloud solution with Snowflake.
+            </p>
+            <div class="hero-buttons" style="display:flex; gap:14px; flex-wrap:wrap;">
+                <a href="/contact-us" class="btn btn-primary btn-glow" style="background: linear-gradient(135deg, #00a2e2, #1d4ed8); border: none;">Consult Partner Architect <i class="fas fa-chevron-right btn-icon"></i></a>
+                <a href="#transformations" class="btn btn-outline">Explore Capabilities</a>
+            </div>
+            
+            <div class="sol-tag-row" style="margin-top: 30px; display: flex; gap: 10px; flex-wrap: wrap;">
+                <span class="sol-tag-pill" style="font-size: 12px; background: rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);"><i class="fas fa-cube" style="color: #00a2e2; margin-right: 6px;"></i> Modern Data Cloud</span>
+                <span class="sol-tag-pill" style="font-size: 12px; background: rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);"><i class="fas fa-share-alt" style="color: #00a2e2; margin-right: 6px;"></i> Governed Sharing</span>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="brand-graphic" style="position: relative; width: 100%; height: 350px; display: flex; justify-content: center; align-items: center;">
+                <div style="position: absolute; width: 280px; height: 280px; border-radius: 50%; background: radial-gradient(circle, rgba(0,162,226,0.15) 0%, transparent 70%); filter: blur(20px);"></div>
+                <div style="position: absolute; width: 260px; height: 260px; border: 1px dashed rgba(0,162,226,0.2); border-radius: 50%; animation: spinOrbit 25s linear infinite;"></div>
+                <div style="position: absolute; width: 180px; height: 180px; border: 1px dashed rgba(59,130,246,0.3); border-radius: 50%; animation: spinOrbitReverse 15s linear infinite;"></div>
+                <div class="ai-core" style="width: 90px; height: 90px; background: linear-gradient(135deg, #00a2e2, #3b82f6); box-shadow: 0 0 30px rgba(0,162,226,0.4); z-index: 2; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-snowflake" style="font-size: 32px; color: #fff;"></i>
+                </div>
+                <!-- Nodes -->
+                <div class="brand-orbit-node" style="width: 12px; height: 12px; background: #00a2e2; top: 80px; right: 80px;"></div>
+                <div class="brand-orbit-node" style="width: 8px; height: 8px; background: #60a5fa; bottom: 80px; left: 80px;"></div>
+                <div class="brand-orbit-node" style="width: 10px; height: 10px; background: #93c5fd; top: 170px; left: 50px;"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How Snowflake Transforms Data Management -->
+<section class="section-alt" id="transformations">
+    <div class="container">
+        <div class="section-header" style="text-align: center; margin-bottom: 50px;">
+            <span class="section-subtitle">Modern Data Cloud</span>
+            <h2 class="section-title">How Snowflake <span>Transforms Data Management</span></h2>
+            <p class="section-desc">Experience the power, scalability, and ease of use of a fully governed SQL data warehouse.</p>
+        </div>
+        
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 30px;">
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(0,162,226,0.1); color: #00a2e2;">
+                    <i class="fas fa-expand-arrows-alt"></i>
+                </div>
+                <h3 class="card-title">Scalability</h3>
+                <p class="card-desc">The architecture allows for effortless scaling, enabling businesses to adjust storage and compute resources independently based on workload demands. This flexibility ensures optimal performance during peak times without overspending during low-activity periods.</p>
+            </div>
+            
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(0,162,226,0.1); color: #00a2e2;">
+                    <i class="fas fa-tachometer-alt"></i>
+                </div>
+                <h3 class="card-title">Performance</h3>
+                <p class="card-desc">Delivers high performance for queries, even with large datasets. Its unique design automatically optimizes query execution, allowing users to access insights quickly without compromising on speed.</p>
+            </div>
+            
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(0,162,226,0.1); color: #00a2e2;">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h3 class="card-title">Integration with Advanced Analytics and ML</h3>
+                <p class="card-desc">Seamlessly integrates with various machine learning and advanced analytics tools, enabling organizations to leverage their data for predictive modeling and AI applications, enhancing decision-making capabilities.</p>
+            </div>
+            
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(0,162,226,0.1); color: #00a2e2;">
+                    <i class="fas fa-hand-holding-usd"></i>
+                </div>
+                <h3 class="card-title">Cost-Effective</h3>
+                <p class="card-desc">Operates on a pay-as-you-go pricing model, allowing organizations to pay only for the storage and compute resources they use. This cost efficiency helps businesses manage budgets while accessing powerful data capabilities.</p>
+            </div>
+            
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(0,162,226,0.1); color: #00a2e2;">
+                    <i class="fas fa-smile"></i>
+                </div>
+                <h3 class="card-title">Ease of Use</h3>
+                <p class="card-desc">Provides a user-friendly interface and integrates smoothly with various data tools and applications. Its SQL-based querying capabilities make it accessible for users without extensive technical backgrounds, facilitating easier data manipulation and analysis.</p>
+            </div>
+            
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(0,162,226,0.1); color: #00a2e2;">
+                    <i class="fas fa-share-alt"></i>
+                </div>
+                <h3 class="card-title">Data Sharing</h3>
+                <p class="card-desc">Enables secure data sharing across organizations and departments in real-time. This feature eliminates the need for data duplication and allows teams to collaborate more effectively by accessing the latest data insights.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Our Snowflake Services -->
+<section class="section" id="services">
+    <div class="container">
+        <div class="section-header" style="text-align: center; margin-bottom: 50px;">
+            <span class="section-subtitle">Services Catalog</span>
+            <h2 class="section-title">Our Comprehensive Services <span>for Snowflake</span></h2>
+            <p class="section-desc">We guide you through architecture design, data pipelines, managed services, and migration to the cloud.</p>
+        </div>
+        
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;">
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-cogs" style="color: #00a2e2;"></i> Implementation
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">Our consulting services ensure a seamless implementation process for Snowflake, tailored to meet your unique data needs. We guide you through setup and configuration, maximizing efficiency and scalability from the start.</p>
+            </div>
+            
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-cloud-upload-alt" style="color: #00a2e2;"></i> Migration
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">With our expertise, we facilitate smooth transitions from legacy systems to the cloud, ensuring data integrity and minimal downtime. Experience the benefits of a modern, cloud-native platform quickly and efficiently.</p>
+            </div>
+            
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-user-shield" style="color: #00a2e2;"></i> Managed Services
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">Our team provides comprehensive support, monitoring, and optimization for your data environment, allowing you to focus on your core business while we enhance performance, security, and cost-efficiency.</p>
+            </div>
+            
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-sitemap" style="color: #00a2e2;"></i> Data Architecture and Design
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">Leverage our consulting services to design and implement a robust data architecture tailored to your analytics needs. We create a scalable framework on Snowflake, ensuring your data is organized and ready for actionable insights.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Resources section -->
+<section class="section-alt" id="resources">
+    <div class="container">
+        <div class="section-header" style="text-align: center; margin-bottom: 50px;">
+            <span class="section-subtitle">Insights</span>
+            <h2 class="section-title">Partner <span>Resources</span></h2>
+            <p class="section-desc">Explore whitepapers, case studies, and insights from Artha Solutions.</p>
+        </div>
+        
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
+            <!-- Resource 1 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #00a2e2; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Data Governance, Data Integration, Healthcare</span>
+                    <h4 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Transforming Healthcare Insurance Operations: A Data Governance Journey for MOOP Compliance</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">Learn how we addressed critical data integration challenges and enhanced policyholder expense management, ensured accurate claims</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #00a2e2;">Download Now! <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <!-- Resource 2 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #00a2e2; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Manufacturing, Pharma, SAP</span>
+                    <h4 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">AI Driven SAP Modernization: A Game-Changer for Pharma Manufacturing</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">Exclusive invite-only event: Explore SAP Data Modernization for Pharma by leveraging AI, GenAI and Smart Test Data...</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #00a2e2;">Learn more <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <!-- Resource 3 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #00a2e2; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Manufacturing, Retail</span>
+                    <h4 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Happy Hour with Talend & Artha Solutions</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">We invite you to join us at the seminar and learn how Artha can help you to...</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #00a2e2;">Learn more <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <!-- Resource 4 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #00a2e2; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Manufacturing, Retail</span>
+                    <h4 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Phoenix Data Conference 2018</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">Artha Solutions sponsors PHX Data Conference 2018, the premier big data event in Phoenix. Technology leaders share...</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #00a2e2;">Learn more <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <!-- Resource 5 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #00a2e2; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Manufacturing, Retail</span>
+                    <h4 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Artha & Qlik are Proud Silver Sponsors for Data Engineering Summit 2023</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">Focused on data engineering innovation, this 2-day conference will give attendees direct access to top engineers &...</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #00a2e2;">Learn more <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <!-- Resource 6 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #00a2e2; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Manufacturing, Retail</span>
+                    <h4 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">QlikWorld Tour North America</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">At Dallas, learn how data drives growth in 2023. Explore Qlik's latest innovations for data management, integration,...</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #00a2e2;">Learn more <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Bottom CTA -->
+<section class="section" style="text-align: center; background: linear-gradient(180deg, var(--bg-primary) 0%, rgba(0,162,226,0.05) 100%);">
+    <div class="container">
+        <h2 class="section-title">Initiate Your <span>Integration Journey</span></h2>
+        <p class="section-desc" style="max-width: 600px; margin: 0 auto 30px;">Artha Solutions helps you deploy, clean, and govern Snowflake storage environments at up to 40% savings.</p>
+        <a href="/contact-us" class="btn btn-primary btn-glow" style="background: linear-gradient(135deg, #00a2e2, #1d4ed8); border: none; box-shadow: 0 0 20px rgba(0,162,226,0.3);">Request a Joint Solution Demo</a>
+    </div>
+</section>
+{% endblock %}

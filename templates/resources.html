@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Resource Center - Webinars, Events & Whitepapers{% endblock %}
+
+{% block content %}
+<!-- Subpage Spacer -->
+<div style="height: var(--nav-height); background-color: var(--bg-secondary);"></div>
+
+<section class="hero" style="min-height: 50vh; padding-top: 60px; padding-bottom: 60px;">
+    <div class="hero-bg-glow hero-glow-1"></div>
+    <div class="container hero-grid" style="grid-template-columns: 1.2fr 0.8fr;">
+        <div class="hero-content">
+            <div class="hero-badge"><i class="fas fa-book"></i> Knowledge Center</div>
+            <h1 class="hero-title" style="font-size: 48px;">
+                ThinkArtha <span>Resources</span>
+            </h1>
+            <p class="hero-desc">
+                Access on-demand webinars, upcoming summits, technical whitepapers, and industry case studies to design your enterprise data blueprints.
+            </p>
+        </div>
+        <div class="hero-visual">
+            <div class="ai-graphic-container" style="max-width: 260px; height: 260px;">
+                <div class="ai-node-circle circle-sm"></div>
+                <div class="ai-core" style="width: 70px; height: 70px; background: var(--grad-primary);">
+                    <i class="fas fa-newspaper" style="font-size: 22px;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Resources Categories Section -->
+<section class="section-alt" id="resources-categories">
+    <div class="container">
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));">
+            <!-- 1. Case Studies -->
+            <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <div class="card-icon-box"><i class="fas fa-book-open"></i></div>
+                    <h3 class="card-title">Case Studies</h3>
+                    <p class="card-desc">Review client success stories on database deduplications, SAP migrations, and GenAI implementations.</p>
+                </div>
+                <a href="/case-studies" class="card-link" style="margin-top: 16px;">View Case Studies <i class="fas fa-chevron-right"></i></a>
+            </div>
+            
+            <!-- 2. Blogs -->
+            <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <div class="card-icon-box"><i class="fas fa-rss"></i></div>
+                    <h3 class="card-title">Blogs & Insights</h3>
+                    <p class="card-desc">Explore technical articles on Talend studio performance, active data governance, and analytics trends.</p>
+                </div>
+                <a href="/blogs" class="card-link" style="margin-top: 16px;">View Blogs <i class="fas fa-chevron-right"></i></a>
+            </div>
+            
+            <!-- 3. Webinars -->
+            <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <div class="card-icon-box"><i class="fas fa-video"></i></div>
+                    <h3 class="card-title">On-Demand Webinars</h3>
+                    <p class="card-desc">Watch certified engineers present technical S/4HANA migration blueprints and active governance rules.</p>
+                </div>
+                <a href="/resources/webinars" class="card-link" style="margin-top: 16px;">View Webinars <i class="fas fa-chevron-right"></i></a>
+            </div>
+            
+            <!-- 4. Events -->
+            <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <div class="card-icon-box"><i class="fas fa-calendar-days"></i></div>
+                    <h3 class="card-title">Events & Summits</h3>
+                    <p class="card-desc">Register for upcoming digital transformation summits and regional data strategy masterclasses.</p>
+                </div>
+                <a href="/resources/events" class="card-link" style="margin-top: 16px;">View Events <i class="fas fa-chevron-right"></i></a>
+            </div>
+            
+            <!-- 5. Whitepapers -->
+            <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <div class="card-icon-box"><i class="fas fa-file-pdf"></i></div>
+                    <h3 class="card-title">Whitepapers</h3>
+                    <p class="card-desc">Read expert analyst research papers on data readiness and compliance in healthcare and finance.</p>
+                </div>
+                <a href="/resources/whitepapers" class="card-link" style="margin-top: 16px;">View Whitepapers <i class="fas fa-chevron-right"></i></a>
+            </div>
+            
+            <!-- 6. Workshops -->
+            <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <div class="card-icon-box"><i class="fas fa-person-chalkboard"></i></div>
+                    <h3 class="card-title">On-Demand Workshop</h3>
+                    <p class="card-desc">Request a custom 2-hour assessment session with our team to map out your migration blueprints.</p>
+                </div>
+                <a href="/resources/on-demand-workshop" class="card-link" style="margin-top: 16px;">Request Workshop <i class="fas fa-chevron-right"></i></a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Bottom CTA -->
+<section class="section" style="text-align: center;">
+    <div class="container">
+        <h2 class="section-title">Elevate Your <span>Data Knowledge</span></h2>
+        <p class="section-desc" style="max-width: 600px; margin: 0 auto 30px;">Request a custom training session or joint data audit workshop with our architects.</p>
+        <a href="/contact-us" class="btn btn-primary btn-glow">Get In Touch</a>
+    </div>
+</section>
+{% endblock %}

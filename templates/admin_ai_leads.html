@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Manage AI Leads - Control Center{% endblock %}
+
+{% block content %}
+<div style="height: var(--nav-height); background-color: var(--bg-secondary);"></div>
+
+<section class="section" style="min-height: 90vh; background-color: var(--bg-secondary); padding: 40px 0;">
+    <div class="container" style="display: grid; grid-template-columns: 260px 1fr; gap: 40px; align-items: start;">
+        
+        <!-- Sidebar Navigation -->
+        {% include 'admin_sidebar.html' %}
+        
+        <!-- Main Content -->
+        <div>
+            <!-- Header -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
+                <div>
+                    <h2 style="font-size: 28px; font-weight: 800; letter-spacing: -0.5px; color: var(--text-primary);">AI Captured Leads</h2>
+                    <p style="font-size: 13px; color: var(--text-tertiary); margin-top: 4px;">Review leads captured from the AI microsite, custom ROI page, and campaign forms.</p>
+                </div>
+                <a href="/admin/artificial-intelligence/export-leads" class="btn btn-primary" style="background: #10b981; border-color: #10b981; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-file-csv"></i> Export CSV
+                </a>
+            </div>
+            
+            <!-- Leads List Table -->
+            <div style="background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); padding: 32px; box-shadow: var(--card-shadow);">
+                {% if leads %}
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid var(--border-color); color: var(--text-secondary); font-weight: 700;">
+                                <th style="padding: 12px 16px;">Contact Details</th>
+                                <th style="padding: 12px 16px;">Business Email</th>
+                                <th style="padding: 12px 16px;">Company & Job Title</th>
+                                <th style="padding: 12px 16px;">Phone & Country</th>
+                                <th style="padding: 12px 16px;">Source & CTA</th>
+                                <th style="padding: 12px 16px;">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for lead in leads %}
+                            <tr style="border-bottom: 1px solid var(--border-color); transition: var(--transition-fast);" onmouseover="this.style.backgroundColor='var(--bg-secondary)'" onmouseout="this.style.backgroundColor='transparent'">
+                                <td style="padding: 16px; font-weight: 600; color: var(--text-primary);">
+                                    {{ lead.first_name }} {{ lead.last_name }}
+                                </td>
+                                <td style="padding: 16px; font-family: monospace; font-size: 12px; color: var(--accent-blue);">
+                                    {{ lead.business_email }}
+                                </td>
+                                <td style="padding: 16px;">
+                                    <div style="font-weight: 600;">{{ lead.company }}</div>
+                                    <div style="font-size: 11.5px; color: var(--text-secondary);">{{ lead.job_title }}</div>
+                                </td>
+                                <td style="padding: 16px;">
+                                    <div>{{ lead.phone or '-' }}</div>
+                                    <div style="font-size: 11.5px; color: var(--text-tertiary);">{{ lead.country }}</div>
+                                </td>
+                                <td style="padding: 16px;">
+                                    <span class="tag-pill" style="font-size: 10.5px; background-color: var(--bg-secondary); border: 1px solid var(--border-color); padding: 2px 8px; border-radius: 4px; display: inline-block; margin-bottom: 4px;">{{ lead.source_page }}</span>
+                                    <div style="font-size: 11px; color: var(--text-tertiary);">{{ lead.cta_clicked }}</div>
+                                </td>
+                                <td style="padding: 16px; color: var(--text-tertiary); font-size: 12px;">
+                                    {{ lead.created_at }}
+                                </td>
+                            </tr>
+                            {% if lead.message %}
+                            <tr style="border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.01);">
+                                <td colspan="6" style="padding: 10px 16px 16px 40px; font-size: 12.5px; color: var(--text-secondary);">
+                                    <i class="fas fa-reply" style="transform: rotate(180deg); margin-right: 8px; color: var(--text-tertiary);"></i>
+                                    <strong>Message:</strong> "{{ lead.message }}"
+                                </td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div style="text-align: center; padding: 40px 0;">
+                    <i class="fas fa-address-book" style="font-size: 40px; color: var(--text-tertiary); margin-bottom: 12px;"></i>
+                    <p style="color: var(--text-secondary);">No leads captured yet.</p>
+                </div>
+                {% endif %}
+            </div>
+            
+        </div>
+    </div>
+</section>
+{% endblock %}

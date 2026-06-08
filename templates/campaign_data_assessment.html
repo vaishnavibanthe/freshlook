@@ -1,0 +1,282 @@
+{% extends "ai_base.html" %}
+
+{% block ai_hero %}
+<!-- Campaign Assessment Hero -->
+<section class="ai-hero" style="background: linear-gradient(135deg, #1e293b, #0f172a); color: white; padding-top: calc(var(--nav-height) + 60px); padding-bottom: 60px;">
+    <div class="container ai-hero-grid" style="grid-template-columns: 1.1fr 0.9fr; gap: 50px;">
+        <div class="ai-hero-content">
+            <div class="ai-badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border-color: rgba(16, 185, 129, 0.2);"><i class="fas fa-clipboard-check"></i> Assessment Platform</div>
+            <h1 class="ai-hero-title" style="color: white; font-size: 38px; line-height: 1.2; margin-top: 15px;">
+                ARTHA INTELLIGENT DATA <br><span style="color: #10b981;">ASSESSMENT PLATFORM</span>
+            </h1>
+            <p style="color: rgba(255,255,255,0.85); font-size: 15.5px; line-height: 1.6; margin-top: 20px;">
+                {{ body_sections.teaser }}
+            </p>
+            <div style="margin-top: 30px; display: flex; gap: 15px; flex-wrap: wrap;">
+                <a href="#assessment-form" class="btn btn-primary btn-glow" style="background: #10b981; border-color: #10b981; color: white;">Claim $1 Assessment <i class="fas fa-arrow-right" style="margin-left: 8px;"></i></a>
+                <a href="#why-platform" class="btn btn-secondary" style="border-color: rgba(255,255,255,0.3); color: white;" onmouseover="this.style.backgroundColor='rgba(255,255,255,0.1)'" onmouseout="this.style.backgroundColor='transparent'">Why Artha Solutions</a>
+            </div>
+        </div>
+        <div class="ai-hero-visual" style="display: flex; align-items: center; justify-content: center;">
+            <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 30px; text-align: center; max-width: 360px; box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
+                <div style="font-size: 48px; color: #10b981; margin-bottom: 15px;"><i class="fas fa-microchip"></i></div>
+                <h3 style="font-size: 16px; font-weight: 700; color: white; margin-bottom: 8px;">Framework Alignment</h3>
+                <p style="font-size: 12.5px; color: rgba(255,255,255,0.65); line-height: 1.5; margin-bottom: 0;">
+                    Assess maturity against leading international frameworks: <strong>ISO 42001, DCAM, NIST AI RMF, GDPR,</strong> and <strong>CCPA</strong>.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block ai_content %}
+<!-- Why Artha Assessment Section -->
+<section class="ai-section" id="why-platform" style="padding-bottom: 0;">
+    <div class="container" style="display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 60px; align-items: start;">
+        <div>
+            <span class="ai-subtitle">Capabilities</span>
+            <h2 class="ai-title" style="font-size: 30px; margin-bottom: 25px;">Why the Artha Assessment Platform?</h2>
+            
+            <div style="display: grid; gap: 25px;">
+                {% for card in body_sections.features %}
+                <div style="display: grid; grid-template-columns: 40px 1fr; gap: 15px;">
+                    <div style="width: 40px; height: 40px; border-radius: 50%; background: rgba(16, 185, 129, 0.08); color: #10b981; display: flex; align-items: center; justify-content: center; font-size: 16px;">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div>
+                        <h4 style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">{{ card.title }}</h4>
+                        <p style="font-size: 13.5px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0;">{{ card.desc }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Inline Assessment Form -->
+        <div id="assessment-form" class="ai-card" style="padding: 40px; box-shadow: var(--glass-shadow); border: 1px solid var(--border-color); background: white; border-radius: 8px; position: relative; top: -80px; z-index: 10;">
+            <div class="ai-badge" style="background: rgba(16, 185, 129, 0.1); color: #10b981; border-color: transparent; margin-bottom: 12px;"><i class="fas fa-fire"></i> Assessment Request</div>
+            <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 8px; color: var(--text-primary);">Claim Your $1 Assessment</h3>
+            <p style="font-size: 13px; color: var(--text-tertiary); margin-bottom: 25px;">
+                Normally valued at $15,999. Audit your data foundations, identify model gaps, and get an actionable roadmap.
+            </p>
+            
+            <form id="campaign-assessment-form" method="POST" action="/artificial-intelligence/submit-lead">
+                <input type="text" name="website_url_honeypot" style="display:none !important" tabindex="-1" autocomplete="off">
+                <input type="hidden" name="source_page" value="campaign-data-assessment">
+                <input type="hidden" name="cta_clicked" value="Claim $1 Assessment Campaign">
+                
+                <div class="form-grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-field" style="margin-bottom: 15px;">
+                        <label for="a_first_name" style="display: block; font-size: 12.5px; font-weight: 600; margin-bottom: 6px; color: var(--text-secondary);">First Name</label>
+                        <input type="text" id="a_first_name" name="first_name" placeholder="John" required class="form-input" style="width: 100%; border: 1px solid var(--border-color); padding: 10px; border-radius: 6px; font-size: 13.5px;">
+                    </div>
+                    <div class="form-field" style="margin-bottom: 15px;">
+                        <label for="a_last_name" style="display: block; font-size: 12.5px; font-weight: 600; margin-bottom: 6px; color: var(--text-secondary);">Last Name</label>
+                        <input type="text" id="a_last_name" name="last_name" placeholder="Doe" required class="form-input" style="width: 100%; border: 1px solid var(--border-color); padding: 10px; border-radius: 6px; font-size: 13.5px;">
+                    </div>
+                </div>
+                
+                <div class="form-field" style="margin-bottom: 15px;">
+                    <label for="a_business_email" style="display: block; font-size: 12.5px; font-weight: 600; margin-bottom: 6px; color: var(--text-secondary);">Business Email <span class="required-star">*</span></label>
+                    <input type="email" id="a_business_email" name="business_email" placeholder="john.doe@enterprise.com" required class="form-input" style="width: 100%; border: 1px solid var(--border-color); padding: 10px; border-radius: 6px; font-size: 13.5px;">
+                    <span class="form-error-msg" id="a-email-error-msg" style="color: #dc2626; font-size: 12px; display: none; margin-top: 4px;">
+                        <i class="fas fa-circle-exclamation"></i> Please use your corporate business email. Personal domains (gmail, yahoo) are not accepted.
+                    </span>
+                </div>
+                
+                <div class="form-grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-field" style="margin-bottom: 15px;">
+                        <label for="a_company" style="display: block; font-size: 12.5px; font-weight: 600; margin-bottom: 6px; color: var(--text-secondary);">Company</label>
+                        <input type="text" id="a_company" name="company" placeholder="Enterprise Inc" required class="form-input" style="width: 100%; border: 1px solid var(--border-color); padding: 10px; border-radius: 6px; font-size: 13.5px;">
+                    </div>
+                    <div class="form-field" style="margin-bottom: 15px;">
+                        <label for="a_job_title" style="display: block; font-size: 12.5px; font-weight: 600; margin-bottom: 6px; color: var(--text-secondary);">Job Title</label>
+                        <input type="text" id="a_job_title" name="job_title" placeholder="CIO / Head of Data" required class="form-input" style="width: 100%; border: 1px solid var(--border-color); padding: 10px; border-radius: 6px; font-size: 13.5px;">
+                    </div>
+                </div>
+
+                <div class="form-grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-field" style="margin-bottom: 15px;">
+                        <label for="a_phone" style="display: block; font-size: 12.5px; font-weight: 600; margin-bottom: 6px; color: var(--text-secondary);">Phone</label>
+                        <input type="tel" id="a_phone" name="phone" placeholder="+1 (555) 123-4567" class="form-input" style="width: 100%; border: 1px solid var(--border-color); padding: 10px; border-radius: 6px; font-size: 13.5px;">
+                    </div>
+                    <div class="form-field" style="margin-bottom: 15px;">
+                        <label for="a_country" style="display: block; font-size: 12.5px; font-weight: 600; margin-bottom: 6px; color: var(--text-secondary);">Country</label>
+                        <input type="text" id="a_country" name="country" placeholder="United States" required class="form-input" style="width: 100%; border: 1px solid var(--border-color); padding: 10px; border-radius: 6px; font-size: 13.5px;">
+                    </div>
+                </div>
+                
+                <div class="form-checkbox" style="display: flex; gap: 8px; align-items: flex-start; margin: 15px 0;">
+                    <input type="checkbox" id="a_consent" name="consent" value="1" required style="margin-top: 3px;">
+                    <label for="a_consent" style="font-size: 12px; color: var(--text-secondary); cursor: pointer; line-height: 1.4;">
+                        I consent to receive assessment details and technical insights from Artha Solutions. <span class="required-star">*</span>
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 12px; background: #10b981; border-color: #10b981;">
+                    Request $1 Assessment <i class="fas fa-clipboard-check"></i>
+                </button>
+                <div id="a-form-response-msg" style="margin-top: 12px; padding: 10px; border-radius: 6px; display: none; font-size: 13.5px;"></div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- Framework alignment section -->
+<section class="ai-section section-alt" style="margin-top: -60px;">
+    <div class="container">
+        <div class="ai-section-header text-center">
+            <span class="ai-subtitle">Methodology</span>
+            <h2 class="ai-title">Day Zero <span>Data Readiness</span></h2>
+            <p class="ai-desc">Reviewing data quality, structure, lineage, and privacy to create a model-ready roadmap.</p>
+        </div>
+        
+        <div class="ai-card-grid grid-3" style="margin-top: 40px;">
+            <div class="ai-card" style="background: white;">
+                <div class="ai-card-icon" style="color: var(--ai-purple);"><i class="fas fa-shield-halved"></i></div>
+                <h3 class="ai-card-title">Governance & Control</h3>
+                <p class="ai-card-desc">Lineage tracing, privacy catalog mapping, policy configuration, and role-based access rules auditing.</p>
+            </div>
+            
+            <div class="ai-card" style="background: white;">
+                <div class="ai-card-icon" style="color: var(--ai-purple);"><i class="fas fa-database"></i></div>
+                <h3 class="ai-card-title">Data Quality & Structure</h3>
+                <p class="ai-card-desc">Deduplication audits, profiling, catalog structure reviews, and real-time CDC sync latency testing.</p>
+            </div>
+            
+            <div class="ai-card" style="background: white;">
+                <div class="ai-card-icon" style="color: var(--ai-purple);"><i class="fas fa-network-wired"></i></div>
+                <h3 class="ai-card-title">Compliance Mapping</h3>
+                <p class="ai-card-desc">Audit templates aligning data flows with EU AI Act, NIST AI RMF, ISO 42001, and HIPAA protocols.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ section -->
+<section class="ai-section">
+    <div class="container">
+        <div class="ai-section-header text-center">
+            <span class="ai-subtitle">FAQ</span>
+            <h2 class="ai-title">Assessment <span>FAQs</span></h2>
+        </div>
+        
+        <div class="faq-list" style="max-width: 800px; margin: 0 auto;">
+            {% for faq in faqs %}
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaqAccordion(event)">
+                    <span>{{ faq.q }}</span>
+                    <i class="fas fa-chevron-down faq-icon"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>{{ faq.a }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- hidden registration success modal -->
+<div id="assessment-success-modal" class="ai-modal">
+    <div class="ai-modal-content" style="max-width: 500px; padding: 40px; text-align: center;">
+        <span class="ai-modal-close" onclick="closeSuccessModal()">&times;</span>
+        <div style="font-size: 56px; color: #10b981; margin-bottom: 20px;"><i class="fas fa-circle-check"></i></div>
+        <h3 style="font-size: 22px; font-weight: 700; margin-bottom: 10px; color: var(--text-primary);">Assessment Requested</h3>
+        <p style="color: var(--text-secondary); font-size: 14.5px; line-height: 1.6; margin-bottom: 25px;">
+            Thank you! Your B2B request for the $1 AI Data Readiness assessment has been received. Our data architects will contact you within 24 hours to schedule the kickoff session.
+        </p>
+        <button onclick="closeSuccessModal()" class="btn btn-primary" style="background: #10b981; border-color: #10b981; width: 100%;">Return to Page</button>
+    </div>
+</div>
+
+<script>
+    // FAQ toggle
+    function toggleFaqAccordion(evt) {
+        const item = evt.currentTarget.parentElement;
+        const answer = item.querySelector('.faq-answer');
+        const icon = item.querySelector('.faq-icon');
+        const isOpen = item.classList.contains('active');
+        
+        document.querySelectorAll('.faq-item').forEach(faq => {
+            faq.classList.remove('active');
+            faq.querySelector('.faq-answer').style.maxHeight = null;
+            faq.querySelector('.faq-icon').style.transform = 'rotate(0deg)';
+        });
+        
+        if (!isOpen) {
+            item.classList.add('active');
+            answer.style.maxHeight = answer.scrollHeight + "px";
+            icon.style.transform = 'rotate(180deg)';
+        }
+    }
+
+    // Success modal controls
+    const successModal = document.getElementById('assessment-success-modal');
+    
+    function closeSuccessModal() {
+        successModal.style.display = 'none';
+    }
+
+    // Form logic
+    const form = document.getElementById('campaign-assessment-form');
+    const responseMsg = document.getElementById('a-form-response-msg');
+    const emailInput = document.getElementById('a_business_email');
+    const emailError = document.getElementById('a-email-error-msg');
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        responseMsg.style.display = 'none';
+        emailError.style.display = 'none';
+
+        const email = emailInput.value.trim().toLowerCase();
+        const personalDomains = [
+            'gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'rediffmail.com',
+            'protonmail.com', 'icloud.com', 'aol.com', 'mail.com', 'gmx.com',
+            'yandex.com', 'zoho.com', 'proton.me', 'live.com', 'yahoo.co.in', 'hotmail.co.uk'
+        ];
+        const domain = email.split('@')[1];
+        if (personalDomains.includes(domain)) {
+            emailError.style.display = 'block';
+            return;
+        }
+
+        const formData = new FormData(form);
+        fetch('/artificial-intelligence/submit-lead', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            responseMsg.style.display = 'block';
+            if (data.status === 'success') {
+                responseMsg.style.backgroundColor = 'rgba(16, 185, 129, 0.1)';
+                responseMsg.style.color = '#10b981';
+                responseMsg.style.border = '1px solid rgba(16, 185, 129, 0.2)';
+                responseMsg.innerText = "Request logged successfully!";
+                form.reset();
+                setTimeout(() => {
+                    responseMsg.style.display = 'none';
+                    successModal.style.display = 'flex';
+                }, 1500);
+            } else {
+                responseMsg.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
+                responseMsg.style.color = '#ef4444';
+                responseMsg.style.border = '1px solid rgba(239, 68, 68, 0.2)';
+                responseMsg.innerText = data.message;
+            }
+        })
+        .catch(err => {
+            responseMsg.style.display = 'block';
+            responseMsg.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
+            responseMsg.style.color = '#ef4444';
+            responseMsg.style.border = '1px solid rgba(239, 68, 68, 0.2)';
+            responseMsg.innerText = 'Something went wrong. Please try again.';
+        });
+    });
+</script>
+{% endblock %}

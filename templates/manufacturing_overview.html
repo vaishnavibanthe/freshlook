@@ -1,0 +1,365 @@
+{% extends "manufacturing_base.html" %}
+
+{% block manufacturing_hero %}
+<!-- Hero Section -->
+<section class="manufacturing-hero">
+    <div class="manufacturing-hero-glow"></div>
+    <div class="container manufacturing-hero-grid">
+        <div class="manufacturing-hero-content">
+            <span class="manufacturing-badge"><i class="fas fa-industry"></i> ThinkArtha Industry Solutions</span>
+            <h1 class="manufacturing-hero-title">
+                {{ page.hero_title }}
+            </h1>
+            <p class="manufacturing-hero-subtitle">
+                {{ page.hero_subtitle }}
+            </p>
+            
+            <div class="manufacturing-hero-ctas">
+                <button onclick="openLeadModal('Hero Primary CTA');" class="btn btn-primary btn-lg">
+                    {{ cta.primary_cta_text or 'Talk to a Manufacturing Data Expert' }} <i class="fas fa-arrow-right btn-icon"></i>
+                </button>
+                <a href="{{ cta.secondary_cta_url or '/industries/manufacturing/use-cases' }}" class="btn btn-outline btn-lg" style="border-color: #f97316; color: #ea580c;">
+                    {{ cta.secondary_cta_text or 'Explore Manufacturing Use Cases' }}
+                </a>
+            </div>
+
+            {% if body_sections.hero_bullets %}
+            <div class="manufacturing-hero-bullets">
+                <h4>Why Modern Manufacturers Partner with Artha:</h4>
+                <ul class="hero-bullet-list">
+                    {% for bullet in body_sections.hero_bullets %}
+                    <li><i class="fas fa-circle-check"></i> {{ bullet }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="manufacturing-hero-visual">
+            <div class="manufacturing-vis-container">
+                <div class="tech-grid-bg"></div>
+                <div class="tech-circle pulsate-slow">
+                    <i class="fas fa-gears text-orange"></i>
+                    <div class="tech-ring ring-1"></div>
+                    <div class="tech-ring ring-2"></div>
+                </div>
+                <div class="tech-node tech-node-1"><i class="fas fa-database"></i><span>ERP / SAP</span></div>
+                <div class="tech-node tech-node-2"><i class="fas fa-microchip"></i><span>MES / Shop</span></div>
+                <div class="tech-node tech-node-3"><i class="fas fa-truck-moving"></i><span>SCM</span></div>
+                <div class="tech-node tech-node-4"><i class="fas fa-brain"></i><span>AI & IoT</span></div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block manufacturing_content %}
+<!-- Challenge Section -->
+<section class="manufacturing-section section-alt">
+    <div class="container">
+        <div class="manufacturing-section-header text-center">
+            <span class="manufacturing-subtitle">The Industry Challenge</span>
+            <h2 class="manufacturing-title">{{ body_sections.challenge_title or 'Manufacturing Transformation Is Blocked by Fragmented Data' }}</h2>
+            <p class="manufacturing-desc">{{ body_sections.challenge_desc }}</p>
+        </div>
+        
+        <div class="manufacturing-card-grid grid-4">
+            {% if body_sections.challenge_cards %}
+                {% for card in body_sections.challenge_cards %}
+                <div class="manufacturing-card challenge-card">
+                    <div class="card-icon-circle"><i class="fas fa-triangle-exclamation"></i></div>
+                    <h3 class="card-title">{{ card.title }}</h3>
+                    <p class="card-desc">{{ card.desc }}</p>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="manufacturing-card challenge-card">
+                    <div class="card-icon-circle"><i class="fas fa-database"></i></div>
+                    <h3 class="card-title">Fragmented Data</h3>
+                    <p class="card-desc">Siloed databases across ERP, MES, and PLM systems hide shop-floor realities.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Framework Section -->
+<section class="manufacturing-section">
+    <div class="container">
+        <div class="manufacturing-section-header text-center">
+            <span class="manufacturing-subtitle">Our Solution Approach</span>
+            <h2 class="manufacturing-title">A Modern Data Foundation for Intelligent Manufacturing</h2>
+            <p class="manufacturing-desc">To achieve Industry 4.0 efficiency, manufacturers require a connected, governed, and quality-controlled pipeline. Our manufacturing framework delivers this across 5 critical layers.</p>
+        </div>
+
+        <div class="framework-layers-container">
+            {% if body_sections.framework_layers %}
+                {% for layer in body_sections.framework_layers %}
+                <div class="framework-layer-item">
+                    <div class="layer-number">{{ loop.index }}</div>
+                    <div class="layer-content">
+                        <h3 class="layer-title">{{ layer.title }}</h3>
+                        <p class="layer-desc">{{ layer.desc }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="framework-layer-item">
+                    <div class="layer-number">1</div>
+                    <div class="layer-content">
+                        <h3 class="layer-title">Connect</h3>
+                        <p class="layer-desc">Integrate IoT telemetry, MES logs, and ERP transaction databases cleanly.</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Who We Help Section -->
+<section class="manufacturing-section section-alt">
+    <div class="container">
+        <div class="manufacturing-section-header text-center">
+            <span class="manufacturing-subtitle">Audience & Impact</span>
+            <h2 class="manufacturing-title">Who We Help</h2>
+            <p class="manufacturing-desc">Artha aligns operations, supply chain, and data architectures to support the business goals of enterprise manufacturing leaders.</p>
+        </div>
+
+        <!-- Audience Tabs -->
+        <div class="audience-tabs-container">
+            <div class="audience-tabs-nav">
+                {% for aud in body_sections.who_we_help %}
+                <button class="audience-tab-btn {% if loop.first %}active{% endif %}" onclick="switchAudienceTab(event, 'aud-tab-{{ loop.index }}')">
+                    {{ aud.role }}
+                </button>
+                {% endfor %}
+            </div>
+            
+            <div class="audience-tabs-content">
+                {% for aud in body_sections.who_we_help %}
+                <div id="aud-tab-{{ loop.index }}" class="audience-tab-pane {% if loop.first %}active{% endif %}">
+                    <div class="audience-grid">
+                        <div class="audience-col">
+                            <h4 class="aud-block-title"><i class="fas fa-circle-exclamation text-orange"></i> Primary Challenges</h4>
+                            <p class="aud-text">{{ aud.pains }}</p>
+                        </div>
+                        <div class="audience-col">
+                            <h4 class="aud-block-title"><i class="fas fa-layer-group text-orange"></i> Artha Solutions</h4>
+                            <p class="aud-text">{{ aud.solutions }}</p>
+                        </div>
+                        <div class="audience-col">
+                            <h4 class="aud-block-title"><i class="fas fa-square-poll-vertical text-orange"></i> Business Outcomes</h4>
+                            <p class="aud-text"><strong>{{ aud.outcomes }}</strong></p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Solution Pillars -->
+<section class="manufacturing-section">
+    <div class="container">
+        <div class="manufacturing-section-header text-center">
+            <span class="manufacturing-subtitle">Our Capabilities</span>
+            <h2 class="manufacturing-title">Manufacturing Solution Pillars</h2>
+            <p class="manufacturing-desc">Explore our specialized data engineering, master data governance, analytics, and AI practices custom-built for industrial settings.</p>
+        </div>
+
+        <div class="manufacturing-card-grid grid-3">
+            <div class="manufacturing-card hover-card">
+                <div class="card-icon-circle accent-orange"><i class="fas fa-network-wired"></i></div>
+                <h3 class="card-title">Manufacturing Data Solutions</h3>
+                <p class="card-desc">Unify shop-floor telemetry and enterprise ERP systems into secure cloud architectures.</p>
+                <a href="/industries/manufacturing/data-solutions" class="card-link">Learn More <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <div class="manufacturing-card hover-card">
+                <div class="card-icon-circle accent-orange"><i class="fas fa-cubes"></i></div>
+                <h3 class="card-title">Master Data Management (MDM)</h3>
+                <p class="card-desc">Create golden records for products, materials, vendors, and assets across plants.</p>
+                <a href="/industries/manufacturing/mdm" class="card-link">Learn More <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <div class="manufacturing-card hover-card">
+                <div class="card-icon-circle accent-orange"><i class="fas fa-chart-line"></i></div>
+                <h3 class="card-title">Manufacturing Analytics</h3>
+                <p class="card-desc">Monitor overall equipment effectiveness (OEE), scrap, yield, and throughput metrics.</p>
+                <a href="/industries/manufacturing/analytics" class="card-link">Learn More <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <div class="manufacturing-card hover-card">
+                <div class="card-icon-circle accent-orange"><i class="fas fa-brain"></i></div>
+                <h3 class="card-title">AI-Ready Manufacturing Data</h3>
+                <p class="card-desc">Structure, clean, and catalog sensor logs to scale predictive maintenance ML models.</p>
+                <a href="/industries/manufacturing/ai-readiness" class="card-link">Learn More <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <div class="manufacturing-card hover-card">
+                <div class="card-icon-circle accent-orange"><i class="fas fa-truck-moving"></i></div>
+                <h3 class="card-title">Supply Chain Intelligence</h3>
+                <p class="card-desc">Track vendor OTIF, carrier transit paths, and demand forecasting inventory buffers.</p>
+                <a href="/industries/manufacturing/supply-chain-operations" class="card-link">Learn More <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <div class="manufacturing-card hover-card">
+                <div class="card-icon-circle accent-orange"><i class="fas fa-bolt"></i></div>
+                <h3 class="card-title">Quality, Asset & Energy</h3>
+                <p class="card-desc">Combine defect logs, repairs, and shift power bills for integrated optimization audits.</p>
+                <a href="/industries/manufacturing/quality-asset-energy" class="card-link">Learn More <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <div class="manufacturing-card hover-card">
+                <div class="card-icon-circle accent-orange"><i class="fas fa-shuffle"></i></div>
+                <h3 class="card-title">SAP, ERP & PLM Modernization</h3>
+                <p class="card-desc">Clean, map, and validate materials and BOM records to accelerate S/4HANA migrations.</p>
+                <a href="/industries/manufacturing/erp-plm-modernization" class="card-link">Learn More <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <div class="manufacturing-card hover-card">
+                <div class="card-icon-circle accent-orange"><i class="fas fa-shield-halved"></i></div>
+                <h3 class="card-title">Data Governance & Observability</h3>
+                <p class="card-desc">Enforce lineage, material stewards, and pipeline checks to stop dirty data before it reaches dashboards.</p>
+                <a href="/industries/manufacturing/data-solutions" class="card-link">Learn More <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <div class="manufacturing-card hover-card">
+                <div class="card-icon-circle accent-orange"><i class="fas fa-magnifying-glass-chart"></i></div>
+                <h3 class="card-title">Manufacturing Use Cases</h3>
+                <p class="card-desc">Explore our full catalog of 20 detailed business-outcome use cases for industrial data projects.</p>
+                <a href="/industries/manufacturing/use-cases" class="card-link">Explore Use Cases <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Business Outcomes Section -->
+<section class="manufacturing-section section-alt">
+    <div class="container">
+        <div class="manufacturing-section-header text-center">
+            <span class="manufacturing-subtitle">Business Value</span>
+            <h2 class="manufacturing-title">Measurable Strategic Outcomes</h2>
+            <p class="manufacturing-desc">Modernizing your manufacturing data architecture drives concrete efficiency and risk mitigation.</p>
+        </div>
+
+        <div class="manufacturing-card-grid grid-3">
+            {% for outcome in body_sections.outcomes %}
+            <div class="outcome-card" style="background: white; padding: 30px; border-radius: 6px; border: 1px solid #e5e7eb; box-shadow: 0 4px 10px rgba(0,0,0,0.02); display: flex; flex-direction: column; align-items: flex-start;">
+                <div class="outcome-icon" style="color: #f97316; font-size: 24px; margin-bottom: 15px;"><i class="fas fa-chart-bar"></i></div>
+                <h4 class="outcome-title" style="font-size: 18px; font-weight: 600; margin-bottom: 10px; color: var(--text-primary);">{{ outcome.title }}</h4>
+                <p class="outcome-text" style="font-size: 14.5px; line-height: 1.6; color: var(--text-secondary);">{{ outcome.desc }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Case Studies Showcase Section -->
+<section class="manufacturing-section">
+    <div class="container">
+        <div class="manufacturing-section-header text-center">
+            <span class="manufacturing-subtitle">Proven Results</span>
+            <h2 class="manufacturing-title">Manufacturing Proof Points</h2>
+            <p class="manufacturing-desc">See how Artha helps industrial enterprises resolve complex fragmentation and build trusted data pipelines.</p>
+        </div>
+
+        <div class="manufacturing-card-grid grid-2">
+            {% for pp in body_sections.proof_points %}
+            <div class="manufacturing-card case-study-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div class="card-content">
+                    <span class="case-study-tag" style="color: #ea580c; background: #fff7ed; border: 1px solid #ffedd5; padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; display: inline-block; margin-bottom: 15px;">{{ pp.title }}</span>
+                    <h3 class="card-title" style="font-size: 20px; font-weight: 600; margin-bottom: 12px;">{{ pp.title }}</h3>
+                    <p class="card-desc" style="font-size: 14.5px; line-height: 1.6; color: var(--text-secondary); font-weight: 300;">{{ pp.desc }}</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/industries/manufacturing/case-studies" class="btn-text" style="color: #f97316; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">Read Success Story <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- FAQs Section -->
+<section class="manufacturing-section section-alt">
+    <div class="container">
+        <div class="manufacturing-section-header text-center">
+            <span class="manufacturing-subtitle">FAQ</span>
+            <h2 class="manufacturing-title">Frequently Asked Questions</h2>
+            <p class="manufacturing-desc">Find answers to common questions about our industrial data governance, MDM, analytics, and AI readiness practices.</p>
+        </div>
+
+        <div class="faq-accordion-container" style="max-width: 800px; margin: 0 auto;">
+            {% if faqs %}
+                {% for faq in faqs %}
+                <div class="faq-accordion-item" style="border-bottom: 1px solid #e5e7eb; padding: 15px 0;">
+                    <button class="faq-accordion-trigger" onclick="toggleFaqAccordion(this)" style="width: 100%; display: flex; justify-content: space-between; align-items: center; background: none; border: none; text-align: left; font-size: 16.5px; font-weight: 600; color: var(--text-primary); cursor: pointer; padding: 10px 0;">
+                        {{ faq.q }} <i class="fas fa-plus icon-plus" style="font-size: 14px; color: #9ca3af;"></i>
+                    </button>
+                    <div class="faq-accordion-panel" style="max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out, padding 0.3s ease-out; padding: 0 10px;">
+                        <p style="font-size: 14.5px; line-height: 1.6; color: var(--text-secondary); font-weight: 300; padding-top: 10px; margin: 0;">{{ faq.a }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Bottom CTA Section -->
+<section class="manufacturing-bottom-cta">
+    <div class="container text-center">
+        <h2 class="cta-title">Ready to Build an AI-Ready Manufacturing Data Foundation?</h2>
+        <p class="cta-subtitle">Talk with our senior manufacturing data solutions architects to align your operations, supply chain, and systems.</p>
+        <div class="cta-actions">
+            <button onclick="openLeadModal('Bottom Overview CTA');" class="btn btn-primary btn-lg btn-glow">
+                Talk to a Manufacturing Data Expert
+            </button>
+            <button onclick="openLeadModal('Bottom Assessment CTA');" class="btn btn-outline btn-lg" style="color: white; border-color: white; background: transparent; margin-left: 15px;">
+                Request a Data Readiness Assessment
+            </button>
+        </div>
+    </div>
+</section>
+
+<script>
+    // Tab switching for "Who We Help"
+    function switchAudienceTab(evt, tabId) {
+        // Hide all panes
+        const panes = document.querySelectorAll('.audience-tab-pane');
+        panes.forEach(pane => pane.classList.remove('active'));
+        
+        // Deactivate all buttons
+        const buttons = document.querySelectorAll('.audience-tab-btn');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        
+        // Show selected pane and set button active
+        document.getElementById(tabId).classList.add('active');
+        evt.currentTarget.classList.add('active');
+    }
+
+    // Toggle FAQ Accordion
+    function toggleFaqAccordion(btn) {
+        btn.classList.toggle('active');
+        const icon = btn.querySelector('i');
+        if (btn.classList.contains('active')) {
+            icon.classList.remove('fa-plus');
+            icon.classList.add('fa-minus');
+        } else {
+            icon.classList.remove('fa-minus');
+            icon.classList.add('fa-plus');
+        }
+        
+        const panel = btn.nextElementSibling;
+        if (panel.style.maxHeight && panel.style.maxHeight !== '0px') {
+            panel.style.maxHeight = '0px';
+            panel.style.padding = '0 10px';
+        } else {
+            panel.style.maxHeight = panel.scrollHeight + "px";
+            panel.style.padding = '10px 10px';
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,461 @@
+{% extends "retail_base.html" %}
+
+{% block retail_hero %}
+<!-- Hero Section -->
+<section class="retail-hero">
+    <div class="retail-hero-glow"></div>
+    <div class="container retail-hero-grid">
+        <div class="retail-hero-content">
+            <span class="retail-badge"><i class="fas fa-shopping-bag"></i> {{ page.title }}</span>
+            <h1 class="retail-hero-title">
+                {{ page.hero_title }}
+            </h1>
+            <p class="retail-hero-subtitle">
+                {{ page.hero_subtitle }}
+            </p>
+            
+            <div class="retail-hero-ctas">
+                <button onclick="openLeadModal('{{ page.title }} Hero CTA');" class="btn btn-primary btn-lg">
+                    {{ cta.primary_cta_text or 'Talk to a Retail Data Expert' }} <i class="fas fa-arrow-right btn-icon"></i>
+                </button>
+                {% if cta.secondary_cta_text and cta.secondary_cta_url %}
+                <a href="{{ cta.secondary_cta_url }}" class="btn btn-outline btn-lg" style="border-color: var(--retail-color); color: var(--retail-dark); margin-left: 15px;">
+                    {{ cta.secondary_cta_text }}
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="retail-hero-visual">
+            <div class="retail-vis-container">
+                <div class="tech-grid-bg"></div>
+                <div class="tech-circle pulsate-slow">
+                    <i class="fas {% if active_subpage == 'customer-engagement' %}fa-user-circle{% elif active_subpage == 'supply-chain-commerce' %}fa-truck{% elif active_subpage == 'operational-resilience' %}fa-cogs{% elif active_subpage == 'risk-compliance-esg' %}fa-shield-halved{% elif active_subpage == 'mdm-customer-product-360' %}fa-address-card{% elif active_subpage == 'analytics-real-time-insights' %}fa-chart-line{% elif active_subpage == 'ai-readiness' %}fa-brain{% else %}fa-database{% endif %} text-retail"></i>
+                    <div class="tech-ring ring-1"></div>
+                    <div class="tech-ring ring-2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block retail_content %}
+<!-- Intro Section -->
+{% if body_sections.intro_p %}
+<section class="retail-section" style="padding: 60px 0 20px 0;">
+    <div class="container">
+        <div class="intro-block" style="border-left: 4px solid var(--retail-color); padding-left: 25px; margin-bottom: 20px;">
+            <p style="font-size: 18px; line-height: 1.7; color: var(--text-primary); font-weight: 300; margin: 0;">
+                {{ body_sections.intro_p }}
+            </p>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Challenge Section -->
+{% if body_sections.challenges %}
+<section class="retail-section section-alt" style="background-color: #fafafa;">
+    <div class="container">
+        <div class="retail-section-header text-center">
+            <span class="retail-subtitle">The Challenges</span>
+            <h2 class="retail-title">Transformation Bottlenecks & Hurdles</h2>
+            <p class="retail-desc">{{ body_sections.challenges_desc or 'Fragmented applications, unvalidated data files, and legacy integration layers increase risk and delay business progress.' }}</p>
+        </div>
+        
+        <div class="retail-card-grid grid-3">
+            {% for chal in body_sections.challenges %}
+            <div class="retail-card challenge-card-retail">
+                <div class="card-icon-circle-retail" style="background: #fef2f2; color: #ef4444;"><i class="fas fa-triangle-exclamation"></i></div>
+                {% if chal is string %}
+                <h3 class="card-title" style="font-size: 16px; font-weight: 700; margin: 0;">{{ chal }}</h3>
+                {% else %}
+                <h3 class="card-title">{{ chal.title }}</h3>
+                <p class="card-desc">{{ chal.desc }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Solution Areas Section / Capabilities Section -->
+{% if body_sections.solutions or body_sections.solution_areas %}
+<section class="retail-section">
+    <div class="container">
+        <div class="retail-section-header text-center">
+            <span class="retail-subtitle">Our Solutions</span>
+            <h2 class="retail-title">Artha Solutions & Architectures</h2>
+            <p class="retail-desc">We build enterprise-grade data platforms to resolve fragmentation, automate pipeline flows, and establish trusted records.</p>
+        </div>
+        
+        <div class="retail-card-grid grid-2">
+            {% set list_to_render = body_sections.solutions or body_sections.solution_areas %}
+            {% for sol in list_to_render %}
+            <div class="retail-card hover-card">
+                <div class="card-icon-circle-retail accent-retail"><i class="fas fa-circle-check"></i></div>
+                {% if sol is string %}
+                <h3 class="card-title" style="font-size: 16.5px; font-weight: 700; margin: 0;">{{ sol }}</h3>
+                {% else %}
+                <h3 class="card-title">{{ sol.title }}</h3>
+                <p class="card-desc">{{ sol.desc }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- MDM Domains and Capabilities Section (For MDM page specific) -->
+{% if body_sections.capabilities %}
+<section class="retail-section section-alt" style="background-color: #fafafa;">
+    <div class="container">
+        <div class="retail-section-header text-center">
+            <span class="retail-subtitle">Capabilities</span>
+            <h2 class="retail-title">Master Data Capabilities</h2>
+            <p class="retail-desc">Our MDM processes standardize, merge, and govern files to assemble golden master registers.</p>
+        </div>
+        
+        <div class="retail-card-grid grid-3">
+            {% for cap in body_sections.capabilities %}
+            <div class="retail-card hover-card">
+                <div class="card-icon-circle-retail accent-retail"><i class="fas fa-cogs"></i></div>
+                {% if cap is string %}
+                <h3 class="card-title" style="font-size: 16.5px; font-weight: 700; margin: 0;">{{ cap }}</h3>
+                {% else %}
+                <h3 class="card-title">{{ cap.title }}</h3>
+                <p class="card-desc">{{ cap.desc }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Customer / Product 360 Capabilities Section (For MDM page specific) -->
+{% if body_sections.customer_360_capabilities or body_sections.product_360_capabilities %}
+<section class="retail-section">
+    <div class="container">
+        <div class="retail-card-grid grid-2">
+            {% if body_sections.customer_360_capabilities %}
+            <div style="background: white; border: 1px solid var(--border-color); border-radius: 6px; padding: 40px; box-shadow: 0 4px 10px rgba(0,0,0,0.01);">
+                <span class="retail-subtitle">Master Profiles</span>
+                <h3 class="retail-title" style="font-size: 24px; margin-bottom: 20px;">Customer 360 Capabilities</h3>
+                <ul class="hero-bullet-list" style="display: grid; gap: 12px;">
+                    {% for cap in body_sections.customer_360_capabilities %}
+                    <li style="font-size: 14.5px; color: var(--text-secondary); display: flex; align-items: flex-start; gap: 10px;">
+                        <i class="fas fa-circle-check" style="color: #10b981; margin-top: 4px;"></i> 
+                        <div>
+                            {% if cap is string %}
+                            {{ cap }}
+                            {% else %}
+                            <strong>{{ cap.title }}:</strong> {{ cap.desc }}
+                            {% endif %}
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            
+            {% if body_sections.product_360_capabilities %}
+            <div style="background: white; border: 1px solid var(--border-color); border-radius: 6px; padding: 40px; box-shadow: 0 4px 10px rgba(0,0,0,0.01);">
+                <span class="retail-subtitle">Catalog Enrichment</span>
+                <h3 class="retail-title" style="font-size: 24px; margin-bottom: 20px;">Product 360 Capabilities</h3>
+                <ul class="hero-bullet-list" style="display: grid; gap: 12px;">
+                    {% for cap in body_sections.product_360_capabilities %}
+                    <li style="font-size: 14.5px; color: var(--text-secondary); display: flex; align-items: flex-start; gap: 10px;">
+                        <i class="fas fa-circle-check" style="color: #10b981; margin-top: 4px;"></i> 
+                        <div>
+                            {% if cap is string %}
+                            {{ cap }}
+                            {% else %}
+                            <strong>{{ cap.title }}:</strong> {{ cap.desc }}
+                            {% endif %}
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- AI-Enabled MDM Features (For MDM page specific) -->
+{% if body_sections.ai_enabled_mdm or body_sections.ai_features %}
+<section class="retail-section section-alt" style="background-color: #fafafa;">
+    <div class="container">
+        <div class="retail-section-header text-center">
+            <span class="retail-subtitle">AI & ML Acceleration</span>
+            <h2 class="retail-title">AI-Powered MDM & Automation</h2>
+            <p class="retail-desc">Accelerate stewardship tasks using smart classification algorithms, matching models, and duplicate detection prompts under active governance.</p>
+        </div>
+        
+        <div class="retail-card-grid grid-3">
+            {% set ai_list = body_sections.ai_enabled_mdm or body_sections.ai_features %}
+            {% for feat in ai_list %}
+            <div class="retail-card hover-card" style="border-top: 3px solid #8b5cf6;">
+                <div class="card-icon-circle-retail" style="background: #f5f3ff; color: #8b5cf6;"><i class="fas fa-wand-magic-sparkles"></i></div>
+                {% if feat is string %}
+                <h3 class="card-title" style="font-size: 16.5px; font-weight: 700; margin: 0;">{{ feat }}</h3>
+                {% else %}
+                <h3 class="card-title">{{ feat.title }}</h3>
+                <p class="card-desc">{{ feat.desc }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- AI Data Readiness Framework (For AI readiness page specific) -->
+{% if body_sections.ai_readiness_framework or body_sections.architecture_flow %}
+<section class="retail-section">
+    <div class="container">
+        <div class="retail-section-header text-center">
+            <span class="retail-subtitle">Flow Diagram</span>
+            <h2 class="retail-title">AI-Ready Retail Data Architecture</h2>
+            <p class="retail-desc">Understand how fragmented transactions, catalog parameters, and logistics points flow into governed datasets to ground models.</p>
+        </div>
+
+        <div class="framework-layers-container">
+            {% set flow_list = body_sections.ai_readiness_framework or body_sections.architecture_flow %}
+            {% for flow in flow_list %}
+            <div class="framework-layer-item">
+                <div class="layer-number-retail">{{ loop.index }}</div>
+                <div class="layer-content">
+                    {% if flow is string %}
+                    <h3 class="layer-title" style="font-size: 16.5px; font-weight: 700; margin: 0;">{{ flow }}</h3>
+                    {% else %}
+                    <h3 class="layer-title">{{ flow.title }}</h3>
+                    <p class="layer-desc">{{ flow.desc }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Governance / Responsible AI Section (For AI readiness / compliance pages specific) -->
+{% if body_sections.responsible_ai_governance or body_sections.governance %}
+<section class="retail-section section-alt" style="background-color: #fafafa;">
+    <div class="container">
+        <div class="retail-section-header text-center">
+            <span class="retail-subtitle">Governance & Control</span>
+            <h2 class="retail-title">Responsible Data Governance & Oversight</h2>
+            <p class="retail-desc">Protect customer privacy rules, trace database query logic, and implement security boundaries to satisfy audits.</p>
+        </div>
+        
+        <div class="retail-card-grid grid-3">
+            {% set gov_list = body_sections.responsible_ai_governance or body_sections.governance %}
+            {% for gov in gov_list %}
+            <div class="retail-card hover-card">
+                <div class="card-icon-circle-retail accent-retail"><i class="fas fa-gavel"></i></div>
+                {% if gov is string %}
+                <h3 class="card-title" style="font-size: 16.5px; font-weight: 700; margin: 0;">{{ gov }}</h3>
+                {% else %}
+                <h3 class="card-title">{{ gov.title }}</h3>
+                <p class="card-desc">{{ gov.desc }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Featured Use Cases Section (For subpages specific) -->
+{% if body_sections.featured_use_cases or body_sections.use_cases %}
+<section class="retail-section">
+    <div class="container">
+        <div class="retail-section-header text-center">
+            <span class="retail-subtitle">Scenarios</span>
+            <h2 class="retail-title">Featured Retail Use Cases</h2>
+            <p class="retail-desc">Browse real-world scenarios illustrating the application of unified databases to support business operations.</p>
+        </div>
+        
+        <div class="retail-card-grid grid-3">
+            {% set uc_list = body_sections.featured_use_cases or body_sections.use_cases %}
+            {% for uc in uc_list %}
+            <div class="retail-card hover-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <div class="card-icon-circle-retail accent-retail"><i class="fas fa-lightbulb"></i></div>
+                    {% if uc is string %}
+                    <h3 class="card-title" style="font-size: 16px; font-weight: 700; margin: 0;">{{ uc }}</h3>
+                    {% else %}
+                    <h3 class="card-title">{{ uc.title or uc }}</h3>
+                    <p class="card-desc">{{ uc.desc or '' }}</p>
+                    {% endif %}
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/industries/retail/use-cases" class="btn-text" style="color: var(--retail-dark); font-weight: 600; display: inline-flex; align-items: center; gap: 8px; text-decoration: none;">Explore Use Cases <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Data Domains Section -->
+{% if body_sections.domains or body_sections.data_domains %}
+<section class="retail-section section-alt" style="background-color: #fafafa;">
+    <div class="container">
+        <div class="retail-section-header text-center">
+            <span class="retail-subtitle">Data Assets</span>
+            <h2 class="retail-title">Critical Data Domains Covered</h2>
+            <p class="retail-desc">We structure, validation-check, and deduplicate primary data entities across financial operational books.</p>
+        </div>
+        
+        <div class="retail-card-grid grid-4">
+            {% set domain_list = body_sections.domains or body_sections.data_domains %}
+            {% for dom in domain_list %}
+            <div class="retail-card" style="background: white; padding: 25px; border-radius: 6px; border: 1px solid #e5e7eb; box-shadow: 0 4px 10px rgba(0,0,0,0.01);">
+                <div class="card-icon-circle-retail accent-retail" style="margin-bottom: 12px;"><i class="fas fa-folder-open"></i></div>
+                {% if dom is string %}
+                <h4 class="card-title" style="font-size: 16px; font-weight: 600; margin: 0; color: var(--text-primary);">{{ dom }}</h4>
+                {% else %}
+                <h4 class="card-title" style="font-size: 16px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">{{ dom.title }}</h4>
+                <p class="card-desc" style="font-size: 13.5px; line-height: 1.5; color: var(--text-secondary); margin: 0; font-weight: 300;">{{ dom.desc }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- KPIs Section (For Analytics specific) -->
+{% if body_sections.kpis or body_sections.kpi_examples %}
+<section class="retail-section">
+    <div class="container">
+        <div class="retail-section-header text-center">
+            <span class="retail-subtitle">KPI Indicators</span>
+            <h2 class="retail-title">Enterprise Analytics Metrics Supported</h2>
+            <p class="retail-desc">Standardize your database triggers to compute essential sales, inventory, compliance, and customer KPIs.</p>
+        </div>
+        
+        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; max-width: 900px; margin: 0 auto;">
+            {% set kpi_list = body_sections.kpis or body_sections.kpi_examples %}
+            {% for kpi in kpi_list %}
+            <span style="display: inline-block; background: var(--retail-light); color: var(--retail-dark); border: 1px solid var(--retail-border); font-size: 14px; font-weight: 600; padding: 8px 18px; border-radius: 30px;">
+                <i class="fas fa-chart-line" style="margin-right: 6px;"></i> {{ kpi }}
+            </span>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Measurable Business Outcomes Section -->
+{% if body_sections.outcomes %}
+<section class="retail-section section-alt" style="background-color: #fafafa;">
+    <div class="container">
+        <div class="retail-section-header text-center">
+            <span class="retail-subtitle">Business Value</span>
+            <h2 class="retail-title">Measurable Outcomes</h2>
+            <p class="retail-desc">Deploying compliance-ready, unified data infrastructures generates concrete financial and regulatory advantages.</p>
+        </div>
+
+        <div class="retail-card-grid grid-3">
+            {% for outcome in body_sections.outcomes %}
+            <div class="retail-card" style="background: white; padding: 30px; border-radius: 6px; border: 1px solid #e5e7eb; box-shadow: 0 4px 10px rgba(0,0,0,0.02); display: flex; flex-direction: column; align-items: flex-start;">
+                <div class="card-icon-circle-retail accent-retail" style="margin-bottom: 15px;"><i class="fas fa-chart-line"></i></div>
+                {% if outcome is string %}
+                <h4 class="card-title" style="font-size: 16.5px; font-weight: 700; margin: 0;">{{ outcome }}</h4>
+                {% else %}
+                <h4 class="card-title" style="font-size: 18px; font-weight: 600; margin-bottom: 10px; color: var(--text-primary);">{{ outcome.title or outcome }}</h4>
+                <p class="card-desc" style="font-size: 14.5px; line-height: 1.6; color: var(--text-secondary); margin: 0;">{{ outcome.desc or '' }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Related Solutions Services -->
+{% if related_services %}
+<section class="retail-section" style="padding: 40px 0; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);">
+    <div class="container text-center">
+        <h4 style="margin-bottom: 20px; font-size: 15px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-secondary); font-weight: 700;">Related Solutions & Services</h4>
+        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px;">
+            {% for svc in related_services %}
+            <a href="{{ svc.url }}" class="btn btn-outline" style="font-size: 13.5px; padding: 8px 20px; border-color: #d1d5db; color: var(--text-secondary); text-decoration: none; border-radius: 4px;">{{ svc.title }}</a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- FAQ Section -->
+<section class="retail-section">
+    <div class="container">
+        <div class="retail-section-header text-center">
+            <span class="retail-subtitle">FAQ</span>
+            <h2 class="retail-title">Frequently Asked Questions</h2>
+            <p class="retail-desc">Common questions regarding our implementation architectures for {{ page.title }}.</p>
+        </div>
+        
+        <div class="faq-accordion-container" style="max-width: 800px; margin: 0 auto;">
+            {% if faqs %}
+                {% for faq in faqs %}
+                <div class="faq-accordion-item" style="border-bottom: 1px solid #e5e7eb; padding: 15px 0;">
+                    <button class="faq-accordion-trigger" onclick="toggleFaqAccordion(this)" style="width: 100%; display: flex; justify-content: space-between; align-items: center; background: none; border: none; text-align: left; font-size: 16.5px; font-weight: 600; color: var(--text-primary); cursor: pointer; padding: 10px 0;">
+                        {{ faq.q }} <i class="fas fa-plus icon-plus" style="font-size: 14px; color: #9ca3af;"></i>
+                    </button>
+                    <div class="faq-accordion-panel" style="max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out, padding 0.3s ease-out; padding: 0 10px;">
+                        <p style="font-size: 14.5px; line-height: 1.6; color: var(--text-secondary); font-weight: 300; padding-top: 10px; margin: 0;">{{ faq.a }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Bottom CTA Section -->
+<section class="retail-bottom-cta">
+    <div class="container text-center">
+        <h2 class="cta-title">Modernize Your {{ page.title }} Program</h2>
+        <p class="cta-subtitle">Connect with our data consultants to build connected schemas, audit data pipelines, and scale your analytics.</p>
+        <div class="cta-actions" style="justify-content: center;">
+            <button onclick="openLeadModal('Bottom CTA: {{ page.title }}');" class="btn btn-primary btn-lg btn-glow">
+                {{ cta.primary_cta_text or 'Talk to a Retail Data Expert' }}
+            </button>
+        </div>
+    </div>
+</section>
+
+<script>
+    function toggleFaqAccordion(btn) {
+        btn.classList.toggle('active');
+        const icon = btn.querySelector('i');
+        if (btn.classList.contains('active')) {
+            icon.classList.remove('fa-plus');
+            icon.classList.add('fa-minus');
+        } else {
+            icon.classList.remove('fa-minus');
+            icon.classList.add('fa-plus');
+        }
+        
+        const panel = btn.nextElementSibling;
+        if (panel.style.maxHeight && panel.style.maxHeight !== '0px') {
+            panel.style.maxHeight = '0px';
+            panel.style.padding = '0 10px';
+        } else {
+            panel.style.maxHeight = panel.scrollHeight + "px";
+            panel.style.padding = '10px 10px';
+        }
+    }
+</script>
+{% endblock %}

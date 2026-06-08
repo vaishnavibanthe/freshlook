@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Artha Solutions helps enterprises modernize data platforms, build AI-ready foundations, and strengthen data governance to deliver scalable, governed insights.">
+    <title>{% block title %}Enterprise AI & Data Services Provider{% endblock %} | Artha Solutions</title>
+    
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom Style Sheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <!-- SEO & Social OpenGraph -->
+    <meta property="og:title" content="Artha Solutions - Enterprise Data & AI Modernization">
+    <meta property="og:description" content="Build AI-ready data foundations, modernize ETL pipelines, and automate governance with Artha solutions.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.thinkartha.com/">
+    
+    <link rel="icon" type="image/png" href="https://www.thinkartha.com/wp-content/uploads/2026/05/Artha-Solutions-logo.png">
+    {% block extra_meta %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}">
+
+    <!-- Header / Navbar -->
+    <header class="header" id="main-header">
+        <div class="container nav-container">
+            <!-- Left: Logo -->
+            <a href="/" class="logo-link" id="nav-logo">
+                <img src="{{ url_for('static', filename='img/artha-logo-main.png') }}" alt="Artha Solutions" class="logo-img logo-main">
+                <img src="{{ url_for('static', filename='img/artha-logo-white.png') }}" alt="Artha Solutions" class="logo-img logo-white" style="display: none;">
+            </a>
+            
+            <!-- Center: Navigation Menu -->
+            <nav class="nav-bar" role="navigation" aria-label="Main Navigation">
+                <ul class="nav-menu">
+                    {% if navigation_menu and navigation_menu['items'] %}
+                        {% for item in navigation_menu['items'] %}
+                            <li class="nav-item {% if item.groups %}has-dropdown{% endif %}">
+                                <a href="{{ item.url or '#' }}" class="nav-link {% if active_page == item.label.lower().replace(' ', '_') %}active{% endif %}" 
+                                   id="nav-item-{{ item.id }}" 
+                                   {% if item.groups %}aria-haspopup="true" aria-expanded="false"{% endif %}>
+                                    {{ item.label }}
+                                    {% if item.groups %}
+                                        <i class="fas fa-chevron-down" style="font-size: 8px; margin-left: 5px; transition: transform 0.2s ease;"></i>
+                                    {% endif %}
+                                </a>
+                                {% if item.groups %}
+                                    <!-- Mega Menu Panel -->
+                                    {% set cols_count = item.groups|length %}
+                                    {% if item.featured_card %}
+                                        {% set cols_count = cols_count + 1 %}
+                                    {% endif %}
+                                    <div class="nav-mega-menu mega-cols-{{ cols_count }}" aria-labelledby="nav-item-{{ item.id }}">
+                                        <div class="mega-menu-grid">
+                                            {% for group in item.groups %}
+                                                <div class="mega-menu-column">
+                                                    {% if group.label == 'Digital Transformation' %}
+                                                        <a href="/artha-advantage/digital-transformations" class="mega-menu-section-label-link" style="text-decoration: none; display: block; margin-bottom: 16px;">
+                                                            <span class="mega-menu-section-label" style="margin-bottom: 0; cursor: pointer; transition: color 0.2s ease;">{{ group.label|upper }}</span>
+                                                        </a>
+                                                    {% else %}
+                                                        <span class="mega-menu-section-label">{{ group.label|upper }}</span>
+                                                    {% endif %}
+                                                    <ul>
+                                                        {% for sub in group['items'] %}
+                                                            <li>
+                                                                <a href="{{ sub.url }}" class="mega-menu-link">
+                                                                    <div class="mega-menu-content">
+                                                                        <span class="mega-menu-title">
+                                                                            {% if sub.icon %}
+                                                                                <i class="{{ sub.icon }}" style="margin-right: 8px; font-size: 13px; color: var(--accent-blue);"></i>
+                                                                            {% endif %}
+                                                                            {{ sub.label }}
+                                                                        </span>
+                                                                        {% if sub.description %}
+                                                                            <span class="mega-menu-desc">{{ sub.description }}</span>
+                                                                        {% endif %}
+                                                                    </div>
+                                                                </a>
+                                                            </li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                            {% endfor %}
+                                            
+                                            {% if item.featured_card %}
+                                                <div class="mega-menu-column featured-card-column">
+                                                    <div class="mega-featured-card">
+                                                        {% if item.featured_card.label %}
+                                                            <span class="badge-featured">{{ item.featured_card.label }}</span>
+                                                        {% endif %}
+                                                        <h5>{{ item.featured_card.title }}</h5>
+                                                        <p>{{ item.featured_card.description }}</p>
+                                                        {% if item.featured_card.cta_text %}
+                                                            <a href="{{ item.featured_card.cta_url }}" class="btn btn-outline btn-xs">
+                                                                {{ item.featured_card.cta_text }} 
+                                                                <i class="fas fa-arrow-right btn-icon" style="margin-left: 4px;"></i>
+                                                            </a>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    {% endif %}
+                </ul>
+            </nav>
+
+            <!-- Right: Search & CTAs -->
+            <div class="header-actions">
+                <button type="button" class="search-overlay-trigger-btn" id="search-trigger-btn" aria-label="Open search overlay">
+                    <i class="fas fa-search"></i>
+                </button>
+
+                {% if navigation_menu and navigation_menu['ctas'] %}
+                    {% for cta in navigation_menu['ctas'] %}
+                        <a href="{{ cta.url }}" class="btn {% if cta.style == 'primary' %}btn-primary{% else %}btn-outline{% endif %} header-cta-btn" id="nav-cta-{{ cta.id }}">{{ cta.label }}</a>
+                    {% endfor %}
+                {% else %}
+                    <a href="/contact-us" class="btn btn-primary header-cta-btn" id="nav-contact">Get in Touch</a>
+                {% endif %}
+            </div>
+            
+            <button class="mobile-toggle" aria-label="Toggle navigation menu" id="nav-toggle" aria-controls="mobile-drawer" aria-expanded="false">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main id="content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-grid">
+            <div class="footer-column footer-logo-block">
+                <a href="/" class="logo-link" style="justify-content: flex-start;">
+                    <img src="{{ url_for('static', filename='img/artha-logo-white.png') }}" alt="Artha Solutions" class="logo-img">
+                </a>
+                <p class="footer-desc">Think Data... Think Artha. We empower organizations with modern data foundations, strategic governance, and production-ready AI solutions.</p>
+                <div class="footer-socials">
+                    <a href="https://linkedin.com/company/artha-data-solutions" target="_blank" aria-label="LinkedIn" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="https://www.youtube.com/@ThinkArtha" target="_blank" aria-label="YouTube" class="social-link"><i class="fab fa-youtube"></i></a>
+                    <a href="https://x.com/ThinkArtha" target="_blank" aria-label="X" class="social-link"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="16" height="16" fill="currentColor" style="display: block;"><path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z"/></svg></a>
+                </div>
+            </div>
+            
+            <div class="footer-column">
+                <h4>Core Offerings</h4>
+                <ul class="footer-links">
+                    <li class="footer-links-item"><a href="/artha-advantage" class="footer-link">Artha Advantage</a></li>
+                    <li class="footer-links-item"><a href="/data-solutions" class="footer-link">Data Modernization</a></li>
+                    <li class="footer-links-item"><a href="/artificial-intelligence" class="footer-link">AI Consulting</a></li>
+                    <li class="footer-links-item"><a href="/case-studies" class="footer-link">Case Studies</a></li>
+                    <li class="footer-links-item"><a href="/blogs" class="footer-link">Blogs</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h4>Solutions</h4>
+                <ul class="footer-links">
+                    <li class="footer-links-item"><a href="/solutions/data-governance" class="footer-link">Data Governance</a></li>
+                    <li class="footer-links-item"><a href="/solutions/master-data-management" class="footer-link">Master Data Management</a></li>
+                    <li class="footer-links-item"><a href="/industries/data-quality" class="footer-link">Data Quality Management</a></li>
+                    <li class="footer-links-item"><a href="/data-readiness" class="footer-link">AI Data Readiness</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h4>Industries</h4>
+                <ul class="footer-links">
+                    <li class="footer-links-item"><a href="/industries/bfsi" class="footer-link">BFSI (Banking & Financial Services)</a></li>
+                    <li class="footer-links-item"><a href="/industries/healthcare" class="footer-link">Healthcare & Life Sciences</a></li>
+                    <li class="footer-links-item"><a href="/industries/manufacturing" class="footer-link">Manufacturing</a></li>
+                    <li class="footer-links-item"><a href="/industries/retail" class="footer-link">Retail & E-Commerce</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="container footer-bottom">
+            <p>Copyright &copy; 2026 Artha Solutions. All rights reserved.</p>
+            <div class="footer-legal-links">
+                <a href="/privacy-policy" class="legal-link">Privacy Policy</a>
+                <a href="/contact-us" class="legal-link">Cookie Policy</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Mobile Navigation Drawer -->
+    <div class="mobile-nav-drawer" id="mobile-drawer" aria-hidden="true">
+        <div class="mobile-nav-backdrop" id="mobile-backdrop"></div>
+        <div class="mobile-nav-content">
+            <div class="mobile-nav-header">
+                <a href="/" class="logo-link">
+                    <img src="{{ url_for('static', filename='img/artha-logo-main.png') }}" alt="Artha Solutions" class="logo-img">
+                </a>
+                <button class="mobile-close-btn" id="mobile-close" aria-label="Close menu">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="mobile-nav-body">
+                <ul class="mobile-menu-list">
+                    {% if navigation_menu and navigation_menu['items'] %}
+                        {% for item in navigation_menu['items'] %}
+                            <li class="mobile-menu-item">
+                                {% if item.groups %}
+                                    <button class="mobile-accordion-toggle" aria-expanded="false">
+                                        {{ item.label }}
+                                        <i class="fas fa-chevron-down"></i>
+                                    </button>
+                                    <div class="mobile-accordion-panel" style="max-height: 0; overflow: hidden; transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+                                        {% for group in item.groups %}
+                                            <div class="mobile-accordion-group">
+                                                {% if group.label == 'Digital Transformation' %}
+                                                    <a href="/artha-advantage/digital-transformations" class="mobile-group-label-link" style="text-decoration: none; display: block; margin-bottom: 8px;">
+                                                        <span class="mobile-group-label" style="margin-bottom: 0; cursor: pointer; color: var(--accent-blue);">{{ group.label|upper }}</span>
+                                                    </a>
+                                                {% else %}
+                                                    <span class="mobile-group-label">{{ group.label|upper }}</span>
+                                                {% endif %}
+                                                <ul>
+                                                    {% for sub in group['items'] %}
+                                                        <li>
+                                                            <a href="{{ sub.url }}" class="mobile-sub-link">
+                                                                {% if sub.icon %}
+                                                                    <i class="{{ sub.icon }}" style="margin-right: 8px; font-size: 11px; color: var(--accent-blue);"></i>
+                                                                {% endif %}
+                                                                {{ sub.label }}
+                                                            </a>
+                                                        </li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <a href="{{ item.url }}" class="mobile-direct-link">{{ item.label }}</a>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    {% endif %}
+                </ul>
+            </div>
+            
+            <div class="mobile-nav-footer">
+                <div class="mobile-ctas">
+                    {% if navigation_menu and navigation_menu['ctas'] %}
+                        {% for cta in navigation_menu['ctas'] %}
+                            <a href="{{ cta.url }}" class="btn {% if cta.style == 'primary' %}btn-primary{% else %}btn-outline{% endif %} mobile-cta-btn">{{ cta.label }}</a>
+                        {% endfor %}
+                    {% else %}
+                        <a href="/contact-us" class="btn btn-primary mobile-cta-btn">Get in Touch</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Overlay -->
+    <div class="search-overlay" id="search-overlay" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="search-overlay-input">
+        <div class="search-overlay-backdrop" id="search-backdrop"></div>
+        <div class="search-overlay-container">
+            <div class="search-overlay-header">
+                <form action="/search" method="GET" class="search-overlay-form" id="search-overlay-form">
+                    <i class="fas fa-search search-input-icon"></i>
+                    <input type="text" name="q" id="search-overlay-input" placeholder="Search for data solutions, AI readiness, case studies..." autocomplete="off" aria-label="Search site">
+                    <button type="button" class="search-overlay-close" id="search-close" aria-label="Close search overlay">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </form>
+            </div>
+            <div class="search-overlay-results-wrapper">
+                <div class="search-suggestions-container" id="search-suggestions-box">
+                    <div class="search-suggestions-section">
+                        <span class="search-suggestions-label">Popular Searches</span>
+                        <div class="popular-search-tags">
+                            <a href="/search?q=Data+Governance" class="popular-tag">Data Governance</a>
+                            <a href="/search?q=AI+Readiness" class="popular-tag">AI Readiness</a>
+                            <a href="/search?q=MDM" class="popular-tag">Master Data Management</a>
+                            <a href="/search?q=Retail" class="popular-tag">Retail Microsite</a>
+                            <a href="/search?q=SAP" class="popular-tag">SAP Modernization</a>
+                        </div>
+                    </div>
+                    <div class="search-suggestions-section" id="dynamic-suggestions-section" style="display: none;">
+                        <span class="search-suggestions-label">Matching Results</span>
+                        <div class="dynamic-suggestions-list" id="dynamic-suggestions-list">
+                            <!-- suggestions populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Script -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

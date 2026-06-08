@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}{{ data.title }}{% endblock %}
+
+{% block content %}
+<!-- Detail Hero -->
+<section class="hero" style="min-height: 60vh; padding-top: calc(var(--nav-height) + 60px); padding-bottom: 60px;">
+    <div class="hero-bg-glow hero-glow-1"></div>
+    <div class="container hero-grid" style="grid-template-columns: 1.2fr 0.8fr;">
+        <div class="hero-content">
+            <div class="hero-badge"><i class="fas fa-toolbox"></i> Enterprise Solutions</div>
+            <h1 class="hero-title" style="font-size: 48px;">
+                {{ data.title }}
+            </h1>
+            <p class="hero-desc">
+                {{ data.tagline }}
+            </p>
+            <div class="hero-buttons">
+                <a href="/contact-us" class="btn btn-primary btn-glow">Consult an Expert <i class="fas fa-chevron-right btn-icon"></i></a>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="ai-graphic-container" style="max-width: 300px; height: 300px;">
+                <div class="ai-node-circle circle-lg"></div>
+                <div class="ai-core" style="width: 80px; height: 80px; background: var(--grad-primary);">
+                    <i class="fas fa-{{ data.icon }}" style="font-size: 28px;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Strip (Dynamic if exists) -->
+{% if data.stats %}
+<section class="stats-section" style="padding: 40px 0; background: var(--grad-cyan-blue);">
+    <div class="container stats-grid">
+        {% for stat in data.stats %}
+        <div class="stat-item">
+            <span class="stat-number" data-target="{{ stat.val }}">{{ stat.val }}</span>
+            <span class="stat-label">{{ stat.label }}</span>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- Features & Core Offerings Grid -->
+<section class="section" id="solution-details">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-subtitle">Scope of Service</span>
+            <h2 class="section-title">Capabilities & <span>Architecture</span></h2>
+            <p class="section-desc">{{ data.description }}</p>
+        </div>
+        
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));">
+            {% for feature in data.features %}
+            <div class="card">
+                <div class="card-icon-box">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h3 class="card-title">{{ feature.title }}</h3>
+                <p class="card-desc">{{ feature.desc }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Case Study Callout (Dynamic if exists) -->
+{% if data.case_study %}
+<section class="section-alt" id="solution-case">
+    <div class="container feature-split">
+        <div class="feature-visual feature-visual-glow">
+            <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80" alt="Corporate data operations workspace representation">
+        </div>
+        <div class="feature-content">
+            <div class="hero-badge"><i class="fas fa-book-open"></i> Client Success</div>
+            <h2 class="feature-title">{{ data.case_study.title }}</h2>
+            <p class="feature-desc">{{ data.case_study.desc }}</p>
+            <p class="feature-desc">Discover how Artha Solutions transforms databases and accelerates migration with certified support.</p>
+            <a href="/contact-us" class="btn btn-primary">Request Full Story Case</a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Bottom Banner -->
+<section class="section" style="background: var(--grad-glow); text-align: center;">
+    <div class="container">
+        <h2 class="section-title">Clean, Secure <span>Data Integration</span></h2>
+        <p class="section-desc" style="max-width: 600px; margin: 0 auto 30px;">Artha Solutions helps you implement modern platforms and maintain reliable insights.</p>
+        <a href="/contact-us" class="btn btn-primary btn-glow">Request an On-Demand Assessment</a>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+
+{% block title %}Alation Data Catalog Partner{% endblock %}
+
+{% block extra_meta %}
+<meta name="description" content="Discover, understand, and govern enterprise data assets with Alation. Learn about Alation data cataloging, lineage tracking, and knowledge sharing.">
+{% endblock %}
+
+{% block content %}
+<style>
+:root {
+    --brand-color: #14b8a6;
+    --brand-color-rgb: 20, 184, 166;
+    --brand-glow: rgba(20, 184, 166, 0.15);
+}
+@keyframes spinOrbit {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+@keyframes spinOrbitReverse {
+    0% { transform: rotate(360deg); }
+    100% { transform: rotate(0deg); }
+}
+.brand-orbit-node {
+    position: absolute;
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--brand-color);
+}
+.card-brand-hover {
+    transition: all 0.3s ease;
+}
+.card-brand-hover:hover {
+    border-color: var(--brand-color) !important;
+    box-shadow: 0 10px 30px var(--brand-glow) !important;
+    transform: translateY(-5px);
+}
+.badge-brand {
+    background: var(--brand-glow);
+    color: var(--brand-color);
+    border: 1px solid rgba(20, 184, 166, 0.3);
+}
+</style>
+
+<!-- Detail Hero -->
+<section class="hero" style="min-height: 60vh; padding-top: calc(var(--nav-height) + 60px); padding-bottom: 60px;">
+    <div class="hero-bg-glow hero-glow-1" style="background: radial-gradient(circle, rgba(20,184,166,0.15) 0%, transparent 70%);"></div>
+    <div class="container hero-grid" style="grid-template-columns: 1.2fr 0.8fr;">
+        <div class="hero-content">
+            <div class="hero-badge badge-brand"><i class="fas fa-book-open"></i> Strategic Partners &middot; Alation</div>
+            <h1 class="hero-title" style="font-size: clamp(34px, 4.5vw, 46px); line-height: 1.15; margin-bottom: 18px;">
+                Alation Data Catalog <span>Expertise</span>
+            </h1>
+            <p class="hero-desc">
+                Alation is a data governance and cataloging solution that helps organizations manage their data landscape. It integrates seamlessly with a variety of data sources, empowering teams to find, understand, and use data effectively.
+            </p>
+            <div class="hero-buttons" style="display:flex; gap:14px; flex-wrap:wrap;">
+                <a href="/contact-us" class="btn btn-primary btn-glow" style="background: linear-gradient(135deg, #14b8a6, #1d4ed8); border: none;">Consult Partner Architect <i class="fas fa-chevron-right btn-icon"></i></a>
+                <a href="#services" class="btn btn-outline">Explore Solutions</a>
+            </div>
+            
+            <div class="sol-tag-row" style="margin-top: 30px; display: flex; gap: 10px; flex-wrap: wrap;">
+                <span class="sol-tag-pill" style="font-size: 12px; background: rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);"><i class="fas fa-atlas" style="color: #14b8a6; margin-right: 6px;"></i> Active Metadata</span>
+                <span class="sol-tag-pill" style="font-size: 12px; background: rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);"><i class="fas fa-sitemap" style="color: #14b8a6; margin-right: 6px;"></i> Data Lineage</span>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="brand-graphic" style="position: relative; width: 100%; height: 350px; display: flex; justify-content: center; align-items: center;">
+                <div style="position: absolute; width: 280px; height: 280px; border-radius: 50%; background: radial-gradient(circle, rgba(20,184,166,0.1) 0%, transparent 70%); filter: blur(20px);"></div>
+                <div style="position: absolute; width: 260px; height: 260px; border: 1px dashed rgba(20,184,166,0.2); border-radius: 50%; animation: spinOrbit 25s linear infinite;"></div>
+                <div style="position: absolute; width: 180px; height: 180px; border: 1px dashed rgba(29,78,216,0.3); border-radius: 50%; animation: spinOrbitReverse 15s linear infinite;"></div>
+                <div class="ai-core" style="width: 90px; height: 90px; background: linear-gradient(135deg, #14b8a6, #1d4ed8); box-shadow: 0 0 30px rgba(20,184,166,0.4); z-index: 2; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-book-open" style="font-size: 32px; color: #fff;"></i>
+                </div>
+                <!-- Nodes -->
+                <div class="brand-orbit-node" style="width: 12px; height: 12px; background: #14b8a6; top: 120px; left: 45px;"></div>
+                <div class="brand-orbit-node" style="width: 8px; height: 8px; background: #2dd4bf; bottom: 120px; right: 45px;"></div>
+                <div class="brand-orbit-node" style="width: 10px; height: 10px; background: #60a5fa; top: 50px; right: 120px;"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Strategic Alation Services to Transform Your Enterprise -->
+<section class="section-alt" id="services">
+    <div class="container">
+        <div class="section-header" style="text-align: center; margin-bottom: 50px;">
+            <span class="section-subtitle">Alation Services</span>
+            <h2 class="section-title">Strategic Alation Services <span>to Transform Your Enterprise</span></h2>
+            <p class="section-desc">Discover comprehensive Alation Consulting services that unlock value and minimize metadata risks for your business.</p>
+        </div>
+        
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 30px;">
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(20,184,166,0.1); color: #14b8a6;">
+                    <i class="fas fa-universal-access"></i>
+                </div>
+                <h3 class="card-title">Improved Data Accessibility</h3>
+                <p class="card-desc">By cataloging and organizing data assets, Alation makes it easier for users across the organization to find and use relevant data, improving decision-making and productivity.</p>
+            </div>
+            
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(20,184,166,0.1); color: #14b8a6;">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3 class="card-title">Enhanced Data Security and Compliance</h3>
+                <p class="card-desc">Alation’s data governance features help businesses meet regulatory requirements and protect sensitive data, reducing the risk of non-compliance and data breaches.</p>
+            </div>
+            
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(20,184,166,0.1); color: #14b8a6;">
+                    <i class="fas fa-tachometer-alt"></i>
+                </div>
+                <h3 class="card-title">Accelerated Data-driven Decision Making</h3>
+                <p class="card-desc">With a centralized data catalog and powerful collaboration tools, teams can quickly access trusted, high-quality data, enabling faster and more informed decisions.</p>
+            </div>
+            
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(20,184,166,0.1); color: #14b8a6;">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <h3 class="card-title">Reduced Operational Costs</h3>
+                <p class="card-desc">Alation’s automated features, such as data lineage and quality management, help reduce manual effort, errors, and inefficiencies, leading to cost savings and more streamlined operations.</p>
+            </div>
+            
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(20,184,166,0.1); color: #14b8a6;">
+                    <i class="fas fa-hands-helping"></i>
+                </div>
+                <h3 class="card-title">Strengthened Data Collaboration</h3>
+                <p class="card-desc">Alation fosters cross-departmental collaboration by enabling teams to share insights, knowledge, and annotations directly within the platform, driving more innovative data-driven solutions.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Our Alation Solutions -->
+<section class="section" id="solutions">
+    <div class="container">
+        <div class="section-header" style="text-align: center; margin-bottom: 50px;">
+            <span class="section-subtitle">Solutions Catalog</span>
+            <h2 class="section-title">Our Alation <span>Solutions</span></h2>
+            <p class="section-desc">Establish governed dictionaries, trace data origins, and manage catalog data assets dynamically.</p>
+        </div>
+        
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;">
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-search" style="color: #14b8a6;"></i> Data Cataloging and Discovery
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">Alation’s robust data cataloging feature enables organizations to organize and classify their data assets. It simplifies the process of data discovery, making it easier for users to find the information they need. Alation's intuitive search interface provides quick access to relevant datasets.</p>
+            </div>
+            
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-gavel" style="color: #14b8a6;"></i> Data Governance and Compliance
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">Alation streamlines the process of ensuring compliance with industry standards and regulations. It allows organizations to enforce data governance policies, such as data access controls, privacy regulations, and audit tracking, helping to mitigate risks.</p>
+            </div>
+            
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-comments" style="color: #14b8a6;"></i> Collaboration and Knowledge Sharing
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">Alation fosters collaboration by providing a centralized platform for data stakeholders to share knowledge. Users can annotate datasets, add comments, and engage in discussions, making it easier for teams to collaborate on projects.</p>
+            </div>
+            
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-code-branch" style="color: #14b8a6;"></i> Automated Data Lineage
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">Alation’s automated data lineage feature allows users to trace the origins of data and understand how it flows across systems. This transparency helps organizations ensure data quality, reduce errors, and improve accountability.</p>
+            </div>
+            
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-user-shield" style="color: #14b8a6;"></i> Stewardship and Quality
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">Alation empowers data stewards with the tools they need to monitor and manage data quality. It helps identify and resolve data inconsistencies, redundancies, and errors, ensuring that your data is accurate, up-to-date, and trustworthy.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Resources section -->
+<section class="section-alt" id="resources">
+    <div class="container">
+        <div class="section-header" style="text-align: center; margin-bottom: 50px;">
+            <span class="section-subtitle">Insights</span>
+            <h2 class="section-title">Partner <span>Resources</span></h2>
+            <p class="section-desc">Explore whitepapers, case studies, and insights from Artha Solutions.</p>
+        </div>
+        
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
+            <!-- Resource 1 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #14b8a6; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Artha Advantage, Banking</span>
+                    <h4 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Artha Solutions & Qlik as Associate Partners for ET BFSI CXO Conclave 2025, Mumbai</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">Artha Solutions and Qlik are proud to join as Associate Partners at the ET BFSI CXO Conclave...</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #14b8a6;">Learn more <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <!-- Resource 2 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #14b8a6; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Artha Advantage, Banking, Qlik</span>
+                    <h4 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Future Bank India Conclave 2025: Data, Compliance & AI for Banks</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">Explore how Indian banks can achieve compliance, data maturity, and AI readiness to lead the digital future....</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #14b8a6;">Learn more <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <!-- Resource 3 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #14b8a6; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Data Governance, Data Integration, Healthcare</span>
+                    <h4 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Transforming Healthcare Insurance Operations: A Data Governance Journey for MOOP Compliance</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">Learn how we addressed critical data integration challenges and enhanced policyholder expense management, ensured accurate claims</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #14b8a6;">Download Now! <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <!-- Resource 4 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #14b8a6; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Analytics, Data Solutions, Healthcare</span>
+                    <h4 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Enhancing Recruitment with Unified Talent Analytics</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">A leading healthcare provider specializing in therapy services faced challenges in managing its talent acquisition processes efficiently....</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #14b8a6;">Download Now! <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <!-- Resource 5 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #14b8a6; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Artha Advantage, Data Solutions, Utilities</span>
+                    <h4 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Enhancing Data Ingestion and Integration: Success with Talend Data Hub</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">A home repair services provider used Talend Data Integration Hub to streamline data ingestion, boost efficiency, and...</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #14b8a6;">Download Now! <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <!-- Resource 6 -->
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #14b8a6; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Artha Advantage, Data Integration, Healthcare</span>
+                    <h4 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Enhancing Data Integration and Performance using Talend</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">Artha Solutions optimized data integration, improved performance, standardized processes, and enhanced monitoring, streamlining operations and preparing for...</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #14b8a6;">Download Now! <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Bottom CTA -->
+<section class="section" style="text-align: center; background: linear-gradient(180deg, var(--bg-primary) 0%, rgba(20,184,166,0.05) 100%);">
+    <div class="container">
+        <h2 class="section-title">Initiate Your <span>Integration Journey</span></h2>
+        <p class="section-desc" style="max-width: 600px; margin: 0 auto 30px;">Artha Solutions helps you deploy, catalog, and govern Alation databases at up to 40% savings.</p>
+        <a href="/contact-us" class="btn btn-primary btn-glow" style="background: linear-gradient(135deg, #14b8a6, #1d4ed8); border: none; box-shadow: 0 0 20px rgba(20,184,166,0.3);">Request a Joint Solution Demo</a>
+    </div>
+</section>
+{% endblock %}

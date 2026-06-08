@@ -1,0 +1,542 @@
+{% extends "base.html" %}
+
+{% block title %}Navigation Settings - Artha Control Center{% endblock %}
+
+{% block content %}
+<div style="height: var(--nav-height); background-color: var(--bg-secondary);"></div>
+
+<section class="section-alt" style="padding-top: 40px; min-height: 90vh;">
+    <div class="container" style="display: grid; grid-template-columns: 280px 1fr; gap: 40px; align-items: start;">
+        
+        <!-- Admin Sidebar Nav -->
+        {% include 'admin_sidebar.html' %}
+        
+        <!-- Workspace -->
+        <div>
+            <!-- Header Bar -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
+                <div>
+                    <h2 style="font-size: 28px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 4px;">Header Navigation</h2>
+                    <p style="font-size: 14px; color: var(--text-secondary); margin: 0;">Configure top menu layout, submenus, spotlight cards, and CTA conversion links.</p>
+                </div>
+                <div style="display: flex; gap: 12px;">
+                    <form action="/admin/navigation/publish" method="POST" style="margin: 0;">
+                        <button type="submit" class="btn btn-primary btn-glow" style="padding: 10px 22px; font-size: 13px;">
+                            <i class="fas fa-cloud-upload-alt btn-icon" style="margin-left: 0; margin-right: 8px;"></i> Publish Changes
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tabs Navigation -->
+            <div style="display: flex; gap: 20px; border-bottom: 2px solid var(--border-color); margin-bottom: 32px;">
+                <button class="nav-tab-trigger active" onclick="switchAdminTab('items-tab')" id="tab-btn-items">Menu Structure</button>
+                <button class="nav-tab-trigger" onclick="switchAdminTab('cards-tab')" id="tab-btn-cards">Featured Spotlight Cards</button>
+                <button class="nav-tab-trigger" onclick="switchAdminTab('ctas-tab')" id="tab-btn-ctas">CTA Action Buttons</button>
+            </div>
+
+            <!-- Tab 1: Menu Structure -->
+            <div class="admin-tab-content" id="items-tab">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                    <h3 style="font-size: 20px; font-weight: 700; margin: 0;">Menu Hierarchy</h3>
+                    <button class="btn btn-secondary" onclick="openItemModal('add')" style="padding: 8px 16px; font-size: 12px;">
+                        <i class="fas fa-plus" style="margin-right: 6px;"></i> Add Menu Item
+                    </button>
+                </div>
+
+                <div style="background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); padding: 32px; box-shadow: var(--card-shadow);">
+                    {% if top_items %}
+                        <div class="nav-tree">
+                            {% for parent in top_items %}
+                                <div class="tree-node parent-node" style="border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; margin-bottom: 16px; background-color: var(--bg-secondary);">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <div style="display: flex; align-items: center; gap: 12px;">
+                                            <i class="fas fa-folder" style="color: var(--accent-blue); font-size: 16px;"></i>
+                                            <span style="font-weight: 700; font-size: 15px;">{{ parent.label }}</span>
+                                            <span style="font-size: 11px; background: var(--bg-primary); padding: 2px 8px; border-radius: 12px; border: 1px solid var(--border-color);">Root (Order: {{ parent.sort_order }})</span>
+                                            {% if not parent.is_visible %}
+                                                <span style="font-size: 10px; background: #fee2e2; color: #dc2626; padding: 2px 8px; border-radius: 12px;">Hidden</span>
+                                            {% endif %}
+                                        </div>
+                                        <div style="display: flex; gap: 8px;">
+                                            <button class="btn btn-outline" style="padding: 4px 10px; font-size: 11px;" onclick="openItemModal('edit', {{ parent|tojson }})">Edit</button>
+                                            <form action="/admin/navigation/items/{{ parent.id }}/delete" method="POST" style="margin:0;" onsubmit="return confirm('Delete this menu item and all its submenus?');">
+                                                <button type="submit" class="btn" style="padding: 4px 10px; font-size: 11px; background-color:#fef2f2; color:#dc2626; border: 1px solid #fee2e2;">Delete</button>
+                                            </form>
+                                        </div>
+                                    </div>
+
+                                    <!-- Sub-items List -->
+                                    <div class="tree-children" style="margin-left: 28px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 12px;">
+                                        {% set children = child_items|selectattr('parent_id', 'equalto', parent.id)|list %}
+                                        {% if children %}
+                                            {% for child in children %}
+                                                <div class="tree-node child-node" style="background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 6px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;">
+                                                    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                                                        <i class="fas fa-link" style="color: var(--text-tertiary); font-size: 12px;"></i>
+                                                        <div>
+                                                            <div style="display: flex; align-items: center; gap: 8px;">
+                                                                <span style="font-weight: 600; font-size: 13px; color: var(--text-primary);">{{ child.label }}</span>
+                                                                {% if child.icon %}
+                                                                    <i class="{{ child.icon }}" style="font-size: 12px; color: var(--text-tertiary);" title="Icon: {{ child.icon }}"></i>
+                                                                {% endif %}
+                                                                <span style="font-size: 10px; color: var(--text-tertiary);">→ {{ child.url }}</span>
+                                                            </div>
+                                                            {% if child.description %}
+                                                                <p style="font-size: 11px; color: var(--text-secondary); margin: 2px 0 0 0;">{{ child.description }}</p>
+                                                            {% endif %}
+                                                        </div>
+                                                        <span style="font-size: 10px; background: var(--bg-secondary); padding: 2px 8px; border-radius: 12px; border: 1px solid var(--border-color);">
+                                                            Group: {{ child.group_label or 'General' }} (Order: {{ child.sort_order }})
+                                                        </span>
+                                                        {% if not child.is_visible %}
+                                                            <span style="font-size: 10px; background: #fee2e2; color: #dc2626; padding: 2px 8px; border-radius: 12px;">Hidden</span>
+                                                        {% endif %}
+                                                    </div>
+                                                    <div style="display: flex; gap: 6px;">
+                                                        <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11px;" onclick="openItemModal('edit', {{ child|tojson }})">Edit</button>
+                                                        <form action="/admin/navigation/items/{{ child.id }}/delete" method="POST" style="margin:0;" onsubmit="return confirm('Delete this item?');">
+                                                            <button type="submit" class="btn" style="padding: 4px 8px; font-size: 11px; background-color:#fef2f2; color:#dc2626; border: 1px solid #fee2e2;">Delete</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        {% else %}
+                                            <span style="font-size: 12px; color: var(--text-tertiary); font-style: italic;">No nested sub-items or columns under this menu.</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div style="text-align: center; padding: 40px 0;">
+                            <i class="fas fa-compass" style="font-size: 40px; color: var(--text-tertiary); margin-bottom: 12px;"></i>
+                            <p style="color: var(--text-secondary);">No navigation menus seeded. Press Publish to restore defaults.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Tab 2: Spotlight Cards -->
+            <div class="admin-tab-content" id="cards-tab" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                    <h3 style="font-size: 20px; font-weight: 700; margin: 0;">Mega Menu Spotlight Cards</h3>
+                    <button class="btn btn-secondary" onclick="openCardModal('add')" style="padding: 8px 16px; font-size: 12px;">
+                        <i class="fas fa-plus" style="margin-right: 6px;"></i> Add Spotlight Card
+                    </button>
+                </div>
+
+                <div style="background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); padding: 32px; box-shadow: var(--card-shadow); display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px;">
+                    {% if featured_cards %}
+                        {% for card in featured_cards %}
+                            {% set parent_item = (top_items|selectattr('id', 'equalto', card.parent_nav_item_id)|list)|first %}
+                            <div style="border: 1px solid var(--border-color); border-radius: var(--border-radius-md); padding: 24px; background-color: var(--bg-secondary); position: relative;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+                                    <div>
+                                        <span class="badge-featured" style="margin-bottom: 8px; display: inline-block;">{{ card.label or 'Spotlight' }}</span>
+                                        <h4 style="font-size: 16px; font-weight: 700; margin: 0 0 4px 0;">{{ card.title }}</h4>
+                                        <span style="font-size: 11px; color: var(--text-tertiary); font-weight: 600;">Menu: {{ parent_item.label if parent_item else 'Unknown' }}</span>
+                                    </div>
+                                    <div style="display: flex; gap: 6px;">
+                                        <button class="btn btn-outline" style="padding: 4px 8px; font-size: 11px;" onclick="openCardModal('edit', {{ card|tojson }})">Edit</button>
+                                        <form action="/admin/navigation/featured-card/{{ card.id }}/delete" method="POST" style="margin:0;" onsubmit="return confirm('Delete this spotlight card?');">
+                                            <button type="submit" class="btn" style="padding: 4px 8px; font-size: 11px; background-color:#fef2f2; color:#dc2626; border: 1px solid #fee2e2;">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.5;">{{ card.description }}</p>
+                                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 12px; font-size: 12px;">
+                                    <span style="color: var(--text-tertiary);">CTA: <a href="{{ card.cta_url }}" target="_blank" style="color: var(--accent-blue); font-weight: 600;">{{ card.cta_text }}</a></span>
+                                    <span style="background: var(--bg-primary); border: 1px solid var(--border-color); padding: 2px 8px; border-radius: 8px; font-size: 10px;">Order: {{ card.sort_order }}</span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div style="grid-column: span 2; text-align: center; padding: 40px 0;">
+                            <i class="fas fa-ad" style="font-size: 40px; color: var(--text-tertiary); margin-bottom: 12px;"></i>
+                            <p style="color: var(--text-secondary);">No spotlight cards created. Add one to show in the dropdown!</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Tab 3: CTAs -->
+            <div class="admin-tab-content" id="ctas-tab" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                    <h3 style="font-size: 20px; font-weight: 700; margin: 0;">CTA Action Buttons</h3>
+                    <button class="btn btn-secondary" onclick="openCtaModal('add')" style="padding: 8px 16px; font-size: 12px;">
+                        <i class="fas fa-plus" style="margin-right: 6px;"></i> Add CTA
+                    </button>
+                </div>
+
+                <div style="background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); padding: 32px; box-shadow: var(--card-shadow);">
+                    {% if ctas %}
+                        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;">
+                            <thead>
+                                <tr style="border-bottom: 2px solid var(--border-color); color: var(--text-secondary); font-weight: 600;">
+                                    <th style="padding: 12px 16px;">Label</th>
+                                    <th style="padding: 12px 16px;">Target Link</th>
+                                    <th style="padding: 12px 16px;">Style Class</th>
+                                    <th style="padding: 12px 16px; text-align: center;">Sort Order</th>
+                                    <th style="padding: 12px 16px; text-align: center;">Visibility</th>
+                                    <th style="padding: 12px 16px; text-align: right;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for cta in ctas %}
+                                    <tr style="border-bottom: 1px solid var(--border-color);" onmouseover="this.style.backgroundColor='var(--bg-secondary)'" onmouseout="this.style.backgroundColor='transparent'">
+                                        <td style="padding: 16px; font-weight: 700;">{{ cta.label }}</td>
+                                        <td style="padding: 16px; color: var(--text-secondary); font-family: monospace;">{{ cta.url }}</td>
+                                        <td style="padding: 16px;">
+                                            <span style="font-size: 11px; background: {% if cta.style == 'primary' %}var(--grad-primary){% else %}var(--bg-secondary){% endif %}; color: {% if cta.style == 'primary' %}#fff{% else %}var(--text-primary){% endif %}; padding: 4px 10px; border-radius: 12px; border: 1px solid var(--border-color); font-weight: 600;">
+                                                {{ cta.style }}
+                                            </span>
+                                        </td>
+                                        <td style="padding: 16px; text-align: center;">{{ cta.sort_order }}</td>
+                                        <td style="padding: 16px; text-align: center;">
+                                            <span style="font-size: 11px; background: {% if cta.is_visible %}#dcfce7; color: #15803d{% else %}#fee2e2; color: #b91c1c{% endif %}; padding: 2px 8px; border-radius: 12px; font-weight: 600;">
+                                                {{ 'Visible' if cta.is_visible else 'Hidden' }}
+                                            </span>
+                                        </td>
+                                        <td style="padding: 16px; text-align: right; white-space: nowrap;">
+                                            <button class="btn btn-outline" style="padding: 6px 12px; font-size: 12px; border-radius: 8px; margin-right: 6px;" onclick="openCtaModal('edit', {{ cta|tojson }})">Edit</button>
+                                            <form action="/admin/navigation/cta/{{ cta.id }}/delete" method="POST" style="display:inline-block; margin:0;" onsubmit="return confirm('Delete this CTA?');">
+                                                <button type="submit" class="btn" style="padding: 6px 12px; font-size: 12px; border-radius: 8px; background-color: #fef2f2; color: #dc2626; border: 1px solid #fee2e2;">Delete</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <div style="text-align: center; padding: 40px 0;">
+                            <i class="fas fa-hand-pointer" style="font-size: 40px; color: var(--text-tertiary); margin-bottom: 12px;"></i>
+                            <p style="color: var(--text-secondary);">No action buttons configured.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- MODALS SYSTEM -->
+
+<!-- Modal 1: Add/Edit Menu Item -->
+<div class="search-overlay" id="item-modal" aria-hidden="true" role="dialog" style="z-index: 1100;">
+    <div class="search-overlay-backdrop" onclick="closeModal('item-modal')"></div>
+    <div style="background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); width: 100%; max-width: 550px; position: relative; margin: 10vh auto; z-index: 1102; padding: 32px; box-shadow: var(--glass-shadow);">
+        <h3 id="item-modal-title" style="font-size: 20px; font-weight: 800; margin-top:0; margin-bottom: 24px; letter-spacing: -0.5px;">Add Menu Item</h3>
+        
+        <form id="item-form" action="/admin/navigation/items" method="POST" style="display: flex; flex-direction: column; gap: 16px; margin: 0;">
+            <input type="hidden" name="menu_id" value="{{ menus[0].id if menus else 1 }}">
+            
+            <div style="display: flex; flex-direction: column; gap: 6px; text-align: left;">
+                <label style="font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Parent Menu (for sub-navigation)</label>
+                <select name="parent_id" id="item-parent-id" style="background: var(--bg-secondary); border: 1px solid var(--border-color); padding: 10px; border-radius: 8px; color: var(--text-primary); font-size: 14px;">
+                    <option value="">None (Top-Level Item)</option>
+                    {% for top in top_items %}
+                        <option value="{{ top.id }}">{{ top.label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div style="display: flex; flex-direction: column; gap: 6px; text-align: left;">
+                    <label style="font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Item Label *</label>
+                    <input type="text" name="label" id="item-label" required style="background: var(--bg-secondary); border: 1px solid var(--border-color); padding: 10px; border-radius: 8px; color: var(--text-primary); font-size: 14px;">
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 6px; text-align: left;">
+                    <label style="font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Link URL</label>
+                    <input type="text" name="url" id="item-url" placeholder="/solutions/data-strategy" style="background: var(--bg-secondary); border: 1px solid var(--border-color); padding: 10px; border-radius: 8px; color: var(--text-primary); font-size: 14px;">
+                </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 6px; text-align: left;">
+                <label style="font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">One-line Description</label>
+                <input type="text" name="description" id="item-desc" placeholder="Brief tagline shown under title" style="background: var(--bg-secondary); border: 1px solid var(--border-color); padding: 10px; border-radius: 8px; color: var(--text-primary); font-size: 14px;">
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
+                <div style="display: flex; flex-direction: column; gap: 6px; text-align: left;">
+                    <label style="font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">FontAwesome Icon</label>
+                    <input type="text" name="icon" id="item-icon" placeholder="fas fa-chart-bar" style="background: var(--bg-secondary); border: 1px solid var(--border-color); padding: 10px; border-radius: 8px; color: var(--text-primary); font-size: 14px;">
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 6px; text-align: left;">
+                    <label style="font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Group Column Label</label>
+                    <input type="text" name="group_label" id="item-group" placeholder="e.g. Accelerators" style="background: var(--bg-secondary); border: 1px solid var(--border-color); padding: 10px; border-radius: 8px; color: var(--text-primary); font-size: 14px;">
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 6px; text-align: left;">
+                    <label style="font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Sort Order</label>
+                    <input type="number" name="sort_order" id="item-order" value="0" style="background: var(--bg-secondary); border: 1px solid var(--border-color); padding: 10px; border-radius: 8px; color: var(--text-primary); font-size: 14px;">
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; border-top: 1px solid var(--border-color); padding-top: 16px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <input type="checkbox" name="is_top_level" value="1" id="item-top-level" style="width:16px; height:16px;">
+                    <label for="item-top-level" style="font-size: 12px; font-weight: 700; color: var(--text-secondary);">Top Level?</label>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <input type="checkbox" name="is_visible" value="1" checked id="item-visible" style="width:16px; height:16px;">
+                    <label for="item-visible" style="font-size: 12px; font-weight: 700; color: var(--text-secondary);">Visible?</label>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <input type="checkbox" name="opens_in_new_tab" value="1" id="item-new-tab" style="width:16px; height:16px;">
+                    <label for="item-new-tab" style="font-size: 12px; font-weight: 700; color: var(--text-secondary);">New Tab?</label>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 16px; border-top: 1px solid var(--border-color); padding-top: 24px;">
+                <button type="button" class="btn btn-outline" onclick="closeModal('item-modal')" style="padding: 10px 20px;">Cancel</button>
+                <button type="submit" class="btn btn-primary" style="padding: 10px 20px;">Save Menu Item</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal 2: Add/Edit Spotlight Card -->
+<div class="search-overlay" id="card-modal" aria-hidden="true" role="dialog" style="z-index: 1100;">
+    <div class="search-overlay-backdrop" onclick="closeModal('card-modal')"></div>
+    <div style="background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); width: 100%; max-width: 550px; position: relative; margin: 10vh auto; z-index: 1102; padding: 32px; box-shadow: var(--glass-shadow);">
+        <h3 id="card-modal-title" style="font-size: 20px; font-weight: 800; margin-top:0; margin-bottom: 24px; letter-spacing: -0.5px;">Add Spotlight Card</h3>
+        
+        <form id="card-form" action="/admin/navigation/featured-card" method="POST" style="display: flex; flex-direction: column; gap: 16px; margin: 0;">
+            <input type="hidden" name="menu_id" value="{{ menus[0].id if menus else 1 }}">
+            
+            <div style="display: flex; flex-direction: column; gap: 6px; text-align: left;">
+                <label style="font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Parent Top-Level Menu *</label>
+                <select name="parent_nav_item_id" id="card-parent-nav" required style="background: var(--bg-secondary); border: 1px solid var(--border-color); padding: 10px; border-radius: 8px; color: var(--text-primary); font-size: 14px;">
+                    {% for top in top_items %}
+                        <option value="{{ top.id }}">{{ top.label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div style="display: flex; flex-direction: column; gap: 6px; text-align: left;">
+                    <label style="font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Card Title *</label>
+                    <input type="text" name="title" id="card-title" required style="background: var(--bg-secondary); border: 1px solid var(--border-color); padding: 10px; border-radius: 8px; color: var(--text-primary); font-size: 14px;">
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 6px; text-align: left;">
+                    <label style="font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Tag/Badge Label</label>
+                    <input type="text" name="label" id="card-label" placeholder="e.g. Featured Spotlight" style="background: var(--bg-secondary); border: 1px solid var(--border-color); padding: 10px; border-radius: 8px; color: var(--text-primary); font-size: 14px;">
+                </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 6px; text-align: left;">
+                <label style="font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Card Description *</label>
+                <textarea name="description" id="card-desc" required rows="3" style="background: var(--bg-secondary); border: 1px solid var(--border-color); padding: 10px; border-radius: 8px; color: var(--text-primary); font-size: 14px; font-family: var(--font-body); resize: none;"></textarea>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div style="display: flex; flex-direction: column; gap: 6px; text-align: left;">
+                    <label style="font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">CTA Link URL</label>
+                    <input type="text" name="cta_url" id="card-cta-url" placeholder="/data-readiness-assessment" style="background: var(--bg-secondary); border: 1px solid var(--border-color); padding: 10px; border-radius: 8px; color: var(--text-primary); font-size: 14px;">
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 6px; text-align: left;">
+                    <label style="font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">CTA Button Text</label>
+                    <input type="text" name="cta_text" id="card-cta-text" placeholder="Download Report" style="background: var(--bg-secondary); border: 1px solid var(--border-color); padding: 10px; border-radius: 8px; color: var(--text-primary); font-size: 14px;">
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; border-top: 1px solid var(--border-color); padding-top: 16px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <input type="checkbox" name="is_visible" value="1" checked id="card-visible" style="width:16px; height:16px;">
+                    <label for="card-visible" style="font-size: 12px; font-weight: 700; color: var(--text-secondary);">Visible?</label>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 6px; text-align: left;">
+                    <label style="font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Sort Order</label>
+                    <input type="number" name="sort_order" id="card-order" value="0" style="background: var(--bg-secondary); border: 1px solid var(--border-color); padding: 10px; border-radius: 8px; color: var(--text-primary); font-size: 14px;">
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 16px; border-top: 1px solid var(--border-color); padding-top: 24px;">
+                <button type="button" class="btn btn-outline" onclick="closeModal('card-modal')" style="padding: 10px 20px;">Cancel</button>
+                <button type="submit" class="btn btn-primary" style="padding: 10px 20px;">Save Spotlight Card</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal 3: Add/Edit CTA -->
+<div class="search-overlay" id="cta-modal" aria-hidden="true" role="dialog" style="z-index: 1100;">
+    <div class="search-overlay-backdrop" onclick="closeModal('cta-modal')"></div>
+    <div style="background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); width: 100%; max-width: 500px; position: relative; margin: 15vh auto; z-index: 1102; padding: 32px; box-shadow: var(--glass-shadow);">
+        <h3 id="cta-modal-title" style="font-size: 20px; font-weight: 800; margin-top:0; margin-bottom: 24px; letter-spacing: -0.5px;">Add CTA Button</h3>
+        
+        <form id="cta-form" action="/admin/navigation/cta" method="POST" style="display: flex; flex-direction: column; gap: 16px; margin: 0;">
+            <div style="display: flex; flex-direction: column; gap: 6px; text-align: left;">
+                <label style="font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Button Label *</label>
+                <input type="text" name="label" id="cta-label" required placeholder="e.g. Talk to an Expert" style="background: var(--bg-secondary); border: 1px solid var(--border-color); padding: 10px; border-radius: 8px; color: var(--text-primary); font-size: 14px;">
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 6px; text-align: left;">
+                <label style="font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Redirect URL Link *</label>
+                <input type="text" name="url" id="cta-url" required placeholder="e.g. /contact-us" style="background: var(--bg-secondary); border: 1px solid var(--border-color); padding: 10px; border-radius: 8px; color: var(--text-primary); font-size: 14px;">
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div style="display: flex; flex-direction: column; gap: 6px; text-align: left;">
+                    <label style="font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Style Theme</label>
+                    <select name="style" id="cta-style" style="background: var(--bg-secondary); border: 1px solid var(--border-color); padding: 10px; border-radius: 8px; color: var(--text-primary); font-size: 14px;">
+                        <option value="primary">Primary (Glow Blue Button)</option>
+                        <option value="secondary">Secondary (Outline Border Button)</option>
+                    </select>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 6px; text-align: left;">
+                    <label style="font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Sort Order</label>
+                    <input type="number" name="sort_order" id="cta-order" value="0" style="background: var(--bg-secondary); border: 1px solid var(--border-color); padding: 10px; border-radius: 8px; color: var(--text-primary); font-size: 14px;">
+                </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 8px; border-top: 1px solid var(--border-color); padding-top: 16px;">
+                <input type="checkbox" name="is_visible" value="1" checked id="cta-visible" style="width:16px; height:16px;">
+                <label for="cta-visible" style="font-size: 12px; font-weight: 700; color: var(--text-secondary);">Visible in Header?</label>
+            </div>
+
+            <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 16px; border-top: 1px solid var(--border-color); padding-top: 24px;">
+                <button type="button" class="btn btn-outline" onclick="closeModal('cta-modal')" style="padding: 10px 20px;">Cancel</button>
+                <button type="submit" class="btn btn-primary" style="padding: 10px 20px;">Save Button</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Tab Switcher
+    function switchAdminTab(tabId) {
+        document.querySelectorAll('.admin-tab-content').forEach(function(el) {
+            el.style.display = 'none';
+        });
+        document.querySelectorAll('.nav-tab-trigger').forEach(function(el) {
+            el.classList.remove('active');
+        });
+        document.getElementById(tabId).style.display = 'block';
+        if (tabId === 'items-tab') {
+            document.getElementById('tab-btn-items').classList.add('active');
+        } else if (tabId === 'cards-tab') {
+            document.getElementById('tab-btn-cards').classList.add('active');
+        } else if (tabId === 'ctas-tab') {
+            document.getElementById('tab-btn-ctas').classList.add('active');
+        }
+    }
+
+    // Modal helpers
+    function openModal(id) {
+        var modal = document.getElementById(id);
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal(id) {
+        var modal = document.getElementById(id);
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+    }
+
+    // Modal populator for Menu Items
+    function openItemModal(mode, data) {
+        var form = document.getElementById('item-form');
+        var title = document.getElementById('item-modal-title');
+        
+        if (mode === 'add') {
+            title.textContent = 'Add Menu Item';
+            form.action = '/admin/navigation/items';
+            form.reset();
+            document.getElementById('item-parent-id').value = '';
+            document.getElementById('item-top-level').checked = false;
+            document.getElementById('item-visible').checked = true;
+            document.getElementById('item-new-tab').checked = false;
+        } else {
+            title.textContent = 'Edit Menu Item';
+            form.action = '/admin/navigation/items/' + data.id;
+            
+            document.getElementById('item-parent-id').value = data.parent_id || '';
+            document.getElementById('item-label').value = data.label || '';
+            document.getElementById('item-url').value = data.url || '';
+            document.getElementById('item-desc').value = data.description || '';
+            document.getElementById('item-icon').value = data.icon || '';
+            document.getElementById('item-group').value = data.group_label || '';
+            document.getElementById('item-order').value = data.sort_order || 0;
+            
+            document.getElementById('item-top-level').checked = !!data.is_top_level;
+            document.getElementById('item-visible').checked = !!data.is_visible;
+            document.getElementById('item-new-tab').checked = !!data.opens_in_new_tab;
+        }
+        openModal('item-modal');
+    }
+
+    // Modal populator for Spotlight Cards
+    function openCardModal(mode, data) {
+        var form = document.getElementById('card-form');
+        var title = document.getElementById('card-modal-title');
+        
+        if (mode === 'add') {
+            title.textContent = 'Add Spotlight Card';
+            form.action = '/admin/navigation/featured-card';
+            form.reset();
+            document.getElementById('card-visible').checked = true;
+        } else {
+            title.textContent = 'Edit Spotlight Card';
+            form.action = '/admin/navigation/featured-card/' + data.id;
+            
+            document.getElementById('card-parent-nav').value = data.parent_nav_item_id || '';
+            document.getElementById('card-title').value = data.title || '';
+            document.getElementById('card-label').value = data.label || '';
+            document.getElementById('card-desc').value = data.description || '';
+            document.getElementById('card-cta-url').value = data.cta_url || '';
+            document.getElementById('card-cta-text').value = data.cta_text || '';
+            document.getElementById('card-order').value = data.sort_order || 0;
+            document.getElementById('card-visible').checked = !!data.is_visible;
+        }
+        openModal('card-modal');
+    }
+
+    // Modal populator for CTAs
+    function openCtaModal(mode, data) {
+        var form = document.getElementById('cta-form');
+        var title = document.getElementById('cta-modal-title');
+        
+        if (mode === 'add') {
+            title.textContent = 'Add CTA Button';
+            form.action = '/admin/navigation/cta';
+            form.reset();
+            document.getElementById('cta-visible').checked = true;
+        } else {
+            title.textContent = 'Edit CTA Button';
+            form.action = '/admin/navigation/cta/' + data.id;
+            
+            document.getElementById('cta-label').value = data.label || '';
+            document.getElementById('cta-url').value = data.url || '';
+            document.getElementById('cta-style').value = data.style || 'primary';
+            document.getElementById('cta-order').value = data.sort_order || 0;
+            document.getElementById('cta-visible').checked = !!data.is_visible;
+        }
+        openModal('cta-modal');
+    }
+</script>
+
+<style>
+    .nav-tab-trigger {
+        background: none;
+        border: none;
+        padding: 12px 24px;
+        font-weight: 700;
+        font-size: 14px;
+        color: var(--text-tertiary);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border-bottom: 2px solid transparent;
+        margin-bottom: -2px;
+        font-family: var(--font-heading);
+    }
+    .nav-tab-trigger.active, .nav-tab-trigger:hover {
+        color: var(--accent-blue);
+        border-bottom-color: var(--accent-blue);
+    }
+</style>
+{% endblock %}

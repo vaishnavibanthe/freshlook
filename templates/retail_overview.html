@@ -1,0 +1,323 @@
+{% extends "retail_base.html" %}
+
+{% block retail_hero %}
+<!-- Hero Section -->
+<section class="retail-hero">
+    <div class="retail-hero-glow"></div>
+    <div class="container retail-hero-grid">
+        <div class="retail-hero-content">
+            <span class="retail-badge"><i class="fas fa-shopping-bag"></i> ThinkArtha Industry Solutions</span>
+            <h1 class="retail-hero-title">
+                {{ page.hero_title }}
+            </h1>
+            <p class="retail-hero-subtitle">
+                {{ page.hero_subtitle }}
+            </p>
+            
+            <div class="retail-hero-ctas">
+                <button onclick="openLeadModal('Hero Primary CTA');" class="btn btn-primary btn-lg">
+                    {{ cta.primary_cta_text or 'Talk to a Retail Data Expert' }} <i class="fas fa-arrow-right btn-icon"></i>
+                </button>
+                <a href="{{ cta.secondary_cta_url or '/industries/retail/use-cases' }}" class="btn btn-outline btn-lg" style="border-color: var(--retail-color); color: var(--retail-dark); margin-left: 15px;">
+                    {{ cta.secondary_cta_text or 'Explore Retail Use Cases' }}
+                </a>
+            </div>
+
+            {% if body_sections.hero_bullets %}
+            <div class="retail-hero-bullets" style="margin-top: 30px;">
+                <h4 style="font-size: 14.5px; font-weight: 700; margin-bottom: 12px; color: var(--text-primary);">Why Retailers & Consumer Brands Partner with Artha:</h4>
+                <ul class="hero-bullet-list">
+                    {% for bullet in body_sections.hero_bullets %}
+                    <li><i class="fas fa-circle-check" style="color: #10b981;"></i> {{ bullet }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="retail-hero-visual">
+            <div class="retail-vis-container">
+                <div class="tech-grid-bg"></div>
+                <div class="tech-circle pulsate-slow">
+                    <i class="fas fa-shopping-bag text-retail"></i>
+                    <div class="tech-ring ring-1"></div>
+                    <div class="tech-ring ring-2"></div>
+                </div>
+                <div class="tech-node tech-node-retail-1"><i class="fas fa-store"></i><span>Omnichannel</span></div>
+                <div class="tech-node tech-node-retail-2"><i class="fas fa-user-circle"></i><span>Customer 360</span></div>
+                <div class="tech-node tech-node-retail-3"><i class="fas fa-truck"></i><span>Supply Chain</span></div>
+                <div class="tech-node tech-node-retail-4"><i class="fas fa-chart-line"></i><span>Real-Time Sales</span></div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block retail_content %}
+<!-- Challenge Section -->
+<section class="retail-section section-alt" style="background-color: #fafafa;">
+    <div class="container">
+        <div class="retail-section-header text-center">
+            <span class="retail-subtitle">The Retail Challenge</span>
+            <h2 class="retail-title">{{ body_sections.challenge_title or 'Retail Growth Is Blocked by Disconnected and Untrusted Data' }}</h2>
+            <p class="retail-desc">{{ body_sections.challenge_desc }}</p>
+        </div>
+        
+        <div class="retail-card-grid grid-3">
+            {% if body_sections.challenge_cards %}
+                {% for card in body_sections.challenge_cards %}
+                <div class="retail-card challenge-card-retail">
+                    <div class="card-icon-circle-retail"><i class="fas fa-triangle-exclamation"></i></div>
+                    <h3 class="card-title">{{ card.title }}</h3>
+                    <p class="card-desc">{{ card.desc }}</p>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="retail-card challenge-card-retail">
+                    <div class="card-icon-circle-retail"><i class="fas fa-database"></i></div>
+                    <h3 class="card-title">Fragmented Data</h3>
+                    <p class="card-desc">Disconnected POS, e-commerce, and inventory databases block real-time insights.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Framework Section -->
+<section class="retail-section">
+    <div class="container">
+        <div class="retail-section-header text-center">
+            <span class="retail-subtitle">Our Solution Approach</span>
+            <h2 class="retail-title">A Modern Data Foundation for Real-Time Retail Intelligence</h2>
+            <p class="retail-desc">To drive digital initiatives and scale AI/GenAI, retail enterprises need a connected, governed, and trusted data framework. Our framework spans 5 critical layers.</p>
+        </div>
+
+        <div class="framework-layers-container">
+            {% if body_sections.framework_layers %}
+                {% for layer in body_sections.framework_layers %}
+                <div class="framework-layer-item">
+                    <div class="layer-number-retail">{{ loop.index }}</div>
+                    <div class="layer-content">
+                        <h3 class="layer-title">{{ layer.title }}</h3>
+                        <p class="layer-desc">{{ layer.desc }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="framework-layer-item">
+                    <div class="layer-number-retail">1</div>
+                    <div class="layer-content">
+                        <h3 class="layer-title">Connect</h3>
+                        <p class="layer-desc">Integrate POS, e-commerce, marketing, supplier, and warehouse databases securely.</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Who We Help Section -->
+<section class="retail-section section-alt" style="background-color: #fafafa;">
+    <div class="container">
+        <div class="retail-section-header text-center">
+            <span class="retail-subtitle">Audience & Impact</span>
+            <h2 class="retail-title">Who We Help</h2>
+            <p class="retail-desc">Artha aligns operations, merchandising, marketing, compliance, and IT leaders to build trusted, real-time, and AI-ready data foundations.</p>
+        </div>
+
+        <!-- Audience Tabs -->
+        <div class="audience-tabs-container" style="display: flex; flex-direction: column; gap: 30px;">
+            <div class="audience-tabs-nav" style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+                {% for aud in body_sections.who_we_help %}
+                <button class="tag-filter-btn-retail {% if loop.first %}active{% endif %}" onclick="switchAudienceTab(event, 'aud-tab-{{ loop.index }}')">
+                    {{ aud.title }}
+                </button>
+                {% endfor %}
+            </div>
+            
+            <div class="audience-tabs-content">
+                {% for aud in body_sections.who_we_help %}
+                <div id="aud-tab-{{ loop.index }}" class="audience-tab-pane {% if loop.first %}active{% endif %}" style="display: {% if loop.first %}block{% else %}none{% endif %};">
+                    <div class="audience-grid">
+                        <div class="audience-col">
+                            <h4 class="aud-block-title"><i class="fas fa-circle-exclamation text-retail"></i> Key Pain Points</h4>
+                            <p class="aud-text">{{ aud.pains }}</p>
+                        </div>
+                        <div class="audience-col">
+                            <h4 class="aud-block-title"><i class="fas fa-layer-group text-retail"></i> Artha Solutions</h4>
+                            <p class="aud-text">{{ aud.solutions }}</p>
+                        </div>
+                        <div class="audience-col">
+                            <h4 class="aud-block-title"><i class="fas fa-square-poll-vertical text-retail"></i> Business Outcomes</h4>
+                            <p class="aud-text"><strong>{{ aud.outcomes }}</strong></p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Solution Pillars -->
+<section class="retail-section">
+    <div class="container">
+        <div class="retail-section-header text-center">
+            <span class="retail-subtitle">Our Capabilities</span>
+            <h2 class="retail-title">Retail Solution Pillars</h2>
+            <p class="retail-desc">Explore our deep engineering, master data governance, analytics, and AI enablement practices tailored for modern commerce.</p>
+        </div>
+
+        <div class="retail-card-grid grid-3">
+            {% for card in body_sections.solutions_pillars_cards %}
+            <div class="retail-card hover-card pillar-card-retail">
+                <div class="card-icon-circle-retail accent-retail"><i class="fas fa-arrow-trend-up"></i></div>
+                <h3 class="card-title">{{ card.title }}</h3>
+                <p class="card-desc">{{ card.desc }}</p>
+                <a href="{{ card.url }}" class="card-link">Learn More <i class="fas fa-arrow-right"></i></a>
+            </div>
+            {% endfor %}
+
+            <!-- Extra static entries to make it a full 10-link microsite dashboard -->
+            <div class="retail-card hover-card pillar-card-retail">
+                <div class="card-icon-circle-retail accent-retail"><i class="fas fa-lightbulb"></i></div>
+                <h3 class="card-title">Retail Use Cases</h3>
+                <p class="card-desc">Browse our full index of detailed B2B use case architectures built for retail outcomes.</p>
+                <a href="/industries/retail/use-cases" class="card-link">Explore Use Cases <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <div class="retail-card hover-card pillar-card-retail">
+                <div class="card-icon-circle-retail accent-retail"><i class="fas fa-clipboard-list-check"></i></div>
+                <h3 class="card-title">Retail Case Studies</h3>
+                <p class="card-desc">Read our client success stories demonstrating retail digital transformation in action.</p>
+                <a href="/industries/retail/case-studies" class="card-link">Read Case Studies <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Business Outcomes Section -->
+<section class="retail-section section-alt" style="background-color: #fafafa;">
+    <div class="container">
+        <div class="retail-section-header text-center">
+            <span class="retail-subtitle">Business Value</span>
+            <h2 class="retail-title">Measurable Strategic Outcomes</h2>
+            <p class="retail-desc">Deploying unified retail data infrastructures generates concrete customer, operational, and financial advantages.</p>
+        </div>
+
+        <div class="retail-card-grid grid-3">
+            {% for outcome in body_sections.outcomes %}
+            <div class="retail-card" style="background: white; padding: 30px; border-radius: 6px; border: 1px solid #e5e7eb; box-shadow: 0 4px 10px rgba(0,0,0,0.02); display: flex; flex-direction: column; align-items: flex-start;">
+                <div class="card-icon-circle-retail accent-retail" style="margin-bottom: 15px;"><i class="fas fa-chart-line"></i></div>
+                <h4 class="card-title" style="font-size: 18px; font-weight: 600; margin-bottom: 10px; color: var(--text-primary);">{{ outcome.title }}</h4>
+                <p class="outcome-text" style="font-size: 14.5px; line-height: 1.6; color: var(--text-secondary); margin: 0;">{{ outcome.desc }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Case Studies Showcase Section -->
+<section class="retail-section">
+    <div class="container">
+        <div class="retail-section-header text-center">
+            <span class="retail-subtitle">Proven Results</span>
+            <h2 class="retail-title">ThinkArtha Retail Proof Points</h2>
+            <p class="retail-desc">See how Artha helps retailers resolve fragmentation, modernize operations, and build secure, compliance-ready platforms.</p>
+        </div>
+
+        <div class="retail-card-grid grid-2">
+            {% for pp in body_sections.proof_points %}
+            <div class="retail-card case-study-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div class="card-content">
+                    <span class="case-study-tag" style="color: var(--retail-dark); background: var(--retail-light); border: 1px solid var(--retail-border); padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; display: inline-block; margin-bottom: 15px;">{{ pp.title }}</span>
+                    <h3 class="card-title" style="font-size: 20px; font-weight: 600; margin-bottom: 12px;">{{ pp.title }}</h3>
+                    <p class="card-desc" style="font-size: 14.5px; line-height: 1.6; color: var(--text-secondary); font-weight: 300;">{{ pp.desc }}</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/industries/retail/case-studies" class="btn-text" style="color: var(--retail-dark); font-weight: 600; display: inline-flex; align-items: center; gap: 8px; text-decoration: none;">Read Success Story <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- FAQs Section -->
+<section class="retail-section section-alt" style="background-color: #fafafa;">
+    <div class="container">
+        <div class="retail-section-header text-center">
+            <span class="retail-subtitle">FAQ</span>
+            <h2 class="retail-title">Frequently Asked Questions</h2>
+            <p class="retail-desc">Find answers to common questions regarding retail master data management, cloud migration, and omnichannel integration.</p>
+        </div>
+
+        <div class="faq-accordion-container" style="max-width: 800px; margin: 0 auto;">
+            {% if faqs %}
+                {% for faq in faqs %}
+                <div class="faq-accordion-item" style="border-bottom: 1px solid #e5e7eb; padding: 15px 0;">
+                    <button class="faq-accordion-trigger" onclick="toggleFaqAccordion(this)" style="width: 100%; display: flex; justify-content: space-between; align-items: center; background: none; border: none; text-align: left; font-size: 16.5px; font-weight: 600; color: var(--text-primary); cursor: pointer; padding: 10px 0;">
+                        {{ faq.q }} <i class="fas fa-plus icon-plus" style="font-size: 14px; color: #9ca3af;"></i>
+                    </button>
+                    <div class="faq-accordion-panel" style="max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out, padding 0.3s ease-out; padding: 0 10px;">
+                        <p style="font-size: 14.5px; line-height: 1.6; color: var(--text-secondary); font-weight: 300; padding-top: 10px; margin: 0;">{{ faq.a }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Bottom CTA Section -->
+<section class="retail-bottom-cta">
+    <div class="container text-center">
+        <h2 class="cta-title">Ready to Build a Real-Time, AI-Ready Retail Data Foundation?</h2>
+        <p class="cta-subtitle">Connect with our senior retail data solutions architects to align inventory, customer records, and omnichannel workflows.</p>
+        <div class="cta-actions" style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
+            <button onclick="openLeadModal('Bottom Overview CTA');" class="btn btn-primary btn-lg btn-glow">
+                Talk to a Retail Data Expert
+            </button>
+            <button onclick="openLeadModal('Bottom Assessment CTA');" class="btn btn-outline btn-lg" style="color: white; border-color: white; background: transparent; margin-left: 15px; border: 1px solid white; padding: 12px 24px; border-radius: 6px; cursor: pointer;">
+                Request a Data Readiness Assessment
+            </button>
+        </div>
+    </div>
+</section>
+
+<script>
+    // Tab switching for "Who We Help"
+    function switchAudienceTab(evt, tabId) {
+        const panes = document.querySelectorAll('.audience-tab-pane');
+        panes.forEach(pane => pane.style.display = 'none');
+        
+        const buttons = document.querySelectorAll('.tag-filter-btn-retail');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        
+        document.getElementById(tabId).style.display = 'block';
+        evt.currentTarget.classList.add('active');
+    }
+
+    // Toggle FAQ Accordion
+    function toggleFaqAccordion(btn) {
+        btn.classList.toggle('active');
+        const icon = btn.querySelector('i');
+        if (btn.classList.contains('active')) {
+            icon.classList.remove('fa-plus');
+            icon.classList.add('fa-minus');
+        } else {
+            icon.classList.remove('fa-minus');
+            icon.classList.add('fa-plus');
+        }
+        
+        const panel = btn.nextElementSibling;
+        if (panel.style.maxHeight && panel.style.maxHeight !== '0px') {
+            panel.style.maxHeight = '0px';
+            panel.style.padding = '0 10px';
+        } else {
+            panel.style.maxHeight = panel.scrollHeight + "px";
+            panel.style.padding = '10px 10px';
+        }
+    }
+</script>
+{% endblock %}

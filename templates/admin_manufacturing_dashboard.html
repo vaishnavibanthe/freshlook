@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Manufacturing Microsite Dashboard - Control Center{% endblock %}
+
+{% block content %}
+<div style="height: var(--nav-height); background-color: var(--bg-secondary);"></div>
+
+<section class="section" style="min-height: 90vh; background-color: var(--bg-secondary); padding: 40px 0;">
+    <div class="container" style="display: grid; grid-template-columns: 260px 1fr; gap: 40px; align-items: start;">
+        
+        <!-- Sidebar Navigation -->
+        {% include 'admin_sidebar.html' %}
+        
+        <!-- Main Content -->
+        <div>
+            <!-- Header -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
+                <div>
+                    <h2 style="font-size: 28px; font-weight: 800; letter-spacing: -0.5px; color: var(--text-primary);">Manufacturing Microsite Control Center</h2>
+                    <p style="font-size: 13px; color: var(--text-tertiary); margin-top: 4px;">Update solution subpage copy blocks, manage use-case categories, and track B2B sales leads.</p>
+                </div>
+            </div>
+            
+            <!-- Statistics Widgets -->
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 32px;">
+                <div style="background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); padding: 24px; box-shadow: var(--card-shadow);">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 12.5px; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">B2B Expert Leads</span>
+                        <div style="width: 36px; height: 36px; border-radius: 50%; background-color: #fff7ed; color: #f97316; display: flex; align-items: center; justify-content: center; font-size: 16px;"><i class="fas fa-address-book"></i></div>
+                    </div>
+                    <h3 style="font-size: 32px; font-weight: 800; color: var(--text-primary); margin-top: 12px; margin-bottom: 4px;">{{ total_leads }}</h3>
+                    <p style="font-size: 12px; color: var(--text-tertiary);">Total submissions captured</p>
+                </div>
+                
+                <div style="background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); padding: 24px; box-shadow: var(--card-shadow);">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 12.5px; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Library Use Cases</span>
+                        <div style="width: 36px; height: 36px; border-radius: 50%; background-color: #f0fdf4; color: #16a34a; display: flex; align-items: center; justify-content: center; font-size: 16px;"><i class="fas fa-lightbulb"></i></div>
+                    </div>
+                    <h3 style="font-size: 32px; font-weight: 800; color: var(--text-primary); margin-top: 12px; margin-bottom: 4px;">{{ total_use_cases }}</h3>
+                    <p style="font-size: 12px; color: var(--text-tertiary);">Active business scenarios</p>
+                </div>
+                
+                <div style="background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); padding: 24px; box-shadow: var(--card-shadow);">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 12.5px; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Active Subpages</span>
+                        <div style="width: 36px; height: 36px; border-radius: 50%; background-color: #eff6ff; color: #3b82f6; display: flex; align-items: center; justify-content: center; font-size: 16px;"><i class="fas fa-file-invoice"></i></div>
+                    </div>
+                    <h3 style="font-size: 32px; font-weight: 800; color: var(--text-primary); margin-top: 12px; margin-bottom: 4px;">{{ total_pages }}</h3>
+                    <p style="font-size: 12px; color: var(--text-tertiary);">Managed pages in database</p>
+                </div>
+            </div>
+            
+            <!-- Recent Leads Section -->
+            <div style="background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); padding: 32px; box-shadow: var(--card-shadow);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                    <h3 style="font-size: 18px; font-weight: 700; color: var(--text-primary);">Recent B2B Inquiries</h3>
+                    <a href="/admin/industries/manufacturing/leads" class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px;">View All Leads</a>
+                </div>
+                
+                {% if recent_leads %}
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13.5px;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid var(--border-color); color: var(--text-secondary); font-weight: 700;">
+                                <th style="padding: 10px 12px;">Date</th>
+                                <th style="padding: 10px 12px;">Name</th>
+                                <th style="padding: 10px 12px;">Email</th>
+                                <th style="padding: 10px 12px;">Company</th>
+                                <th style="padding: 10px 12px;">Job Title</th>
+                                <th style="padding: 10px 12px;">Interest</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ld in recent_leads %}
+                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                <td style="padding: 12px; white-space: nowrap;">{{ ld.created_at }}</td>
+                                <td style="padding: 12px; font-weight: 600; color: var(--text-primary);">{{ ld.first_name }} {{ ld.last_name }}</td>
+                                <td style="padding: 12px;">{{ ld.business_email }}</td>
+                                <td style="padding: 12px;">{{ ld.company }}</td>
+                                <td style="padding: 12px;">{{ ld.job_title }}</td>
+                                <td style="padding: 12px;"><span style="background-color: #fff7ed; color: #ea580c; border: 1px solid #ffedd5; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">{{ ld.area_of_interest }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div style="text-align: center; padding: 30px 0; color: var(--text-tertiary);">
+                    <i class="fas fa-inbox" style="font-size: 30px; margin-bottom: 10px; display: block;"></i>
+                    <p style="margin: 0; font-size: 14px;">No inquiries have been received yet.</p>
+                </div>
+                {% endif %}
+            </div>
+            
+        </div>
+    </div>
+</section>
+{% endblock %}

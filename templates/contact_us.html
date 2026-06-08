@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Contact Us - Connect with Artha Solutions{% endblock %}
+
+{% block content %}
+<!-- Subpage Hero -->
+<section class="hero" style="min-height: 50vh; padding-top: calc(var(--nav-height) + 60px); padding-bottom: 60px;" id="contact-hero">
+    <div class="hero-bg-glow hero-glow-1"></div>
+    <div class="container hero-grid" style="grid-template-columns: 1.3fr 0.7fr;">
+        <div class="hero-content">
+            <div class="hero-badge"><i class="fas fa-envelope"></i> Contact Us</div>
+            <h1 class="hero-title" style="font-size: 48px;">
+                Connect With Us <span>Today!</span>
+            </h1>
+            <p class="hero-desc">
+                Have questions about our data accelerators, governance strategies, or AI assessment audits? Drop us a line, and our consulting architects will get right back to you.
+            </p>
+        </div>
+        <div class="hero-visual">
+            <div class="ai-graphic-container" style="max-width: 260px; height: 260px;">
+                <div class="ai-node-circle circle-sm"></div>
+                <div class="ai-core" style="width: 70px; height: 70px; background: var(--grad-primary);">
+                    <i class="fas fa-paper-plane" style="font-size: 22px;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Form & Info Grid -->
+<section class="section-alt" id="contact-hub-section">
+    <div class="container contact-hub-grid">
+        <!-- Contact Form Card -->
+        <div class="contact-card">
+            <h3 style="font-size: 24px; margin-bottom: 28px;">Send a Message</h3>
+            
+            <form id="artha-contact-form" method="POST" action="/contact-us">
+                <div class="form-group half-width">
+                    <div>
+                        <label for="name" class="form-label">Full Name *</label>
+                        <input type="text" id="name" name="name" class="form-control" placeholder="John Doe" required>
+                    </div>
+                    <div>
+                        <label for="email" class="form-label">Work Email *</label>
+                        <input type="email" id="email" name="email" class="form-control" placeholder="john@company.com" required>
+                    </div>
+                </div>
+                
+                <div class="form-group half-width">
+                    <div>
+                        <label for="inquiry_type" class="form-label">Inquiry Type *</label>
+                        <select id="inquiry_type" name="inquiry_type" class="form-control" required>
+                            <option value="Request for Services">Request for Services</option>
+                            <option value="Partners">Partners</option>
+                            <option value="Media">Media</option>
+                            <option value="Investor Relations">Investor Relations</option>
+                            <option value="Career Seekers">Career Seekers</option>
+                            <option value="Alumni">Alumni</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="subject" class="form-label">Subject *</label>
+                        <input type="text" id="subject" name="subject" class="form-control" placeholder="AI Assessment inquiry" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="message" class="form-label">Message *</label>
+                    <textarea id="message" name="message" class="form-control" placeholder="Briefly describe your data goals or challenges..." required></textarea>
+                </div>
+                
+                <div class="form-checkbox-group">
+                    <input type="checkbox" id="contact_agreement" class="form-checkbox" required checked>
+                    <label for="contact_agreement" class="form-checkbox-label">
+                        I agree to the Artha Solutions <a href="#">Privacy Policy</a> and authorize Artha to contact me based on the information provided above.
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-glow" style="width: 100%;">
+                    Submit Inquiry <i class="fas fa-paper-plane btn-icon"></i>
+                </button>
+            </form>
+        </div>
+        
+        <!-- Info Cards Column -->
+        <div class="contact-info-panel">
+            <!-- Email / Phone Block -->
+            <div class="info-block">
+                <div class="info-icon"><i class="fas fa-headset"></i></div>
+                <div class="info-content">
+                    <h4>Direct Contact</h4>
+                    <p style="margin-bottom: 4px;"><strong>Email:</strong> info@thinkartha.com</p>
+                    <p><strong>Phone:</strong> +1 (480) 400-8000</p>
+                </div>
+            </div>
+            
+            <!-- Global Offices Grid -->
+            <div>
+                <h4 style="font-size: 20px; font-weight: 700; margin-bottom: 16px;">Global Offices</h4>
+                <div class="office-grid">
+                    <!-- USA Headquarters -->
+                    <div class="office-card">
+                        <div class="office-title"><i class="fas fa-map-marker-alt" style="color: var(--accent-blue); margin-right: 6px;"></i> USA (HQ)</div>
+                        <p class="office-addr">Scottsdale, Arizona & Naperville, Illinois</p>
+                    </div>
+                    <!-- Singapore Office -->
+                    <div class="office-card">
+                        <div class="office-title"><i class="fas fa-map-marker-alt" style="color: var(--accent-cyan); margin-right: 6px;"></i> Singapore</div>
+                        <p class="office-addr">Think Artha Asia Pte, Singapore</p>
+                    </div>
+                    <!-- India Office -->
+                    <div class="office-card">
+                        <div class="office-title"><i class="fas fa-map-marker-alt" style="color: var(--accent-blue); margin-right: 6px;"></i> India</div>
+                        <p class="office-addr">Hyderabad, Telangana, India</p>
+                    </div>
+                    <!-- Indonesia Office -->
+                    <div class="office-card">
+                        <div class="office-title"><i class="fas fa-map-marker-alt" style="color: var(--accent-cyan); margin-right: 6px;"></i> Indonesia</div>
+                        <p class="office-addr">Jakarta, Indonesia</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Map Callout -->
+            <div style="border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); padding: 24px; background: var(--bg-primary); display: flex; align-items: center; gap: 16px;">
+                <div style="font-size: 32px; color: var(--accent-cyan);"><i class="fas fa-globe-americas"></i></div>
+                <div>
+                    <h5 style="font-weight: 700; font-size: 15px;">24/7 Global Managed Services</h5>
+                    <p style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">Our 300+ certified engineers deliver global support across North America, Europe, and Asia.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

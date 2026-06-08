@@ -1,0 +1,1142 @@
+{% extends "base.html" %}
+
+{% block title %}ETL Tool Migrator & Accelerator | B'etl™ by Artha Solutions{% endblock %}
+{% block extra_meta %}
+<meta name="description" content="Accelerate ETL migration with our advanced ETL Tool Accelerator and Migrator. Migrate Informatica to Talend with lower risk and faster implementation.">
+{% endblock %}
+
+{% block content %}
+
+<!-- ══════════════════════════════════════════
+     HERO — B'etl™ : Convert. Validate. Accelerate.
+═════════════════════════════════════════════ -->
+<section class="hero betl-hero" id="betl-hero">
+    <div class="hero-bg-glow hero-glow-1" style="opacity:0.55;"></div>
+    <div class="hero-bg-glow hero-glow-2" style="opacity:0.35; right:-5%; top:25%;"></div>
+
+    <!-- Animated circuit lines -->
+    <div class="betl-circuit" aria-hidden="true">
+        <svg viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+            <line x1="0" y1="120"  x2="1200" y2="120"  stroke="rgba(99,102,241,0.08)" stroke-width="1"/>
+            <line x1="0" y1="300"  x2="1200" y2="300"  stroke="rgba(6,182,212,0.06)"  stroke-width="1"/>
+            <line x1="0" y1="480"  x2="1200" y2="480"  stroke="rgba(99,102,241,0.05)" stroke-width="1"/>
+            <line x1="200" y1="0"  x2="200"  y2="600"  stroke="rgba(99,102,241,0.05)" stroke-width="1"/>
+            <line x1="600" y1="0"  x2="600"  y2="600"  stroke="rgba(6,182,212,0.04)"  stroke-width="1"/>
+            <line x1="1000" y1="0" x2="1000" y2="600"  stroke="rgba(99,102,241,0.05)" stroke-width="1"/>
+            <!-- Data flow dots -->
+            <circle class="betl-dot" cx="200" cy="120" r="3" fill="rgba(99,102,241,0.4)"/>
+            <circle class="betl-dot" cx="600" cy="300" r="4" fill="rgba(6,182,212,0.5)"/>
+            <circle class="betl-dot" cx="1000" cy="120" r="3" fill="rgba(99,102,241,0.4)"/>
+        </svg>
+    </div>
+
+    <div class="container" style="position:relative; z-index:1;">
+        <div class="betl-hero-grid">
+            <!-- Left: headline -->
+            <div class="betl-hero-content">
+                <div class="hero-badge" style="display:inline-flex; margin-bottom:20px;">
+                    <i class="fas fa-bolt"></i> B'etl™ Migrator &amp; Accelerator
+                </div>
+                <h1 class="hero-title" style="font-size: clamp(40px, 5.5vw, 68px); line-height:1.1; margin-bottom:16px;">
+                    B'etl™ : <span>Convert. Validate.</span><br>Accelerate.
+                </h1>
+                <p class="hero-desc" style="font-size:19px; max-width:480px; line-height:1.7; margin-bottom:12px;">
+                    Modernization doesn't have to be hard. With B'etl™, it isn't.
+                </p>
+                <p style="font-size:15px; color:var(--text-secondary); max-width:480px; line-height:1.7; margin-bottom:32px;">
+                    B'etl™ blends automation, validation, and optimization — giving you not just converted jobs, but a future-proof Talend ecosystem.
+                </p>
+                <div style="display:flex; gap:14px; flex-wrap:wrap;">
+                    <a href="/contact-us" class="btn btn-primary btn-glow" id="betl-hero-cta" style="padding:14px 28px; font-size:15px;">
+                        <i class="fas fa-play-circle" style="margin-right:8px;"></i>Watch Demo
+                    </a>
+                    <a href="/contact-us" class="btn btn-outline" style="padding:14px 28px; font-size:15px;">
+                        Get a Free Assessment
+                    </a>
+                </div>
+
+                <!-- Value pillars row -->
+                <div class="betl-pillars">
+                    <div class="betl-pillar"><i class="fas fa-robot"></i><span>AI-Powered ETL Migration</span></div>
+                    <div class="betl-pillar"><i class="fas fa-eraser"></i><span>Eliminate Manual Rework</span></div>
+                    <div class="betl-pillar"><i class="fas fa-magnifying-glass-minus"></i><span>No Lost Logic</span></div>
+                    <div class="betl-pillar"><i class="fas fa-sack-dollar"></i><span>Avoid Budget Overruns</span></div>
+                </div>
+            </div>
+
+            <!-- Right: animated visual -->
+            <div class="betl-hero-visual">
+                <div class="betl-visual-card" id="betl-visual-card">
+                    <!-- Migration flow diagram -->
+                    <div class="betl-flow">
+                        <div class="betl-flow-node betl-node-source">
+                            <i class="fas fa-server"></i>
+                            <span>Legacy ETL</span>
+                            <small>Informatica / iWay / Pentaho</small>
+                        </div>
+                        <div class="betl-flow-arrow">
+                            <div class="betl-flow-line"></div>
+                            <div class="betl-flow-pulse"></div>
+                            <i class="fas fa-shuffle betl-flow-icon"></i>
+                        </div>
+                        <div class="betl-flow-node betl-node-target">
+                            <i class="fas fa-cube"></i>
+                            <span>Talend Cloud</span>
+                            <small>Future-proof ecosystem</small>
+                        </div>
+                    </div>
+                    <div class="betl-visual-badge">
+                        <i class="fas fa-check-circle" style="color:#10b981;"></i>
+                        <span>70% faster conversion</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     STATS BAND
+═════════════════════════════════════════════ -->
+<section style="background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 60%, #164e63 100%); padding: 48px 0; position:relative; overflow:hidden;">
+    <div style="position:absolute; inset:0; background: radial-gradient(ellipse at 30% 50%, rgba(99,102,241,0.15) 0%, transparent 60%); pointer-events:none;"></div>
+    <div class="container">
+        <div class="betl-stats-grid">
+            <div class="betl-stat">
+                <div class="betl-stat-num">70%</div>
+                <div class="betl-stat-desc">Save up to 70% of time while migrating from iWay, Pentaho, Informatica or any other legacy system</div>
+            </div>
+            <div class="betl-stat-divider"></div>
+            <div class="betl-stat">
+                <div class="betl-stat-num">100s</div>
+                <div class="betl-stat-desc">Convert 100s of Legacy jobs in minutes while maintaining conformity to target technology standards</div>
+            </div>
+            <div class="betl-stat-divider"></div>
+            <div class="betl-stat">
+                <div class="betl-stat-num">70%</div>
+                <div class="betl-stat-desc">70% Conversion Efficiency with just a few clicks of basic configurations saving huge amounts of time</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     CLIENT LOGOS
+═════════════════════════════════════════════ -->
+<section style="background:var(--bg-secondary); padding: 36px 0; border-bottom: 1px solid var(--border-color);">
+    <div class="container">
+        <p style="text-align:center; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:var(--text-muted); margin-bottom:24px;">Trusted by enterprises across 26+ countries</p>
+        <div class="betl-logos">
+            <div class="betl-logo-item"><i class="fas fa-building" style="font-size:22px; margin-right:8px;"></i>Generali</div>
+            <div class="betl-logo-item"><i class="fas fa-pizza-slice" style="font-size:22px; margin-right:8px;"></i>Domino's</div>
+            <div class="betl-logo-item"><i class="fas fa-house-medical" style="font-size:22px; margin-right:8px;"></i>HomeServe</div>
+            <div class="betl-logo-item"><i class="fas fa-industry" style="font-size:22px; margin-right:8px;"></i>Carhartt</div>
+            <div class="betl-logo-item"><i class="fas fa-gears" style="font-size:22px; margin-right:8px;"></i>Hanon Systems</div>
+            <div class="betl-logo-item"><i class="fas fa-chart-line" style="font-size:22px; margin-right:8px;"></i>Axis</div>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     HOW B'ETL WORKS — TABBED
+═════════════════════════════════════════════ -->
+<section class="section" id="betl-how" style="background:var(--bg-primary); padding: 90px 0;">
+    <div class="container">
+        <div class="section-header" style="text-align:center; margin-bottom:56px;">
+            <span class="section-subtitle-badge">Under the Hood</span>
+            <h2 class="section-title" style="margin-top:16px;">How <span>B'etl™</span> Works</h2>
+            <p class="section-desc" style="max-width:620px; margin:16px auto 0;">A two-stage intelligent pipeline that analyzes your legacy landscape and converts it to a governed Talend ecosystem.</p>
+        </div>
+
+        <div class="betl-tabs-nav" id="betl-tabs-nav">
+            <button class="betl-tab-btn active" data-tab="betl-analyzer" id="tab-btn-analyzer">
+                <span class="betl-tab-num">1</span>
+                <span class="betl-tab-label">Analyzer</span>
+            </button>
+            <button class="betl-tab-btn" data-tab="betl-converter" id="tab-btn-converter">
+                <span class="betl-tab-num">2</span>
+                <span class="betl-tab-label">Converter</span>
+            </button>
+        </div>
+
+        <!-- TAB 1: Analyzer -->
+        <div class="betl-tab-pane active" id="betl-analyzer">
+            <div class="betl-split">
+                <div class="betl-split-content">
+                    <div class="hero-badge" style="display:inline-flex; margin-bottom:18px;">
+                        <i class="fas fa-magnifying-glass-chart"></i> Stage 1
+                    </div>
+                    <h3 style="font-size:28px; font-weight:800; color:var(--text-primary); margin-bottom:16px; line-height:1.3;">
+                        B'etl™ Analyzer: Deep Visibility into Your ETL Landscape
+                    </h3>
+                    <p style="font-size:16px; color:var(--text-secondary); line-height:1.75; margin-bottom:28px;">
+                        Before modernization, clarity is power. B'etl™ Analyzer gives you a detailed, accurate view of your current ETL landscape — within seconds.
+                    </p>
+                    <ul class="betl-feature-list">
+                        <li>
+                            <div class="betl-feat-icon" style="background:rgba(99,102,241,0.12);"><i class="fas fa-check" style="color:#818cf8;"></i></div>
+                            <div><strong>Instantly discovers all ETL jobs</strong>, mappings, and components across legacy tools</div>
+                        </li>
+                        <li>
+                            <div class="betl-feat-icon" style="background:rgba(6,182,212,0.12);"><i class="fas fa-check" style="color:#22d3ee;"></i></div>
+                            <div><strong>Automatically classifies components</strong> by complexity to prioritize migration effort</div>
+                        </li>
+                        <li>
+                            <div class="betl-feat-icon" style="background:rgba(16,185,129,0.12);"><i class="fas fa-check" style="color:#34d399;"></i></div>
+                            <div><strong>Generates actionable Excel summaries</strong> for scoping, budgeting, and planning</div>
+                        </li>
+                    </ul>
+                    <a href="/contact-us" class="btn btn-primary" style="margin-top:8px; padding:13px 28px;">
+                        Get an ETL Landscape Report <i class="fas fa-arrow-right btn-icon"></i>
+                    </a>
+                </div>
+                <div class="betl-split-visual">
+                    <div class="betl-analyzer-card">
+                        <div class="betl-analyzer-header">
+                            <i class="fas fa-table-columns" style="color:#818cf8;"></i>
+                            <span>ETL Landscape Analysis Report</span>
+                            <div class="betl-header-dots"><span></span><span></span><span></span></div>
+                        </div>
+                        <div class="betl-analyzer-body">
+                            <div class="betl-analyzer-row">
+                                <span class="betl-tag betl-tag-blue">Jobs Scanned</span>
+                                <strong>1,248</strong>
+                                <div class="betl-mini-bar" style="width:85%; background:linear-gradient(90deg,#6366f1,#818cf8);"></div>
+                            </div>
+                            <div class="betl-analyzer-row">
+                                <span class="betl-tag betl-tag-cyan">Auto-Convertible</span>
+                                <strong>874 (70%)</strong>
+                                <div class="betl-mini-bar" style="width:70%; background:linear-gradient(90deg,#06b6d4,#22d3ee);"></div>
+                            </div>
+                            <div class="betl-analyzer-row">
+                                <span class="betl-tag betl-tag-amber">Medium Complexity</span>
+                                <strong>249 (20%)</strong>
+                                <div class="betl-mini-bar" style="width:20%; background:linear-gradient(90deg,#f59e0b,#fbbf24);"></div>
+                            </div>
+                            <div class="betl-analyzer-row">
+                                <span class="betl-tag betl-tag-red">Manual Review</span>
+                                <strong>125 (10%)</strong>
+                                <div class="betl-mini-bar" style="width:10%; background:linear-gradient(90deg,#ef4444,#f87171);"></div>
+                            </div>
+                            <div class="betl-analyzer-footer">
+                                <i class="fas fa-file-excel" style="color:#10b981;"></i>
+                                <span>Scope_Report_v2.xlsx exported</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: Converter -->
+        <div class="betl-tab-pane" id="betl-converter">
+            <div class="betl-split">
+                <div class="betl-split-content">
+                    <div class="hero-badge" style="display:inline-flex; margin-bottom:18px;">
+                        <i class="fas fa-code-compare"></i> Stage 2
+                    </div>
+                    <h3 style="font-size:28px; font-weight:800; color:var(--text-primary); margin-bottom:16px; line-height:1.3;">
+                        B'etl™ Converter: Few-Click Migration That Does 70% of the Job
+                    </h3>
+                    <p style="font-size:16px; color:var(--text-secondary); line-height:1.75; margin-bottom:28px;">
+                        With advanced automation and deep platform compatibility, our converter migrates over 70% of your ETL jobs seamlessly.
+                    </p>
+                    <ul class="betl-feature-list">
+                        <li>
+                            <div class="betl-feat-icon" style="background:rgba(139,92,246,0.12);"><i class="fas fa-check" style="color:#a78bfa;"></i></div>
+                            <div><strong>Built on a robust parser and translator framework</strong> — it adapts complex workflows, metadata, and business rules into target technology with unmatched accuracy</div>
+                        </li>
+                        <li>
+                            <div class="betl-feat-icon" style="background:rgba(99,102,241,0.12);"><i class="fas fa-check" style="color:#818cf8;"></i></div>
+                            <div><strong>Reduce migration efforts by up to 75%</strong> compared to manual processes</div>
+                        </li>
+                        <li>
+                            <div class="betl-feat-icon" style="background:rgba(6,182,212,0.12);"><i class="fas fa-check" style="color:#22d3ee;"></i></div>
+                            <div><strong>Generates deployment-ready Talend jobs</strong> that follow best practices automatically</div>
+                        </li>
+                    </ul>
+                    <a href="/contact-us" class="btn btn-primary" style="margin-top:8px; padding:13px 28px;">
+                        See a Live Conversion Demo <i class="fas fa-arrow-right btn-icon"></i>
+                    </a>
+                </div>
+                <div class="betl-split-visual">
+                    <div class="betl-converter-card">
+                        <div class="betl-code-block">
+                            <div class="betl-code-header">
+                                <span class="betl-code-dot" style="background:#ef4444;"></span>
+                                <span class="betl-code-dot" style="background:#f59e0b;"></span>
+                                <span class="betl-code-dot" style="background:#10b981;"></span>
+                                <span style="font-size:11px; color:#64748b; margin-left:8px;">Informatica → Talend</span>
+                            </div>
+                            <div class="betl-code-body">
+                                <div class="betl-code-line betl-line-removed">- SQ_Transformation(SQL: SELECT * FROM orders)</div>
+                                <div class="betl-code-line betl-line-removed">- EXP_Calculate(formula: v_total = IN_qty * IN_price)</div>
+                                <div class="betl-code-line betl-line-removed">- RTR_Filter(condition: v_total > 1000)</div>
+                                <div class="betl-code-line betl-line-removed">- TGT_Oracle(table: orders_summary)</div>
+                                <div class="betl-code-spacer"></div>
+                                <div class="betl-code-line betl-line-added">+ tDBInput(query: SELECT * FROM orders)</div>
+                                <div class="betl-code-line betl-line-added">+ tMap(expression: total = qty * price)</div>
+                                <div class="betl-code-line betl-line-added">+ tFilterRow(condition: total > 1000)</div>
+                                <div class="betl-code-line betl-line-added">+ tDBOutput(table: orders_summary)</div>
+                            </div>
+                            <div class="betl-code-footer">
+                                <i class="fas fa-check-circle" style="color:#10b981;"></i>
+                                <span>4 components converted in 0.3s</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     BUSINESS VALUE — 5 FEATURE CARDS
+═════════════════════════════════════════════ -->
+<section class="section" id="betl-value" style="background:var(--bg-secondary); padding: 90px 0;">
+    <div class="container">
+        <div class="section-header" style="text-align:center; margin-bottom:56px;">
+            <span class="section-subtitle-badge">Why B'etl™</span>
+            <h2 class="section-title" style="margin-top:16px;">Transform Your Business with <span>Scalable, Efficient</span> Data Migration</h2>
+            <p class="section-desc" style="max-width:640px; margin:16px auto 0;">Five core value propositions that make B'etl™ the #1 choice for ETL modernization programs globally.</p>
+        </div>
+
+        <div class="betl-value-grid">
+            <div class="betl-value-card" style="--vc: #6366f1; --vcg: rgba(99,102,241,0.12);">
+                <div class="betl-vc-icon"><i class="fas fa-plug-circle-bolt"></i></div>
+                <h3 class="betl-vc-title">Bridging Legacy Platform Gaps</h3>
+                <p class="betl-vc-desc">Our migrator eliminates the challenges of legacy ETL tools like iWay, Informatica, and DataStage by automating migrations, even with limited documentation and inconsistent design practices — reducing dependency on scarce legacy expertise.</p>
+            </div>
+            <div class="betl-value-card" style="--vc: #06b6d4; --vcg: rgba(6,182,212,0.12);">
+                <div class="betl-vc-icon"><i class="fas fa-user-gear"></i></div>
+                <h3 class="betl-vc-title">Overcoming Skill Shortages</h3>
+                <p class="betl-vc-desc">With extensive support for legacy technologies and a wide range of compatibilities, our tool ensures seamless transitions to Talend or any other technology — minimizing the need for manual customization and meeting today's complex integration requirements.</p>
+            </div>
+            <div class="betl-value-card" style="--vc: #10b981; --vcg: rgba(16,185,129,0.12);">
+                <div class="betl-vc-icon"><i class="fas fa-gauge-high"></i></div>
+                <h3 class="betl-vc-title">Boosting Performance &amp; Productivity</h3>
+                <p class="betl-vc-desc">By addressing performance bottlenecks in legacy systems and optimizing Talend implementations, the migrator enhances team productivity and accelerates development cycles, enabling agile practices.</p>
+            </div>
+            <div class="betl-value-card" style="--vc: #f59e0b; --vcg: rgba(245,158,11,0.12);">
+                <div class="betl-vc-icon"><i class="fas fa-arrow-trend-up"></i></div>
+                <h3 class="betl-vc-title">Simplifying Upgrades &amp; Cost Models</h3>
+                <p class="betl-vc-desc">Our tool eliminates upgrade complexities and enables a smooth transition to Talend's subscription-based licensing model, reducing costs while empowering teams to adopt and scale Talend efficiently.</p>
+            </div>
+            <div class="betl-value-card" style="--vc: #8b5cf6; --vcg: rgba(139,92,246,0.12);">
+                <div class="betl-vc-icon"><i class="fas fa-code-branch"></i></div>
+                <h3 class="betl-vc-title">Aligning with Target Technology Standards</h3>
+                <p class="betl-vc-desc">The ETL migrator enforces strict conformity to Talend's architecture, ensuring clean, maintainable, and scalable designs while reducing costly errors often caused by manual coding.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     FEW-CLICK TABS — SECONDARY FEATURES
+═════════════════════════════════════════════ -->
+<section class="section" id="betl-features" style="background:var(--bg-primary); padding: 90px 0;">
+    <div class="container">
+        <div class="section-header" style="text-align:center; margin-bottom:56px;">
+            <span class="section-subtitle-badge">Platform Capabilities</span>
+            <h2 class="section-title" style="margin-top:16px;">Everything You Need for <span>Zero-Risk Migration</span></h2>
+        </div>
+
+        <div class="betl-feat-tabs-nav" id="betl-feat-tabs-nav">
+            <button class="betl-feat-tab-btn active" data-ftab="feat-click" id="ftab-click">
+                <i class="fas fa-computer-mouse"></i> Few Click ETL Migration
+            </button>
+            <button class="betl-feat-tab-btn" data-ftab="feat-support" id="ftab-support">
+                <i class="fas fa-headset"></i> Free Support Hours
+            </button>
+            <button class="betl-feat-tab-btn" data-ftab="feat-training" id="ftab-training">
+                <i class="fas fa-graduation-cap"></i> Training for Manual Steps
+            </button>
+            <button class="betl-feat-tab-btn" data-ftab="feat-whitelabel" id="ftab-whitelabel">
+                <i class="fas fa-tag"></i> White Label &amp; Own
+            </button>
+        </div>
+
+        <div class="betl-feat-content">
+            <!-- Few Click ETL Migration -->
+            <div class="betl-feat-pane active" id="feat-click">
+                <div class="betl-split" style="gap:60px;">
+                    <div class="betl-split-content">
+                        <h3 style="font-size:26px; font-weight:800; margin-bottom:16px;">Few Click Migration which does 70% of the Job</h3>
+                        <p style="font-size:15px; color:var(--text-secondary); line-height:1.75; margin-bottom:24px;">With advanced automation and deep platform compatibility, our converter migrates over 70% of your ETL jobs seamlessly.</p>
+                        <ul class="betl-feature-list">
+                            <li>
+                                <div class="betl-feat-icon" style="background:rgba(99,102,241,0.12);"><i class="fas fa-check" style="color:#818cf8;"></i></div>
+                                <div>Built on a robust parser and translator framework, it adapts complex workflows, metadata, and business rules into target technology with unmatched accuracy</div>
+                            </li>
+                            <li>
+                                <div class="betl-feat-icon" style="background:rgba(6,182,212,0.12);"><i class="fas fa-check" style="color:#22d3ee;"></i></div>
+                                <div>Reduce migration efforts by up to 75% compared to manual processes</div>
+                            </li>
+                        </ul>
+                        <a href="/contact-us" class="btn btn-primary" style="margin-top:16px; padding:13px 26px;">Schedule a Live Demo <i class="fas fa-arrow-right btn-icon"></i></a>
+                    </div>
+                    <div class="betl-split-visual">
+                        <div style="background:linear-gradient(135deg,rgba(99,102,241,0.08),rgba(6,182,212,0.08)); border:1px solid var(--border-color); border-radius:20px; padding:32px; position:relative; overflow:hidden;">
+                            <div style="position:absolute; top:-30px; right:-30px; width:120px; height:120px; border-radius:50%; background:radial-gradient(circle,rgba(99,102,241,0.15),transparent 70%);"></div>
+                            <div style="display:flex; flex-direction:column; gap:16px; position:relative; z-index:1;">
+                                <div style="display:flex; align-items:center; gap:12px; background:var(--bg-primary); border:1px solid var(--border-color); border-radius:12px; padding:16px;">
+                                    <div style="width:36px; height:36px; border-radius:8px; background:rgba(99,102,241,0.12); display:flex; align-items:center; justify-content:center; flex-shrink:0;"><i class="fas fa-upload" style="color:#818cf8;"></i></div>
+                                    <div><strong style="font-size:13px; display:block;">Step 1:</strong><span style="font-size:12px; color:var(--text-secondary);">Upload your legacy ETL source files</span></div>
+                                </div>
+                                <div style="display:flex; align-items:center; gap:12px; background:var(--bg-primary); border:1px solid var(--border-color); border-radius:12px; padding:16px;">
+                                    <div style="width:36px; height:36px; border-radius:8px; background:rgba(6,182,212,0.12); display:flex; align-items:center; justify-content:center; flex-shrink:0;"><i class="fas fa-sliders" style="color:#22d3ee;"></i></div>
+                                    <div><strong style="font-size:13px; display:block;">Step 2:</strong><span style="font-size:12px; color:var(--text-secondary);">Configure target platform settings</span></div>
+                                </div>
+                                <div style="display:flex; align-items:center; gap:12px; background:var(--bg-primary); border:1px solid rgba(16,185,129,0.3); border-radius:12px; padding:16px;">
+                                    <div style="width:36px; height:36px; border-radius:8px; background:rgba(16,185,129,0.12); display:flex; align-items:center; justify-content:center; flex-shrink:0;"><i class="fas fa-rocket" style="color:#34d399;"></i></div>
+                                    <div><strong style="font-size:13px; display:block; color:#10b981;">Step 3: Done!</strong><span style="font-size:12px; color:var(--text-secondary);">Download converted Talend jobs instantly</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Free Support Hours -->
+            <div class="betl-feat-pane" id="feat-support">
+                <div class="betl-split" style="gap:60px;">
+                    <div class="betl-split-content">
+                        <h3 style="font-size:26px; font-weight:800; margin-bottom:16px;">Free Support Hours Included</h3>
+                        <p style="font-size:15px; color:var(--text-secondary); line-height:1.75; margin-bottom:24px;">Every B'etl™ license includes dedicated engineering support hours. Our certified Talend experts guide your team through edge cases, complex transformations, and post-migration validation.</p>
+                        <ul class="betl-feature-list">
+                            <li>
+                                <div class="betl-feat-icon" style="background:rgba(6,182,212,0.12);"><i class="fas fa-check" style="color:#22d3ee;"></i></div>
+                                <div>Dedicated Talend-certified engineer assigned to your project</div>
+                            </li>
+                            <li>
+                                <div class="betl-feat-icon" style="background:rgba(6,182,212,0.12);"><i class="fas fa-check" style="color:#22d3ee;"></i></div>
+                                <div>Priority ticket resolution for migration blockers and edge cases</div>
+                            </li>
+                            <li>
+                                <div class="betl-feat-icon" style="background:rgba(6,182,212,0.12);"><i class="fas fa-check" style="color:#22d3ee;"></i></div>
+                                <div>Post-migration validation and performance tuning sessions</div>
+                            </li>
+                        </ul>
+                        <a href="/contact-us" class="btn btn-primary" style="margin-top:16px; padding:13px 26px;">Speak with Our Team <i class="fas fa-arrow-right btn-icon"></i></a>
+                    </div>
+                    <div class="betl-split-visual">
+                        <div style="background:linear-gradient(135deg,rgba(6,182,212,0.08),rgba(99,102,241,0.08)); border:1px solid var(--border-color); border-radius:20px; padding:36px; text-align:center;">
+                            <div style="width:80px; height:80px; border-radius:50%; background:rgba(6,182,212,0.15); display:flex; align-items:center; justify-content:center; margin:0 auto 20px;"><i class="fas fa-headset" style="font-size:36px; color:#22d3ee;"></i></div>
+                            <div style="font-size:42px; font-weight:900; background:linear-gradient(135deg,#22d3ee,#818cf8); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:8px;">24/7</div>
+                            <p style="font-size:15px; color:var(--text-secondary); line-height:1.6;">Support coverage across time zones — US, UK, India, APAC</p>
+                            <div style="display:flex; gap:10px; justify-content:center; margin-top:20px; flex-wrap:wrap;">
+                                <span style="background:rgba(6,182,212,0.12); color:#22d3ee; border:1px solid rgba(6,182,212,0.2); border-radius:20px; padding:5px 14px; font-size:12px; font-weight:600;">EST</span>
+                                <span style="background:rgba(6,182,212,0.12); color:#22d3ee; border:1px solid rgba(6,182,212,0.2); border-radius:20px; padding:5px 14px; font-size:12px; font-weight:600;">BST</span>
+                                <span style="background:rgba(6,182,212,0.12); color:#22d3ee; border:1px solid rgba(6,182,212,0.2); border-radius:20px; padding:5px 14px; font-size:12px; font-weight:600;">IST</span>
+                                <span style="background:rgba(6,182,212,0.12); color:#22d3ee; border:1px solid rgba(6,182,212,0.2); border-radius:20px; padding:5px 14px; font-size:12px; font-weight:600;">SGT</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Training for Manual Steps -->
+            <div class="betl-feat-pane" id="feat-training">
+                <div class="betl-split" style="gap:60px;">
+                    <div class="betl-split-content">
+                        <h3 style="font-size:26px; font-weight:800; margin-bottom:16px;">Training for the 30% Manual Steps</h3>
+                        <p style="font-size:15px; color:var(--text-secondary); line-height:1.75; margin-bottom:24px;">The complex 30% doesn't have to slow you down. Our structured training program equips your developers to handle edge cases, custom transformations, and business logic conversions confidently.</p>
+                        <ul class="betl-feature-list">
+                            <li>
+                                <div class="betl-feat-icon" style="background:rgba(16,185,129,0.12);"><i class="fas fa-check" style="color:#34d399;"></i></div>
+                                <div>Hands-on workshops covering complex ETL patterns and Talend best practices</div>
+                            </li>
+                            <li>
+                                <div class="betl-feat-icon" style="background:rgba(16,185,129,0.12);"><i class="fas fa-check" style="color:#34d399;"></i></div>
+                                <div>Video library of real migration case studies and walkthroughs</div>
+                            </li>
+                            <li>
+                                <div class="betl-feat-icon" style="background:rgba(16,185,129,0.12);"><i class="fas fa-check" style="color:#34d399;"></i></div>
+                                <div>Certification tracks for your development team upon completion</div>
+                            </li>
+                        </ul>
+                        <a href="/contact-us" class="btn btn-primary" style="margin-top:16px; padding:13px 26px;">Explore Training Options <i class="fas fa-arrow-right btn-icon"></i></a>
+                    </div>
+                    <div class="betl-split-visual">
+                        <div style="background:linear-gradient(135deg,rgba(16,185,129,0.08),rgba(6,182,212,0.08)); border:1px solid var(--border-color); border-radius:20px; padding:36px;">
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                                <div style="background:var(--bg-primary); border:1px solid var(--border-color); border-radius:12px; padding:20px; text-align:center;">
+                                    <div style="font-size:28px; font-weight:800; color:#10b981;">4</div>
+                                    <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Week Program</div>
+                                </div>
+                                <div style="background:var(--bg-primary); border:1px solid var(--border-color); border-radius:12px; padding:20px; text-align:center;">
+                                    <div style="font-size:28px; font-weight:800; color:#10b981;">40+</div>
+                                    <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Training Hours</div>
+                                </div>
+                                <div style="background:var(--bg-primary); border:1px solid var(--border-color); border-radius:12px; padding:20px; text-align:center;">
+                                    <div style="font-size:28px; font-weight:800; color:#10b981;">Live</div>
+                                    <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Instructor-led</div>
+                                </div>
+                                <div style="background:var(--bg-primary); border:1px solid rgba(16,185,129,0.3); border-radius:12px; padding:20px; text-align:center;">
+                                    <div style="font-size:28px; font-weight:800; color:#10b981;">✓</div>
+                                    <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Certification</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- White Label & Own -->
+            <div class="betl-feat-pane" id="feat-whitelabel">
+                <div class="betl-split" style="gap:60px;">
+                    <div class="betl-split-content">
+                        <h3 style="font-size:26px; font-weight:800; margin-bottom:16px;">White Label &amp; Own the Platform</h3>
+                        <p style="font-size:15px; color:var(--text-secondary); line-height:1.75; margin-bottom:24px;">System Integrators and consulting firms can white-label B'etl™ to offer ETL migration as a branded service — expanding your practice offerings without building from scratch.</p>
+                        <ul class="betl-feature-list">
+                            <li>
+                                <div class="betl-feat-icon" style="background:rgba(139,92,246,0.12);"><i class="fas fa-check" style="color:#a78bfa;"></i></div>
+                                <div>Full white-label branding with your company logo and color scheme</div>
+                            </li>
+                            <li>
+                                <div class="betl-feat-icon" style="background:rgba(139,92,246,0.12);"><i class="fas fa-check" style="color:#a78bfa;"></i></div>
+                                <div>Reseller licensing model with tiered pricing for your client engagements</div>
+                            </li>
+                            <li>
+                                <div class="betl-feat-icon" style="background:rgba(139,92,246,0.12);"><i class="fas fa-check" style="color:#a78bfa;"></i></div>
+                                <div>Dedicated partner onboarding and co-selling support from Artha's team</div>
+                            </li>
+                        </ul>
+                        <a href="/contact-us" class="btn btn-primary" style="margin-top:16px; padding:13px 26px;">Become a Partner <i class="fas fa-arrow-right btn-icon"></i></a>
+                    </div>
+                    <div class="betl-split-visual">
+                        <div style="background:linear-gradient(135deg,rgba(139,92,246,0.08),rgba(99,102,241,0.08)); border:1px solid var(--border-color); border-radius:20px; padding:36px; text-align:center;">
+                            <div style="width:80px; height:80px; border-radius:50%; background:rgba(139,92,246,0.15); display:flex; align-items:center; justify-content:center; margin:0 auto 20px;"><i class="fas fa-tag" style="font-size:36px; color:#a78bfa;"></i></div>
+                            <h4 style="font-size:18px; font-weight:700; margin-bottom:8px;">Your Brand. Our Technology.</h4>
+                            <p style="font-size:14px; color:var(--text-secondary); line-height:1.6; margin-bottom:20px;">Launch a full ETL migration practice under your brand with zero R&amp;D investment.</p>
+                            <div style="display:flex; flex-direction:column; gap:10px; text-align:left;">
+                                <div style="display:flex; align-items:center; gap:10px; font-size:13px;"><i class="fas fa-check-circle" style="color:#a78bfa;"></i> OEM licensing available</div>
+                                <div style="display:flex; align-items:center; gap:10px; font-size:13px;"><i class="fas fa-check-circle" style="color:#a78bfa;"></i> API-first architecture for custom UI</div>
+                                <div style="display:flex; align-items:center; gap:10px; font-size:13px;"><i class="fas fa-check-circle" style="color:#a78bfa;"></i> Co-marketing support included</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     SUPPORTED MIGRATIONS TABLE
+═════════════════════════════════════════════ -->
+<section style="background:var(--bg-secondary); padding: 80px 0;">
+    <div class="container">
+        <div class="section-header" style="text-align:center; margin-bottom:48px;">
+            <span class="section-subtitle-badge">Compatibility</span>
+            <h2 class="section-title" style="margin-top:16px;">Supported <span>Source Platforms</span></h2>
+            <p class="section-desc" style="max-width:560px; margin:16px auto 0;">B'etl™ supports migration from the most widely used legacy ETL platforms to modern Talend Cloud.</p>
+        </div>
+        <div class="betl-compat-grid">
+            <div class="betl-compat-card">
+                <div class="betl-compat-icon" style="background:rgba(239,68,68,0.1); color:#f87171;"><i class="fas fa-network-wired"></i></div>
+                <strong>Informatica PowerCenter</strong>
+                <span class="betl-compat-rate">95%</span>
+                <div class="betl-compat-bar"><div style="width:95%; background:linear-gradient(90deg,#ef4444,#f87171);"></div></div>
+            </div>
+            <div class="betl-compat-card">
+                <div class="betl-compat-icon" style="background:rgba(245,158,11,0.1); color:#fbbf24;"><i class="fas fa-diagram-project"></i></div>
+                <strong>iWay</strong>
+                <span class="betl-compat-rate">90%</span>
+                <div class="betl-compat-bar"><div style="width:90%; background:linear-gradient(90deg,#f59e0b,#fbbf24);"></div></div>
+            </div>
+            <div class="betl-compat-card">
+                <div class="betl-compat-icon" style="background:rgba(16,185,129,0.1); color:#34d399;"><i class="fas fa-leaf"></i></div>
+                <strong>Pentaho</strong>
+                <span class="betl-compat-rate">85%</span>
+                <div class="betl-compat-bar"><div style="width:85%; background:linear-gradient(90deg,#10b981,#34d399);"></div></div>
+            </div>
+            <div class="betl-compat-card">
+                <div class="betl-compat-icon" style="background:rgba(6,182,212,0.1); color:#22d3ee;"><i class="fas fa-database"></i></div>
+                <strong>IBM DataStage</strong>
+                <span class="betl-compat-rate">80%</span>
+                <div class="betl-compat-bar"><div style="width:80%; background:linear-gradient(90deg,#06b6d4,#22d3ee);"></div></div>
+            </div>
+            <div class="betl-compat-card">
+                <div class="betl-compat-icon" style="background:rgba(99,102,241,0.1); color:#818cf8;"><i class="fas fa-code"></i></div>
+                <strong>BODS / Data Services</strong>
+                <span class="betl-compat-rate">78%</span>
+                <div class="betl-compat-bar"><div style="width:78%; background:linear-gradient(90deg,#6366f1,#818cf8);"></div></div>
+            </div>
+            <div class="betl-compat-card">
+                <div class="betl-compat-icon" style="background:rgba(139,92,246,0.1); color:#a78bfa;"><i class="fas fa-infinity"></i></div>
+                <strong>SSIS</strong>
+                <span class="betl-compat-rate">75%</span>
+                <div class="betl-compat-bar"><div style="width:75%; background:linear-gradient(90deg,#8b5cf6,#a78bfa);"></div></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     BOTTOM CTA
+═════════════════════════════════════════════ -->
+<section style="background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 50%, #164e63 100%); padding: 80px 0; position:relative; overflow:hidden;">
+    <div style="position:absolute; inset:0; background: radial-gradient(ellipse at 30% 50%, rgba(99,102,241,0.2) 0%, transparent 60%), radial-gradient(ellipse at 70% 50%, rgba(6,182,212,0.15) 0%, transparent 60%); pointer-events:none;"></div>
+    <div class="container" style="text-align:center; position:relative; z-index:1;">
+        <div class="hero-badge" style="display:inline-flex; margin:0 auto 20px; background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.15); color:#e2e8f0;">
+            <i class="fas fa-rocket"></i> Start Your Migration
+        </div>
+        <h2 style="font-size:clamp(28px,4vw,48px); font-weight:800; color:#f8fafc; margin-bottom:16px; line-height:1.2;">
+            Ready to modernize your ETL landscape?
+        </h2>
+        <p style="font-size:17px; color:#94a3b8; max-width:580px; margin:0 auto 40px; line-height:1.7;">
+            Schedule a free 30-minute ETL landscape assessment. Our engineers will analyze your current setup and show you exactly what B'etl™ can automate.
+        </p>
+        <div style="display:flex; gap:16px; justify-content:center; flex-wrap:wrap;">
+            <a href="/contact-us" class="btn btn-primary btn-glow" style="padding:14px 32px; font-size:15px; background:linear-gradient(135deg,#6366f1,#06b6d4);">
+                Book a Free Assessment <i class="fas fa-calendar btn-icon"></i>
+            </a>
+            <a href="/partners/talend" class="btn" style="padding:14px 32px; font-size:15px; background:rgba(255,255,255,0.08); color:#e2e8f0; border:1px solid rgba(255,255,255,0.15); backdrop-filter:blur(8px);">
+                Our Talend Partnership
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     PAGE STYLES
+═════════════════════════════════════════════ -->
+<style>
+/* Hero */
+.betl-hero {
+    min-height: 80vh;
+    padding-top: calc(var(--nav-height) + 80px);
+    padding-bottom: 80px;
+    overflow: hidden;
+    position: relative;
+}
+.betl-circuit {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+.betl-circuit svg { width: 100%; height: 100%; }
+.betl-dot { animation: dotPulse 3s ease-in-out infinite; }
+.betl-dot:nth-child(2) { animation-delay: 1s; }
+.betl-dot:nth-child(3) { animation-delay: 2s; }
+@keyframes dotPulse {
+    0%, 100% { opacity: 0.4; r: 3; }
+    50%       { opacity: 1;   r: 5; }
+}
+
+.betl-hero-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 60px;
+    align-items: center;
+}
+@media (max-width: 900px) {
+    .betl-hero-grid { grid-template-columns: 1fr; }
+    .betl-hero-visual { display: none; }
+}
+
+/* Value pillars */
+.betl-pillars {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-top: 32px;
+}
+.betl-pillar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 8px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+.betl-pillar i { color: #818cf8; font-size: 13px; }
+
+/* Hero visual card */
+.betl-visual-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 24px;
+    padding: 36px 28px;
+    backdrop-filter: blur(12px);
+    animation: cardFloat 4s ease-in-out infinite;
+}
+@keyframes cardFloat {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-10px); }
+}
+
+.betl-flow {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 24px;
+}
+.betl-flow-node {
+    flex: 1;
+    text-align: center;
+    padding: 20px 12px;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.08);
+}
+.betl-node-source { background: rgba(239,68,68,0.08); }
+.betl-node-target { background: rgba(6,182,212,0.08); }
+.betl-flow-node i { font-size: 28px; display: block; margin-bottom: 8px; }
+.betl-node-source i { color: #f87171; }
+.betl-node-target i { color: #22d3ee; }
+.betl-flow-node span { display: block; font-size: 13px; font-weight: 700; color: var(--text-primary); }
+.betl-flow-node small { display: block; font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+.betl-flow-arrow {
+    flex-shrink: 0;
+    width: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+.betl-flow-line {
+    height: 2px;
+    width: 100%;
+    background: linear-gradient(90deg, #6366f1, #06b6d4);
+    position: relative;
+}
+.betl-flow-pulse {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #818cf8;
+    animation: flowPulse 2s linear infinite;
+}
+@keyframes flowPulse {
+    from { left: 0%; opacity: 1; }
+    to   { left: 100%; opacity: 0; }
+}
+.betl-flow-icon {
+    font-size: 12px;
+    color: #818cf8;
+    margin-top: 6px;
+}
+.betl-visual-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(16,185,129,0.1);
+    border: 1px solid rgba(16,185,129,0.2);
+    border-radius: 10px;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #34d399;
+}
+
+/* Stats */
+.betl-stats-grid {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    position: relative;
+    z-index: 1;
+}
+.betl-stat {
+    flex: 1;
+    padding: 0 40px;
+    text-align: center;
+}
+.betl-stat:first-child { padding-left: 0; }
+.betl-stat:last-child  { padding-right: 0; }
+.betl-stat-num {
+    font-size: 56px;
+    font-weight: 900;
+    background: linear-gradient(135deg, #818cf8, #22d3ee);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    display: block;
+    margin-bottom: 12px;
+}
+.betl-stat-desc {
+    font-size: 14px;
+    color: #94a3b8;
+    line-height: 1.6;
+}
+.betl-stat-divider {
+    width: 1px;
+    background: rgba(255,255,255,0.1);
+    align-self: stretch;
+}
+
+/* Client logos */
+.betl-logos {
+    display: flex;
+    gap: 32px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.betl-logo-item {
+    display: flex;
+    align-items: center;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-muted);
+    padding: 6px 0;
+    transition: color 0.2s ease;
+}
+.betl-logo-item:hover { color: var(--text-secondary); }
+
+/* How it works tabs */
+.betl-tabs-nav {
+    display: flex;
+    gap: 4px;
+    border-bottom: 2px solid var(--border-color);
+    margin-bottom: 48px;
+}
+.betl-tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 24px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-muted);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: all 0.2s ease;
+    font-family: var(--font-body);
+}
+.betl-tab-btn.active {
+    color: var(--accent-blue);
+    border-bottom-color: var(--accent-blue);
+}
+.betl-tab-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(99,102,241,0.1);
+    color: #818cf8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 800;
+}
+.betl-tab-btn.active .betl-tab-num {
+    background: rgba(99,102,241,0.25);
+}
+
+/* Tab panes */
+.betl-tab-pane { display: none; }
+.betl-tab-pane.active { display: block; }
+
+/* Split layout */
+.betl-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+}
+@media (max-width: 900px) {
+    .betl-split { grid-template-columns: 1fr; }
+    .betl-split-visual { display: none; }
+}
+
+/* Feature list */
+.betl-feature-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 0;
+}
+.betl-feature-list li {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.65;
+}
+.betl-feat-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+    font-size: 12px;
+}
+
+/* Analyzer card */
+.betl-analyzer-card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 18px;
+    overflow: hidden;
+}
+.betl-analyzer-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 20px;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+.betl-header-dots { display: flex; gap: 5px; margin-left: auto; }
+.betl-header-dots span { width: 10px; height: 10px; border-radius: 50%; background: var(--border-color); }
+.betl-analyzer-body { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+.betl-analyzer-row { display: flex; flex-direction: column; gap: 6px; }
+.betl-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    width: fit-content;
+}
+.betl-tag-blue  { background:rgba(99,102,241,0.12); color:#818cf8; }
+.betl-tag-cyan  { background:rgba(6,182,212,0.12);  color:#22d3ee; }
+.betl-tag-amber { background:rgba(245,158,11,0.12); color:#fbbf24; }
+.betl-tag-red   { background:rgba(239,68,68,0.12);  color:#f87171; }
+.betl-mini-bar { height: 4px; border-radius: 2px; }
+.betl-analyzer-row strong { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+.betl-analyzer-footer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+    padding-top: 12px;
+    border-top: 1px solid var(--border-color);
+}
+
+/* Code block (converter) */
+.betl-converter-card { }
+.betl-code-block {
+    background: #0d1117;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 18px;
+    overflow: hidden;
+}
+.betl-code-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.04);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.betl-code-dot { width: 12px; height: 12px; border-radius: 50%; }
+.betl-code-body { padding: 20px; display: flex; flex-direction: column; gap: 4px; font-family: 'Courier New', monospace; font-size: 12px; }
+.betl-code-line { padding: 3px 8px; border-radius: 4px; }
+.betl-line-removed { color: #f87171; background: rgba(239,68,68,0.08); }
+.betl-line-added   { color: #34d399; background: rgba(16,185,129,0.08); }
+.betl-code-spacer  { height: 8px; }
+.betl-code-footer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: rgba(255,255,255,0.02);
+    border-top: 1px solid rgba(255,255,255,0.06);
+    font-size: 11px;
+    color: #64748b;
+}
+
+/* Value cards */
+.betl-value-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+@media (max-width: 1050px) { .betl-value-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 640px)  { .betl-value-grid { grid-template-columns: 1fr; } }
+
+.betl-value-card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 32px 28px;
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.betl-value-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--vc, #6366f1);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.2);
+}
+.betl-vc-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    background: var(--vcg, rgba(99,102,241,0.12));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    font-size: 22px;
+    color: var(--vc, #6366f1);
+    transition: transform 0.3s ease;
+}
+.betl-value-card:hover .betl-vc-icon { transform: scale(1.1) rotate(-5deg); }
+.betl-vc-title {
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+    line-height: 1.4;
+}
+.betl-vc-desc {
+    font-size: 13.5px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+}
+
+/* Feature tabs */
+.betl-feat-tabs-nav {
+    display: flex;
+    gap: 4px;
+    border-bottom: 2px solid var(--border-color);
+    margin-bottom: 48px;
+    flex-wrap: wrap;
+}
+.betl-feat-tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-muted);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: all 0.2s ease;
+    font-family: var(--font-body);
+    white-space: nowrap;
+}
+.betl-feat-tab-btn.active { color: var(--accent-blue); border-bottom-color: var(--accent-blue); }
+.betl-feat-tab-btn i { font-size: 13px; }
+.betl-feat-pane { display: none; }
+.betl-feat-pane.active { display: block; }
+.betl-feat-content { }
+
+/* Compatibility grid */
+.betl-compat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+@media (max-width: 900px) { .betl-compat-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 580px) { .betl-compat-grid { grid-template-columns: 1fr; } }
+
+.betl-compat-card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 24px 20px;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+.betl-compat-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(99,102,241,0.3);
+}
+.betl-compat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    margin-bottom: 12px;
+}
+.betl-compat-card strong {
+    display: block;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+.betl-compat-rate {
+    display: block;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+.betl-compat-bar {
+    height: 4px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 2px;
+    overflow: hidden;
+}
+.betl-compat-bar div {
+    height: 100%;
+    border-radius: 2px;
+    animation: barGrow 1.2s ease both;
+    transform-origin: left;
+}
+@keyframes barGrow {
+    from { transform: scaleX(0); }
+    to   { transform: scaleX(1); }
+}
+</style>
+
+<script>
+/* How it works tabs */
+document.querySelectorAll('#betl-tabs-nav .betl-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('#betl-tabs-nav .betl-tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.betl-tab-pane').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        const target = document.getElementById(btn.dataset.tab);
+        if (target) target.classList.add('active');
+    });
+});
+
+/* Feature tabs */
+document.querySelectorAll('#betl-feat-tabs-nav .betl-feat-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('#betl-feat-tabs-nav .betl-feat-tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.betl-feat-pane').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        const target = document.getElementById(btn.dataset.ftab);
+        if (target) target.classList.add('active');
+    });
+});
+
+/* Intersection observer for bar animations */
+const betlBars = document.querySelectorAll('.betl-compat-bar div');
+const barObserver = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+        if (e.isIntersecting) {
+            e.target.style.animation = 'none';
+            e.target.offsetHeight;
+            e.target.style.animation = '';
+        }
+    });
+}, { threshold: 0.5 });
+betlBars.forEach(bar => barObserver.observe(bar));
+</script>
+
+{% endblock %}

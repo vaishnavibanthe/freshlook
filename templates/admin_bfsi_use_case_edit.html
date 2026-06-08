@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if use_case %}Edit Use Case - {{ use_case.title }}{% else %}Create New BFSI Use Case{% endif %}
+{% endblock %}
+
+{% block content %}
+<div style="height: var(--nav-height); background-color: var(--bg-secondary);"></div>
+
+<section class="section" style="min-height: 90vh; background-color: var(--bg-secondary); padding: 40px 0;">
+    <div class="container" style="display: grid; grid-template-columns: 260px 1fr; gap: 40px; align-items: start;">
+        
+        <!-- Sidebar Navigation -->
+        {% include 'admin_sidebar.html' %}
+        
+        <!-- Main Form -->
+        <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <div>
+                    <h2 style="font-size: 24px; font-weight: 800; color: var(--text-primary);">
+                        {% if use_case %}Edit Use Case: {{ use_case.title }}{% else %}New BFSI Use Case{% endif %}
+                    </h2>
+                    <p style="font-size: 12px; color: var(--text-tertiary); margin-top: 4px;">Define financial data solutions, target systems, and operational business outcomes.</p>
+                </div>
+                <a href="/admin/industries/bfsi/use-cases" class="btn btn-secondary" style="font-size: 13px; padding: 8px 16px;"><i class="fas fa-arrow-left"></i> Cancel</a>
+            </div>
+
+            <form method="POST" action="{% if use_case %}/admin/industries/bfsi/use-cases/{{ use_case.id }}{% else %}/admin/industries/bfsi/use-cases/new{% endif %}" style="background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); padding: 32px; box-shadow: var(--card-shadow); display: grid; gap: 20px;">
+                
+                <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 30px;">
+                    <!-- Column 1: Core Content -->
+                    <div style="display: grid; gap: 20px;">
+                        <div class="form-field">
+                            <label style="display: block; font-weight: 600; font-size: 13.5px; margin-bottom: 6px;">Use Case Title</label>
+                            <input type="text" id="use-case-title" name="title" value="{{ use_case.title if use_case else '' }}" required class="form-input" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;" oninput="updateSlug(this.value)">
+                        </div>
+
+                        <div class="form-field">
+                            <label style="display: block; font-weight: 600; font-size: 13.5px; margin-bottom: 6px;">Slug (URL segment)</label>
+                            <input type="text" id="use-case-slug" name="slug" value="{{ use_case.slug if use_case else '' }}" required class="form-input" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-family: monospace;">
+                        </div>
+
+                        <div class="form-field">
+                            <label style="display: block; font-weight: 600; font-size: 13.5px; margin-bottom: 6px;">Audience Type (e.g. CIOs, CDOs, Compliance Leads)</label>
+                            <input type="text" name="audience_type" value="{{ use_case.audience_type if use_case else '' }}" placeholder="Banking CIOs and CDOs" class="form-input" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;">
+                        </div>
+
+                        <div class="form-field">
+                            <label style="display: block; font-weight: 600; font-size: 13.5px; margin-bottom: 6px;">Problem Statement</label>
+                            <textarea name="problem" required class="form-input" style="width: 100%; height: 100px; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; resize: vertical;">{{ use_case.problem if use_case else '' }}</textarea>
+                        </div>
+
+                        <div class="form-field">
+                            <label style="display: block; font-weight: 600; font-size: 13.5px; margin-bottom: 6px;">Artha Solution Description</label>
+                            <textarea name="artha_solution" required class="form-input" style="width: 100%; height: 100px; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; resize: vertical;">{{ use_case.artha_solution if use_case else '' }}</textarea>
+                        </div>
+
+                        <div class="form-field">
+                            <label style="display: block; font-weight: 600; font-size: 13.5px; margin-bottom: 6px;">Data Domains Involved</label>
+                            <input type="text" name="data_domains" value="{{ use_case.data_domains if use_case else '' }}" placeholder="Customer EMR, core deposits, payments" required class="form-input" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;">
+                        </div>
+                    </div>
+
+                    <!-- Column 2: Meta, Stacks & Tags -->
+                    <div style="display: grid; gap: 20px; align-content: start;">
+                        <div class="form-field">
+                            <label style="display: block; font-weight: 600; font-size: 13.5px; margin-bottom: 6px;">Status</label>
+                            <select name="status" class="form-input" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;">
+                                <option value="Published" {% if use_case and use_case.status == 'Published' %}selected{% endif %}>Published</option>
+                                <option value="Draft" {% if use_case and use_case.status == 'Draft' %}selected{% endif %}>Draft</option>
+                            </select>
+                        </div>
+
+                        <div class="form-field">
+                            <label style="display: block; font-weight: 600; font-size: 13.5px; margin-bottom: 6px;">Category Filter Tags (Comma Separated)</label>
+                            <input type="text" name="tags" value="{{ use_case.tags if use_case else '' }}" placeholder="Banking, MDM, Risk" class="form-input" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;">
+                            <p style="font-size: 11px; color: var(--text-tertiary); margin-top: 4px;">Available tags: Banking, Insurance, Customer 360, MDM, Risk, Fraud, Compliance, Finance, Analytics, AI Readiness, Data Governance, Data Quality, Cloud Modernization, ETL Modernization.</p>
+                        </div>
+
+                        <div class="form-field">
+                            <label style="display: block; font-weight: 600; font-size: 13.5px; margin-bottom: 6px;">Technologies & Services Stack</label>
+                            <input type="text" name="technologies" value="{{ use_case.technologies if use_case else '' }}" placeholder="Snowflake, Collibra Data Governance, Talend" required class="form-input" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;">
+                        </div>
+
+                        <div class="form-field">
+                            <label style="display: block; font-weight: 600; font-size: 13.5px; margin-bottom: 6px;">Business Outcomes & Metrics</label>
+                            <input type="text" name="business_outcomes" value="{{ use_case.business_outcomes if use_case else '' }}" placeholder="Accelerated risk reporting and audit trail lineage compilation" required class="form-input" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SEO & AEO Block -->
+                <div style="border-top: 1px solid var(--border-color); padding-top: 25px; margin-top: 10px;">
+                    <h4 style="font-size: 15px; font-weight: 700; margin-bottom: 15px; color: var(--text-secondary);">SEO & Search Engine AI Optimization (AEO)</h4>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px;">
+                        <div class="form-field">
+                            <label style="font-size: 12px; color: var(--text-secondary);">SEO Meta Title</label>
+                            <input type="text" name="seo_title" value="{{ use_case.seo_title if use_case else '' }}" class="form-input" style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px;">
+                        </div>
+                        <div class="form-field">
+                            <label style="font-size: 12px; color: var(--text-secondary);">GenAI Summary (For ChatGPT, Perplexity, Gemini)</label>
+                            <input type="text" name="ai_summary" value="{{ use_case.ai_summary if use_case else '' }}" class="form-input" style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px;">
+                        </div>
+                    </div>
+                    
+                    <div class="form-field">
+                        <label style="font-size: 12px; color: var(--text-secondary);">SEO Meta Description</label>
+                        <textarea name="seo_description" class="form-input" style="width: 100%; height: 60px; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; resize: vertical;">{{ use_case.seo_description if use_case else '' }}</textarea>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 15px; border-top: 1px solid var(--border-color); padding-top: 25px;">
+                    <a href="/admin/industries/bfsi/use-cases" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary btn-glow" style="background-color: var(--bfsi-blue, #2563eb);">Save Use Case <i class="fas fa-save btn-icon"></i></button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<script>
+    function updateSlug(titleVal) {
+        // Only auto-update slug on new creations, not edits
+        {% if use_case %}
+            return;
+        {% endif %}
+        const slugInput = document.getElementById('use-case-slug');
+        const formatted = titleVal.toLowerCase()
+            .replace(/[^a-z0-9\s-]/g, '')
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-')
+            .trim();
+        slugInput.value = formatted;
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,357 @@
+{% extends "base.html" %}
+
+{% block title %}Hospitality & Travel Solutions | Hospitality Industry Insights{% endblock %}
+
+{% block extra_meta %}
+<meta name="description" content="Leverage data-driven insights to create personalized guest experiences, optimize hotel bookings, and streamline property management system operations.">
+{% endblock %}
+
+{% block content %}
+<style>
+:root {
+    --brand-color: #f43f5e;
+    --brand-color-rgb: 244, 63, 94;
+    --brand-glow: rgba(244, 63, 94, 0.15);
+    --secondary-color: #f59e0b;
+}
+@keyframes spinOrbit {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+@keyframes spinOrbitReverse {
+    0% { transform: rotate(360deg); }
+    100% { transform: rotate(0deg); }
+}
+.brand-orbit-node {
+    position: absolute;
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--brand-color);
+}
+.card-brand-hover {
+    transition: all 0.3s ease;
+}
+.card-brand-hover:hover {
+    border-color: var(--brand-color) !important;
+    box-shadow: 0 10px 30px var(--brand-glow) !important;
+    transform: translateY(-5px);
+}
+.badge-brand {
+    background: var(--brand-glow);
+    color: var(--brand-color);
+    border: 1px solid rgba(244, 63, 94, 0.3);
+}
+</style>
+
+<!-- Hero Section -->
+<section class="hero" style="min-height: 60vh; padding-top: calc(var(--nav-height) + 60px); padding-bottom: 60px;">
+    <div class="hero-bg-glow hero-glow-1" style="background: radial-gradient(circle, rgba(244,63,94,0.15) 0%, transparent 70%);"></div>
+    <div class="container hero-grid" style="grid-template-columns: 1.2fr 0.8fr;">
+        <div class="hero-content">
+            <div class="hero-badge badge-brand"><i class="fas fa-hotel"></i> Industry Verticals &middot; Hospitality & Travel</div>
+            <h1 class="hero-title" style="font-size: clamp(34px, 4.5vw, 46px); line-height: 1.15; margin-bottom: 18px;">
+                Data-Driven <span>Hospitality Solutions</span>
+            </h1>
+            <p class="hero-desc">
+                Artha Solutions helps you discover how data can revolutionize your hospitality business by leveraging data-driven insights to create personalized guest experiences, optimize property bookings, and achieve lasting success.
+            </p>
+            <div class="hero-buttons" style="display:flex; gap:14px; flex-wrap:wrap;">
+                <a href="/contact-us" class="btn btn-primary btn-glow" style="background: linear-gradient(135deg, #f43f5e, #f59e0b); border: none;">Consult Industry Architect <i class="fas fa-chevron-right btn-icon"></i></a>
+                <a href="#operations" class="btn btn-outline">Explore Operations</a>
+            </div>
+        </div>
+        
+        <div class="hero-visual">
+            <div class="brand-graphic" style="position: relative; width: 100%; height: 350px; display: flex; justify-content: center; align-items: center;">
+                <div style="position: absolute; width: 280px; height: 280px; border-radius: 50%; background: radial-gradient(circle, rgba(244,63,94,0.1) 0%, transparent 70%); filter: blur(20px);"></div>
+                <div style="position: absolute; width: 260px; height: 260px; border: 1px dashed rgba(244,63,94,0.2); border-radius: 50%; animation: spinOrbit 25s linear infinite;"></div>
+                <div style="position: absolute; width: 180px; height: 180px; border: 1px dashed rgba(245,158,11,0.3); border-radius: 50%; animation: spinOrbitReverse 15s linear infinite;"></div>
+                <div class="ai-core" style="width: 90px; height: 90px; background: linear-gradient(135deg, #f43f5e, #f59e0b); box-shadow: 0 0 30px rgba(244,63,94,0.4); z-index: 2; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-concierge-bell" style="font-size: 36px; color: #fff;"></i>
+                </div>
+                <!-- Nodes -->
+                <div class="brand-orbit-node" style="width: 12px; height: 12px; background: #f43f5e; top: 60px; left: 140px; box-shadow: 0 0 10px #f43f5e;"></div>
+                <div class="brand-orbit-node" style="width: 8px; height: 8px; background: #fb7185; bottom: 70px; left: 80px; box-shadow: 0 0 8px #fb7185;"></div>
+                <div class="brand-orbit-node" style="width: 10px; height: 10px; background: #fbbf24; top: 160px; right: 40px; box-shadow: 0 0 10px #fbbf24;"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Strip -->
+<section class="stats-section" style="padding: 50px 0; background: linear-gradient(135deg, #220011 0%, #110008 100%); border-y: 1px solid rgba(244,63,94,0.1);">
+    <div class="container stats-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); text-align: center; gap: 30px;">
+        <div class="stat-item" style="display: flex; flex-direction: column; align-items: center;">
+            <span class="stat-number" style="font-size: 56px; font-weight: 800; color: #f43f5e; line-height: 1;">90%</span>
+            <span class="stat-label" style="font-size: 14px; color: var(--text-secondary); margin-top: 10px; max-width: 250px;">Improved data quality by 90% through centralized profile reconciliations</span>
+        </div>
+        <div class="stat-item" style="display: flex; flex-direction: column; align-items: center; border-x: 1px solid rgba(255,255,255,0.05);">
+            <span class="stat-number" style="font-size: 56px; font-weight: 800; color: #f59e0b; line-height: 1;">10X</span>
+            <span class="stat-label" style="font-size: 14px; color: var(--text-secondary); margin-top: 10px; max-width: 250px;">Increased processing speed by 10X using metadata-driven ingestion pipelines</span>
+        </div>
+        <div class="stat-item" style="display: flex; flex-direction: column; align-items: center;">
+            <span class="stat-number" style="font-size: 56px; font-weight: 800; color: #f43f5e; line-height: 1;">$2M</span>
+            <span class="stat-label" style="font-size: 14px; color: var(--text-secondary); margin-top: 10px; max-width: 250px;">Reduced infrastructure and storage costs by USD 2M through cloud migrations</span>
+        </div>
+    </div>
+</section>
+
+<!-- Operations Section -->
+<section class="section-alt" id="operations">
+    <div class="container">
+        <div class="section-header" style="text-align: center; margin-bottom: 50px;">
+            <span class="section-subtitle">Operations Needs</span>
+            <h2 class="section-title">Enhancing Mobility, Booking, and Property Management <span>for Better Operations</span></h2>
+            <p class="section-desc">Streamlining multi-module connections, customer check-in flexibility, and business intelligence.</p>
+        </div>
+        
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 30px;">
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(244,63,94,0.1); color: #f43f5e;">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <h3 class="card-title">On-The-Go: Accelerating Mobile Enablement</h3>
+                <p class="card-desc">Enhanced customer experience with mobile enablement, that offers a comprehensive suite of features, flexibility and scalability.</p>
+            </div>
+            
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(244,63,94,0.1); color: #f43f5e;">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <h3 class="card-title">Events Booking Optimization</h3>
+                <p class="card-desc">Modern events booking application that optimized the existing app for web and mobile, interfacing with various applications, a full-fledged booking system with additional services for seamless event management.</p>
+            </div>
+            
+            <div class="card card-brand-hover">
+                <div class="card-icon-box" style="background: rgba(244,63,94,0.1); color: #f43f5e;">
+                    <i class="fas fa-hotel"></i>
+                </div>
+                <h3 class="card-title">Robust Property Management System</h3>
+                <p class="card-desc">New cloud-based property management system with open APIs improved multi-module connections, data exchange, and business intelligence that led to increased revenue and better guest service.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Success Story spotlight 1 (Cruise Line) -->
+<section class="section" id="case-study-cruise">
+    <div class="container feature-split">
+        <div class="feature-content">
+            <div class="hero-badge badge-brand"><i class="fas fa-ship"></i> Cruise Solutions</div>
+            <h2 class="feature-title">Transforming Guest Experiences through Data Modernization for a leading Cruise Line</h2>
+            <p class="feature-desc">Artha integrated fragmented guest data, enabled advanced analytics, and elevated customer experiences, driving loyalty and revenue growth.</p>
+            <p class="feature-desc">By consolidating loyalty card programs, cabin booking systems, and point-of-sale logs, we delivered a true Guest 360 solution.</p>
+            <a href="/contact-us" class="btn btn-primary" style="background: linear-gradient(135deg, #f43f5e, #f59e0b); border: none;">Download Full Case Details</a>
+        </div>
+        <div class="feature-visual feature-visual-glow">
+            <img src="https://images.unsplash.com/photo-1548574505-5e239809ee19?auto=format&fit=crop&w=800&q=80" alt="Large white cruise line ship floating on ocean water during sunset">
+        </div>
+    </div>
+</section>
+
+<!-- Smarter Hospitality, Simpler Data (Capabilities) -->
+<section class="section-alt" id="capabilities">
+    <div class="container">
+        <div class="section-header" style="text-align: center; margin-bottom: 50px;">
+            <span class="section-subtitle">Capabilities</span>
+            <h2 class="section-title">Smarter Hospitality, <span>Simpler Data</span></h2>
+            <p class="section-desc">Consolidate hotel transactions, POS feeds, and guest directories into unified profiles.</p>
+        </div>
+        
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-folder-open" style="color: #f43f5e;"></i> Centralized Data Repository
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">Consolidate and standardize data from various sources, including property management systems, point-of-sale systems, customer relationship management systems, and online booking platforms while ensuring data consistency and accuracy across the organization.</p>
+            </div>
+            
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-chart-line" style="color: #f43f5e;"></i> Real-time Analytics
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">Actionable insights into key performance indicators (KPIs), such as occupancy rates, average daily rate, guest satisfaction, and revenue per available room; forecasting trends and optimize resource allocation.</p>
+            </div>
+            
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-project-diagram" style="color: #f43f5e;"></i> Interoperable Integration
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">Seamlessly integrates with existing hospitality software and systems to avoid data silos while adapting to the evolving technological landscape and industry standards.</p>
+            </div>
+            
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-user-shield" style="color: #f43f5e;"></i> Data Security and Privacy
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">Robust security measures to safeguard sensitive guest data, including personal information and payment details, compliance to industry regulations like GDPR and CCPA.</p>
+            </div>
+            
+            <div class="card card-brand-hover" style="padding: 24px;">
+                <h4 style="font-size: 18px; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-compress-arrows-alt" style="color: #f43f5e;"></i> Scalability
+                </h4>
+                <p class="card-desc" style="font-size: 14px; line-height: 1.6;">Accommodate the increasing volume and complexity of data as the business expands while maintaining performance and reliability even with large datasets.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Success Story spotlight 2 (Hotel Management) -->
+<section class="section" id="case-study-hotel">
+    <div class="container feature-split">
+        <div class="feature-visual feature-visual-glow">
+            <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80" alt="Luxury hotel swimming pool backyard chairs lounge at night">
+        </div>
+        <div class="feature-content">
+            <div class="hero-badge badge-brand"><i class="fas fa-hotel"></i> Hotel Solutions</div>
+            <h2 class="feature-title">Revolutionizing Hotel Management through Customer-Centric Integration</h2>
+            <p class="feature-desc">Artha Solutions helped a global hospitality firm transform hotel management with 100% data security, automated bookings, improved efficiency, and enhanced customer satisfaction.</p>
+            <p class="feature-desc">Using open-API architectures, we unified booking flows across 150+ properties dynamically.</p>
+            <a href="/contact-us" class="btn btn-primary" style="background: linear-gradient(135deg, #f43f5e, #f59e0b); border: none;">Read Full Story</a>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonial quote -->
+<section class="section-alt" style="background: linear-gradient(180deg, var(--bg-secondary) 0%, rgba(244,63,94,0.03) 50%, var(--bg-secondary) 100%);">
+    <div class="container" style="max-width: 900px; padding: 40px 20px;">
+        <div class="card" style="padding: 40px; border-left: 4px solid #f43f5e; background: rgba(255,255,255,0.02); display: flex; flex-direction: column; gap: 20px;">
+            <div style="font-size: 48px; color: rgba(244,63,94,0.2); line-height: 1; height: 20px;"><i class="fas fa-quote-left"></i></div>
+            <p style="font-size: 20px; color: var(--text-primary); line-height: 1.6; font-style: italic;">
+                "Cleansing and consolidating consumer data enables us to deliver the kind of personalized experience today's consumers deserve and expect."
+            </p>
+            <div style="display: flex; align-items: center; gap: 14px; margin-top: 10px;">
+                <div style="width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #f43f5e, #f59e0b); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
+                    SB
+                </div>
+                <div>
+                    <strong style="display: block; font-size: 16px; color: var(--text-primary);">Steve Brennan</strong>
+                    <span style="font-size: 13px; color: var(--text-muted);">Vice President, Data Strategy & Analytics</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Events & Blogs Section -->
+<section class="section" id="resources">
+    <div class="container">
+        <div class="section-header" style="text-align: center; margin-bottom: 50px;">
+            <span class="section-subtitle">Resource Center</span>
+            <h2 class="section-title">Events & <span>Latest Insights</span></h2>
+            <p class="section-desc">Explore upcoming events and latest blogs from our analytics experts.</p>
+        </div>
+        
+        <!-- Events Grid -->
+        <h3 style="font-size: 22px; color: var(--text-primary); margin-bottom: 24px; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-calendar-alt" style="color: #f43f5e;"></i> Upcoming Events & Webinars
+        </h3>
+        
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; margin-bottom: 50px;">
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #f43f5e; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Webinar &middot; May 31</span>
+                    <h4 style="font-size: 17px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Future Ready Data Foundation From AI Pilot to Production Value</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">Explores how organizations can overcome these challenges by building a future-ready data foundation that enables trusted, scalable, and AI-ready data.</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #f43f5e;">Watch Now <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #f43f5e; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Event &middot; Apr 13</span>
+                    <h4 style="font-size: 17px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Artha Solutions Proud Sponsor of Qlik Connect 2026</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">Gaylord Palms Resort & Convention Center, Kissimmee, Florida. Showcasing AI-ready data foundations, data integration, ETL modernization, and MDM solutions at Booth# SS15.</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #f43f5e;">Read More <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #f43f5e; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Event &middot; Nov 27</span>
+                    <h4 style="font-size: 17px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Artha Solutions to host Qlik AI Reality Tour 2025 – Bengaluru</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">An exclusive event designed to help you turn data, analytics, and AI initiatives into real business impact. Discover practical strategies, real-world use cases, and embedding intelligence.</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/contact-us" class="card-link" style="color: #f43f5e;">Read More <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Blogs Grid -->
+        <h3 style="font-size: 22px; color: var(--text-primary); margin-bottom: 24px; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-blog" style="color: #f43f5e;"></i> From the ThinkArtha Blog
+        </h3>
+        
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #f43f5e; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Talend &middot; August 30, 2021</span>
+                    <h4 style="font-size: 17px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">5 Ways Talend Helps You Succeed At Big Data Governance and Metadata Management</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">The uses of Talend are multidimensional when it comes to Big Data Governance, making work easier for developers and managers alike.</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/blogs" class="card-link" style="color: #f43f5e;">Read More <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #f43f5e; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Cloud &middot; June 7, 2022</span>
+                    <h4 style="font-size: 17px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">How to Choose the Right Managed Cloud Services Provider for Your Business?</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">Businesses are increasingly relying on cloud services to support their business infrastructure, databases, performance, and storage options.</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/blogs" class="card-link" style="color: #f43f5e;">Read More <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #f43f5e; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Data Quality &middot; July 20, 2023</span>
+                    <h4 style="font-size: 17px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">The Quest for Data Consistency</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">Data needs to be extracted, processed, and refined before it can be used effectively. Data quality is a crucial element for business consistency.</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/blogs" class="card-link" style="color: #f43f5e;">Read More <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #f43f5e; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Pipelines &middot; September 4, 2025</span>
+                    <h4 style="font-size: 17px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Cloud-Based Data Pipelines: Architecting the Next Decade of Retail IT</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">As we look ahead to 2030, the retail and travel enterprise will not be defined by channels, but how effectively it operationalizes data across systems.</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/blogs" class="card-link" style="color: #f43f5e;">Read More <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+            
+            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 12px; color: #f43f5e; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Modernization &middot; August 30, 2021</span>
+                    <h4 style="font-size: 17px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">How Modernizing ETL Processes Helps You Uncover Business Intelligence</h4>
+                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">We live in a world of information: there is a more significant amount of it than any time in recent years. Modernizing ETL processes helps extract insights cleanly.</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/blogs" class="card-link" style="color: #f43f5e;">Read More <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Bottom CTA -->
+<section class="section-alt" style="text-align: center; background: linear-gradient(180deg, var(--bg-secondary) 0%, rgba(244,63,94,0.05) 100%);">
+    <div class="container">
+        <h2 class="section-title">Scale Your <span>Operations With Data</span></h2>
+        <p class="section-desc" style="max-width: 600px; margin: 0 auto 30px;">Speak with our certified systems architects to configure a secure, compliant hospitality pathway.</p>
+        <a href="/contact-us" class="btn btn-primary btn-glow" style="background: linear-gradient(135deg, #f43f5e, #f59e0b); border: none; box-shadow: 0 0 20px rgba(244,63,94,0.3);">Consult With Our Architects</a>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}{{ data.title }} - Careers{% endblock %}
+
+{% block content %}
+<!-- Subpage Spacer -->
+<div style="height: var(--nav-height); background-color: var(--bg-secondary);"></div>
+
+<article class="section" style="padding-top: 60px;">
+    <div class="container" style="display: grid; grid-template-columns: 1.8fr 1.2fr; gap: 60px; align-items: start;">
+        
+        <!-- Job Details -->
+        <div>
+            <!-- Breadcrumbs -->
+            <div style="display: flex; gap: 8px; font-size: 13px; color: var(--text-tertiary); margin-bottom: 24px; font-weight: 500;">
+                <a href="/">Home</a> <span>/</span>
+                <a href="/careers">Careers</a> <span>/</span>
+                <span style="color: var(--text-primary);">Open Positions</span>
+            </div>
+            
+            <span class="ai-card-tag ai-tag-existing" style="margin-bottom: 16px; display: inline-block;">{{ data.department }}</span>
+            
+            <!-- Title -->
+            <h1 style="font-size: 38px; line-height: 1.25; font-weight: 800; letter-spacing: -1px; margin-bottom: 12px; color: var(--text-primary);">
+                {{ data.title }}
+            </h1>
+            
+            <div style="display: flex; gap: 24px; margin-bottom: 32px; font-size: 14px; color: var(--text-secondary); font-weight: 500;">
+                <span><i class="fas fa-location-dot" style="margin-right: 6px; color: var(--accent-blue);"></i> {{ data.location }}</span>
+                <span><i class="fas fa-briefcase" style="margin-right: 6px; color: var(--accent-blue);"></i> {{ data.type }}</span>
+            </div>
+            
+            <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 16px; color: var(--text-primary); border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">Job Description</h3>
+            <p style="font-size: 15px; line-height: 1.7; color: var(--text-secondary); font-weight: 400; margin-bottom: 32px;">{{ data.description }}</p>
+            
+            <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 16px; color: var(--text-primary); border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">Requirements & Qualifications</h3>
+            <ul style="padding-left: 20px; margin-bottom: 40px;">
+                {% for req in data.requirements %}
+                <li style="margin-bottom: 12px; font-size: 15px; line-height: 1.6; color: var(--text-secondary); font-weight: 400;">
+                    {{ req }}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        
+        <!-- Application Sidebar Form -->
+        <aside style="background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); padding: 32px; position: sticky; top: calc(var(--nav-height) + 20px);">
+            <h3 style="font-size: 18px; font-weight: 700; border-bottom: 2px solid var(--accent-blue); padding-bottom: 12px; margin-bottom: 24px;">Apply Now</h3>
+            <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 24px;">Submit your resume and details to apply for this opening. Our HR team will reach out within 3 business days.</p>
+            
+            <form action="/contact-us" method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 16px;">
+                <div class="form-group">
+                    <label class="form-label" style="font-size: 12px; margin-bottom: 6px; display: block;">Full Name</label>
+                    <input type="text" name="name" required class="form-control" placeholder="John Doe" style="padding: 10px 12px; font-size: 13px; width: 100%; border-radius: 6px;">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" style="font-size: 12px; margin-bottom: 6px; display: block;">Email Address</label>
+                    <input type="email" name="email" required class="form-control" placeholder="john@domain.com" style="padding: 10px 12px; font-size: 13px; width: 100%; border-radius: 6px;">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" style="font-size: 12px; margin-bottom: 6px; display: block;">LinkedIn Profile URL</label>
+                    <input type="url" name="linkedin" class="form-control" placeholder="https://linkedin.com/in/username" style="padding: 10px 12px; font-size: 13px; width: 100%; border-radius: 6px;">
+                </div>
+                
+                <input type="hidden" name="job_applied" value="{{ data.title }}">
+                
+                <button type="submit" class="btn btn-primary" style="padding: 12px; border-radius: 6px; font-size: 13px; width: 100%; font-weight: 600; margin-top: 10px;">
+                    Submit Application <i class="fas fa-check btn-icon" style="font-size: 11px;"></i>
+                </button>
+            </form>
+        </aside>
+        
+    </div>
+</article>
+{% endblock %}

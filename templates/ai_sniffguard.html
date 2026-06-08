@@ -1,0 +1,151 @@
+{% extends "ai_base.html" %}
+
+{% block ai_hero %}
+<!-- SniffGuard Hero -->
+<section class="ai-hero" style="background: radial-gradient(circle at center, rgba(239, 68, 68, 0.04) 0%, rgba(15, 23, 42, 0.01) 100%), var(--bg-primary); padding: 80px 0;">
+    <div class="ai-hero-glow" style="background: radial-gradient(circle, rgba(239, 68, 68, 0.08) 0%, transparent 70%);"></div>
+    <div class="container ai-hero-grid" style="grid-template-columns: 1.15fr 0.85fr;">
+        <div class="ai-hero-content">
+            <div class="ai-badge" style="background: rgba(239, 68, 68, 0.08); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.15);"><i class="fas fa-shield-halved"></i> Active Middleware</div>
+            <h1 class="ai-hero-title">
+                AI SniffGuard:<br><span>API Cost & Safety Guardrails</span>
+            </h1>
+            <p class="ai-hero-subtitle">
+                An active middleware proxy layer that sits between your applications and LLM endpoints. SniffGuard handles prompt caching, rate limits, model fallback routing, and real-time PII masking to cut compute costs while ensuring total compliance.
+            </p>
+            <div class="ai-hero-ctas" style="margin-top: 30px;">
+                <a href="javascript:void(0);" onclick="openLeadModal('Hero CTA: AI SniffGuard');" class="btn btn-primary btn-glow" style="background: linear-gradient(135deg, #ef4444, #f43f5e); border: none;">Get a Cost Audit <i class="fas fa-arrow-trend-down" style="margin-left: 6px;"></i></a>
+                <a href="#interactive-model" class="btn btn-secondary">See How It Works</a>
+            </div>
+        </div>
+        <div class="ai-hero-visual">
+            <div class="ai-vis-container" style="border-color: rgba(239, 68, 68, 0.15);">
+                <div class="ai-core-node" style="background: linear-gradient(135deg, #ef4444, #f43f5e); color: white;">
+                    <i class="fas fa-shield-halved"></i>
+                </div>
+                <div class="ai-orbit-circle orbit-1" style="border-color: rgba(239, 68, 68, 0.15);"></div>
+                <div class="ai-orbit-circle orbit-2" style="border-color: rgba(239, 68, 68, 0.1);"></div>
+                <div class="ai-satellite node-a" style="background: rgba(239, 68, 68, 0.1); border-color: #ef4444; color: #ef4444;"><i class="fas fa-lock"></i></div>
+                <div class="ai-satellite node-b" style="background: rgba(239, 68, 68, 0.1); border-color: #ef4444; color: #ef4444;"><i class="fas fa-dollar-sign"></i></div>
+                <div class="ai-satellite node-c" style="background: rgba(239, 68, 68, 0.1); border-color: #ef4444; color: #ef4444;"><i class="fas fa-gauge-high"></i></div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block ai_content %}
+<!-- Interactive Data Flow Diagram Section -->
+<section class="ai-section" id="interactive-model" style="border-top: 1px solid var(--border-color); padding: 80px 0;">
+    <div class="container">
+        <div class="ai-section-header text-center" style="margin-bottom: 50px;">
+            <span class="ai-subtitle" style="color: #ef4444;">Architecture</span>
+            <h2 class="ai-title">Where SniffGuard <span>Sits in Your Stack</span></h2>
+            <p class="ai-desc" style="max-width: 650px; margin: 0 auto;">By proxying all model queries, SniffGuard filters prompts and optimizes token routing before requesting expensive APIs.</p>
+        </div>
+
+        <!-- Interactive Flow Diagram -->
+        <div class="interactive-flow-container">
+            <div class="flow-node client-node">
+                <i class="fas fa-laptop-code"></i>
+                <span>Client App</span>
+            </div>
+            <div class="flow-line client-line"></div>
+            <div class="flow-node sniffguard-node">
+                <i class="fas fa-shield-halved"></i>
+                <span>SniffGuard</span>
+            </div>
+            <div class="flow-line llm-line"></div>
+            <div class="flow-node llm-node">
+                <i class="fas fa-brain"></i>
+                <span>LLM APIs</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Functional Features Grid -->
+<section class="ai-section section-alt" style="padding: 80px 0;">
+    <div class="container">
+        <div class="ai-section-header text-center" style="margin-bottom: 50px;">
+            <span class="ai-subtitle" style="color: #ef4444;">Capabilities</span>
+            <h2 class="ai-title">Core Protection <span>& Cost Optimizations</span></h2>
+            <p class="ai-desc">Engineered to audit queries and govern outbound parameters automatically.</p>
+        </div>
+
+        <div class="ai-card-grid grid-3">
+            <div class="ai-card" style="background: white; border-radius: 16px; padding: 35px; box-shadow: var(--card-shadow);">
+                <div class="ai-card-icon" style="background: rgba(239, 68, 68, 0.05); color: #ef4444; width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                    <i class="fas fa-chart-line" style="font-size: 20px;"></i>
+                </div>
+                <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 12px;">Real-Time Audits</h3>
+                <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0;">
+                    Track API tokens consumed, calculate exact endpoint costs in real time, and flag latency bottlenecks dynamically across departments.
+                </p>
+            </div>
+
+            <div class="ai-card" style="background: white; border-radius: 16px; padding: 35px; box-shadow: var(--card-shadow);">
+                <div class="ai-card-icon" style="background: rgba(239, 68, 68, 0.05); color: #ef4444; width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                    <i class="fas fa-user-shield" style="font-size: 20px;"></i>
+                </div>
+                <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 12px;">Active PII Masking</h3>
+                <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0;">
+                    Automatically identify and redact sensitive customer profiles, social security numbers, and financial keys before prompt submission.
+                </p>
+            </div>
+
+            <div class="ai-card" style="background: white; border-radius: 16px; padding: 35px; box-shadow: var(--card-shadow);">
+                <div class="ai-card-icon" style="background: rgba(239, 68, 68, 0.05); color: #ef4444; width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                    <i class="fas fa-database" style="font-size: 20px;"></i>
+                </div>
+                <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 12px;">Automatic Caching</h3>
+                <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0;">
+                    Interprets semantic similarity to cache previous model answers locally. Reduces prompt processing fees by up to 40% on repeated queries.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Payback metrics -->
+<section class="ai-section" style="padding: 80px 0;">
+    <div class="container">
+        <div class="ai-section-header text-center" style="margin-bottom: 60px;">
+            <span class="ai-subtitle" style="color: #ef4444;">Value Realization</span>
+            <h2 class="ai-title">Guaranteed <span>Optimization Metrics</span></h2>
+            <p class="ai-desc">Realized metrics measured across enterprise data platform pilots.</p>
+        </div>
+
+        <div class="ai-card-grid grid-3">
+            <div class="ai-card text-center" style="background: white; border-radius: 16px; padding: 45px 35px; box-shadow: var(--card-shadow); border-top: 4px solid #ef4444;">
+                <div style="font-size: 48px; font-weight: 800; color: #ef4444; font-family: var(--font-heading); margin-bottom: 8px;">~25%</div>
+                <div style="font-size: 12px; font-weight: 700; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px;">Cost Reduction</div>
+                <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0;">Average infrastructure and API call compute cost reduction measured across production models.</p>
+            </div>
+
+            <div class="ai-card text-center" style="background: white; border-radius: 16px; padding: 45px 35px; box-shadow: var(--card-shadow); border-top: 4px solid #ef4444;">
+                <div style="font-size: 48px; font-weight: 800; color: #ef4444; font-family: var(--font-heading); margin-bottom: 8px;">40%</div>
+                <div style="font-size: 12px; font-weight: 700; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px;">Tokens Saved</div>
+                <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0;">Reduction in prompt input tokens accomplished through semantic caching and system message deduplication.</p>
+            </div>
+
+            <div class="ai-card text-center" style="background: white; border-radius: 16px; padding: 45px 35px; box-shadow: var(--card-shadow); border-top: 4px solid #ef4444;">
+                <div style="font-size: 48px; font-weight: 800; color: #ef4444; font-family: var(--font-heading); margin-bottom: 8px;">&lt;12</div>
+                <div style="font-size: 12px; font-weight: 700; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px;">Months Payback</div>
+                <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0;">Average payback period to completely amortize implementation expenses based on verified model savings.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Outcome CTA section -->
+<section class="ai-bottom-cta" style="background: linear-gradient(135deg, #ef4444, #f43f5e); padding: 80px 0; text-align: center; color: white;">
+    <div class="container" style="max-width: 700px; margin: 0 auto;">
+        <h2 class="ai-title" style="color: white; margin-bottom: 20px;">We Win When You Win. <span>Not Before.</span></h2>
+        <p style="color: rgba(255,255,255,0.9); font-size: 16px; line-height: 1.6; margin-bottom: 30px;">
+            AI SniffGuard auditing fees are structured entirely as a percentage of your verified API savings. Start with a complimentary token assessment to identify redundancies.
+        </p>
+        <a href="javascript:void(0);" onclick="openLeadModal('AI SniffGuard Bottom CTA');" class="btn btn-primary btn-glow" style="background: white; color: #ef4444; border-color: white;">Get Free Token Audit <i class="fas fa-arrow-right" style="margin-left: 8px;"></i></a>
+    </div>
+</section>
+{% endblock %}

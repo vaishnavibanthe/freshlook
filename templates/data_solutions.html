@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Data Solutions & Governance{% endblock %}
+
+{% block content %}
+<!-- Subpage Hero -->
+<section class="hero" style="min-height: 60vh; padding-top: calc(var(--nav-height) + 60px); padding-bottom: 60px;" id="data-hero">
+    <div class="hero-bg-glow hero-glow-1"></div>
+    <div class="container hero-grid" style="grid-template-columns: 1.2fr 0.8fr;">
+        <div class="hero-content">
+            <div class="hero-badge"><i class="fas fa-database"></i> Data Solutions</div>
+            <h1 class="hero-title" style="font-size: 48px;">
+                Empowering Confident <span>Data-Driven Decisions</span>
+            </h1>
+            <p class="hero-desc">
+                From Strategy to Governance, we help you master enterprise data assets. Establish reliable data quality, secure compliance pipelines, and scale your data infrastructure.
+            </p>
+        </div>
+        <div class="hero-visual">
+            <div class="ai-graphic-container" style="max-width: 300px; height: 300px;">
+                <div class="ai-node-circle circle-lg"></div>
+                <div class="ai-core" style="width: 80px; height: 80px; background: var(--grad-primary);">
+                    <i class="fas fa-project-diagram" style="font-size: 28px;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Core Services / Pillar Grid -->
+<section class="section-alt" id="data-services-list">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-subtitle">Our Offerings</span>
+            <h2 class="section-title">Enterprise Data <span>Modernization Services</span></h2>
+            <p class="section-desc">Create a single source of truth and build a framework to support active intelligence across your organization.</p>
+        </div>
+        
+        <div class="card-grid">
+            <!-- 1. Data Strategy -->
+            <div class="card">
+                <div class="card-icon-box"><i class="fas fa-chess"></i></div>
+                <h3 class="card-title">Data Strategy</h3>
+                <p class="card-desc">Align your business objectives with a technical data blueprint. Define cloud architecture priorities, choose storage schemas, and fund key fixes.</p>
+            </div>
+            
+            <!-- 2. Master Data Management (MDM) -->
+            <div class="card">
+                <div class="card-icon-box"><i class="fas fa-sitemap"></i></div>
+                <h3 class="card-title">Master Data Management</h3>
+                <p class="card-desc">Break free from siloed information. Ensure consistency, accuracy, and accountability with a single golden record for customers, products, and partners.</p>
+            </div>
+            
+            <!-- 3. Enterprise Data Management -->
+            <div class="card">
+                <div class="card-icon-box"><i class="fas fa-boxes-packing"></i></div>
+                <h3 class="card-title">Enterprise Data Management</h3>
+                <p class="card-desc">Manage the lifecycle of your databases, from initial design, storage scaling, cloud migrations, to secure archiving operations.</p>
+            </div>
+            
+            <!-- 4. Data Governance -->
+            <div class="card">
+                <div class="card-icon-box"><i class="fas fa-gavel"></i></div>
+                <h3 class="card-title">Data Governance</h3>
+                <p class="card-desc">Implement metadata catalogs, active controls, data lineage, and risk/compliance protocols to guarantee data stewardship.</p>
+            </div>
+            
+            <!-- 5. Data Quality -->
+            <div class="card">
+                <div class="card-icon-box"><i class="fas fa-shield-heart"></i></div>
+                <h3 class="card-title">Data Quality</h3>
+                <p class="card-desc">Deploy automated profiling and validation rules to isolate anomalies, correct syntax errors, and maintain reliable data feeds.</p>
+            </div>
+            
+            <!-- 6. Data Science & Analytics -->
+            <div class="card">
+                <div class="card-icon-box"><i class="fas fa-chart-line"></i></div>
+                <h3 class="card-title">Data Science & Analytics</h3>
+                <p class="card-desc">Turn raw data into active predictions. Develop custom BI dashboards, ML pipelines, and modeling workflows for key stakeholders.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- IDC Spotlight Section -->
+<section class="section" id="idc-spotlight">
+    <div class="container feature-split">
+        <div class="feature-content">
+            <div class="hero-badge"><i class="fas fa-chart-bar"></i> Analyst Speak</div>
+            <h2 class="feature-title">IDC Spotlight: Robust Data Foundations for Day Zero of AI</h2>
+            <p class="feature-desc">"Success with AI starts with data. Laying a solid data foundation for AI requires data and metadata unification, quality management, and control – treating data as a product."</p>
+            <p class="feature-desc">Organizations face mounting pressure to deliver value. Read the official IDC Spotlight paper to explore actionable frameworks for AI maturity.</p>
+            <div style="display: flex; gap: 16px; margin-top: 20px;">
+                <a href="/contact-us" class="btn btn-primary">Download Paper <i class="fas fa-download btn-icon"></i></a>
+                <a href="/contact-us" class="btn btn-secondary">Watch Video <i class="fas fa-play btn-icon" style="font-size: 11px;"></i></a>
+            </div>
+        </div>
+        <div class="feature-visual feature-visual-glow">
+            <img src="https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?auto=format&fit=crop&w=800&q=80" alt="Futuristic data analysis chart representing IDC reports">
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="section-alt" style="text-align: center;" id="data-cta">
+    <div class="container">
+        <h2 class="section-title">Clean, Consistent, <span>Well-Governed Data</span></h2>
+        <p class="section-desc" style="max-width: 600px; margin: 0 auto 30px;">Artha Solutions helps you implement corporate data strategies and technical frameworks tailored for your business success.</p>
+        <a href="/contact-us" class="btn btn-primary btn-glow">Request a Data Maturity Assessment</a>
+    </div>
+</section>
+{% endblock %}

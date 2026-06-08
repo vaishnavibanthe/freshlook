@@ -1,0 +1,598 @@
+{% extends "base.html" %}
+
+{% block title %}Artha Advantage - Data Accelerators & AI Platforms{% endblock %}
+
+{% block extra_meta %}
+<meta name="description" content="Discover Artha's proprietary data accelerators: Data Insights Platform, MDM Lite, Customer 360, Dynamic Ingestion Framework, ETL Tool Migration, and AI SniffGuard.">
+{% endblock %}
+
+{% block content %}
+
+<!-- ═══════════════════════════════════════════
+     HERO SECTION
+════════════════════════════════════════════ -->
+<section class="hero" style="min-height: 72vh; padding-top: calc(var(--nav-height) + 80px); padding-bottom: 80px; overflow: hidden; position: relative;" id="advantage-hero">
+    <div class="hero-bg-glow hero-glow-1" style="opacity: 0.6;"></div>
+    <div class="hero-bg-glow hero-glow-2" style="opacity: 0.4; right: -5%; top: 20%;"></div>
+
+    <!-- Floating background orbs -->
+    <div style="position: absolute; width: 600px; height: 600px; border-radius: 50%; background: radial-gradient(circle, rgba(99,102,241,0.07) 0%, transparent 70%); top: -100px; left: -150px; pointer-events: none;"></div>
+    <div style="position: absolute; width: 400px; height: 400px; border-radius: 50%; background: radial-gradient(circle, rgba(6,182,212,0.07) 0%, transparent 70%); bottom: 0; right: 5%; pointer-events: none;"></div>
+
+    <div class="container" style="text-align: center; position: relative; z-index: 1;">
+        <div class="hero-badge" style="margin: 0 auto 24px; display: inline-flex;">
+            <i class="fas fa-rocket"></i> Proprietary Accelerators
+        </div>
+        <h1 class="hero-title" style="font-size: clamp(42px, 6vw, 72px); max-width: 900px; margin: 0 auto 24px; line-height: 1.1;">
+            The <span>Artha Advantage</span>
+        </h1>
+        <p class="hero-desc" style="max-width: 680px; margin: 0 auto 40px; font-size: 19px; line-height: 1.7;">
+            Purpose-built data platforms engineered to compress timelines, reduce costs, and accelerate your enterprise's journey to trusted, AI-ready data.
+        </p>
+        <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+            <a href="#advantage-products" class="btn btn-primary btn-glow" style="padding: 14px 32px; font-size: 15px;">
+                Explore Platforms <i class="fas fa-arrow-down btn-icon"></i>
+            </a>
+            <a href="/contact-us" class="btn btn-outline" style="padding: 14px 32px; font-size: 15px;">
+                Talk to an Expert
+            </a>
+        </div>
+
+        <!-- Stat pills row -->
+        <div style="display: flex; gap: 32px; justify-content: center; flex-wrap: wrap; margin-top: 60px;">
+            <div class="adv-stat-pill">
+                <span class="adv-stat-num">80%</span>
+                <span class="adv-stat-label">Data Reliability</span>
+            </div>
+            <div class="adv-stat-pill">
+                <span class="adv-stat-num">90%</span>
+                <span class="adv-stat-label">ETL Migration Automated</span>
+            </div>
+            <div class="adv-stat-pill">
+                <span class="adv-stat-num">40%</span>
+                <span class="adv-stat-label">Cost Savings</span>
+            </div>
+            <div class="adv-stat-pill">
+                <span class="adv-stat-num">45 Days</span>
+                <span class="adv-stat-label">MDM Go-Live</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     PRODUCT CARDS GRID
+════════════════════════════════════════════ -->
+<section class="section" id="advantage-products" style="background: var(--bg-secondary); padding: 100px 0; position: relative; overflow: hidden;">
+    <div style="position: absolute; inset: 0; background: radial-gradient(ellipse at 20% 50%, rgba(99,102,241,0.04) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(6,182,212,0.04) 0%, transparent 60%); pointer-events: none;"></div>
+
+    <div class="container" style="position: relative; z-index: 1;">
+        <div class="section-header" style="text-align: center; margin-bottom: 70px;">
+            <span class="section-subtitle-badge">Our Platforms</span>
+            <h2 class="section-title" style="margin-top: 16px;">Engineered to <span>Accelerate Value</span></h2>
+            <p class="section-desc" style="max-width: 640px; margin: 20px auto 0;">
+                Six modular platforms, each purpose-built to solve a specific enterprise data challenge — all integrating natively with Talend, Snowflake, Azure, and AWS.
+            </p>
+        </div>
+
+        <div class="adv-cards-grid">
+
+            <!-- ── Card 1: Data Insights Platform ── -->
+            <a href="/artha-advantage/data-insights-platform" class="adv-product-card" id="card-dip" style="--card-accent: #6366f1; --card-glow: rgba(99,102,241,0.18);">
+                <div class="adv-card-glow-orb"></div>
+                <div class="adv-card-icon-wrap" style="background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(99,102,241,0.05));">
+                    <div class="adv-card-icon-ring"></div>
+                    <i class="fas fa-sitemap adv-card-icon"></i>
+                </div>
+                <div class="adv-card-badge">Governance Core</div>
+                <h3 class="adv-card-title">Data Insights Platform</h3>
+                <p class="adv-card-desc">Comprehensive, AI-driven solution to streamline Data Governance across the entire enterprise — from lineage to compliance automation.</p>
+                <ul class="adv-card-features">
+                    <li><i class="fas fa-check-circle"></i> Active metadata discovery & profiling</li>
+                    <li><i class="fas fa-check-circle"></i> Automated data lineage mapping</li>
+                    <li><i class="fas fa-check-circle"></i> GDPR, HIPAA, CCPA templates</li>
+                </ul>
+                <div class="adv-card-cta">
+                    Explore Platform <i class="fas fa-arrow-right"></i>
+                </div>
+            </a>
+
+            <!-- ── Card 2: MDM Lite ── -->
+            <a href="/artha-advantage/mdm-lite" class="adv-product-card" id="card-mdmlite" style="--card-accent: #06b6d4; --card-glow: rgba(6,182,212,0.18);">
+                <div class="adv-card-glow-orb"></div>
+                <div class="adv-card-icon-wrap" style="background: linear-gradient(135deg, rgba(6,182,212,0.15), rgba(6,182,212,0.05));">
+                    <div class="adv-card-icon-ring"></div>
+                    <i class="fas fa-database adv-card-icon"></i>
+                </div>
+                <div class="adv-card-badge">Master Data</div>
+                <h3 class="adv-card-title">MDM Lite</h3>
+                <p class="adv-card-desc">Cost-effective, easy-to-use platform to manage and centralize master data — without multi-year enterprise software contracts.</p>
+                <ul class="adv-card-features">
+                    <li><i class="fas fa-check-circle"></i> Rapid deployment in under 45 days</li>
+                    <li><i class="fas fa-check-circle"></i> ML-powered deduplication</li>
+                    <li><i class="fas fa-check-circle"></i> Intuitive steward UI</li>
+                </ul>
+                <div class="adv-card-cta">
+                    Explore Platform <i class="fas fa-arrow-right"></i>
+                </div>
+            </a>
+
+            <!-- ── Card 3: Customer 360 ── -->
+            <a href="/artha-advantage/customer-360" class="adv-product-card" id="card-c360" style="--card-accent: #10b981; --card-glow: rgba(16,185,129,0.18);">
+                <div class="adv-card-glow-orb"></div>
+                <div class="adv-card-icon-wrap" style="background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(16,185,129,0.05));">
+                    <div class="adv-card-icon-ring"></div>
+                    <i class="fas fa-users adv-card-icon"></i>
+                </div>
+                <div class="adv-card-badge">Customer Insights</div>
+                <h3 class="adv-card-title">Customer 360</h3>
+                <p class="adv-card-desc">A complete customer picture with unified data from every touchpoint — loyalty, transactions, and support — for actionable insights.</p>
+                <ul class="adv-card-features">
+                    <li><i class="fas fa-check-circle"></i> Real-time identity resolution</li>
+                    <li><i class="fas fa-check-circle"></i> Predictive CLV scoring</li>
+                    <li><i class="fas fa-check-circle"></i> Native CRM integration APIs</li>
+                </ul>
+                <div class="adv-card-cta">
+                    Explore Platform <i class="fas fa-arrow-right"></i>
+                </div>
+            </a>
+
+            <!-- ── Card 4: Dynamic Ingestion Framework ── -->
+            <a href="/artha-advantage/dynamic-ingestion-framework" class="adv-product-card" id="card-dif" style="--card-accent: #f59e0b; --card-glow: rgba(245,158,11,0.18);">
+                <div class="adv-card-glow-orb"></div>
+                <div class="adv-card-icon-wrap" style="background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(245,158,11,0.05));">
+                    <div class="adv-card-icon-ring"></div>
+                    <i class="fas fa-bolt adv-card-icon"></i>
+                </div>
+                <div class="adv-card-badge">ETL Automation</div>
+                <h3 class="adv-card-title">Dynamic Ingestion Framework</h3>
+                <p class="adv-card-desc">Revolutionize Data Ingestion with Metadata-driven ETL — stop building manual pipelines and let the framework handle execution dynamically.</p>
+                <ul class="adv-card-features">
+                    <li><i class="fas fa-check-circle"></i> Metadata-driven configuration</li>
+                    <li><i class="fas fa-check-circle"></i> Built-in quality reconciliation</li>
+                    <li><i class="fas fa-check-circle"></i> Dynamic schema shift handling</li>
+                </ul>
+                <div class="adv-card-cta">
+                    Explore Platform <i class="fas fa-arrow-right"></i>
+                </div>
+            </a>
+
+            <!-- ── Card 5: ETL Tool Migration ── -->
+            <a href="/artha-advantage/technology-and-data-migration" class="adv-product-card" id="card-etl" style="--card-accent: #8b5cf6; --card-glow: rgba(139,92,246,0.18);">
+                <div class="adv-card-glow-orb"></div>
+                <div class="adv-card-icon-wrap" style="background: linear-gradient(135deg, rgba(139,92,246,0.15), rgba(139,92,246,0.05));">
+                    <div class="adv-card-icon-ring"></div>
+                    <i class="fas fa-shuffle adv-card-icon"></i>
+                </div>
+                <div class="adv-card-badge">B'etl™ Migrator</div>
+                <h3 class="adv-card-title">ETL Tool Migration</h3>
+                <p class="adv-card-desc">Accelerate your ETL Tool Migration to Talend — automate legacy mappings, slash conversion effort by 80%, and migrate with full governance.</p>
+                <ul class="adv-card-features">
+                    <li><i class="fas fa-check-circle"></i> Automatic code analysis & conversion</li>
+                    <li><i class="fas fa-check-circle"></i> Logic consistency verification</li>
+                    <li><i class="fas fa-check-circle"></i> 70% faster migration timelines</li>
+                </ul>
+                <div class="adv-card-cta">
+                    Explore Platform <i class="fas fa-arrow-right"></i>
+                </div>
+            </a>
+
+            <!-- ── Card 6: AI SniffGuard ── -->
+            <a href="/artha-advantage/ai-sniffguard" class="adv-product-card" id="card-sniffguard" style="--card-accent: #ef4444; --card-glow: rgba(239,68,68,0.18);">
+                <div class="adv-card-glow-orb"></div>
+                <div class="adv-card-icon-wrap" style="background: linear-gradient(135deg, rgba(239,68,68,0.15), rgba(239,68,68,0.05));">
+                    <div class="adv-card-icon-ring"></div>
+                    <i class="fas fa-shield-halved adv-card-icon"></i>
+                </div>
+                <div class="adv-card-badge">AI Security</div>
+                <h3 class="adv-card-title">AI SniffGuard</h3>
+                <p class="adv-card-desc">Real-time security, cost optimization & guardrails for LLM APIs — protect your AI pipelines from prompt injection, data leaks, and cost overruns.</p>
+                <ul class="adv-card-features">
+                    <li><i class="fas fa-check-circle"></i> Real-time prompt inspection</li>
+                    <li><i class="fas fa-check-circle"></i> Token cost optimization engine</li>
+                    <li><i class="fas fa-check-circle"></i> Compliance guardrails for LLMs</li>
+                </ul>
+                <div class="adv-card-cta">
+                    Explore Platform <i class="fas fa-arrow-right"></i>
+                </div>
+            </a>
+
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     WHY ARTHA ADVANTAGE — SPLIT SECTION
+════════════════════════════════════════════ -->
+<section class="section" id="why-advantage" style="background: var(--bg-primary); padding: 100px 0;">
+    <div class="container">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;">
+            <!-- Left: visual -->
+            <div style="position: relative;">
+                <div style="background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(6,182,212,0.08)); border: 1px solid var(--border-color); border-radius: 24px; padding: 48px; position: relative; overflow: hidden;">
+                    <!-- Decorative grid lines -->
+                    <div style="position: absolute; inset: 0; background-image: linear-gradient(rgba(99,102,241,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(99,102,241,0.05) 1px, transparent 1px); background-size: 32px 32px; border-radius: 24px;"></div>
+                    <div style="position: relative; z-index: 1;">
+                        <div class="adv-why-metric">
+                            <div class="adv-why-metric-bar" style="width: 90%; background: linear-gradient(90deg, #6366f1, #8b5cf6);"></div>
+                            <span>Data Quality Automation</span>
+                            <strong>90%</strong>
+                        </div>
+                        <div class="adv-why-metric">
+                            <div class="adv-why-metric-bar" style="width: 80%; background: linear-gradient(90deg, #06b6d4, #6366f1);"></div>
+                            <span>Implementation Acceleration</span>
+                            <strong>80%</strong>
+                        </div>
+                        <div class="adv-why-metric">
+                            <div class="adv-why-metric-bar" style="width: 40%; background: linear-gradient(90deg, #10b981, #06b6d4);"></div>
+                            <span>Cost Reduction</span>
+                            <strong>40%</strong>
+                        </div>
+                        <div class="adv-why-metric">
+                            <div class="adv-why-metric-bar" style="width: 70%; background: linear-gradient(90deg, #f59e0b, #10b981);"></div>
+                            <span>Faster Time-to-Insight</span>
+                            <strong>3×</strong>
+                        </div>
+
+                        <!-- Bottom badges -->
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 32px; padding-top: 28px; border-top: 1px solid var(--border-color);">
+                            <span style="background: rgba(99,102,241,0.12); color: #818cf8; border: 1px solid rgba(99,102,241,0.2); border-radius: 20px; padding: 6px 14px; font-size: 12px; font-weight: 600;">Talend Native</span>
+                            <span style="background: rgba(6,182,212,0.12); color: #22d3ee; border: 1px solid rgba(6,182,212,0.2); border-radius: 20px; padding: 6px 14px; font-size: 12px; font-weight: 600;">Snowflake Ready</span>
+                            <span style="background: rgba(16,185,129,0.12); color: #34d399; border: 1px solid rgba(16,185,129,0.2); border-radius: 20px; padding: 6px 14px; font-size: 12px; font-weight: 600;">Azure & AWS</span>
+                            <span style="background: rgba(245,158,11,0.12); color: #fbbf24; border: 1px solid rgba(245,158,11,0.2); border-radius: 20px; padding: 6px 14px; font-size: 12px; font-weight: 600;">AI-Ready</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: content -->
+            <div>
+                <div class="hero-badge" style="display: inline-flex; margin-bottom: 20px;">
+                    <i class="fas fa-gears"></i> Built Differently
+                </div>
+                <h2 class="feature-title" style="font-size: clamp(28px, 3.5vw, 42px); line-height: 1.2; margin-bottom: 20px;">
+                    Why Artha Accelerators Outperform Off-the-Shelf
+                </h2>
+                <p class="feature-desc" style="font-size: 16px; margin-bottom: 32px;">
+                    Unlike generic SaaS platforms, each Artha accelerator is born from 200+ real enterprise implementations. They ship pre-integrated with your existing tech stack and are configured — not customized — to go live faster.
+                </p>
+                <ul style="list-style: none; display: flex; flex-direction: column; gap: 18px;">
+                    <li style="display: flex; gap: 16px; align-items: flex-start;">
+                        <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(99,102,241,0.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;">
+                            <i class="fas fa-plug" style="color: #818cf8; font-size: 16px;"></i>
+                        </div>
+                        <div>
+                            <strong style="display: block; color: var(--text-primary); margin-bottom: 4px; font-size: 15px;">Pre-integrated with your ecosystem</strong>
+                            <span style="font-size: 14px; color: var(--text-secondary); line-height: 1.6;">Native connectors for Talend, Snowflake, Azure, AWS, Qlik and SAP — no integration sprints needed.</span>
+                        </div>
+                    </li>
+                    <li style="display: flex; gap: 16px; align-items: flex-start;">
+                        <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(6,182,212,0.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;">
+                            <i class="fas fa-calendar-check" style="color: #22d3ee; font-size: 16px;"></i>
+                        </div>
+                        <div>
+                            <strong style="display: block; color: var(--text-primary); margin-bottom: 4px; font-size: 15px;">Weeks, not months, to go live</strong>
+                            <span style="font-size: 14px; color: var(--text-secondary); line-height: 1.6;">Pre-built configuration templates compress deployment timelines from 6 months to 4–8 weeks.</span>
+                        </div>
+                    </li>
+                    <li style="display: flex; gap: 16px; align-items: flex-start;">
+                        <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(16,185,129,0.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;">
+                            <i class="fas fa-shield-halved" style="color: #34d399; font-size: 16px;"></i>
+                        </div>
+                        <div>
+                            <strong style="display: block; color: var(--text-primary); margin-bottom: 4px; font-size: 15px;">Governance built-in from day one</strong>
+                            <span style="font-size: 14px; color: var(--text-secondary); line-height: 1.6;">Every platform ships with audit trails, role-based access, data lineage, and compliance reporting.</span>
+                        </div>
+                    </li>
+                </ul>
+                <a href="/contact-us" class="btn btn-primary btn-glow" style="margin-top: 36px; padding: 13px 30px; font-size: 14px;">
+                    Schedule a Demo <i class="fas fa-calendar btn-icon"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     BOTTOM CTA BAND
+════════════════════════════════════════════ -->
+<section style="background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 50%, #164e63 100%); padding: 80px 0; position: relative; overflow: hidden;">
+    <div style="position: absolute; inset: 0; background: radial-gradient(ellipse at 30% 50%, rgba(99,102,241,0.2) 0%, transparent 60%), radial-gradient(ellipse at 70% 50%, rgba(6,182,212,0.15) 0%, transparent 60%); pointer-events: none;"></div>
+    <div class="container" style="text-align: center; position: relative; z-index: 1;">
+        <div class="hero-badge" style="margin: 0 auto 20px; display: inline-flex; background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.15); color: #e2e8f0;">
+            <i class="fas fa-handshake"></i> Let's Build Together
+        </div>
+        <h2 style="font-size: clamp(28px, 4vw, 48px); font-weight: 800; color: #f8fafc; margin-bottom: 16px; line-height: 1.2;">
+            Ready to accelerate your data journey?
+        </h2>
+        <p style="font-size: 17px; color: #94a3b8; max-width: 580px; margin: 0 auto 40px; line-height: 1.7;">
+            Our team of data engineers and architects will help you identify the right accelerator and design a roadmap tailored to your business.
+        </p>
+        <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+            <a href="/contact-us" class="btn btn-primary btn-glow" style="padding: 14px 32px; font-size: 15px; background: linear-gradient(135deg, #6366f1, #06b6d4);">
+                Get a Free Assessment <i class="fas fa-arrow-right btn-icon"></i>
+            </a>
+            <a href="/case-studies" class="btn" style="padding: 14px 32px; font-size: 15px; background: rgba(255,255,255,0.08); color: #e2e8f0; border: 1px solid rgba(255,255,255,0.15); backdrop-filter: blur(8px);">
+                View Case Studies
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     PAGE-SPECIFIC STYLES
+════════════════════════════════════════════ -->
+<style>
+/* ── Stat Pills ── */
+.adv-stat-pill {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 16px 28px;
+    backdrop-filter: blur(8px);
+    transition: transform 0.3s ease, border-color 0.3s ease;
+}
+.adv-stat-pill:hover {
+    transform: translateY(-3px);
+    border-color: rgba(99,102,241,0.4);
+}
+.adv-stat-num {
+    font-size: 28px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #818cf8, #22d3ee);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+}
+.adv-stat-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ── Product Cards Grid ── */
+.adv-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+}
+@media (max-width: 1100px) {
+    .adv-cards-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 680px) {
+    .adv-cards-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Product Card ── */
+.adv-product-card {
+    position: relative;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 24px;
+    padding: 36px 32px 32px;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    overflow: hidden;
+    transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), border-color 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+.adv-product-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 24px;
+    background: radial-gradient(circle at var(--mx,50%) var(--my,50%), var(--card-glow,rgba(99,102,241,0.15)), transparent 60%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+}
+.adv-product-card:hover::before { opacity: 1; }
+.adv-product-card:hover {
+    transform: translateY(-8px) scale(1.01);
+    border-color: var(--card-accent, #6366f1);
+    box-shadow: 0 24px 60px var(--card-glow, rgba(99,102,241,0.2)), 0 0 0 1px var(--card-accent, #6366f1);
+}
+
+/* Glow orb behind icon */
+.adv-card-glow-orb {
+    position: absolute;
+    top: -60px;
+    right: -60px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--card-glow,rgba(99,102,241,0.12)), transparent 70%);
+    pointer-events: none;
+    transition: transform 0.5s ease;
+}
+.adv-product-card:hover .adv-card-glow-orb {
+    transform: scale(1.4);
+}
+
+/* Icon wrap */
+.adv-card-icon-wrap {
+    position: relative;
+    width: 68px;
+    height: 68px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+    border: 1px solid rgba(255,255,255,0.08);
+    flex-shrink: 0;
+}
+.adv-card-icon-ring {
+    position: absolute;
+    inset: -4px;
+    border-radius: 22px;
+    border: 1px solid var(--card-accent, #6366f1);
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    transform: scale(0.85);
+}
+.adv-product-card:hover .adv-card-icon-ring {
+    opacity: 0.5;
+    transform: scale(1);
+}
+.adv-card-icon {
+    font-size: 26px;
+    color: var(--card-accent, #6366f1);
+    position: relative;
+    z-index: 1;
+    transition: transform 0.3s ease;
+}
+.adv-product-card:hover .adv-card-icon {
+    transform: scale(1.1) rotate(-5deg);
+}
+
+/* Badge */
+.adv-card-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--card-accent, #6366f1);
+    margin-bottom: 10px;
+}
+
+/* Title */
+.adv-card-title {
+    font-size: 21px;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 14px;
+    line-height: 1.3;
+    letter-spacing: -0.3px;
+}
+
+/* Description */
+.adv-card-desc {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin-bottom: 22px;
+    flex: 1;
+}
+
+/* Feature list */
+.adv-card-features {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 28px;
+    padding: 0;
+}
+.adv-card-features li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+.adv-card-features li i {
+    color: var(--card-accent, #6366f1);
+    font-size: 13px;
+    flex-shrink: 0;
+}
+
+/* CTA link at bottom */
+.adv-card-cta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--card-accent, #6366f1);
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+    transition: gap 0.2s ease;
+    margin-top: auto;
+}
+.adv-product-card:hover .adv-card-cta {
+    gap: 14px;
+}
+.adv-card-cta i {
+    font-size: 12px;
+    transition: transform 0.25s ease;
+}
+.adv-product-card:hover .adv-card-cta i {
+    transform: translateX(4px);
+}
+
+/* ── Why Artha Metrics ── */
+.adv-why-metric {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+.adv-why-metric:last-of-type { margin-bottom: 0; }
+.adv-why-metric-bar {
+    grid-column: 1 / -1;
+    height: 6px;
+    border-radius: 3px;
+    margin-bottom: 6px;
+    position: relative;
+    animation: barGrow 1.2s cubic-bezier(0.4,0,0.2,1) both;
+    transform-origin: left;
+}
+@keyframes barGrow {
+    from { transform: scaleX(0); opacity: 0; }
+    to   { transform: scaleX(1); opacity: 1; }
+}
+.adv-why-metric span {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+.adv-why-metric strong {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--text-primary);
+    text-align: right;
+}
+
+/* ── Mouse-track glow on cards ── */
+</style>
+
+<script>
+/* Mouse-position-aware glow on product cards */
+document.querySelectorAll('.adv-product-card').forEach(card => {
+    card.addEventListener('mousemove', e => {
+        const rect = card.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width  * 100).toFixed(1);
+        const y = ((e.clientY - rect.top)  / rect.height * 100).toFixed(1);
+        card.style.setProperty('--mx', x + '%');
+        card.style.setProperty('--my', y + '%');
+    });
+});
+
+/* Intersection observer — animate bar widths on scroll */
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+        if (e.isIntersecting) {
+            e.target.querySelectorAll('.adv-why-metric-bar').forEach((bar, i) => {
+                bar.style.animationDelay = `${i * 0.15}s`;
+            });
+        }
+    });
+}, { threshold: 0.3 });
+const whySection = document.getElementById('why-advantage');
+if (whySection) observer.observe(whySection);
+</script>
+
+{% endblock %}

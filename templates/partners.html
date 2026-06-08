@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Our Partners - Enterprise Integration Ecosystem{% endblock %}
+
+{% block content %}
+<!-- Detail Hero -->
+<section class="hero" style="min-height: 50vh; padding-top: calc(var(--nav-height) + 60px); padding-bottom: 60px;">
+    <div class="hero-bg-glow hero-glow-1"></div>
+    <div class="container hero-grid" style="grid-template-columns: 1.2fr 0.8fr;">
+        <div class="hero-content">
+            <div class="hero-badge"><i class="fas fa-handshake"></i> Partner Directory</div>
+            <h1 class="hero-title" style="font-size: 48px;">
+                Strategic <span>Technology Partners</span>
+            </h1>
+            <p class="hero-desc">
+                We partner with leading cloud, warehousing, and ETL engines to deliver reliable, certified integrations.
+            </p>
+        </div>
+        <div class="hero-visual">
+            <div class="ai-graphic-container" style="max-width: 260px; height: 260px;">
+                <div class="ai-node-circle circle-sm"></div>
+                <div class="ai-core" style="width: 70px; height: 70px; background: var(--grad-primary);">
+                    <i class="fas fa-handshake" style="font-size: 22px;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Partners Grid Section -->
+<section class="section-alt" id="all-partners">
+    <div class="container">
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));">
+            {% for slug, partner in nav_partners.items() %}
+            <div class="card">
+                <div class="card-icon-box">
+                    <i class="{% if partner.icon_type %}{{ partner.icon_type }}{% else %}fas{% endif %} fa-{{ partner.icon }}"></i>
+                </div>
+                <h3 class="card-title">{{ partner.title }}</h3>
+                <p class="card-desc">{{ partner.tagline }}</p>
+                <a href="/partners/{{ slug }}" class="card-link">Learn More <i class="fas fa-chevron-right"></i></a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Bottom CTA -->
+<section class="section" style="text-align: center;">
+    <div class="container">
+        <h2 class="section-title">Natively Integrated <span>Ecosystems</span></h2>
+        <p class="section-desc" style="max-width: 600px; margin: 0 auto 30px;">Artha Solutions helps you deploy, clean, and govern partner databases at up to 40% savings.</p>
+        <a href="/contact-us" class="btn btn-primary btn-glow">Consult Partner Architect</a>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,368 @@
+{% extends "ai_base.html" %}
+
+{% block ai_hero %}
+<!-- Assessment Hero -->
+<section class="ai-hero" style="background: radial-gradient(circle at center, rgba(124, 58, 237, 0.04) 0%, rgba(15, 23, 42, 0.01) 100%), var(--bg-primary); padding: 80px 0;">
+    <div class="ai-hero-glow" style="background: radial-gradient(circle, rgba(124, 58, 237, 0.08) 0%, transparent 70%);"></div>
+    <div class="container ai-hero-grid" style="grid-template-columns: 1.15fr 0.85fr;">
+        <div class="ai-hero-content">
+            <div class="ai-badge" style="background: rgba(124, 58, 237, 0.08); color: #7c3aed; border: 1px solid rgba(124, 58, 237, 0.15);"><i class="fas fa-gauge-high"></i> AI & Data Readiness</div>
+            <h1 class="ai-hero-title">
+                Intelligent Data <br><span>Assessment Platform</span>
+            </h1>
+            <p class="ai-hero-subtitle">
+                Assess your current data, governance, and control maturity before AI risk becomes business risk. Run evidence-gated, auditable assessments aligned with international frameworks.
+            </p>
+            <div class="ai-hero-ctas" style="margin-top: 30px;">
+                <a href="javascript:void(0);" onclick="openLeadModal('Hero CTA: AI Data Readiness Assessment');" class="btn btn-primary btn-glow" style="background: linear-gradient(135deg, #7c3aed, #a855f7); border: none;">Claim $1 Assessment <i class="fas fa-sack-dollar" style="margin-left: 6px;"></i></a>
+                <a href="#assessment-pillars" class="btn btn-secondary">Explore Platform</a>
+            </div>
+        </div>
+        
+        <div class="ai-hero-visual">
+            <div class="assessment-radar-container">
+                <!-- Radar Circles -->
+                <div class="radar-circle radar-lg"></div>
+                <div class="radar-circle radar-md"></div>
+                <div class="radar-circle radar-sm"></div>
+                
+                <!-- Scanning Sweep -->
+                <div class="radar-sweep"></div>
+                
+                <!-- Radar Nodes / Scanned Points -->
+                <div class="radar-node node-1" title="Data Lineage"><i class="fas fa-diagram-project"></i></div>
+                <div class="radar-node node-2" title="Data Quality"><i class="fas fa-shield-heart"></i></div>
+                <div class="radar-node node-3" title="Compliance"><i class="fas fa-gavel"></i></div>
+                <div class="radar-node node-4" title="AI Memory"><i class="fas fa-brain"></i></div>
+                <div class="radar-node node-5" title="Model Security"><i class="fas fa-lock"></i></div>
+                
+                <!-- Core Node -->
+                <div class="radar-core">
+                    <i class="fas fa-radar"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block ai_content %}
+<!-- Section: Gap Maturity Grid -->
+<section class="ai-section" id="assessment-pillars" style="border-top: 1px solid var(--border-color); padding: 80px 0;">
+    <div class="container">
+        <div class="ai-section-header text-center" style="margin-bottom: 50px;">
+            <span class="ai-subtitle" style="color: #7c3aed;">Intelligent Assessment</span>
+            <h2 class="ai-title">Get a Clear View of Your <span>Maturity & Readiness Gaps</span></h2>
+            <p class="ai-desc" style="max-width: 720px; margin: 0 auto;">
+                Artha is a configurable assessment orchestration platform that enables enterprises to run structured, evidence-gated governance assessments across AI models, data systems, and business units with full auditability.
+            </p>
+        </div>
+
+        <div class="ai-card-grid grid-2">
+            <!-- 1. Maturity View -->
+            <div class="ai-card" style="background: white; border-radius: 16px; padding: 35px; box-shadow: var(--card-shadow); display: flex; gap: 20px; align-items: flex-start;">
+                <div class="ai-card-icon" style="background: rgba(124, 58, 237, 0.05); color: #7c3aed; width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <i class="fas fa-eye" style="font-size: 20px;"></i>
+                </div>
+                <div>
+                    <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 10px; color: var(--text-primary);">Maturity View</h3>
+                    <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0;">
+                        A structured AI readiness assessment that gives leadership a clear view of current data maturity, control strengths, and the gaps that could slow AI adoption.
+                    </p>
+                </div>
+            </div>
+
+            <!-- 2. Framework Fit -->
+            <div class="ai-card" style="background: white; border-radius: 16px; padding: 35px; box-shadow: var(--card-shadow); display: flex; gap: 20px; align-items: flex-start;">
+                <div class="ai-card-icon" style="background: rgba(124, 58, 237, 0.05); color: #7c3aed; width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <i class="fas fa-circle-nodes" style="font-size: 20px;"></i>
+                </div>
+                <div>
+                    <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 10px; color: var(--text-primary);">Framework Fit</h3>
+                    <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0;">
+                        A flexible assessment model aligned to DCAM, ISO 42001, NIST AI RMF, or your internal governance standards, so readiness can be measured against the framework that matters to your enterprise.
+                    </p>
+                </div>
+            </div>
+
+            <!-- 3. Decision Insights -->
+            <div class="ai-card" style="background: white; border-radius: 16px; padding: 35px; box-shadow: var(--card-shadow); display: flex; gap: 20px; align-items: flex-start;">
+                <div class="ai-card-icon" style="background: rgba(124, 58, 237, 0.05); color: #7c3aed; width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <i class="fas fa-chart-pie" style="font-size: 20px;"></i>
+                </div>
+                <div>
+                    <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 10px; color: var(--text-primary);">Decision Insights</h3>
+                    <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0;">
+                        Evidence-based scoring supported by executive dashboards, risk heatmaps, and gap analysis to help CIOs and CDOs prioritize investments, manage risk, and drive focused action.
+                    </p>
+                </div>
+            </div>
+
+            <!-- 4. Audit Control -->
+            <div class="ai-card" style="background: white; border-radius: 16px; padding: 35px; box-shadow: var(--card-shadow); display: flex; gap: 20px; align-items: flex-start;">
+                <div class="ai-card-icon" style="background: rgba(124, 58, 237, 0.05); color: #7c3aed; width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <i class="fas fa-shield-halved" style="font-size: 20px;"></i>
+                </div>
+                <div>
+                    <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 10px; color: var(--text-primary);">Audit Control</h3>
+                    <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0;">
+                        A regulator-defensible audit trail with role-based workflows that brings accountability across business, data, risk, and compliance teams while preserving full traceability.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Section: Core Capabilities / Make Trust Measurable -->
+<section class="ai-section section-alt" style="padding: 80px 0;">
+    <div class="container">
+        <div class="ai-section-header text-center" style="margin-bottom: 50px;">
+            <span class="ai-subtitle" style="color: #7c3aed;">Data Readiness & Governance</span>
+            <h2 class="ai-title">Make <span>Trust Measurable</span></h2>
+            <p class="ai-desc">End-to-end capabilities evaluated in our AI Data Readiness framework.</p>
+        </div>
+
+        <div class="ai-card-grid grid-3">
+            <!-- 1. Data Governance -->
+            <div class="ai-card" style="background: white; border-radius: 16px; padding: 35px; box-shadow: var(--card-shadow);">
+                <div class="ai-card-icon" style="background: rgba(124, 58, 237, 0.05); color: #7c3aed; width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                    <i class="fas fa-sitemap" style="font-size: 20px;"></i>
+                </div>
+                <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 12px;">Data Readiness & Governance</h3>
+                <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0;">
+                    A single control plane-catalog, lineage, quality rules, and privacy-so leaders can trace any KPI to source and ship with confidence.
+                </p>
+            </div>
+
+            <!-- 2. Data Audit & Quality -->
+            <div class="ai-card" style="background: white; border-radius: 16px; padding: 35px; box-shadow: var(--card-shadow);">
+                <div class="ai-card-icon" style="background: rgba(124, 58, 237, 0.05); color: #7c3aed; width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                    <i class="fas fa-circle-check" style="font-size: 20px;"></i>
+                </div>
+                <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 12px;">Data Audit & Quality</h3>
+                <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0;">
+                    Assess, profile, and continuously validate data quality across sources for accuracy, completeness, freshness, and bias; so AI models learn from reliable inputs and perform consistently.
+                </p>
+            </div>
+
+            <!-- 3. Data Structure & Integration -->
+            <div class="ai-card" style="background: white; border-radius: 16px; padding: 35px; box-shadow: var(--card-shadow);">
+                <div class="ai-card-icon" style="background: rgba(124, 58, 237, 0.05); color: #7c3aed; width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                    <i class="fas fa-network-wired" style="font-size: 20px;"></i>
+                </div>
+                <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 12px;">Data Structure & Integration</h3>
+                <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0;">
+                    Standardize and integrate data across systems using modern architectures, ensuring AI, analytics, and agents can access the right data, in the right form, at the moment of decision.
+                </p>
+            </div>
+
+            <!-- 4. Compliance & Security -->
+            <div class="ai-card" style="background: white; border-radius: 16px; padding: 35px; box-shadow: var(--card-shadow);">
+                <div class="ai-card-icon" style="background: rgba(124, 58, 237, 0.05); color: #7c3aed; width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                    <i class="fas fa-lock" style="font-size: 20px;"></i>
+                </div>
+                <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 12px;">Compliance & Security</h3>
+                <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0;">
+                    Embed privacy, access controls, and auditability into data pipelines, so sensitive information stays secure and AI initiatives meet regulatory and risk requirements by design.
+                </p>
+            </div>
+
+            <!-- 5. AI Governance -->
+            <div class="ai-card" style="background: white; border-radius: 16px; padding: 35px; box-shadow: var(--card-shadow);">
+                <div class="ai-card-icon" style="background: rgba(124, 58, 237, 0.05); color: #7c3aed; width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                    <i class="fas fa-scale-balanced" style="font-size: 20px;"></i>
+                </div>
+                <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 12px;">AI Governance</h3>
+                <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0;">
+                    Define policies, ownership, and accountability for AI use; covering data, models, and decisions, so innovation scales with transparency, explainability, and trust.
+                </p>
+            </div>
+            
+            <!-- 6. Placeholder / CTA Card -->
+            <div class="ai-card" style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.05), rgba(217, 70, 239, 0.05)); border: 1px dashed rgba(124, 58, 237, 0.3); border-radius: 16px; padding: 35px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 12px; color: var(--text-primary);">Overcome Ingestion Risks</h3>
+                <p style="font-size: 13.5px; color: var(--text-secondary); margin-bottom: 20px; line-height: 1.5;">Map pipeline and model dependencies under strict governance frameworks.</p>
+                <a href="javascript:void(0);" onclick="openLeadModal('AI Ingestion Capabilities CTA');" class="btn btn-primary btn-glow" style="background: var(--accent-blue); border: none; font-size: 13px; padding: 10px 20px;">Get Started</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Section: Special Promo Offer -->
+<section class="ai-section" style="padding: 80px 0;">
+    <div class="container">
+        <div class="promo-card-container">
+            <div class="promo-grid">
+                <div>
+                    <span class="ai-subtitle" style="color: #a855f7; margin-bottom: 10px; display: inline-block;">Limited Time Offer</span>
+                    <h2 style="font-size: 32px; font-weight: 800; font-family: var(--font-heading); margin-bottom: 15px; color: #ffffff;">
+                        AI Data Readiness Assessment
+                    </h2>
+                    <h4 style="font-size: 18px; color: #cbd5e1; font-weight: 600; margin-bottom: 20px;">
+                        Know where to begin—and what to fix first in just $1
+                    </h4>
+                    <p style="font-size: 15px; line-height: 1.6; color: #94a3b8; margin-bottom: 30px;">
+                        A structured readiness assessment that identifies gaps, prioritizes use cases, and delivers a clear 60–90 day roadmap to move AI from pilot to production. It’s not a survey but a real assessment backed by international frameworks and expert consultants.
+                    </p>
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                        <a href="javascript:void(0);" onclick="openLeadModal('Special $1 Promo Assessment Claim');" class="btn btn-primary btn-glow" style="background: #a855f7; border: none; font-weight: 700;">Claim $1 Assessment <i class="fas fa-arrow-right" style="margin-left: 6px;"></i></a>
+                        <a href="javascript:void(0);" onclick="openLeadModal('Promo Download Brochure');" class="btn btn-secondary" style="border-color: rgba(255,255,255,0.2); color: #ffffff;">Download Brochure <i class="fas fa-file-pdf" style="margin-left: 6px;"></i></a>
+                    </div>
+                </div>
+                
+                <div style="display: flex; justify-content: center; align-items: center;">
+                    <div class="promo-price-tag">
+                        <div style="font-size: 13px; text-transform: uppercase; font-weight: 700; opacity: 0.8; margin-bottom: 5px;">Promo Value</div>
+                        <div class="promo-price-val">$1</div>
+                        <div class="promo-price-lbl">Assessment worth $15,999</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Section: Analyst Quote -->
+<section class="ai-section section-alt" style="padding: 80px 0;">
+    <div class="container feature-split" style="display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 50px; align-items: center;">
+        <div class="feature-content">
+            <div class="ai-badge" style="background: rgba(245, 158, 11, 0.08); color: #d97706; margin-bottom: 15px; border: 1px solid rgba(245, 158, 11, 0.15);"><i class="fas fa-chart-line"></i> Analyst Speak</div>
+            <h2 class="ai-title" style="font-size: 32px; margin-bottom: 20px;">IDC Analyst Spotlight: <span>Day Zero of AI</span></h2>
+            <p style="color: var(--text-secondary); font-size: 15px; line-height: 1.65; margin-bottom: 20px;">
+                Most enterprise AI initiatives fail or stall because of fragmented data foundations. Laying down active metadata catalogs, lineage rules, and data cleansing layers early is today's top operational priority.
+            </p>
+            <p style="color: var(--text-secondary); font-size: 15px; line-height: 1.65; margin-bottom: 25px;">
+                Read the official analyst findings to map out your infrastructure prerequisites and overcome pipeline ingestion risks.
+            </p>
+            <a href="/white-papers/future-ready-data-foundation-from-ai-pilot-to-production-value" class="btn btn-primary" style="background: #d97706; border: none; font-weight: 700;">Watch On-Demand Video <i class="fas fa-circle-play" style="margin-left: 8px;"></i></a>
+        </div>
+        
+        <div class="feature-visual" style="border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; box-shadow: var(--card-shadow); padding: 40px; background: #fff; border-left: 6px solid #d97706; position: relative;">
+            <div style="font-size: 44px; color: #d97706; margin-bottom: 15px; opacity: 0.15; position: absolute; top: 25px; left: 30px;"><i class="fas fa-quote-left"></i></div>
+            <div style="position: relative; z-index: 2;">
+                <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 12px; color: var(--text-primary); margin-top: 15px;">Building Robust Data Foundations</h3>
+                <p style="font-size: 14.5px; color: var(--text-secondary); line-height: 1.65; margin-bottom: 20px; font-style: italic;">
+                    "Success with AI starts with data. Improving data quality and accessibility for AI is today's top organizational priority. However, laying a solid data foundation for AI requires data and metadata unification, quality management, and control – treating data as a product."
+                </p>
+                <strong style="font-size: 13.5px; color: var(--text-primary); display: block; font-family: var(--font-heading);">IDC Analyst Commentary</strong>
+                <span style="font-size: 12px; color: var(--text-tertiary);">Enterprise Intelligence Spotlight Report</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Section: FAQs -->
+<section class="ai-section" style="padding: 80px 0;">
+    <div class="container">
+        <div class="ai-section-header text-center" style="margin-bottom: 50px;">
+            <span class="ai-subtitle" style="color: #7c3aed;">FAQs</span>
+            <h2 class="ai-title">Got Questions? <span>We’ve Got Answers</span></h2>
+            <p class="ai-desc">Common questions regarding the Artha Intelligent Data Assessment Platform.</p>
+        </div>
+
+        <div class="faq-list" style="max-width: 800px; margin: 0 auto;">
+            <!-- FAQ 1 -->
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaqAccordion(event)">
+                    <span>What is the AI Data Readiness Assessment?</span>
+                    <i class="fas fa-chevron-down faq-icon"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>It is a structured assessment designed to evaluate how ready your enterprise data foundation is to support AI at scale. It helps identify gaps across data quality, governance, controls, evidence, accountability, and auditability so you can move from pilot-stage AI to trusted business adoption.</p>
+                </div>
+            </div>
+
+            <!-- FAQ 2 -->
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaqAccordion(event)">
+                    <span>How is this different from a survey or questionnaire?</span>
+                    <i class="fas fa-chevron-down faq-icon"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>This is not a generic survey. It is an evidence-led, workflow-based assessment with role-based participation, review and challenge cycles, scoring, audit trails, and executive reporting. It is built for governance rigor, not just data collection.</p>
+                </div>
+            </div>
+
+            <!-- FAQ 3 -->
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaqAccordion(event)">
+                    <span>Why should a CIO invest in this assessment now?</span>
+                    <i class="fas fa-chevron-down faq-icon"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Most AI initiatives slow down because the underlying data is fragmented, poorly governed, or not production-ready. This assessment helps CIOs understand where the enterprise is exposed, where capabilities are strong, and what must be prioritized to reduce risk and accelerate AI outcomes.</p>
+                </div>
+            </div>
+
+            <!-- FAQ 4 -->
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaqAccordion(event)">
+                    <span>What will I receive at the end of the assessment?</span>
+                    <i class="fas fa-chevron-down faq-icon"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>You receive a clear view of your current maturity, key readiness gaps, risk areas, supporting evidence, and a prioritized roadmap for improvement. Leadership also gets dashboards, heatmaps, and gap analysis to support decision-making.</p>
+                </div>
+            </div>
+
+            <!-- FAQ 5 -->
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaqAccordion(event)">
+                    <span>What frameworks does it align to?</span>
+                    <i class="fas fa-chevron-down faq-icon"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>The assessment can align to recognized frameworks such as DCAM, ISO 42001, and NIST AI RMF, as well as enterprise-specific governance and control requirements.</p>
+                </div>
+            </div>
+
+            <!-- FAQ 6 -->
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaqAccordion(event)">
+                    <span>Who should be involved from my organization?</span>
+                    <i class="fas fa-chevron-down faq-icon"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Typically, the CIO sponsors the initiative, while data leaders, governance teams, SMEs, risk/compliance stakeholders, and business owners participate. This ensures the findings are practical, cross-functional, and aligned to enterprise priorities.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Outcome CTA section -->
+<section class="ai-bottom-cta" style="background: linear-gradient(135deg, #7c3aed, #a855f7); padding: 80px 0; text-align: center; color: white;">
+    <div class="container" style="max-width: 700px; margin: 0 auto;">
+        <h2 class="ai-title" style="color: white; margin-bottom: 20px;">Start Your <span>Data & AI Journey</span></h2>
+        <p style="color: rgba(255,255,255,0.9); font-size: 16px; line-height: 1.6; margin-bottom: 30px;">
+            Delivering value today while preparing for tomorrow requires more than insight. It demands intelligent action. Let’s explore how data and AI can transform your business.
+        </p>
+        <a href="javascript:void(0);" onclick="openLeadModal('AI Data Readiness Assessment Bottom CTA');" class="btn btn-primary btn-glow" style="background: white; color: #7c3aed; border-color: white;">Consult Our Architects <i class="fas fa-arrow-right" style="margin-left: 8px;"></i></a>
+    </div>
+</section>
+
+<script>
+    // FAQ Accordion toggle
+    function toggleFaqAccordion(evt) {
+        const item = evt.currentTarget.parentElement;
+        const answer = item.querySelector('.faq-answer');
+        const icon = item.querySelector('.faq-icon');
+        const isOpen = item.classList.contains('active');
+        
+        // Close all other FAQs
+        document.querySelectorAll('.faq-item').forEach(faq => {
+            faq.classList.remove('active');
+            faq.querySelector('.faq-answer').style.maxHeight = null;
+            faq.querySelector('.faq-icon').style.transform = 'rotate(0deg)';
+        });
+        
+        // Open current if closed
+        if (!isOpen) {
+            item.classList.add('active');
+            answer.style.maxHeight = answer.scrollHeight + "px";
+            icon.style.transform = 'rotate(180deg)';
+        }
+    }
+</script>
+{% endblock %}

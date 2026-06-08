@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Manufacturing Sales Leads - Control Center{% endblock %}
+
+{% block content %}
+<div style="height: var(--nav-height); background-color: var(--bg-secondary);"></div>
+
+<section class="section" style="min-height: 90vh; background-color: var(--bg-secondary); padding: 40px 0;">
+    <div class="container" style="display: grid; grid-template-columns: 260px 1fr; gap: 40px; align-items: start;">
+        
+        <!-- Sidebar Navigation -->
+        {% include 'admin_sidebar.html' %}
+        
+        <!-- Main Content -->
+        <div>
+            <!-- Header -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
+                <div>
+                    <h2 style="font-size: 28px; font-weight: 800; letter-spacing: -0.5px; color: var(--text-primary);">Manufacturing B2B Inquiries</h2>
+                    <p style="font-size: 13px; color: var(--text-tertiary); margin-top: 4px;">Track and download contacts received via the manufacturing microsite CTA forms.</p>
+                </div>
+                <a href="/admin/industries/manufacturing/export-leads" class="btn btn-primary" style="padding: 10px 20px; font-size: 14px; background: #16a34a; border-color: #16a34a;">
+                    <i class="fas fa-file-csv"></i> Export Leads to CSV
+                </a>
+            </div>
+            
+            <!-- Leads Grid/Table -->
+            <div style="background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); padding: 32px; box-shadow: var(--card-shadow);">
+                {% if leads %}
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; line-height: 1.5;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid var(--border-color); color: var(--text-secondary); font-weight: 700;">
+                                <th style="padding: 12px 14px; white-space: nowrap;">Submitted Date</th>
+                                <th style="padding: 12px 14px;">Contact Name</th>
+                                <th style="padding: 12px 14px;">Company Details</th>
+                                <th style="padding: 12px 14px;">Area of Interest</th>
+                                <th style="padding: 12px 14px;">Message Details</th>
+                                <th style="padding: 12px 14px; text-align: center;">Consent</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ld in leads %}
+                            <tr style="border-bottom: 1px solid var(--border-color); transition: var(--transition-fast);" onmouseover="this.style.backgroundColor='var(--bg-secondary)'" onmouseout="this.style.backgroundColor='transparent'">
+                                <td style="padding: 14px 12px; white-space: nowrap; color: var(--text-tertiary);">{{ ld.created_at }}</td>
+                                <td style="padding: 14px 12px;">
+                                    <strong style="display: block; font-size: 13.5px; color: var(--text-primary);">{{ ld.first_name }} {{ ld.last_name }}</strong>
+                                    <span style="font-size: 11.5px; color: var(--text-tertiary);">{{ ld.business_email }}</span>
+                                    {% if ld.phone %}<span style="display: block; font-size: 11px; color: var(--text-tertiary);">P: {{ ld.phone }}</span>{% endif %}
+                                </td>
+                                <td style="padding: 14px 12px;">
+                                    <strong style="display: block; font-size: 13px; color: var(--text-primary);">{{ ld.company }}</strong>
+                                    <span style="font-size: 11.5px; color: var(--text-secondary);">{{ ld.job_title }}</span>
+                                    <span style="display: block; font-size: 11px; color: var(--text-tertiary);">{{ ld.country }}</span>
+                                </td>
+                                <td style="padding: 14px 12px;">
+                                    <span style="background-color: #fff7ed; color: #ea580c; border: 1px solid #ffedd5; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; display: inline-block; margin-bottom: 4px;">{{ ld.area_of_interest }}</span>
+                                    <span style="display: block; font-size: 10.5px; color: var(--text-tertiary);">Source: {{ ld.source_page }}</span>
+                                    <span style="display: block; font-size: 10.5px; color: var(--text-tertiary);">CTA: {{ ld.cta_clicked }}</span>
+                                </td>
+                                <td style="padding: 14px 12px; max-width: 250px;">
+                                    {% if ld.message %}
+                                    <p style="margin: 0; font-size: 12px; color: var(--text-secondary); font-weight: 300;">{{ ld.message }}</p>
+                                    {% else %}
+                                    <span style="color: var(--text-tertiary); font-style: italic; font-size: 12px;">No message provided.</span>
+                                    {% endif %}
+                                    {% if ld.utm_source or ld.referrer %}
+                                    <div style="margin-top: 6px; font-size: 10px; color: var(--text-tertiary); background: #f3f4f6; padding: 4px; border-radius: 4px;">
+                                        {% if ld.utm_source %}S: {{ ld.utm_source }} | M: {{ ld.utm_medium }} | C: {{ ld.utm_campaign }}{% endif %}
+                                        {% if ld.referrer %}<div style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">Ref: {{ ld.referrer }}</div>{% endif %}
+                                    </div>
+                                    {% endif %}
+                                </td>
+                                <td style="padding: 14px 12px; text-align: center;">
+                                    {% if ld.consent %}
+                                    <span style="font-size: 11px; background-color: #f0fdf4; color: #16a34a; padding: 2px 8px; border-radius: 4px; font-weight: 600;"><i class="fas fa-check"></i> Given</span>
+                                    {% else %}
+                                    <span style="font-size: 11px; background-color: #fef2f2; color: #dc2626; padding: 2px 8px; border-radius: 4px; font-weight: 600;"><i class="fas fa-xmark"></i> None</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div style="text-align: center; padding: 40px 0;">
+                    <i class="fas fa-address-book" style="font-size: 40px; color: var(--text-tertiary); margin-bottom: 12px;"></i>
+                    <p style="color: var(--text-secondary);">No lead submissions found in the database.</p>
+                </div>
+                {% endif %}
+            </div>
+            
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Retail Use Cases - Control Center{% endblock %}
+
+{% block content %}
+<div style="height: var(--nav-height); background-color: var(--bg-secondary);"></div>
+
+<section class="section" style="min-height: 90vh; background-color: var(--bg-secondary); padding: 40px 0;">
+    <div class="container" style="display: grid; grid-template-columns: 260px 1fr; gap: 40px; align-items: start;">
+        
+        <!-- Sidebar Navigation -->
+        {% include 'admin_sidebar.html' %}
+        
+        <!-- Main Content -->
+        <div>
+            <!-- Header -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
+                <div>
+                    <h2 style="font-size: 28px; font-weight: 800; letter-spacing: -0.5px; color: var(--text-primary);">Retail Use Cases</h2>
+                    <p style="font-size: 13px; color: var(--text-tertiary); margin-top: 4px;">Define retail, omnichannel, supply chain, and commerce scenarios showing technical challenges, solutions, stacks, and outcomes.</p>
+                </div>
+                
+                <a href="/admin/industries/retail/use-cases/new" class="btn btn-primary btn-glow" style="padding: 10px 22px; font-size: 13px; border-radius: 8px; display: flex; align-items: center; gap: 6px; background-color: var(--retail-color, #0ea5e9); border-color: var(--retail-color, #0ea5e9);">
+                    <i class="fas fa-plus"></i> Add Use Case
+                </a>
+            </div>
+            
+            <!-- Use Cases Table -->
+            <div style="background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); padding: 32px; box-shadow: var(--card-shadow);">
+                {% if use_cases %}
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid var(--border-color); color: var(--text-secondary); font-weight: 700;">
+                                <th style="padding: 14px 16px;">Title</th>
+                                <th style="padding: 14px 16px;">Audience</th>
+                                <th style="padding: 14px 16px;">Data Domains</th>
+                                <th style="padding: 14px 16px;">Technologies</th>
+                                <th style="padding: 14px 16px; text-align: center;">Status</th>
+                                <th style="padding: 14px 16px; text-align: center;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for uc in use_cases %}
+                            <tr style="border-bottom: 1px solid var(--border-color); transition: var(--transition-fast);" onmouseover="this.style.backgroundColor='var(--bg-secondary)'" onmouseout="this.style.backgroundColor='transparent'">
+                                <td style="padding: 16px; font-weight: 600; color: var(--text-primary);">{{ uc.title }}</td>
+                                <td style="padding: 16px;">{{ uc.audience_type }}</td>
+                                <td style="padding: 16px; color: var(--text-secondary); max-width: 180px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">{{ uc.data_domains }}</td>
+                                <td style="padding: 16px; color: var(--text-tertiary); max-width: 180px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">{{ uc.technologies }}</td>
+                                <td style="padding: 16px; text-align: center;">
+                                    <span style="margin: 0; font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 600; background-color: {% if uc.status == 'Published' %}#ecfdf5{% else %}#fff7ed{% endif %}; color: {% if uc.status == 'Published' %}#047857{% else %}#c2410c{% endif %}; border: 1px solid transparent;">
+                                        {{ uc.status }}
+                                    </span>
+                                </td>
+                                <td style="padding: 16px; text-align: center; white-space: nowrap;">
+                                    <a href="/admin/industries/retail/use-cases/{{ uc.id }}" class="btn btn-secondary" style="padding: 6px 10px; font-size: 12px; border-radius: 6px; margin-right: 4px;" title="Edit Use Case"><i class="fas fa-pen"></i></a>
+                                    <form action="/admin/industries/retail/use-cases/{{ uc.id }}/delete" method="POST" style="display: inline-block;" onsubmit="return confirm('Are you sure you want to delete this use case?');">
+                                        <button type="submit" class="btn" style="padding: 6px 10px; font-size: 12px; border-radius: 6px; background-color: #fef2f2; color: #dc2626; border: 1px solid #fee2e2;" title="Delete Use Case"><i class="fas fa-trash"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div style="text-align: center; padding: 40px 0;">
+                    <i class="fas fa-lightbulb" style="font-size: 40px; color: var(--text-tertiary); margin-bottom: 12px;"></i>
+                    <p style="color: var(--text-secondary); font-size: 14px;">No use cases in library. Click "Add Use Case" to create one.</p>
+                </div>
+                {% endif %}
+            </div>
+            
+        </div>
+    </div>
+</section>
+{% endblock %}

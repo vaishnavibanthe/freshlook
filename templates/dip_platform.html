@@ -1,0 +1,1032 @@
+{% extends "base.html" %}
+
+{% block title %}Data Insights Platform (DIP) | AI-Driven Data Governance | Artha Solutions{% endblock %}
+{% block extra_meta %}
+<meta name="description" content="Artha's Data Insights Platform (DIP) is a comprehensive, AI-driven solution that streamlines data governance, improves data quality, and drives actionable insights.">
+{% endblock %}
+
+{% block content %}
+
+<!-- ══════════════════════════════════════════
+     HERO
+═════════════════════════════════════════════ -->
+<section class="dip-hero" id="dip-hero">
+    <!-- Animated mesh background -->
+    <div class="dip-bg-mesh" aria-hidden="true"></div>
+    <div class="hero-bg-glow hero-glow-1" style="opacity:0.5;"></div>
+    <div class="hero-bg-glow hero-glow-2" style="opacity:0.3; right:-8%; top:30%;"></div>
+
+    <div class="container dip-hero-grid">
+        <!-- Left -->
+        <div class="dip-hero-content">
+            <div class="hero-badge" style="margin-bottom:20px;">
+                <i class="fas fa-sitemap"></i> Artha Advantage · DIP
+            </div>
+            <h1 class="hero-title" style="font-size:clamp(38px,5vw,64px); line-height:1.1; margin-bottom:18px;">
+                Data Insights<br><span>Platform</span>
+            </h1>
+            <p class="hero-desc" style="font-size:17px; max-width:520px; line-height:1.75; margin-bottom:32px;">
+                Artha's Data Insights Platform (DIP) is a comprehensive, AI-driven solution that streamlines data governance, improves data quality, and drives actionable insights. The platform enables organizations to treat data as a strategic asset, ensuring seamless access, compliance with regulations, and enhanced decision-making capabilities across all business functions.
+            </p>
+            <div style="display:flex; gap:14px; flex-wrap:wrap;">
+                <a href="/contact-us" class="btn btn-primary btn-glow" id="dip-hero-cta">
+                    Request a Demo <i class="fas fa-arrow-right btn-icon"></i>
+                </a>
+                <a href="#dip-features" class="btn btn-outline">
+                    Explore Features
+                </a>
+            </div>
+
+            <!-- Tag pills -->
+            <div class="dip-tag-row">
+                <span class="dip-tag-pill"><i class="fas fa-shield-halved"></i> GDPR &amp; CCPA Ready</span>
+                <span class="dip-tag-pill"><i class="fas fa-robot"></i> AI-Driven Rules</span>
+                <span class="dip-tag-pill"><i class="fas fa-plug"></i> 40+ Connectors</span>
+                <span class="dip-tag-pill"><i class="fas fa-chart-line"></i> Real-time Insights</span>
+            </div>
+        </div>
+
+        <!-- Right: animated platform visual -->
+        <div class="dip-hero-visual">
+            <div class="dip-platform-card">
+                <!-- Mini dashboard mockup -->
+                <div class="dip-card-header">
+                    <div class="dip-card-dots"><span></span><span></span><span></span></div>
+                    <span style="font-size:12px; font-weight:600; color:var(--text-secondary);">DIP · Data Governance Console</span>
+                    <div class="dip-header-badge"><i class="fas fa-circle" style="color:#10b981; font-size:7px;"></i> Live</div>
+                </div>
+                <div class="dip-card-body">
+                    <div class="dip-metric-row">
+                        <div class="dip-metric">
+                            <span class="dip-metric-num" style="color:#818cf8;">1B+</span>
+                            <span class="dip-metric-label">Records/day</span>
+                        </div>
+                        <div class="dip-metric">
+                            <span class="dip-metric-num" style="color:#22d3ee;">85%</span>
+                            <span class="dip-metric-label">Validation Acc.</span>
+                        </div>
+                        <div class="dip-metric">
+                            <span class="dip-metric-num" style="color:#34d399;">40+</span>
+                            <span class="dip-metric-label">Data Sources</span>
+                        </div>
+                    </div>
+                    <div class="dip-quality-bar-wrap">
+                        <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted); margin-bottom:5px;">
+                            <span>Data Quality Score</span><span style="color:#10b981; font-weight:700;">94%</span>
+                        </div>
+                        <div class="dip-quality-bar">
+                            <div class="dip-quality-fill" style="width:94%;"></div>
+                        </div>
+                    </div>
+                    <div class="dip-rule-list">
+                        <div class="dip-rule-item dip-rule-pass"><i class="fas fa-check-circle"></i><span>PII Masking Rules</span><span class="dip-badge-pass">Active</span></div>
+                        <div class="dip-rule-item dip-rule-pass"><i class="fas fa-check-circle"></i><span>GDPR Compliance</span><span class="dip-badge-pass">Active</span></div>
+                        <div class="dip-rule-item dip-rule-warn"><i class="fas fa-triangle-exclamation"></i><span>Stale Records Scan</span><span class="dip-badge-warn">Running</span></div>
+                        <div class="dip-rule-item dip-rule-pass"><i class="fas fa-check-circle"></i><span>MDM Golden Record</span><span class="dip-badge-pass">Synced</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     STATS BAND — Partnership + Numbers
+═════════════════════════════════════════════ -->
+<section class="dip-stats-band">
+    <div class="container">
+        <div class="dip-partner-label">
+            <i class="fas fa-handshake" style="color:#818cf8;"></i>
+            <span>11 Years of Partnership with Qlik · <em>Recognized Partner of the Year 6× in a row since 2018</em></span>
+        </div>
+        <div class="dip-stats-grid">
+            <div class="dip-stat-item">
+                <div class="dip-stat-num">1B+</div>
+                <div class="dip-stat-label">Records evaluated for compliance daily</div>
+            </div>
+            <div class="dip-stat-sep"></div>
+            <div class="dip-stat-item">
+                <div class="dip-stat-num">85%</div>
+                <div class="dip-stat-label">Validation accuracy with AI-enabled rules</div>
+            </div>
+            <div class="dip-stat-sep"></div>
+            <div class="dip-stat-item">
+                <div class="dip-stat-num">40+</div>
+                <div class="dip-stat-label">Different data sources to connect with ease</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     CLIENT LOGOS
+═════════════════════════════════════════════ -->
+<section class="dip-logos-band">
+    <div class="container">
+        <p class="dip-logos-label">Trusted by leading enterprises across APAC, EMEA &amp; North America</p>
+        <div class="dip-logos-row">
+            <div class="dip-logo-chip"><i class="fas fa-coins"></i> Pegadaian</div>
+            <div class="dip-logo-chip"><i class="fas fa-building-columns"></i> Adira Finance</div>
+            <div class="dip-logo-chip"><i class="fas fa-university"></i> Bank Mandiri</div>
+            <div class="dip-logo-chip"><i class="fas fa-shield"></i> Security Bank</div>
+            <div class="dip-logo-chip"><i class="fas fa-landmark"></i> Bank Danamon</div>
+            <div class="dip-logo-chip"><i class="fas fa-credit-card"></i> DBS Bank</div>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     ONE-STOP SHOP — 5 USE-CASE CARDS
+═════════════════════════════════════════════ -->
+<section class="section dip-use-section" id="dip-use-cases">
+    <div class="container">
+        <div class="section-header" style="text-align:center; margin-bottom:56px;">
+            <span class="section-subtitle-badge">Platform Scope</span>
+            <h2 class="section-title" style="margin-top:16px;">One-stop Shop for All Your<br><span>Data Governance Needs</span></h2>
+        </div>
+
+        <div class="dip-use-grid">
+            <!-- Card 1 -->
+            <div class="dip-use-card" style="--uc:#6366f1; --ucg:rgba(99,102,241,0.1);">
+                <div class="dip-use-icon"><i class="fas fa-scale-balanced"></i></div>
+                <h3 class="dip-use-title">Regulatory Compliance &amp; Data Governance</h3>
+                <p class="dip-use-desc">Helps enterprises implement robust data governance practices that ensure compliance with evolving regulations like GDPR, CCPA, and HIPAA. The platform automates governance workflows, enhances data quality, and reduces risks associated with non-compliance.</p>
+                <div class="dip-use-tags">
+                    <span>GDPR</span><span>CCPA</span><span>HIPAA</span>
+                </div>
+            </div>
+            <!-- Card 2 -->
+            <div class="dip-use-card" style="--uc:#06b6d4; --ucg:rgba(6,182,212,0.1);">
+                <div class="dip-use-icon"><i class="fas fa-users-viewfinder"></i></div>
+                <h3 class="dip-use-title">Master Data Management (MDM) for Customer 360</h3>
+                <p class="dip-use-desc">With MDM capabilities, DIP unifies disparate customer data sources to create a single, authoritative view. This enables personalized customer interactions across multiple touchpoints, enhancing engagement and retention.</p>
+                <div class="dip-use-tags">
+                    <span>MDM</span><span>Customer 360</span><span>Golden Record</span>
+                </div>
+            </div>
+            <!-- Card 3 -->
+            <div class="dip-use-card" style="--uc:#10b981; --ucg:rgba(16,185,129,0.1);">
+                <div class="dip-use-icon"><i class="fas fa-arrows-rotate"></i></div>
+                <h3 class="dip-use-title">Data Onboarding &amp; Migration for Operational Efficiency</h3>
+                <p class="dip-use-desc">Automates data mapping, cleansing, and transformation to ensure seamless, secure, and accurate data transfers. The platform anticipates and resolves migration bottlenecks, enabling efficient onboarding, reduced downtime, and faster time-to-value.</p>
+                <div class="dip-use-tags">
+                    <span>Mapping</span><span>Cleansing</span><span>Migration</span>
+                </div>
+            </div>
+            <!-- Card 4 -->
+            <div class="dip-use-card" style="--uc:#f59e0b; --ucg:rgba(245,158,11,0.1);">
+                <div class="dip-use-icon"><i class="fas fa-store"></i></div>
+                <h3 class="dip-use-title">Data Marketplace for Cross-Departmental Collaboration</h3>
+                <p class="dip-use-desc">DIP's Data Marketplace allows various departments to access governed, high-quality data. It enables teams like marketing, finance, and operations to make faster, data-driven decisions with real-time insights.</p>
+                <div class="dip-use-tags">
+                    <span>Self-service</span><span>Real-time</span><span>Governed</span>
+                </div>
+            </div>
+            <!-- Card 5 -->
+            <div class="dip-use-card" style="--uc:#8b5cf6; --ucg:rgba(139,92,246,0.1);">
+                <div class="dip-use-icon"><i class="fas fa-wand-magic-sparkles"></i></div>
+                <h3 class="dip-use-title">AI-Driven Rule Management for Improved Data Quality</h3>
+                <p class="dip-use-desc">The platform's AI-driven policy engine automates rule creation and data validation processes, improving the overall quality of data. This results in better business outcomes with more reliable data for decision-making.</p>
+                <div class="dip-use-tags">
+                    <span>AI Rules</span><span>Validation</span><span>Automation</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     CASE STUDY CALLOUT 1
+═════════════════════════════════════════════ -->
+<section class="dip-cs-section" id="dip-cs1">
+    <div class="container dip-cs-grid">
+        <div class="dip-cs-content">
+            <div class="hero-badge" style="margin-bottom:16px;"><i class="fas fa-file-lines"></i> Case Study</div>
+            <h2 style="font-size:clamp(22px,3vw,36px); font-weight:800; color:var(--text-primary); line-height:1.3; margin-bottom:16px;">
+                Leveraging Data Insights Platform for Effective Data Governance in Commercial Real Estate
+            </h2>
+            <p style="font-size:15px; color:var(--text-secondary); line-height:1.75; margin-bottom:28px;">
+                Artha's Data Insights Platform drove innovation &amp; efficiency in the commercial real estate department of a leading bank — establishing active governance workflows, improving data completeness, and accelerating regulatory reporting timelines.
+            </p>
+            <a href="/case-studies" class="btn btn-primary" style="padding:13px 26px;">
+                Download Now <i class="fas fa-download btn-icon"></i>
+            </a>
+        </div>
+        <div class="dip-cs-visual">
+            <div class="dip-cs-card">
+                <div class="dip-cs-icon-ring">
+                    <i class="fas fa-building-columns" style="font-size:38px; color:#818cf8;"></i>
+                </div>
+                <div class="dip-cs-stat-row">
+                    <div class="dip-cs-stat"><span class="dip-cs-num">65%</span><span>Faster Compliance Reporting</span></div>
+                    <div class="dip-cs-stat"><span class="dip-cs-num">100%</span><span>Audit Readiness</span></div>
+                </div>
+                <p style="font-size:12px; color:var(--text-muted); text-align:center; margin-top:4px; font-style:italic;">Commercial Real Estate · Leading APAC Bank</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     FEATURES & CAPABILITIES — GRID
+═════════════════════════════════════════════ -->
+<section class="section" id="dip-features" style="background:var(--bg-secondary); padding:90px 0;">
+    <div class="container">
+        <div class="section-header" style="text-align:center; margin-bottom:56px;">
+            <span class="section-subtitle-badge">Platform Capabilities</span>
+            <h2 class="section-title" style="margin-top:16px;">Data Governance <span>Simplified</span></h2>
+            <p class="section-desc" style="max-width:600px; margin:16px auto 0;">Six core capabilities that make DIP the enterprise-grade choice for data governance, quality, and accessibility.</p>
+        </div>
+
+        <div class="dip-feat-layout">
+            <!-- Left visual -->
+            <div class="dip-feat-visual">
+                <div class="dip-feat-illustration">
+                    <div class="dip-govern-ring dip-gr-1"></div>
+                    <div class="dip-govern-ring dip-gr-2"></div>
+                    <div class="dip-govern-center">
+                        <i class="fas fa-sitemap"></i>
+                        <span>DIP Core</span>
+                    </div>
+                    <!-- Satellite nodes -->
+                    <div class="dip-sat dip-sat-1"><i class="fas fa-shield-halved"></i></div>
+                    <div class="dip-sat dip-sat-2"><i class="fas fa-database"></i></div>
+                    <div class="dip-sat dip-sat-3"><i class="fas fa-robot"></i></div>
+                    <div class="dip-sat dip-sat-4"><i class="fas fa-chart-bar"></i></div>
+                    <div class="dip-sat dip-sat-5"><i class="fas fa-plug"></i></div>
+                    <div class="dip-sat dip-sat-6"><i class="fas fa-shuffle"></i></div>
+                </div>
+            </div>
+
+            <!-- Right feature list -->
+            <div class="dip-feat-list">
+                <div class="dip-feat-item" style="--fi:#6366f1;">
+                    <div class="dip-feat-num">01</div>
+                    <div class="dip-feat-body">
+                        <h3>Streamlined Data Onboarding &amp; Migration</h3>
+                        <p>DIP automates data ingestion, mapping, cleansing, and transformation for seamless onboarding, enabling accurate migration, faster discovery, and a unified enterprise view with minimal effort.</p>
+                    </div>
+                </div>
+                <div class="dip-feat-item" style="--fi:#06b6d4;">
+                    <div class="dip-feat-num">02</div>
+                    <div class="dip-feat-body">
+                        <h3>Comprehensive Data Governance &amp; Compliance</h3>
+                        <p>DIP's governance tools automate compliance with regulations (GDPR, CCPA) through AI-driven policy enforcement, ensuring data integrity and privacy across all data flows.</p>
+                    </div>
+                </div>
+                <div class="dip-feat-item" style="--fi:#10b981;">
+                    <div class="dip-feat-num">03</div>
+                    <div class="dip-feat-body">
+                        <h3>Enhanced Data Quality &amp; Orchestration</h3>
+                        <p>DIP ensures data accuracy through cleansing, validation, and reconciliation, while its orchestration engine automates the entire data management process end-to-end.</p>
+                    </div>
+                </div>
+                <div class="dip-feat-item" style="--fi:#f59e0b;">
+                    <div class="dip-feat-num">04</div>
+                    <div class="dip-feat-body">
+                        <h3>AI-Driven Data Access &amp; Real-Time Data Marketplace</h3>
+                        <p>DIP provides a real-time data marketplace with governed, trusted data for analytics, reporting, and decisions — ensuring integrity and availability with industry models and trust indices.</p>
+                    </div>
+                </div>
+                <div class="dip-feat-item" style="--fi:#8b5cf6;">
+                    <div class="dip-feat-num">05</div>
+                    <div class="dip-feat-body">
+                        <h3>Seamless Integration with Business Platforms</h3>
+                        <p>DIP integrates with major business platforms (SAP, Oracle, Salesforce, etc.), enabling data-driven decisions and enhanced business performance across the enterprise.</p>
+                    </div>
+                </div>
+                <div class="dip-feat-item" style="--fi:#ec4899;">
+                    <div class="dip-feat-num">06</div>
+                    <div class="dip-feat-body">
+                        <h3>Effortless Data Standardization &amp; Management</h3>
+                        <p>DIP automates MDM and RDM, ensuring consistent, accurate data for a trusted single view — enhancing quality, reliability, and operational efficiency across the organization.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     CASE STUDY CALLOUT 2
+═════════════════════════════════════════════ -->
+<section class="dip-cs2-section">
+    <div class="container">
+        <div class="dip-cs2-card">
+            <div class="dip-cs2-icon">
+                <i class="fas fa-tower-broadcast"></i>
+            </div>
+            <div class="dip-cs2-content">
+                <div class="hero-badge" style="margin-bottom:12px; background:rgba(6,182,212,0.1); border-color:rgba(6,182,212,0.2); color:#22d3ee;">
+                    <i class="fas fa-star"></i> Customer Success
+                </div>
+                <h3 style="font-size:clamp(18px,2.5vw,28px); font-weight:800; color:var(--text-primary); margin-bottom:10px; line-height:1.3;">
+                    A Leading Telecom Player Improved Customer Satisfaction with Data Insights Platform
+                </h3>
+                <p style="font-size:14px; color:var(--text-secondary); line-height:1.7; margin-bottom:20px;">
+                    Artha's DIP monitors data quality daily, while on-the-fly creation of data quality and business rules helps cleanse and transform data for reporting — delivering measurable improvements in customer satisfaction scores.
+                </p>
+                <a href="/case-studies" class="btn btn-primary" style="padding:11px 22px; font-size:14px;">
+                    Read Full Story <i class="fas fa-arrow-right btn-icon"></i>
+                </a>
+            </div>
+            <div class="dip-cs2-stats">
+                <div class="dip-cs2-stat-item">
+                    <div class="dip-cs2-stat-num">Daily</div>
+                    <div class="dip-cs2-stat-lbl">Quality Monitoring</div>
+                </div>
+                <div class="dip-cs2-stat-item">
+                    <div class="dip-cs2-stat-num">Real-time</div>
+                    <div class="dip-cs2-stat-lbl">Rule Creation</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     TESTIMONIALS
+═════════════════════════════════════════════ -->
+<section class="section" style="background:var(--bg-primary); padding:80px 0;">
+    <div class="container">
+        <div class="section-header" style="text-align:center; margin-bottom:48px;">
+            <span class="section-subtitle-badge">What Clients Say</span>
+            <h2 class="section-title" style="margin-top:16px;">Trusted by Data <span>Leaders Worldwide</span></h2>
+        </div>
+        <div class="dip-testimonials-grid">
+            <div class="dip-testimonial">
+                <div class="dip-quote-icon"><i class="fas fa-quote-left"></i></div>
+                <p class="dip-quote-text">
+                    "Cleansing and consolidating consumer data enables us to deliver the kind of personalized experience today's consumers deserve and expect."
+                </p>
+                <div class="dip-quote-author">
+                    <div class="dip-author-avatar" style="background:linear-gradient(135deg,#6366f1,#818cf8);">SB</div>
+                    <div>
+                        <strong>Steve Brennan</strong>
+                        <span>Vice President, Data Strategy &amp; Analytics</span>
+                        <span class="dip-author-company">Carhartt</span>
+                    </div>
+                </div>
+            </div>
+            <div class="dip-testimonial">
+                <div class="dip-quote-icon"><i class="fas fa-quote-left"></i></div>
+                <p class="dip-quote-text">
+                    "We are very happy that we worked with Artha Solutions on our Upgrade project. Right from the 1st initial communication, the entire team was dedicated to success."
+                </p>
+                <div class="dip-quote-author">
+                    <div class="dip-author-avatar" style="background:linear-gradient(135deg,#06b6d4,#22d3ee);">VM</div>
+                    <div>
+                        <strong>Vivek Makan</strong>
+                        <span>Director, Data &amp; Analytics</span>
+                        <span class="dip-author-company">Managed Healthcare Associates, Inc.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     UPCOMING EVENTS
+═════════════════════════════════════════════ -->
+<section class="section" style="background:var(--bg-secondary); padding:80px 0;">
+    <div class="container">
+        <div class="section-header" style="text-align:center; margin-bottom:48px;">
+            <span class="section-subtitle-badge">Stay Connected</span>
+            <h2 class="section-title" style="margin-top:16px;">Events &amp; <span>Webinars</span></h2>
+        </div>
+        <div class="dip-events-grid">
+            <div class="dip-event-card">
+                <div class="dip-event-date">
+                    <span class="dip-event-month">MAY</span>
+                    <span class="dip-event-day">31</span>
+                </div>
+                <div class="dip-event-body">
+                    <div class="dip-event-badge" style="color:#818cf8; background:rgba(99,102,241,0.1);">Webinar</div>
+                    <h4 class="dip-event-title">Future Ready Data Foundation: From AI Pilot to Production Value</h4>
+                    <p class="dip-event-desc">Explores how organizations can overcome data challenges by building a future-ready data foundation that enables trusted, scalable, and AI-ready data.</p>
+                </div>
+                <a href="/resources/events" class="dip-event-cta">Learn More <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="dip-event-card">
+                <div class="dip-event-date">
+                    <span class="dip-event-month">APR</span>
+                    <span class="dip-event-day">13</span>
+                </div>
+                <div class="dip-event-body">
+                    <div class="dip-event-badge" style="color:#22d3ee; background:rgba(6,182,212,0.1);">Conference</div>
+                    <h4 class="dip-event-title">Artha Solutions at Qlik Connect 2026</h4>
+                    <p class="dip-event-desc">Gaylord Palms Resort &amp; Convention Center, Kissimmee, Florida. Showcasing AI-ready data foundations, ETL modernization, and MDM solutions. Booth #SS15.</p>
+                </div>
+                <a href="/resources/events" class="dip-event-cta">Learn More <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="dip-event-card">
+                <div class="dip-event-date">
+                    <span class="dip-event-month">NOV</span>
+                    <span class="dip-event-day">27</span>
+                </div>
+                <div class="dip-event-body">
+                    <div class="dip-event-badge" style="color:#34d399; background:rgba(16,185,129,0.1);">In-Person</div>
+                    <h4 class="dip-event-title">Qlik AI Reality Tour 2025 – Bengaluru</h4>
+                    <p class="dip-event-desc">Artha Solutions hosts the Qlik AI Reality Tour – Bengaluru. Discover practical strategies and real-world AI use cases that drive real business impact.</p>
+                </div>
+                <a href="/resources/events" class="dip-event-cta">Learn More <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     BOTTOM CTA
+═════════════════════════════════════════════ -->
+<section class="dip-cta-band">
+    <div class="dip-cta-glow dip-cta-glow-l"></div>
+    <div class="dip-cta-glow dip-cta-glow-r"></div>
+    <div class="container" style="text-align:center; position:relative; z-index:1;">
+        <div class="hero-badge" style="display:inline-flex; margin:0 auto 20px; background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.15); color:#e2e8f0;">
+            <i class="fas fa-rocket"></i> Get Started
+        </div>
+        <h2 style="font-size:clamp(26px,4vw,48px); font-weight:800; color:#f8fafc; margin-bottom:16px; line-height:1.2;">
+            Ready to govern your data with<br>intelligence and precision?
+        </h2>
+        <p style="font-size:17px; color:#94a3b8; max-width:560px; margin:0 auto 40px; line-height:1.7;">
+            Schedule a personalized demo of Artha's Data Insights Platform and see how AI-driven governance can transform your data landscape.
+        </p>
+        <div style="display:flex; gap:16px; justify-content:center; flex-wrap:wrap;">
+            <a href="/contact-us" class="btn btn-primary btn-glow" style="padding:15px 32px; font-size:15px; background:linear-gradient(135deg,#6366f1,#06b6d4);">
+                Book a Demo <i class="fas fa-calendar btn-icon"></i>
+            </a>
+            <a href="/artha-advantage" class="btn" style="padding:15px 32px; font-size:15px; background:rgba(255,255,255,0.08); color:#e2e8f0; border:1px solid rgba(255,255,255,0.15);">
+                All Artha Advantage Products
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     STYLES
+═════════════════════════════════════════════ -->
+<style>
+/* ── Hero ─────────────────────────────────── */
+.dip-hero {
+    min-height: 88vh;
+    padding-top: calc(var(--nav-height) + 80px);
+    padding-bottom: 80px;
+    position: relative;
+    overflow: hidden;
+}
+.dip-bg-mesh {
+    position: absolute;
+    inset: 0;
+    background-image:
+        radial-gradient(circle at 1px 1px, rgba(99,102,241,0.08) 1px, transparent 0);
+    background-size: 40px 40px;
+    pointer-events: none;
+}
+.dip-hero-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 60px;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+}
+@media (max-width:900px) {
+    .dip-hero-grid { grid-template-columns: 1fr; }
+    .dip-hero-visual { display: none; }
+}
+.dip-tag-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 28px;
+}
+.dip-tag-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+.dip-tag-pill i { color: #818cf8; font-size: 11px; }
+
+/* ── Platform Dashboard Card ──────────────── */
+.dip-platform-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 24px;
+    overflow: hidden;
+    backdrop-filter: blur(12px);
+    animation: dipFloat 5s ease-in-out infinite;
+}
+@keyframes dipFloat {
+    0%,100% { transform: translateY(0); }
+    50%      { transform: translateY(-10px); }
+}
+.dip-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 20px;
+    background: rgba(255,255,255,0.03);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.dip-card-dots { display: flex; gap: 5px; }
+.dip-card-dots span { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.12); }
+.dip-header-badge {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #10b981;
+    background: rgba(16,185,129,0.1);
+    border: 1px solid rgba(16,185,129,0.2);
+    border-radius: 20px;
+    padding: 3px 10px;
+}
+.dip-card-body { padding: 24px 20px; display: flex; flex-direction: column; gap: 20px; }
+.dip-metric-row { display: flex; gap: 12px; }
+.dip-metric {
+    flex: 1;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    padding: 14px 10px;
+    text-align: center;
+}
+.dip-metric-num { display: block; font-size: 22px; font-weight: 900; line-height: 1; }
+.dip-metric-label { display: block; font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+.dip-quality-bar-wrap { }
+.dip-quality-bar {
+    height: 6px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 3px;
+    overflow: hidden;
+}
+.dip-quality-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #6366f1, #10b981);
+    border-radius: 3px;
+    animation: dipBarGrow 1.5s ease both;
+    transform-origin: left;
+}
+@keyframes dipBarGrow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.dip-rule-list { display: flex; flex-direction: column; gap: 8px; }
+.dip-rule-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
+}
+.dip-rule-pass { background: rgba(16,185,129,0.07); color: #34d399; }
+.dip-rule-warn { background: rgba(245,158,11,0.07); color: #fbbf24; }
+.dip-rule-item span:first-of-type { flex: 1; }
+.dip-badge-pass {
+    font-size: 10px;
+    background: rgba(16,185,129,0.15);
+    color: #10b981;
+    border-radius: 20px;
+    padding: 2px 8px;
+    font-weight: 700;
+}
+.dip-badge-warn {
+    font-size: 10px;
+    background: rgba(245,158,11,0.15);
+    color: #f59e0b;
+    border-radius: 20px;
+    padding: 2px 8px;
+    font-weight: 700;
+}
+
+/* ── Stats Band ───────────────────────────── */
+.dip-stats-band {
+    background: linear-gradient(135deg, #1e1b4b, #0f172a 60%, #164e63);
+    padding: 48px 0;
+    position: relative;
+    overflow: hidden;
+}
+.dip-partner-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+    font-size: 14px;
+    color: #94a3b8;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+    text-align: center;
+}
+.dip-partner-label em { color: #c7d2fe; font-style: normal; font-weight: 600; }
+.dip-stats-grid {
+    display: flex;
+    align-items: flex-start;
+    position: relative;
+    z-index: 1;
+}
+.dip-stat-item { flex: 1; text-align: center; padding: 0 32px; }
+.dip-stat-num {
+    font-size: 52px;
+    font-weight: 900;
+    background: linear-gradient(135deg, #818cf8, #22d3ee);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    display: block;
+    margin-bottom: 10px;
+}
+.dip-stat-label { font-size: 14px; color: #94a3b8; line-height: 1.5; }
+.dip-stat-sep { width: 1px; background: rgba(255,255,255,0.1); align-self: stretch; }
+
+/* ── Logos Band ───────────────────────────── */
+.dip-logos-band {
+    background: var(--bg-secondary);
+    padding: 36px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+.dip-logos-label {
+    text-align: center;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+}
+.dip-logos-row {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.dip-logo-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-muted);
+    padding: 8px 16px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    transition: all 0.2s ease;
+}
+.dip-logo-chip i { color: #818cf8; }
+.dip-logo-chip:hover { color: var(--text-secondary); border-color: rgba(99,102,241,0.3); }
+
+/* ── Use Cases ────────────────────────────── */
+.dip-use-section { background: var(--bg-primary); padding: 90px 0; }
+.dip-use-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+@media (max-width:1050px) { .dip-use-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width:640px)  { .dip-use-grid { grid-template-columns: 1fr; } }
+
+.dip-use-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 28px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.dip-use-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--uc);
+    box-shadow: 0 20px 48px rgba(0,0,0,0.2);
+}
+.dip-use-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: var(--ucg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: var(--uc);
+    transition: transform 0.3s ease;
+}
+.dip-use-card:hover .dip-use-icon { transform: scale(1.1) rotate(-5deg); }
+.dip-use-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--text-primary);
+    line-height: 1.4;
+}
+.dip-use-desc { font-size: 13.5px; color: var(--text-secondary); line-height: 1.7; flex: 1; }
+.dip-use-tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+.dip-use-tags span {
+    font-size: 11px;
+    font-weight: 600;
+    background: var(--ucg);
+    color: var(--uc);
+    border-radius: 20px;
+    padding: 3px 10px;
+}
+
+/* ── Case Study 1 ─────────────────────────── */
+.dip-cs-section {
+    background: var(--bg-secondary);
+    padding: 80px 0;
+    position: relative;
+    overflow: hidden;
+}
+.dip-cs-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 70% 50%, rgba(99,102,241,0.06) 0%, transparent 60%);
+    pointer-events: none;
+}
+.dip-cs-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 60px;
+    align-items: center;
+}
+@media (max-width:900px) { .dip-cs-grid { grid-template-columns: 1fr; } .dip-cs-visual { display: none; } }
+.dip-cs-card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 24px;
+    padding: 36px 28px;
+    text-align: center;
+}
+.dip-cs-icon-ring {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(99,102,241,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+.dip-cs-stat-row { display: flex; gap: 16px; justify-content: center; margin-top: 16px; }
+.dip-cs-stat { display: flex; flex-direction: column; gap: 4px; }
+.dip-cs-num { font-size: 28px; font-weight: 900; color: #818cf8; }
+.dip-cs-stat span:last-child { font-size: 11px; color: var(--text-muted); }
+
+/* ── Features Layout ──────────────────────── */
+.dip-feat-layout {
+    display: grid;
+    grid-template-columns: 0.7fr 1.3fr;
+    gap: 60px;
+    align-items: center;
+}
+@media (max-width:900px) { .dip-feat-layout { grid-template-columns: 1fr; } .dip-feat-visual { display: none; } }
+
+/* ── Governance Orbit Animation ────────────── */
+.dip-feat-illustration {
+    width: 320px;
+    height: 320px;
+    position: relative;
+    margin: 0 auto;
+}
+.dip-govern-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px dashed rgba(99,102,241,0.2);
+}
+.dip-gr-1 { inset: 0; animation: orbitSpin 20s linear infinite; }
+.dip-gr-2 { inset: 30px; border-color: rgba(6,182,212,0.15); animation: orbitSpin 30s linear infinite reverse; }
+@keyframes orbitSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.dip-govern-center {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(6,182,212,0.15));
+    border: 1px solid rgba(99,102,241,0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    z-index: 2;
+}
+.dip-govern-center i { font-size: 28px; color: #818cf8; }
+.dip-govern-center span { font-size: 10px; font-weight: 700; color: var(--text-muted); }
+
+/* Satellite positioning */
+.dip-sat {
+    position: absolute;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; color: #818cf8;
+    animation: dipPulse 3s ease-in-out infinite;
+}
+.dip-sat-1 { top:  8px; left: 50%; transform: translateX(-50%); }
+.dip-sat-2 { top: 50%; right: 8px; transform: translateY(-50%); animation-delay: 0.5s; }
+.dip-sat-3 { bottom: 8px; left: 50%; transform: translateX(-50%); animation-delay: 1s; }
+.dip-sat-4 { top: 50%; left: 8px; transform: translateY(-50%); animation-delay: 1.5s; }
+.dip-sat-5 { top: 50px; right: 50px; animation-delay: 2s; }
+.dip-sat-6 { bottom: 50px; left: 50px; animation-delay: 2.5s; }
+@keyframes dipPulse {
+    0%,100% { transform: translateX(var(--tx,0)) translateY(var(--ty,0)) scale(1); box-shadow: 0 0 0 0 rgba(99,102,241,0); }
+    50%      { transform: translateX(var(--tx,0)) translateY(var(--ty,0)) scale(1.1); box-shadow: 0 0 0 8px rgba(99,102,241,0.08); }
+}
+
+/* ── Feature List ─────────────────────────── */
+.dip-feat-list { display: flex; flex-direction: column; gap: 0; }
+.dip-feat-item {
+    display: flex;
+    gap: 20px;
+    padding: 24px 0;
+    border-bottom: 1px solid var(--border-color);
+    transition: background 0.2s ease;
+}
+.dip-feat-item:last-child { border-bottom: none; }
+.dip-feat-item:hover { padding-left: 8px; }
+.dip-feat-num {
+    font-size: 13px;
+    font-weight: 900;
+    color: var(--fi, #6366f1);
+    opacity: 0.5;
+    flex-shrink: 0;
+    width: 28px;
+    padding-top: 2px;
+}
+.dip-feat-body h3 {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+    line-height: 1.4;
+}
+.dip-feat-body p { font-size: 13.5px; color: var(--text-secondary); line-height: 1.7; }
+
+/* ── Case Study 2 ─────────────────────────── */
+.dip-cs2-section { background: var(--bg-primary); padding: 60px 0; }
+.dip-cs2-card {
+    background: linear-gradient(135deg, rgba(6,182,212,0.06), rgba(99,102,241,0.06));
+    border: 1px solid rgba(6,182,212,0.15);
+    border-radius: 24px;
+    padding: 40px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 32px;
+    align-items: center;
+}
+@media (max-width:900px) { .dip-cs2-card { grid-template-columns: 1fr; } }
+.dip-cs2-icon {
+    width: 72px; height: 72px;
+    border-radius: 18px;
+    background: rgba(6,182,212,0.1);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 30px; color: #22d3ee;
+    flex-shrink: 0;
+}
+.dip-cs2-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 140px;
+}
+@media (max-width:900px) { .dip-cs2-stats { flex-direction: row; } }
+.dip-cs2-stat-item {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 14px;
+    text-align: center;
+}
+.dip-cs2-stat-num { display: block; font-size: 16px; font-weight: 900; color: #22d3ee; margin-bottom: 4px; }
+.dip-cs2-stat-lbl { display: block; font-size: 11px; color: var(--text-muted); }
+
+/* ── Testimonials ─────────────────────────── */
+.dip-testimonials-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+@media (max-width:768px) { .dip-testimonials-grid { grid-template-columns: 1fr; } }
+.dip-testimonial {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    transition: transform 0.3s ease, border-color 0.3s ease;
+}
+.dip-testimonial:hover { transform: translateY(-4px); border-color: rgba(99,102,241,0.3); }
+.dip-quote-icon { font-size: 24px; color: rgba(99,102,241,0.3); }
+.dip-quote-text {
+    font-size: 15px;
+    line-height: 1.75;
+    color: var(--text-secondary);
+    font-style: italic;
+    flex: 1;
+}
+.dip-quote-author { display: flex; align-items: center; gap: 14px; }
+.dip-author-avatar {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    font-weight: 800;
+    color: #fff;
+    flex-shrink: 0;
+}
+.dip-quote-author div:last-child { display: flex; flex-direction: column; gap: 2px; }
+.dip-quote-author strong { font-size: 14px; font-weight: 800; color: var(--text-primary); }
+.dip-quote-author span { font-size: 12px; color: var(--text-muted); }
+.dip-author-company { font-size: 11px !important; font-weight: 700 !important; color: #818cf8 !important; }
+
+/* ── Events ───────────────────────────────── */
+.dip-events-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+@media (max-width:1000px) { .dip-events-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width:640px)  { .dip-events-grid { grid-template-columns: 1fr; } }
+.dip-event-card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease, border-color 0.3s ease;
+}
+.dip-event-card:hover { transform: translateY(-4px); border-color: rgba(99,102,241,0.3); }
+.dip-event-date {
+    background: linear-gradient(135deg, rgba(99,102,241,0.12), rgba(6,182,212,0.08));
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+}
+.dip-event-month { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); }
+.dip-event-day { font-size: 40px; font-weight: 900; background: linear-gradient(135deg,#818cf8,#22d3ee); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; line-height:1; }
+.dip-event-body { padding: 20px; flex: 1; display: flex; flex-direction: column; gap: 8px; }
+.dip-event-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 20px;
+    padding: 3px 10px;
+    width: fit-content;
+}
+.dip-event-title { font-size: 14px; font-weight: 800; color: var(--text-primary); line-height: 1.4; flex: 1; }
+.dip-event-desc { font-size: 12.5px; color: var(--text-muted); line-height: 1.6; }
+.dip-event-cta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #818cf8;
+    padding: 14px 20px;
+    border-top: 1px solid var(--border-color);
+    text-decoration: none;
+    transition: gap 0.2s ease;
+}
+.dip-event-cta:hover { gap: 10px; }
+
+/* ── Bottom CTA ───────────────────────────── */
+.dip-cta-band {
+    background: linear-gradient(135deg, #1e1b4b, #0f172a 50%, #164e63);
+    padding: 90px 0;
+    position: relative;
+    overflow: hidden;
+}
+.dip-cta-glow {
+    position: absolute;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    pointer-events: none;
+}
+.dip-cta-glow-l { background: radial-gradient(circle, rgba(99,102,241,0.2), transparent 70%); top: -100px; left: -100px; }
+.dip-cta-glow-r { background: radial-gradient(circle, rgba(6,182,212,0.15), transparent 70%); bottom: -100px; right: -100px; }
+</style>
+
+{% endblock %}

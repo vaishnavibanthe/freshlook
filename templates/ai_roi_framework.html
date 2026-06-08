@@ -1,0 +1,166 @@
+{% extends "ai_base.html" %}
+
+{% block ai_hero %}
+<!-- Framework Hero -->
+<section class="ai-hero" style="background: radial-gradient(circle at center, rgba(124, 58, 237, 0.04) 0%, rgba(15, 23, 42, 0.01) 100%), var(--bg-primary); padding: 80px 0;">
+    <div class="ai-hero-glow" style="background: radial-gradient(circle, rgba(124, 58, 237, 0.08) 0%, transparent 70%);"></div>
+    <div class="container ai-hero-grid" style="grid-template-columns: 1.15fr 0.85fr;">
+        <div class="ai-hero-content">
+            <div class="ai-badge" style="background: rgba(124, 58, 237, 0.08); color: #7c3aed; border: 1px solid rgba(124, 58, 237, 0.15);"><i class="fas fa-cubes"></i> Enterprise Deployment</div>
+            <h1 class="ai-hero-title">
+                AI ROI Solutions<br><span>Enterprise Framework</span>
+            </h1>
+            <p class="ai-hero-subtitle">
+                A robust, metadata-driven architecture designed to bridge the gap between database pipelines and production AI models. The framework enables you to construct secure custom RAG indexes, deploy fine-tuning pipelines, and automate action loops under strict enterprise governance rules.
+            </p>
+            <div class="ai-hero-ctas" style="margin-top: 30px;">
+                <a href="javascript:void(0);" onclick="openLeadModal('Hero CTA: AI ROI Framework');" class="btn btn-primary btn-glow" style="background: linear-gradient(135deg, #7c3aed, #a855f7); border: none;">Request Demo <i class="fas fa-play-circle" style="margin-left: 6px;"></i></a>
+                <a href="#under-the-hood" class="btn btn-secondary">Explore Architecture</a>
+            </div>
+        </div>
+        <div class="ai-hero-visual">
+            <div class="ai-vis-container" style="border-color: rgba(124, 58, 237, 0.15);">
+                <div class="ai-core-node" style="background: linear-gradient(135deg, #7c3aed, #a855f7); color: white;">
+                    <i class="fas fa-cubes"></i>
+                </div>
+                <div class="ai-orbit-circle orbit-1" style="border-color: rgba(124, 58, 237, 0.15);"></div>
+                <div class="ai-orbit-circle orbit-2" style="border-color: rgba(124, 58, 237, 0.10);"></div>
+                <div class="ai-satellite node-a" style="background: rgba(124, 58, 237, 0.1); border-color: #7c3aed; color: #7c3aed;"><i class="fas fa-sitemap"></i></div>
+                <div class="ai-satellite node-b" style="background: rgba(124, 58, 237, 0.1); border-color: #7c3aed; color: #7c3aed;"><i class="fas fa-robot"></i></div>
+                <div class="ai-satellite node-c" style="background: rgba(124, 58, 237, 0.1); border-color: #7c3aed; color: #7c3aed;"><i class="fas fa-shield"></i></div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block ai_content %}
+<!-- Functional Offerings Grid -->
+<section class="ai-section" style="border-top: 1px solid var(--border-color); padding: 80px 0;">
+    <div class="container">
+        <div class="ai-section-header text-center" style="margin-bottom: 50px;">
+            <span class="ai-subtitle" style="color: #7c3aed;">Capabilities</span>
+            <h2 class="ai-title">Framework <span>Features</span></h2>
+            <p class="ai-desc">End-to-end orchestration and deployment blocks configured specifically for enterprise database stacks.</p>
+        </div>
+
+        <div class="ai-card-grid grid-3">
+            <div class="ai-card" style="background: white; border-radius: 16px; padding: 35px; box-shadow: var(--card-shadow);">
+                <div class="ai-card-icon" style="background: rgba(124, 58, 237, 0.05); color: #7c3aed; width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                    <i class="fas fa-search" style="font-size: 20px;"></i>
+                </div>
+                <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 12px;">Custom RAG Indexes</h3>
+                <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0;">
+                    Construct rich semantic indexes and vector store structures to connect local databases directly to generative search engines safely.
+                </p>
+            </div>
+
+            <div class="ai-card" style="background: white; border-radius: 16px; padding: 35px; box-shadow: var(--card-shadow);">
+                <div class="ai-card-icon" style="background: rgba(124, 58, 237, 0.05); color: #7c3aed; width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                    <i class="fas fa-arrows-spin" style="font-size: 20px;"></i>
+                </div>
+                <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 12px;">Model Fine-Tuning</h3>
+                <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0;">
+                    Custom training blocks and pipelines to fine-tune open source models (like Llama or Mistral) on proprietary manuals and catalog metadata.
+                </p>
+            </div>
+
+            <div class="ai-card" style="background: white; border-radius: 16px; padding: 35px; box-shadow: var(--card-shadow);">
+                <div class="ai-card-icon" style="background: rgba(124, 58, 237, 0.05); color: #7c3aed; width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                    <i class="fas fa-shield" style="font-size: 20px;"></i>
+                </div>
+                <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 12px;">Data Lineage & Security</h3>
+                <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0;">
+                    Complete verification trails. Sniff and trace training data dependencies automatically to remain compliant with privacy guidelines.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Under the Hood / MAAC Section -->
+<section class="ai-section section-alt" id="under-the-hood" style="padding: 80px 0;">
+    <div class="container">
+        <div class="maac-catalyst-block">
+            <!-- Subtle background grid effect -->
+            <div style="position: absolute; inset: 0; opacity: 0.03; background-image: radial-gradient(circle, #ffffff 1.5px, transparent 1.5px); background-size: 24px 24px;"></div>
+            
+            <div class="maac-grid">
+                <div style="position: relative; z-index: 2;">
+                    <span class="ai-subtitle" style="color: #a855f7; margin-bottom: 10px; display: inline-block;">Orchestration Layer</span>
+                    <h2 style="font-size: 36px; font-weight: 800; font-family: var(--font-heading); margin-bottom: 20px; line-height: 1.2;">
+                        The Framework Runs on <span style="background: linear-gradient(135deg, #a855f7, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">MAAC Catalyst</span>
+                    </h2>
+                    <p style="font-size: 15.5px; line-height: 1.65; color: #cbd5e1; margin-bottom: 30px;">
+                        MAAC (Master Agent and App Catalog) is a metadata-driven orchestration framework that acts as the control plane. It coordinates execution pipelines, manages model memory, schedules action loops, and enforces role permission rules across multi-system database links.
+                    </p>
+                    <a href="javascript:void(0);" onclick="openLeadModal('MAAC Architecture Briefing');" class="btn btn-primary" style="background: #a855f7; border: none; font-weight: 700; padding: 14px 28px; border-radius: 12px;">
+                        Request Architecture Briefing <i class="fas fa-file-pdf" style="margin-left: 6px;"></i>
+                    </a>
+                </div>
+
+                <div class="maac-stats-grid" style="position: relative; z-index: 2;">
+                    <div class="maac-stat-card">
+                        <div class="maac-stat-val">1 Day</div>
+                        <div class="maac-stat-lbl">Ingestion Setup</div>
+                    </div>
+                    <div class="maac-stat-card">
+                        <div class="maac-stat-val">Pre-built</div>
+                        <div class="maac-stat-lbl">Database Connectors</div>
+                    </div>
+                    <div class="maac-stat-card">
+                        <div class="maac-stat-val">Days</div>
+                        <div class="maac-stat-lbl">Custom Workflows</div>
+                    </div>
+                    <div class="maac-stat-card">
+                        <div class="maac-stat-val">Governed</div>
+                        <div class="maac-stat-lbl">Active Compliance</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Payback metrics -->
+<section class="ai-section" style="padding: 80px 0;">
+    <div class="container">
+        <div class="ai-section-header text-center" style="margin-bottom: 60px;">
+            <span class="ai-subtitle" style="color: #7c3aed;">Value Realization</span>
+            <h2 class="ai-title">Key <span>Performance Targets</span></h2>
+            <p class="ai-desc">Expected ROI timeline and savings metrics built on historical deployment footprints.</p>
+        </div>
+
+        <div class="ai-card-grid grid-3">
+            <div class="ai-card text-center" style="background: white; border-radius: 16px; padding: 45px 35px; box-shadow: var(--card-shadow); border-top: 4px solid #7c3aed;">
+                <div style="font-size: 48px; font-weight: 800; color: #7c3aed; font-family: var(--font-heading); margin-bottom: 8px;">8-16</div>
+                <div style="font-size: 12px; font-weight: 700; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px;">Weeks Setup</div>
+                <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0;">Average timeline to deploy fully customized neural models and RAG data loops into production environments.</p>
+            </div>
+
+            <div class="ai-card text-center" style="background: white; border-radius: 16px; padding: 45px 35px; box-shadow: var(--card-shadow); border-top: 4px solid #7c3aed;">
+                <div style="font-size: 48px; font-weight: 800; color: #7c3aed; font-family: var(--font-heading); margin-bottom: 8px;">~25%</div>
+                <div style="font-size: 12px; font-weight: 700; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px;">Infra Savings</div>
+                <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0;">Average reduction in total data catalog maintenance and model hosting overheads across cloud systems.</p>
+            </div>
+
+            <div class="ai-card text-center" style="background: white; border-radius: 16px; padding: 45px 35px; box-shadow: var(--card-shadow); border-top: 4px solid #7c3aed;">
+                <div style="font-size: 48px; font-weight: 800; color: #7c3aed; font-family: var(--font-heading); margin-bottom: 8px;">&lt;12</div>
+                <div style="font-size: 12px; font-weight: 700; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px;">Months Payback</div>
+                <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0;">Average period to recoup model setup and custom indexing costs via verified operational cost reductions.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Outcome CTA section -->
+<section class="ai-bottom-cta" style="background: linear-gradient(135deg, #7c3aed, #a855f7); padding: 80px 0; text-align: center; color: white;">
+    <div class="container" style="max-width: 700px; margin: 0 auto;">
+        <h2 class="ai-title" style="color: white; margin-bottom: 20px;">We Win When You Win. <span>Not Before.</span></h2>
+        <p style="color: rgba(255,255,255,0.9); font-size: 16px; line-height: 1.6; margin-bottom: 30px;">
+            Our engagement frameworks are outcome-linked. Start with a structured data maturity assessment to identify pipeline integration check-points.
+        </p>
+        <a href="javascript:void(0);" onclick="openLeadModal('AI ROI Framework Bottom CTA');" class="btn btn-primary btn-glow" style="background: white; color: #7c3aed; border-color: white;">Schedule Platform Assessment <i class="fas fa-arrow-right" style="margin-left: 8px;"></i></a>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}{{ data.title }}{% endblock %}
+
+{% block content %}
+<!-- Detail Hero -->
+<section class="hero" style="min-height: 60vh; padding-top: calc(var(--nav-height) + 60px); padding-bottom: 60px;">
+    <div class="hero-bg-glow hero-glow-1"></div>
+    <div class="container hero-grid" style="grid-template-columns: 1.2fr 0.8fr;">
+        <div class="hero-content">
+            <div class="hero-badge"><i class="fas fa-handshake"></i> Strategic Partners</div>
+            <h1 class="hero-title" style="font-size: 48px;">
+                {{ data.title }}
+            </h1>
+            <p class="hero-desc">
+                {{ data.tagline }}
+            </p>
+            <div class="hero-buttons">
+                <a href="/contact-us" class="btn btn-primary btn-glow">Consult Partner Architect <i class="fas fa-chevron-right btn-icon"></i></a>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="ai-graphic-container" style="max-width: 300px; height: 300px;">
+                <div class="ai-node-circle circle-lg"></div>
+                <div class="ai-core" style="width: 80px; height: 80px; background: var(--grad-primary);">
+                    <i class="{% if data.icon_type %}{{ data.icon_type }}{% else %}fas{% endif %} fa-{{ data.icon }}" style="font-size: 28px;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Highlights & Partnership Strengths -->
+<section class="section-alt" id="partner-highlights">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-subtitle">Integration Details</span>
+            <h2 class="section-title">Ecosystem <span>Highlights</span></h2>
+            <p class="section-desc">{{ data.description }}</p>
+        </div>
+        
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));">
+            {% for highlight in data.highlights %}
+            <div class="card">
+                <div class="card-icon-box">
+                    <i class="fas fa-star" style="animation: pulseGlow 1.5s infinite;"></i>
+                </div>
+                <h3 class="card-title">Key Strength</h3>
+                <p class="card-desc" style="font-size: 16px; color: var(--text-primary);">{{ highlight }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Joint Value Proposition -->
+<section class="section" id="partner-joint-value">
+    <div class="container feature-split">
+        <div class="feature-content">
+            <div class="hero-badge"><i class="fas fa-cubes"></i> Joint Solution</div>
+            <h2 class="feature-title">Transforming Data landscapes Together</h2>
+            <p class="feature-desc">Artha Solutions integrates natively with our technology partners to deliver robust, governed, and scalable solutions for data pipelines and active analytics.</p>
+            <p class="feature-desc">We automate conversions, optimize storage layouts, and verify governance standards dynamically across multi-cloud environments.</p>
+            <a href="/contact-us" class="btn btn-primary btn-glow">Consult Partner Architect</a>
+        </div>
+        <div class="feature-visual feature-visual-glow">
+            <img src="https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=800&q=80" alt="Consultants collaborating on dynamic digital product strategy dashboards">
+        </div>
+    </div>
+</section>
+
+<!-- Bottom Banner -->
+<section class="section-alt" style="text-align: center;">
+    <div class="container">
+        <h2 class="section-title">Initiate Your <span>Integration Journey</span></h2>
+        <p class="section-desc" style="max-width: 600px; margin: 0 auto 30px;">Artha Solutions helps you deploy, clean, and govern partner software systems at up to 40% savings.</p>
+        <a href="/contact-us" class="btn btn-primary btn-glow">Request a Joint Solution Demo</a>
+    </div>
+</section>
+{% endblock %}

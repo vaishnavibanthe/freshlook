@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Client Placements & Staffing Solutions{% endblock %}
+
+{% block content %}
+<!-- Subpage Spacer -->
+<div style="height: var(--nav-height); background-color: var(--bg-secondary);"></div>
+
+<section class="hero" style="min-height: 50vh; padding-top: 60px; padding-bottom: 60px;">
+    <div class="hero-bg-glow hero-glow-1"></div>
+    <div class="container hero-grid" style="grid-template-columns: 1.2fr 0.8fr;">
+        <div class="hero-content">
+            <div class="hero-badge"><i class="fas fa-handshake"></i> Staffing Services</div>
+            <h1 class="hero-title" style="font-size: 48px;">
+                Client Staffing <span>& Placements</span>
+            </h1>
+            <p class="hero-desc">
+                Artha Solutions matches certified data integration developers, database administrators, and technical PMs with global enterprises. Accelerate your delivery centers with our pre-vetted specialists.
+            </p>
+            <div class="hero-buttons">
+                <a href="/contact-us" class="btn btn-primary btn-glow">Request Staffing Support</a>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="ai-graphic-container" style="max-width: 260px; height: 260px;">
+                <div class="ai-node-circle circle-sm"></div>
+                <div class="ai-core" style="width: 70px; height: 70px; background: var(--grad-primary);">
+                    <i class="fas fa-users-gear" style="font-size: 22px;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Placements Overview Section -->
+<section class="section-alt" id="staffing-pillars">
+    <div class="container">
+        <div class="section-header" style="margin-bottom: 50px;">
+            <span class="section-subtitle">Our Delivery Models</span>
+            <h2 class="section-title">Flexible Technical <span>Sourcing</span></h2>
+            <p class="section-desc">We offer flexible engagement models to support software engineering, Talend mapping, database tuning, and cloud migrations.</p>
+        </div>
+        
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));">
+            <!-- Pillar 1 -->
+            <div class="card">
+                <div class="card-icon-box"><i class="fas fa-people-arrows"></i></div>
+                <h3 class="card-title">Contract Staffing</h3>
+                <p class="card-desc">Scale your engineering pipelines dynamically. We supply certified Talend developers and database admins for short-term and project-based sprints.</p>
+            </div>
+            
+            <!-- Pillar 2 -->
+            <div class="card">
+                <div class="card-icon-box"><i class="fas fa-user-tie"></i></div>
+                <h3 class="card-title">Direct Placements</h3>
+                <p class="card-desc">Find permanent technical leaders. We leverage our global network to source senior database architects, AI practitioners, and delivery directors.</p>
+            </div>
+            
+            <!-- Pillar 3 -->
+            <div class="card">
+                <div class="card-icon-box"><i class="fas fa-globe-asia"></i></div>
+                <h3 class="card-title">Offshore Delivery Centers</h3>
+                <p class="card-desc">Optimize operating overheads. Set up dedicated delivery teams in our India or ASEAN offices, managed by senior onshore PMs.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Client Trust Banner -->
+<section class="section" style="background: var(--grad-glow); text-align: center;">
+    <div class="container">
+        <h2 class="section-title">Trusted by <span>Fortune 500 Networks</span></h2>
+        <p class="section-desc" style="max-width: 600px; margin: 0 auto 30px;">Our staffing pool comprises over 300+ certified specialists across North America, Europe, and Asia.</p>
+        <a href="/contact-us" class="btn btn-primary btn-glow">Talk to a Placement Coordinator</a>
+    </div>
+</section>
+{% endblock %}

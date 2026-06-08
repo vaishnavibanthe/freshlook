@@ -1,0 +1,309 @@
+{% extends "retail_base.html" %}
+
+{% block retail_hero %}
+<!-- Hero Section -->
+<section class="retail-hero">
+    <div class="retail-hero-glow"></div>
+    <div class="container retail-hero-grid" style="grid-template-columns: 1fr;">
+        <div class="retail-hero-content text-center" style="max-width: 800px; margin: 0 auto;">
+            <span class="retail-badge"><i class="fas fa-shopping-bag"></i> {{ page.title or 'Retail Case Studies' }}</span>
+            <h1 class="retail-hero-title">
+                {{ page.hero_title or 'Retail Case Studies & Success Stories' }}
+            </h1>
+            <p class="retail-hero-subtitle" style="margin-bottom: 30px;">
+                {{ page.hero_subtitle or 'Discover how Artha Solutions helps retailers, consumer brands, and distributors modernize data foundations, improve Customer 360, and build AI-ready architectures.' }}
+            </p>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block retail_content %}
+<!-- Case Studies Grid Section -->
+<section class="retail-section section-alt" style="background-color: #fafafa;">
+    <div class="container">
+        
+        <!-- Retail Outcomes Dashboard -->
+        <div class="retail-dashboard-banner" style="background: white; border: 1px solid var(--border-color); border-radius: 12px; padding: 25px; margin-bottom: 35px; box-shadow: 0 4px 20px rgba(0,0,0,0.015); display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px;">
+            <div style="text-align: center; border-right: 1px solid var(--border-color); padding-right: 10px;">
+                <div style="font-size: 32px; font-weight: 800; color: var(--retail-color); margin-bottom: 6px;">94%</div>
+                <h4 style="font-size: 13px; font-weight: 700; color: var(--text-color); margin: 0 0 4px 0;">Duplicate Profile Reduction</h4>
+                <p style="font-size: 11.5px; color: var(--text-secondary); margin: 0; line-height: 1.3;">Customer 360 golden record consolidation</p>
+            </div>
+            <div style="text-align: center; border-right: 1px solid var(--border-color); padding-right: 10px;">
+                <div style="font-size: 32px; font-weight: 800; color: var(--retail-color); margin-bottom: 6px;">85%</div>
+                <h4 style="font-size: 13px; font-weight: 700; color: var(--text-color); margin: 0 0 4px 0;">Faster Product Onboarding</h4>
+                <p style="font-size: 11.5px; color: var(--text-secondary); margin: 0; line-height: 1.3;">SKU master data catalog harmonization</p>
+            </div>
+            <div style="text-align: center; border-right: 1px solid var(--border-color); padding-right: 10px;">
+                <div style="font-size: 32px; font-weight: 800; color: var(--retail-color); margin-bottom: 6px;">99.8%</div>
+                <h4 style="font-size: 13px; font-weight: 700; color: var(--text-color); margin: 0 0 4px 0;">Inventory Sync Accuracy</h4>
+                <p style="font-size: 11.5px; color: var(--text-secondary); margin: 0; line-height: 1.3;">Near-real-time CDC inventory pipelines</p>
+            </div>
+            <div style="text-align: center; padding-right: 10px;">
+                <div style="font-size: 32px; font-weight: 800; color: var(--retail-color); margin-bottom: 6px;">$12M+</div>
+                <h4 style="font-size: 13px; font-weight: 700; color: var(--text-color); margin: 0 0 4px 0;">Optimized Procurement Spend</h4>
+                <p style="font-size: 11.5px; color: var(--text-secondary); margin: 0; line-height: 1.3;">Supplier master record de-duplication</p>
+            </div>
+        </div>
+        
+        <div class="retail-card-grid grid-3">
+            {% if case_studies %}
+                {% for study in case_studies %}
+                <div class="retail-card case-study-card" style="background: white; border: 1px solid var(--border-color); border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; height: 100%; transition: transform 0.3s, box-shadow 0.3s; padding: 0;">
+                    {% if study.thumbnail_path %}
+                    <img src="{{ study.thumbnail_path }}" alt="{{ study.title }}" style="width: 100%; height: 200px; object-fit: cover;">
+                    {% else %}
+                    <div class="card-image-placeholder-retail" style="height: 200px; background: linear-gradient(135deg, var(--retail-color), var(--retail-dark)); display: flex; align-items: center; justify-content: center; color: white; font-size: 40px;">
+                        <i class="fas fa-shopping-bag"></i>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="card-content" style="padding: 25px; display: flex; flex-direction: column; flex-grow: 1;">
+                        <span class="case-study-tag" style="background: var(--retail-light); color: var(--retail-dark); border: 1px solid var(--retail-border); padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; text-transform: uppercase; align-self: flex-start; margin-bottom: 12px;">
+                            {{ study.industry or 'Retail' }}
+                        </span>
+                        <h3 class="card-title" style="font-size: 18px; margin: 0 0 12px 0; line-height: 1.4; color: var(--text-color); font-weight: 700;">{{ study.title }}</h3>
+                        <p class="card-desc" style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 20px; font-weight: 300;">
+                            {{ study.card_summary or study.solution_summary or 'Learn how Artha deployed a modern retail database, resolved duplicate profiles, and established clean sync models.' }}
+                        </p>
+                        
+                        <!-- Tech Stack Badges -->
+                        {% if study.technologies %}
+                        <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; align-items: center;">
+                            {% set tech_list = study.technologies.split(',') %}
+                            {% for tech in tech_list[:4] %}
+                                {% if tech.strip() %}
+                                <span style="font-size: 10.5px; font-weight: 700; background: var(--retail-light); color: var(--retail-dark); border: 1px solid var(--retail-border); padding: 3px 10px; border-radius: 20px;">{{ tech.strip() }}</span>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        {% if study.key_metrics %}
+                        {% set study_metrics = load_json_helper(study.key_metrics) %}
+                        {% if study_metrics and study_metrics|length > 0 %}
+                        <div class="study-metrics" style="margin-top: auto; padding-top: 15px; border-top: 1px solid var(--border-color); margin-bottom: 20px; font-size: 13px; color: var(--retail-dark); font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-chart-line" style="color: var(--retail-color);"></i> 
+                            <span><strong>{{ study_metrics[0].value }}</strong> {{ study_metrics[0].label }}</span>
+                        </div>
+                        {% endif %}
+                        {% endif %}
+                        
+                        <div style="margin-top: auto; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;">
+                            <a href="/case-studies/{{ study.slug }}" class="btn btn-outline btn-sm" style="flex-grow: 1; text-align: center; text-decoration: none; border-color: #d1d5db; color: var(--text-secondary);">Read Case Study</a>
+                            {% if study.pdf_file_path %}
+                            <button onclick="openLeadModal('Download Case Study: {{ study.title }}');" class="btn btn-primary btn-sm" style="background-color: var(--retail-color); border-color: var(--retail-color);">
+                                <i class="fas fa-download"></i> PDF
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <!-- Fallback Placeholders -->
+                <!-- 1. Customer 360 -->
+                <div class="retail-card case-study-card" style="background: white; border: 1px solid var(--border-color); border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; height: 100%; transition: transform 0.3s, box-shadow 0.3s; padding: 0;">
+                    <div class="card-image-placeholder-retail" style="height: 180px; background: linear-gradient(135deg, var(--retail-color), var(--retail-dark));">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="card-content" style="padding: 25px; display: flex; flex-direction: column; flex-grow: 1;">
+                        <span class="case-study-tag" style="background: var(--retail-light); color: var(--retail-dark); border: 1px solid var(--retail-border); padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; text-transform: uppercase; align-self: flex-start; margin-bottom: 12px;">Customer 360</span>
+                        <h3 class="card-title" style="font-size: 17px; margin: 0 0 12px 0; line-height: 1.4; color: var(--text-color); font-weight: 700;">Customer 360 Integration for Omnichannel Retail</h3>
+                        <p class="card-desc" style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 20px; font-weight: 300;">
+                            Consolidated profile records across POS, e-commerce, and loyalty systems, reducing duplicate profiles and boosting campaign CTR.
+                        </p>
+                        <div class="study-metrics" style="margin-top: auto; padding-top: 15px; border-top: 1px solid var(--border-color); margin-bottom: 20px; font-size: 13.5px; color: var(--retail-dark); font-weight: 600;">
+                            <i class="fas fa-chart-line"></i> 94% duplicate profile reduction
+                        </div>
+                        <div style="margin-top: auto;">
+                            <button onclick="openLeadModal('Request Case Study: Retail Customer 360');" class="btn btn-primary btn-block" style="width: 100%; background-color: var(--retail-color); border-color: var(--retail-color);">
+                                Request Case Study Details <i class="fas fa-download btn-icon"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Product 360 -->
+                <div class="retail-card case-study-card" style="background: white; border: 1px solid var(--border-color); border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; height: 100%; transition: transform 0.3s, box-shadow 0.3s; padding: 0;">
+                    <div class="card-image-placeholder-retail" style="height: 180px; background: linear-gradient(135deg, var(--retail-color), var(--retail-dark));">
+                        <i class="fas fa-barcode"></i>
+                    </div>
+                    <div class="card-content" style="padding: 25px; display: flex; flex-direction: column; flex-grow: 1;">
+                        <span class="case-study-tag" style="background: var(--retail-light); color: var(--retail-dark); border: 1px solid var(--retail-border); padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; text-transform: uppercase; align-self: flex-start; margin-bottom: 12px;">Product 360</span>
+                        <h3 class="card-title" style="font-size: 17px; margin: 0 0 12px 0; line-height: 1.4; color: var(--text-color); font-weight: 700;">SKU Master Data & Product Onboarding Modernization</h3>
+                        <p class="card-desc" style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 20px; font-weight: 300;">
+                            Harmonized 1.5M SKU records across disparate databases, reducing product setup time and accelerating online channel launches.
+                        </p>
+                        <div class="study-metrics" style="margin-top: auto; padding-top: 15px; border-top: 1px solid var(--border-color); margin-bottom: 20px; font-size: 13.5px; color: var(--retail-dark); font-weight: 600;">
+                            <i class="fas fa-chart-line"></i> 85% faster product onboarding
+                        </div>
+                        <div style="margin-top: auto;">
+                            <button onclick="openLeadModal('Request Case Study: Retail Product 360');" class="btn btn-primary btn-block" style="width: 100%; background-color: var(--retail-color); border-color: var(--retail-color);">
+                                Request Case Study Details <i class="fas fa-download btn-icon"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Supplier 360 -->
+                <div class="retail-card case-study-card" style="background: white; border: 1px solid var(--border-color); border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; height: 100%; transition: transform 0.3s, box-shadow 0.3s; padding: 0;">
+                    <div class="card-image-placeholder-retail" style="height: 180px; background: linear-gradient(135deg, var(--retail-color), var(--retail-dark));">
+                        <i class="fas fa-truck"></i>
+                    </div>
+                    <div class="card-content" style="padding: 25px; display: flex; flex-direction: column; flex-grow: 1;">
+                        <span class="case-study-tag" style="background: var(--retail-light); color: var(--retail-dark); border: 1px solid var(--retail-border); padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; text-transform: uppercase; align-self: flex-start; margin-bottom: 12px;">Supplier 360</span>
+                        <h3 class="card-title" style="font-size: 17px; margin: 0 0 12px 0; line-height: 1.4; color: var(--text-color); font-weight: 700;">Supplier Data Quality & Spend Visibility for Global Brand</h3>
+                        <p class="card-desc" style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 20px; font-weight: 300;">
+                            Deduplicated vendor records across multiple operational units to create a single supplier master catalog, identifying volume discount opportunities.
+                        </p>
+                        <div class="study-metrics" style="margin-top: auto; padding-top: 15px; border-top: 1px solid var(--border-color); margin-bottom: 20px; font-size: 13.5px; color: var(--retail-dark); font-weight: 600;">
+                            <i class="fas fa-chart-line"></i> $12M optimized procurement spend
+                        </div>
+                        <div style="margin-top: auto;">
+                            <button onclick="openLeadModal('Request Case Study: Retail Supplier 360');" class="btn btn-primary btn-block" style="width: 100%; background-color: var(--retail-color); border-color: var(--retail-color);">
+                                Request Case Study Details <i class="fas fa-download btn-icon"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Operational Resilience -->
+                <div class="retail-card case-study-card" style="background: white; border: 1px solid var(--border-color); border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; height: 100%; transition: transform 0.3s, box-shadow 0.3s; padding: 0;">
+                    <div class="card-image-placeholder-retail" style="height: 180px; background: linear-gradient(135deg, var(--retail-color), var(--retail-dark));">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="card-content" style="padding: 25px; display: flex; flex-direction: column; flex-grow: 1;">
+                        <span class="case-study-tag" style="background: var(--retail-light); color: var(--retail-dark); border: 1px solid var(--retail-border); padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; text-transform: uppercase; align-self: flex-start; margin-bottom: 12px;">Real-Time Inventory</span>
+                        <h3 class="card-title" style="font-size: 17px; margin: 0 0 12px 0; line-height: 1.4; color: var(--text-color); font-weight: 700;">Real-Time Inventory Analytics & CDC Pipeline</h3>
+                        <p class="card-desc" style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 20px; font-weight: 300;">
+                            Built a near-real-time CDC sync pipeline linking regional warehouses with web marketplaces to cut order cancellation rates.
+                        </p>
+                        <div class="study-metrics" style="margin-top: auto; padding-top: 15px; border-top: 1px solid var(--border-color); margin-bottom: 20px; font-size: 13.5px; color: var(--retail-dark); font-weight: 600;">
+                            <i class="fas fa-chart-line"></i> 99.8% inventory sync accuracy
+                        </div>
+                        <div style="margin-top: auto;">
+                            <button onclick="openLeadModal('Request Case Study: Retail Inventory CDC');" class="btn btn-primary btn-block" style="width: 100%; background-color: var(--retail-color); border-color: var(--retail-color);">
+                                Request Case Study Details <i class="fas fa-download btn-icon"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. Risk Compliance & ESG -->
+                <div class="retail-card case-study-card" style="background: white; border: 1px solid var(--border-color); border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; height: 100%; transition: transform 0.3s, box-shadow 0.3s; padding: 0;">
+                    <div class="card-image-placeholder-retail" style="height: 180px; background: linear-gradient(135deg, var(--retail-color), var(--retail-dark));">
+                        <i class="fas fa-leaf"></i>
+                    </div>
+                    <div class="card-content" style="padding: 25px; display: flex; flex-direction: column; flex-grow: 1;">
+                        <span class="case-study-tag" style="background: var(--retail-light); color: var(--retail-dark); border: 1px solid var(--retail-border); padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; text-transform: uppercase; align-self: flex-start; margin-bottom: 12px;">ESG Data Hub</span>
+                        <h3 class="card-title" style="font-size: 17px; margin: 0 0 12px 0; line-height: 1.4; color: var(--text-color); font-weight: 700;">ESG Data Hub and Sustainability Reporting for Retailer</h3>
+                        <p class="card-desc" style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 20px; font-weight: 300;">
+                            Compiled supply chain emission logs and vendor certification documents into a structured ESG data hub, automating compliance reporting.
+                        </p>
+                        <div class="study-metrics" style="margin-top: auto; padding-top: 15px; border-top: 1px solid var(--border-color); margin-bottom: 20px; font-size: 13.5px; color: var(--retail-dark); font-weight: 600;">
+                            <i class="fas fa-chart-line"></i> 100% automated carbon emissions audits
+                        </div>
+                        <div style="margin-top: auto;">
+                            <button onclick="openLeadModal('Request Case Study: Retail ESG Data Hub');" class="btn btn-primary btn-block" style="width: 100%; background-color: var(--retail-color); border-color: var(--retail-color);">
+                                Request Case Study Details <i class="fas fa-download btn-icon"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. Retail M&A Data Integration -->
+                <div class="retail-card case-study-card" style="background: white; border: 1px solid var(--border-color); border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; height: 100%; transition: transform 0.3s, box-shadow 0.3s; padding: 0;">
+                    <div class="card-image-placeholder-retail" style="height: 180px; background: linear-gradient(135deg, var(--retail-color), var(--retail-dark));">
+                        <i class="fas fa-shuffle"></i>
+                    </div>
+                    <div class="card-content" style="padding: 25px; display: flex; flex-direction: column; flex-grow: 1;">
+                        <span class="case-study-tag" style="background: var(--retail-light); color: var(--retail-dark); border: 1px solid var(--retail-border); padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; text-transform: uppercase; align-self: flex-start; margin-bottom: 12px;">M&A Integration</span>
+                        <h3 class="card-title" style="font-size: 17px; margin: 0 0 12px 0; line-height: 1.4; color: var(--text-color); font-weight: 700;">Retail M&A Integration and ETL Modernization</h3>
+                        <p class="card-desc" style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 20px; font-weight: 300;">
+                            Designed post-merger database mapping templates and cloud ELT sync lines to consolidate legacy POS databases under strict access boundaries.
+                        </p>
+                        <div class="study-metrics" style="margin-top: auto; padding-top: 15px; border-top: 1px solid var(--border-color); margin-bottom: 20px; font-size: 13.5px; color: var(--retail-dark); font-weight: 600;">
+                            <i class="fas fa-chart-line"></i> 60% lower post-merger integration costs
+                        </div>
+                        <div style="margin-top: auto;">
+                            <button onclick="openLeadModal('Request Case Study: Retail M&A Integration');" class="btn btn-primary btn-block" style="width: 100%; background-color: var(--retail-color); border-color: var(--retail-color);">
+                                Request Case Study Details <i class="fas fa-download btn-icon"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- FAQs Section -->
+<section class="retail-section">
+    <div class="container">
+        <div class="retail-section-header text-center">
+            <span class="retail-subtitle">FAQ</span>
+            <h2 class="retail-title">Frequently Asked Questions</h2>
+            <p class="retail-desc">Common questions on downloading and accessing our case studies.</p>
+        </div>
+
+        <div class="faq-accordion-container" style="max-width: 800px; margin: 0 auto;">
+            <div class="faq-accordion-item" style="border-bottom: 1px solid #e5e7eb; padding: 15px 0;">
+                <button class="faq-accordion-trigger" onclick="toggleFaqAccordion(this)" style="width: 100%; display: flex; justify-content: space-between; align-items: center; background: none; border: none; text-align: left; font-size: 16.5px; font-weight: 600; color: var(--text-primary); cursor: pointer; padding: 10px 0;">
+                    How can I access the full PDF case studies? <i class="fas fa-plus icon-plus" style="font-size: 14px; color: #9ca3af;"></i>
+                </button>
+                <div class="faq-accordion-panel" style="max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out, padding 0.3s ease-out; padding: 0 10px;">
+                    <p style="font-size: 14.5px; line-height: 1.6; color: var(--text-secondary); font-weight: 300; padding-top: 10px; margin: 0;">To request detailed architecture blueprints or official case study files, click "Request Case Study Details" or "PDF" buttons, enter your official B2B company email, and an access link will be emailed to you immediately.</p>
+                </div>
+            </div>
+            
+            <div class="faq-accordion-item" style="border-bottom: 1px solid #e5e7eb; padding: 15px 0;">
+                <button class="faq-accordion-trigger" onclick="toggleFaqAccordion(this)" style="width: 100%; display: flex; justify-content: space-between; align-items: center; background: none; border: none; text-align: left; font-size: 16.5px; font-weight: 600; color: var(--text-primary); cursor: pointer; padding: 10px 0;">
+                    Can I share these case studies with my team? <i class="fas fa-plus icon-plus" style="font-size: 14px; color: #9ca3af;"></i>
+                </button>
+                <div class="faq-accordion-panel" style="max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out, padding 0.3s ease-out; padding: 0 10px;">
+                    <p style="font-size: 14.5px; line-height: 1.6; color: var(--text-secondary); font-weight: 300; padding-top: 10px; margin: 0;">Yes. The downloadable PDF documents are formatted for enterprise distribution and can be shared internally for analysis and vendor evaluation.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Bottom CTA Section -->
+<section class="retail-bottom-cta">
+    <div class="container text-center">
+        <h2 class="cta-title">Want to Benchmark Your Retail Data Performance?</h2>
+        <p class="cta-subtitle">Our team can perform a Data Readiness Assessment to evaluate your core sync, MDM matching rates, and governance compliance levels.</p>
+        <div class="cta-actions" style="justify-content: center;">
+            <button onclick="openLeadModal('Bottom Case Studies CTA');" class="btn btn-primary btn-lg btn-glow">
+                Request a Data Readiness Assessment
+            </button>
+        </div>
+    </div>
+</section>
+
+<script>
+    // Toggle FAQ Accordion
+    function toggleFaqAccordion(btn) {
+        btn.classList.toggle('active');
+        const icon = btn.querySelector('i');
+        if (btn.classList.contains('active')) {
+            icon.classList.remove('fa-plus');
+            icon.classList.add('fa-minus');
+        } else {
+            icon.classList.remove('fa-minus');
+            icon.classList.add('fa-plus');
+        }
+        
+        const panel = btn.nextElementSibling;
+        if (panel.style.maxHeight && panel.style.maxHeight !== '0px') {
+            panel.style.maxHeight = '0px';
+            panel.style.padding = '0 10px';
+        } else {
+            panel.style.maxHeight = panel.scrollHeight + "px";
+            panel.style.padding = '10px 10px';
+        }
+    }
+</script>
+{% endblock %}

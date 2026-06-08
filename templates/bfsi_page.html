@@ -1,0 +1,323 @@
+{% extends "bfsi_base.html" %}
+
+{% block bfsi_hero %}
+<!-- Hero Section -->
+<section class="bfsi-hero">
+    <div class="bfsi-hero-glow"></div>
+    <div class="container bfsi-hero-grid">
+        <div class="bfsi-hero-content">
+            <span class="bfsi-badge"><i class="fas fa-landmark"></i> {{ page.title }}</span>
+            <h1 class="bfsi-hero-title">
+                {{ page.hero_title }}
+            </h1>
+            <p class="bfsi-hero-subtitle">
+                {{ page.hero_subtitle }}
+            </p>
+            
+            <div class="bfsi-hero-ctas">
+                <button onclick="openLeadModal('{{ page.title }} Hero CTA');" class="btn btn-primary btn-lg">
+                    {{ cta.primary_cta_text or 'Talk to a BFSI Data Expert' }} <i class="fas fa-arrow-right btn-icon"></i>
+                </button>
+                {% if cta.secondary_cta_text and cta.secondary_cta_url %}
+                <a href="{{ cta.secondary_cta_url }}" class="btn btn-outline btn-lg" style="border-color: #2563eb; color: #1d4ed8; margin-left: 15px;">
+                    {{ cta.secondary_cta_text }}
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="bfsi-hero-visual">
+            <div class="bfsi-vis-container">
+                <div class="tech-grid-bg"></div>
+                <div class="tech-circle pulsate-slow">
+                    <i class="fas {% if active_subpage == 'banking' %}fa-wallet{% elif active_subpage == 'insurance' %}fa-file-invoice-dollar{% elif active_subpage == 'data-governance-compliance' %}fa-shield-halved{% elif active_subpage == 'mdm-customer-360' %}fa-address-card{% elif active_subpage == 'analytics-risk' %}fa-chart-line{% elif active_subpage == 'ai-readiness' %}fa-brain{% else %}fa-database{% endif %} text-blue"></i>
+                    <div class="tech-ring ring-1"></div>
+                    <div class="tech-ring ring-2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block bfsi_content %}
+<!-- Intro Section -->
+{% if body_sections.intro_p %}
+<section class="bfsi-section" style="padding: 60px 0 20px 0;">
+    <div class="container">
+        <div class="intro-block" style="border-left: 4px solid #2563eb; padding-left: 25px; margin-bottom: 20px;">
+            <p style="font-size: 18px; line-height: 1.7; color: var(--text-primary); font-weight: 300; margin: 0;">
+                {{ body_sections.intro_p }}
+            </p>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Challenge Section -->
+{% if body_sections.challenges %}
+<section class="bfsi-section section-alt">
+    <div class="container">
+        <div class="bfsi-section-header text-center">
+            <span class="bfsi-subtitle">The Challenges</span>
+            <h2 class="bfsi-title">Transformation Bottlenecks & Hurdles</h2>
+            <p class="bfsi-desc">Fragmented platforms, inconsistent validation rules, and manual steps increase compliance risk and hinder analytics delivery.</p>
+        </div>
+        
+        <div class="bfsi-card-grid grid-3">
+            {% for chal in body_sections.challenges %}
+            <div class="bfsi-card challenge-card">
+                <div class="card-icon-circle"><i class="fas fa-triangle-exclamation"></i></div>
+                <h3 class="card-title">{{ chal.title }}</h3>
+                <p class="card-desc">{{ chal.desc }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Solution Areas Section -->
+{% if body_sections.solution_areas %}
+<section class="bfsi-section">
+    <div class="container">
+        <div class="bfsi-section-header text-center">
+            <span class="bfsi-subtitle">Our Solutions</span>
+            <h2 class="bfsi-title">Artha Solutions & Architectures</h2>
+            <p class="bfsi-desc">We build enterprise-grade data platforms to resolve fragmentation, automate pipeline flows, and establish trusted records.</p>
+        </div>
+        
+        <div class="bfsi-card-grid grid-2">
+            {% for sol in body_sections.solution_areas %}
+            <div class="bfsi-card hover-card">
+                <div class="card-icon-circle accent-blue"><i class="fas fa-circle-check"></i></div>
+                <h3 class="card-title">{{ sol.title }}</h3>
+                <p class="card-desc">{{ sol.desc }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Capabilities Section -->
+{% if body_sections.capabilities %}
+<section class="bfsi-section {% if not body_sections.solution_areas %}section-alt{% endif %}">
+    <div class="container">
+        <div class="bfsi-section-header text-center">
+            <span class="bfsi-subtitle">Capabilities</span>
+            <h2 class="bfsi-title">Operational Data Capabilities</h2>
+            <p class="bfsi-desc">Our core capabilities cover the full modern data stack, ensuring robust pipelines, governance catalogs, and analytics delivery.</p>
+        </div>
+        
+        <div class="bfsi-card-grid grid-2">
+            {% for cap in body_sections.capabilities %}
+            <div class="bfsi-card hover-card">
+                <div class="card-icon-circle accent-blue"><i class="fas fa-cogs"></i></div>
+                <h3 class="card-title">{{ cap.title }}</h3>
+                <p class="card-desc">{{ cap.desc }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- AI Features Section (For MDM page specific) -->
+{% if body_sections.ai_features %}
+<section class="bfsi-section">
+    <div class="container">
+        <div class="bfsi-section-header text-center">
+            <span class="bfsi-subtitle">AI & ML Acceleration</span>
+            <h2 class="bfsi-title">AI-Powered MDM Enhancements</h2>
+            <p class="bfsi-desc">Accelerate data stewardship tasks using smart matching recommendations, deduplication heuristics, and automated alerts under human governance.</p>
+        </div>
+        
+        <div class="bfsi-card-grid grid-3">
+            {% for feat in body_sections.ai_features %}
+            <div class="bfsi-card hover-card" style="border-top: 3px solid #8b5cf6;">
+                <div class="card-icon-circle" style="background: #f5f3ff; color: #8b5cf6;"><i class="fas fa-wand-magic-sparkles"></i></div>
+                <h3 class="card-title">{{ feat.title }}</h3>
+                <p class="card-desc">{{ feat.desc }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Governance / Responsible AI Section -->
+{% if body_sections.governance %}
+<section class="bfsi-section section-alt">
+    <div class="container">
+        <div class="bfsi-section-header text-center">
+            <span class="bfsi-subtitle">Governance & Oversight</span>
+            <h2 class="bfsi-title">Data Framework & Stewardship Controls</h2>
+            <p class="bfsi-desc">Ensure complete model input traceability, metadata glossaries, and privacy boundaries under strict oversight frameworks.</p>
+        </div>
+        
+        <div class="bfsi-card-grid grid-3">
+            {% for gov in body_sections.governance %}
+            <div class="bfsi-card hover-card">
+                <div class="card-icon-circle accent-blue"><i class="fas fa-gavel"></i></div>
+                <h3 class="card-title">{{ gov.title }}</h3>
+                <p class="card-desc">{{ gov.desc }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Featured Use Cases Section (For Analytics/AI specific) -->
+{% if body_sections.use_cases %}
+<section class="bfsi-section">
+    <div class="container">
+        <div class="bfsi-section-header text-center">
+            <span class="bfsi-subtitle">Use Cases</span>
+            <h2 class="bfsi-title">Featured Business Scenarios</h2>
+            <p class="bfsi-desc">Real-world applications delivering data validation, credit monitoring, and fraud scoring dashboards for enterprise teams.</p>
+        </div>
+        
+        <div class="bfsi-card-grid grid-2">
+            {% for uc in body_sections.use_cases %}
+            <div class="bfsi-card hover-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <div class="card-icon-circle accent-blue"><i class="fas fa-lightbulb"></i></div>
+                    <h3 class="card-title">{{ uc.title }}</h3>
+                    <p class="card-desc">{{ uc.desc }}</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <a href="/industries/bfsi/use-cases" class="btn-text" style="color: #2563eb; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">Explore Full Use Cases <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Data Domains Section -->
+{% if body_sections.domains %}
+<section class="bfsi-section section-alt">
+    <div class="container">
+        <div class="bfsi-section-header text-center">
+            <span class="bfsi-subtitle">Data Assets</span>
+            <h2 class="bfsi-title">Critical Data Domains Covered</h2>
+            <p class="bfsi-desc">We structure, validation-check, and deduplicate primary data entities across financial operational books.</p>
+        </div>
+        
+        <div class="bfsi-card-grid grid-4">
+            {% for dom in body_sections.domains %}
+            <div class="outcome-card" style="background: white; padding: 25px; border-radius: 6px; border: 1px solid #e5e7eb; box-shadow: 0 4px 10px rgba(0,0,0,0.01);">
+                <div class="outcome-icon" style="color: #2563eb; font-size: 20px; margin-bottom: 12px;"><i class="fas fa-folder-open"></i></div>
+                {% if dom is string %}
+                <h4 class="outcome-title" style="font-size: 16px; font-weight: 600; margin: 0; color: var(--text-primary);">{{ dom }}</h4>
+                {% else %}
+                <h4 class="outcome-title" style="font-size: 16px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">{{ dom.title }}</h4>
+                <p class="outcome-text" style="font-size: 13.5px; line-height: 1.5; color: var(--text-secondary); margin: 0; font-weight: 300;">{{ dom.desc }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- KPIs Section (For Analytics specific) -->
+{% if body_sections.kpis %}
+<section class="bfsi-section">
+    <div class="container">
+        <div class="bfsi-section-header text-center">
+            <span class="bfsi-subtitle">KPI Indicators</span>
+            <h2 class="bfsi-title">Enterprise Analytics Metrics Supported</h2>
+            <p class="bfsi-desc">Standardize your database triggers to compute essential risk, customer, and compliance KPI dashboards.</p>
+        </div>
+        
+        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; max-width: 900px; margin: 0 auto;">
+            {% for kpi in body_sections.kpis %}
+            <span style="display: inline-block; background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; font-size: 14px; font-weight: 600; padding: 8px 18px; border-radius: 30px;">
+                <i class="fas fa-chart-line" style="margin-right: 6px;"></i> {{ kpi }}
+            </span>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Related Solutions Services -->
+{% if related_services %}
+<section class="bfsi-section section-alt" style="padding: 40px 0; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);">
+    <div class="container text-center">
+        <h4 style="margin-bottom: 20px; font-size: 15px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-secondary); font-weight: 700;">Related Solutions & Services</h4>
+        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px;">
+            {% for svc in related_services %}
+            <a href="{{ svc.url }}" class="btn btn-outline" style="font-size: 13.5px; padding: 8px 20px; border-color: #d1d5db; color: var(--text-secondary); text-decoration: none; border-radius: 4px;">{{ svc.title }}</a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- FAQ Section -->
+<section class="bfsi-section">
+    <div class="container">
+        <div class="bfsi-section-header text-center">
+            <span class="bfsi-subtitle">FAQ</span>
+            <h2 class="bfsi-title">Frequently Asked Questions</h2>
+            <p class="bfsi-desc">Common questions regarding our implementation architectures for {{ page.title }}.</p>
+        </div>
+        
+        <div class="faq-accordion-container" style="max-width: 800px; margin: 0 auto;">
+            {% if faqs %}
+                {% for faq in faqs %}
+                <div class="faq-accordion-item" style="border-bottom: 1px solid #e5e7eb; padding: 15px 0;">
+                    <button class="faq-accordion-trigger" onclick="toggleFaqAccordion(this)" style="width: 100%; display: flex; justify-content: space-between; align-items: center; background: none; border: none; text-align: left; font-size: 16.5px; font-weight: 600; color: var(--text-primary); cursor: pointer; padding: 10px 0;">
+                        {{ faq.q }} <i class="fas fa-plus icon-plus" style="font-size: 14px; color: #9ca3af;"></i>
+                    </button>
+                    <div class="faq-accordion-panel" style="max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out, padding 0.3s ease-out; padding: 0 10px;">
+                        <p style="font-size: 14.5px; line-height: 1.6; color: var(--text-secondary); font-weight: 300; padding-top: 10px; margin: 0;">{{ faq.a }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Bottom CTA Section -->
+<section class="bfsi-bottom-cta">
+    <div class="container text-center">
+        <h2 class="cta-title">Modernize Your {{ page.title }} Program</h2>
+        <p class="cta-subtitle">Connect with our data consultants to trace compliance pathways, run deduplication merges, and upgrade your databases.</p>
+        <div class="cta-actions" style="justify-content: center;">
+            <button onclick="openLeadModal('Bottom CTA: {{ page.title }}');" class="btn btn-primary btn-lg btn-glow">
+                {{ cta.primary_cta_text or 'Talk to a BFSI Data Expert' }}
+            </button>
+        </div>
+    </div>
+</section>
+
+<script>
+    function toggleFaqAccordion(btn) {
+        btn.classList.toggle('active');
+        const icon = btn.querySelector('i');
+        if (btn.classList.contains('active')) {
+            icon.classList.remove('fa-plus');
+            icon.classList.add('fa-minus');
+        } else {
+            icon.classList.remove('fa-minus');
+            icon.classList.add('fa-plus');
+        }
+        
+        const panel = btn.nextElementSibling;
+        if (panel.style.maxHeight && panel.style.maxHeight !== '0px') {
+            panel.style.maxHeight = '0px';
+            panel.style.padding = '0 10px';
+        } else {
+            panel.style.maxHeight = panel.scrollHeight + "px";
+            panel.style.padding = '10px 10px';
+        }
+    }
+</script>
+{% endblock %}

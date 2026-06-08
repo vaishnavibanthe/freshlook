@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}{% if resource %}Edit {{ type }}: {{ resource.title }}{% else %}Add New Event / Webinar{% endif %} - Artha Control Center{% endblock %}
+
+{% block content %}
+<!-- Subpage Spacer -->
+<div style="height: var(--nav-height); background-color: var(--bg-secondary);"></div>
+
+<section class="section-alt" style="padding-top: 40px; min-height: 90vh;">
+    <div class="container" style="display: grid; grid-template-columns: 280px 1fr; gap: 40px; align-items: start;">
+        
+        <!-- Admin Sidebar Nav -->
+        {% include 'admin_sidebar.html' %}
+        
+        <!-- Main Form Grid -->
+        <div class="contact-card" style="padding: 40px; background: var(--bg-primary);">
+            <h3 style="font-size: 24px; margin-bottom: 24px;">{% if resource %}Edit {{ type }}{% else %}Create New Event / Webinar{% endif %}</h3>
+            
+            {% if error %}
+            <div style="background-color: #fef2f2; border: 1px solid #fee2e2; padding: 12px 16px; border-radius: var(--border-radius-sm); color: #dc2626; font-size: 13px; margin-bottom: 20px;">
+                <i class="fas fa-exclamation-triangle"></i> {{ error }}
+            </div>
+            {% endif %}
+            
+            <form id="resource-editor-form" method="POST" action="{% if resource %}/admin/{{ type|lower }}/edit/{{ resource.id }}{% else %}/admin/resource/new{% endif %}">
+                
+                <!-- Resource Type (Only editable on create) -->
+                <div class="form-group">
+                    <label for="resource-type" class="form-label">Resource Type *</label>
+                    {% if resource %}
+                        <input type="text" class="form-control" value="{{ type }}" readonly style="background-color: var(--bg-secondary); cursor: not-allowed; font-weight: 700;">
+                        <input type="hidden" name="type" value="{{ type }}">
+                    {% else %}
+                        <select id="resource-type" name="type" class="form-control" required onchange="toggleFormLabels()">
+                            <option value="Event" {% if type == 'Event' %}selected{% endif %}>Upcoming Event & Summit</option>
+                            <option value="Webinar" {% if type == 'Webinar' %}selected{% endif %}>On-Demand Webinar</option>
+                        </select>
+                    {% endif %}
+                </div>
+
+                <!-- Title -->
+                <div class="form-group">
+                    <label for="resource-title" class="form-label">Title *</label>
+                    <input type="text" id="resource-title" name="title" class="form-control" placeholder="Enter title" value="{{ resource.title if resource else '' }}" required style="font-size: 15px; font-weight: 600;">
+                </div>
+                
+                <!-- Slug -->
+                <div class="form-group">
+                    <label for="resource-slug" class="form-label">URL Slug *</label>
+                    <input type="text" id="resource-slug" name="slug" class="form-control" placeholder="url-friendly-slug" value="{{ resource.slug if resource else '' }}" required style="font-family: monospace; font-size: 13px;">
+                </div>
+                
+                <!-- Date/Duration & Location/Host split -->
+                <div class="form-group half-width" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div>
+                        <label id="lbl-date-duration" for="resource-date" class="form-label">Date *</label>
+                        <input type="text" id="resource-date" name="date" class="form-control" placeholder="October 14, 2026 / 45 min" value="{% if type == 'Webinar' %}{{ resource.duration if resource else '' }}{% else %}{{ resource.date if resource else '' }}{% endif %}" required>
+                    </div>
+                    <div>
+                        <label id="lbl-location-host" for="resource-location" class="form-label">Location *</label>
+                        <input type="text" id="resource-location" name="location" class="form-control" placeholder="Chicago, IL / Artha Solutions" value="{% if type == 'Webinar' %}{{ resource.host if resource else '' }}{% else %}{{ resource.location if resource else '' }}{% endif %}" required>
+                    </div>
+                </div>
+                
+                <!-- Summary -->
+                <div class="form-group">
+                    <label for="resource-summary" class="form-label">Short Summary *</label>
+                    <input type="text" id="resource-summary" name="summary" class="form-control" placeholder="Brief one-line summary..." value="{{ resource.summary if resource else '' }}" required style="font-size: 14px;">
+                </div>
+
+                <!-- Description -->
+                <div class="form-group">
+                    <label for="resource-description" class="form-label">Detailed Description *</label>
+                    <textarea id="resource-description" name="description" class="form-control" placeholder="Detailed schedule, speaker profiles, agenda details..." required style="min-height: 250px; font-family: inherit; font-size: 14px; line-height: 1.6;">{{ resource.description if resource else '' }}</textarea>
+                </div>
+                
+                <div style="display: flex; gap: 16px; margin-top: 30px;">
+                    <a href="/admin/resources" class="btn btn-secondary" style="flex: 1; padding: 12px; text-align: center; text-decoration: none;">
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary btn-glow" style="flex: 2; padding: 12px;">
+                        Save Resource & Update Database <i class="fas fa-save btn-icon"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+    </div>
+</section>
+
+<script>
+function toggleFormLabels() {
+    const typeSelect = document.getElementById('resource-type');
+    const typeValue = typeSelect ? typeSelect.value : "{{ type }}";
+    
+    const lblDateDuration = document.getElementById('lbl-date-duration');
+    const lblLocationHost = document.getElementById('lbl-location-host');
+    const inputDate = document.getElementById('resource-date');
+    const inputLocation = document.getElementById('resource-location');
+    
+    if (typeValue === 'Webinar') {
+        lblDateDuration.innerText = 'Duration *';
+        inputDate.placeholder = 'e.g. 45 min, 60 min';
+        lblLocationHost.innerText = 'Host *';
+        inputLocation.placeholder = 'e.g. Artha Solutions & Qlik';
+    } else {
+        lblDateDuration.innerText = 'Date *';
+        inputDate.placeholder = 'e.g. October 14, 2026';
+        lblLocationHost.innerText = 'Location *';
+        inputLocation.placeholder = 'e.g. Chicago, IL';
+    }
+}
+
+// Automatically sync slug from title if it is a new resource
+const titleInput = document.getElementById('resource-title');
+const slugInput = document.getElementById('resource-slug');
+if (titleInput && slugInput && !slugInput.value) {
+    titleInput.addEventListener('input', function() {
+        const slugified = titleInput.value
+            .toLowerCase()
+            .replace(/[^a-z0-9\s-]/g, '')
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-');
+        slugInput.value = slugified;
+    });
+}
+
+// Run on page load
+document.addEventListener('DOMContentLoaded', toggleFormLabels);
+</script>
+{% endblock %}

@@ -1,0 +1,632 @@
+{% extends "base.html" %}
+
+{% block title %}Data Quality Management Services | Data Quality Solutions{% endblock %}
+{% block extra_meta %}
+<meta name="description" content="Ensure accurate, complete, and reliable data with Artha's Data Quality solutions. Minimize revenue leakage, reduce downtime, and fuel AI with trusted data.">
+{% endblock %}
+
+{% block content %}
+
+<!-- ══════════════════════════════════════════
+     HERO SECTION
+     ═════════════════════════════════════════════ -->
+<section class="sol-hero" id="sol-hero">
+    <div class="sol-bg-mesh" aria-hidden="true"></div>
+    <div class="hero-bg-glow hero-glow-1" style="opacity:0.45; background: radial-gradient(circle, rgba(6,182,212,0.3) 0%, transparent 70%);"></div>
+
+    <div class="container sol-hero-grid">
+        <div class="sol-hero-content">
+            <div class="hero-badge" style="margin-bottom:20px; color:#06b6d4; background:rgba(6,182,212,0.1); border-color:rgba(6,182,212,0.2);">
+                <i class="fas fa-circle-check"></i> Solutions · Data Quality
+            </div>
+            <h1 class="hero-title" style="font-size:clamp(38px,5vw,64px); line-height:1.1; margin-bottom:18px;">
+                Data Quality<br><span>Management</span>
+            </h1>
+            <p class="hero-desc" style="font-size:17px; max-width:540px; line-height:1.75; margin-bottom:32px;">
+                Unlock the power of trusted data. Clean, consistent, and well-governed data is the foundation of intelligent decision-making and operational efficiency. We ensure your data drives business success.
+            </p>
+            <div style="display:flex; gap:14px; flex-wrap:wrap;">
+                <a href="/contact-us" class="btn btn-primary btn-glow" id="sol-hero-cta" style="background:linear-gradient(135deg,#06b6d4,#10b981); border:none;">
+                    Get in Touch <i class="fas fa-arrow-right btn-icon"></i>
+                </a>
+                <a href="#sol-pillars" class="btn btn-outline" style="border-color:#06b6d4; color:#06b6d4;">
+                    Explore Data Quality
+                </a>
+            </div>
+
+            <!-- Tag pills -->
+            <div class="sol-tag-row">
+                <span class="sol-tag-pill"><i class="fas fa-magnifying-glass"></i> Deep Assessment</span>
+                <span class="sol-tag-pill"><i class="fas fa-wand-magic-sparkles"></i> Automated Cleansing</span>
+                <span class="sol-tag-pill"><i class="fas fa-robot"></i> AI Monitoring</span>
+                <span class="sol-tag-pill"><i class="fas fa-shield"></i> GDPR / HIPAA Compliance</span>
+            </div>
+        </div>
+
+        <!-- Right: Graphic Visualization -->
+        <div class="sol-hero-visual">
+            <div class="sol-visual-card" style="border-color:rgba(6,182,212,0.2);">
+                <div class="sol-card-header">
+                    <div class="ds-card-dots"><span></span><span></span><span></span></div>
+                    <span style="font-size:12px; font-weight:600; color:var(--text-secondary);">Data Quality Health Console</span>
+                    <div class="sol-header-badge" style="color:#06b6d4; background:rgba(6,182,212,0.1); border-color:rgba(6,182,212,0.2);"><i class="fas fa-circle" style="color:#06b6d4; font-size:7px;"></i> Optimized</div>
+                </div>
+                <div class="sol-card-body">
+                    <div class="sol-metric-row">
+                        <div class="sol-metric" style="border-color:rgba(6,182,212,0.2);"><span class="num" style="color:#06b6d4;">$15M</span><span class="lbl">Poor Data Cost</span></div>
+                        <div class="sol-metric" style="border-color:rgba(6,182,212,0.2);"><span class="num" style="color:#06b6d4;">20%</span><span class="lbl">Marketing ROI Up</span></div>
+                        <div class="sol-metric" style="border-color:rgba(6,182,212,0.2);"><span class="num" style="color:#06b6d4;">47%</span><span class="lbl">Project Failure Risk</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     STATS BAND
+     ═════════════════════════════════════════════ -->
+<section class="sol-stats-band">
+    <div class="container sol-stats-grid">
+        <div class="sol-stat-item">
+            <div class="sol-stat-num" style="color:#06b6d4; background:linear-gradient(135deg,#a5f3fc,#06b6d4); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">$15M</div>
+            <div class="sol-stat-label">Average annual losses incurred by businesses due to poor data quality</div>
+        </div>
+        <div class="sol-stat-sep"></div>
+        <div class="sol-stat-item">
+            <div class="sol-stat-num" style="color:#06b6d4; background:linear-gradient(135deg,#a5f3fc,#06b6d4); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">20%</div>
+            <div class="sol-stat-label">Marketing campaign ROI increase enabled by improving data validity</div>
+        </div>
+        <div class="sol-stat-sep"></div>
+        <div class="sol-stat-item">
+            <div class="sol-stat-num" style="color:#06b6d4; background:linear-gradient(135deg,#a5f3fc,#06b6d4); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">47%</div>
+            <div class="sol-stat-label">Of data-related enterprise initiatives fail outright due to poor quality data</div>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     DATA QUALITY PILLARS (Elevate Business Performance)
+     ═════════════════════════════════════════════ -->
+<section class="section sol-pillars-section" id="sol-pillars">
+    <div class="container">
+        <div class="section-header" style="text-align:center; margin-bottom:56px;">
+            <span class="section-subtitle-badge">Impact</span>
+            <h2 class="section-title" style="margin-top:16px;">Elevate Performance with <span>High-Quality Data</span></h2>
+            <p class="section-desc" style="max-width:600px; margin:16px auto 0;">Maintain pure, consistent, and well-governed data assets across cloud systems, accelerating launches and ensuring compliance.</p>
+        </div>
+
+        <div class="sol-pillars-grid">
+            <div class="sol-pillar-card" style="--pc:#06b6d4; --pcg:rgba(6,182,212,0.1);">
+                <div class="sol-pillar-icon"><i class="fas fa-users-rectangle"></i></div>
+                <h3 class="sol-pillar-title">Improved Customer Experience</h3>
+                <p class="sol-pillar-desc">Deliver personalized interactions and improve engagement by maintaining a clean 360-degree view of customer data across all touchpoints.</p>
+            </div>
+            <div class="sol-pillar-card" style="--pc:#10b981; --pcg:rgba(16,185,129,0.1);">
+                <div class="sol-pillar-icon"><i class="fas fa-rocket"></i></div>
+                <h3 class="sol-pillar-title">Faster Time-to-Market</h3>
+                <p class="sol-pillar-desc">Accelerate product launches and streamline service delivery by ensuring data accuracy and reducing bottlenecks in key integration processes.</p>
+            </div>
+            <div class="sol-pillar-card" style="--pc:#3b82f6; --pcg:rgba(59,130,246,0.1);">
+                <div class="sol-pillar-icon"><i class="fas fa-scale-balanced"></i></div>
+                <h3 class="sol-pillar-title">Regulatory Compliance</h3>
+                <p class="sol-pillar-desc">Mitigate risks and meet regulatory requirements like GDPR, CCPA, and HIPAA with robust data quality checks, minimizing audit fines.</p>
+            </div>
+            <div class="sol-pillar-card" style="--pc:#ef4444; --pcg:rgba(239,68,68,0.1);">
+                <div class="sol-pillar-icon"><i class="fas fa-gears"></i></div>
+                <h3 class="sol-pillar-title">Optimized Operations</h3>
+                <p class="sol-pillar-desc">Reduce application downtime and enhance operational efficiency through automated validations and data-driven decision-making.</p>
+            </div>
+            <div class="sol-pillar-card" style="--pc:#f59e0b; --pcg:rgba(245,158,11,0.1);">
+                <div class="sol-pillar-icon"><i class="fas fa-cloud-arrow-up"></i></div>
+                <h3 class="sol-pillar-title">Seamless Cloud Integration</h3>
+                <p class="sol-pillar-desc">Enable smooth transitions to cloud environments by harmonizing records from legacy on-premise systems with modern cloud solutions.</p>
+            </div>
+            <div class="sol-pillar-card" style="--pc:#a855f7; --pcg:rgba(168,85,247,0.1);">
+                <div class="sol-pillar-icon"><i class="fas fa-microchip"></i></div>
+                <h3 class="sol-pillar-title">Data-Driven Innovation</h3>
+                <p class="sol-pillar-desc">Fuel AI models and business analytics with high-quality, real-time data inputs that unlock deeper insights and drive transformation.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     CASE STUDY SPOTLIGHT 1 (Retail Talend Success)
+     ═════════════════════════════════════════════ -->
+<section class="sol-cs-section" id="sol-case-study">
+    <div class="container sol-cs-grid">
+        <div class="sol-cs-content">
+            <div class="hero-badge" style="margin-bottom:16px; border-color:rgba(6,182,212,0.3); color:#06b6d4;"><i class="fas fa-file-invoice"></i> Retail Success</div>
+            <h2 style="font-size:clamp(22px,3vw,36px); font-weight:800; color:var(--text-primary); line-height:1.3; margin-bottom:16px;">
+                Quality Data, Quality Customers: Retail Success
+            </h2>
+            <p style="font-size:15px; color:var(--text-secondary); line-height:1.75; margin-bottom:28px;">
+                Artha Solutions, using Talend, enhanced data quality for a global retail brand. We implemented advanced de-duplication and real-time address validation, improving customer info accuracy.
+            </p>
+            <a href="/case-studies" class="btn btn-primary" style="padding:13px 26px; background:linear-gradient(135deg,#06b6d4,#10b981); border:none;">
+                Download Case Study <i class="fas fa-download btn-icon"></i>
+            </a>
+        </div>
+        <div class="sol-cs-visual">
+            <div class="sol-cs-card" style="border-color:rgba(6,182,212,0.2);">
+                <div class="sol-cs-icon-ring" style="background:rgba(6,182,212,0.1);">
+                    <i class="fas fa-cart-shopping" style="font-size:38px; color:#06b6d4;"></i>
+                </div>
+                <div class="sol-cs-stats">
+                    <div class="sol-cs-stat"><span class="sol-cs-num" style="color:#06b6d4;">99.8%</span><span>Address Accuracy</span></div>
+                    <div class="sol-cs-stat"><span class="sol-cs-num" style="color:#06b6d4;">55%</span><span>Redundancy Cut</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     DATA QUALITY CAPABILITIES (AI Driven Quality)
+     ═════════════════════════════════════════════ -->
+<section class="section" id="sol-capabilities" style="background:var(--bg-secondary); padding:90px 0;">
+    <div class="container">
+        <div class="section-header" style="text-align:center; margin-bottom:56px;">
+            <span class="section-subtitle-badge">Platform Pillars</span>
+            <h2 class="section-title" style="margin-top:16px;">AI-Driven <span>Data Quality</span></h2>
+        </div>
+
+        <div class="sol-cap-layout">
+            <div class="sol-cap-visual">
+                <div class="sol-cap-gears">
+                    <div class="gear gear-1" style="color:rgba(6,182,212,0.15);"><i class="fas fa-cog"></i></div>
+                    <div class="gear gear-2" style="color:rgba(6,182,212,0.15); font-size:74px; animation-duration:15s; animation-direction:reverse;"><i class="fas fa-cog"></i></div>
+                    <div class="gear-center" style="color:#06b6d4; background:rgba(6,182,212,0.08); border-color:rgba(6,182,212,0.15);"><i class="fas fa-circle-check"></i></div>
+                </div>
+            </div>
+
+            <div class="sol-cap-list">
+                <div class="sol-cap-item" style="--ci:#06b6d4;">
+                    <div class="sol-cap-num">01</div>
+                    <div class="sol-cap-body">
+                        <h3>Data Assessment & Profiling</h3>
+                        <p>Conduct in-depth data assessments to identify gaps, structural redundancies, and operational risks in your data ecosystem. Profiling tools evaluate readiness.</p>
+                    </div>
+                </div>
+                <div class="sol-cap-item" style="--ci:#10b981;">
+                    <div class="sol-cap-num">02</div>
+                    <div class="sol-cap-body">
+                        <h3>Data Cleansing & Transformation</h3>
+                        <p>Automate data cleansing tasks to extract inconsistencies, purge duplicates, and convert raw text fields into verified, standardized attributes.</p>
+                    </div>
+                </div>
+                <div class="sol-cap-item" style="--ci:#3b82f6;">
+                    <div class="sol-cap-num">03</div>
+                    <div class="sol-cap-body">
+                        <h3>Data Governance & Compliance</h3>
+                        <p>Deploy governed processes detailing steward ownerships and automated workflows to secure compliance, PII access, and general audit readiness.</p>
+                    </div>
+                </div>
+                <div class="sol-cap-item" style="--ci:#f59e0b;">
+                    <div class="sol-cap-num">04</div>
+                    <div class="sol-cap-body">
+                        <h3>AI-Driven Monitoring & Optimization</h3>
+                        <p>Continuously inspect data pipelines using predictive models, automatically flagging anomalies and ensuring compliance dynamically.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     CASE STUDY SPOTLIGHT 2 (Talend Migration reference)
+     ═════════════════════════════════════════════ -->
+<section class="sol-cs2-section" style="background:var(--bg-primary); padding:70px 0;">
+    <div class="container">
+        <div class="sol-cs2-card" style="border-color:rgba(6,182,212,0.2);">
+            <div class="sol-cs2-icon" style="background:rgba(6,182,212,0.1); color:#06b6d4;"><i class="fas fa-arrows-to-circle"></i></div>
+            <div class="sol-cs2-body">
+                <div class="hero-badge" style="margin-bottom:12px; color:#06b6d4; background:rgba(6,182,212,0.1); border-color:rgba(6,182,212,0.2);">Modernization Success</div>
+                <h4>Achieving Peak Performance with Spark Streaming Lookups</h4>
+                <p>Read our technical guide detailing how we optimized Talend Spark Streaming lookups using efficient cache components, improving real-time validation throughput by 4x.</p>
+            </div>
+            <div class="sol-cs2-action">
+                <a href="/case-studies" class="btn btn-outline" style="border-color:#06b6d4; color:#06b6d4;">Read Story <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     TESTIMONIALS SECTION
+     ═════════════════════════════════════════════ -->
+<section class="section" style="background:var(--bg-secondary); padding:80px 0;">
+    <div class="container">
+        <div class="section-header" style="text-align:center; margin-bottom:48px;">
+            <span class="section-subtitle-badge">Success Stories</span>
+            <h2 class="section-title" style="margin-top:16px;">Trusted by <span>Industry Leaders</span></h2>
+        </div>
+        <div class="sol-testimonials-grid">
+            <div class="sol-testimonial">
+                <div class="sol-quote-icon"><i class="fas fa-quote-left"></i></div>
+                <p class="sol-quote-text">
+                    "Cleansing and consolidating consumer data enables us to deliver the kind of personalized experience today's consumers deserve and expect."
+                </p>
+                <div class="sol-quote-author">
+                    <div class="sol-avatar">SB</div>
+                    <div>
+                        <strong>Steve Brennan</strong>
+                        <span>Vice President, Data Strategy &amp; Analytics</span>
+                        <span class="sol-company">Carhartt</span>
+                    </div>
+                </div>
+            </div>
+            <div class="sol-testimonial">
+                <div class="sol-quote-icon"><i class="fas fa-quote-left"></i></div>
+                <p class="sol-quote-text">
+                    "We are very happy that we worked with Artha Solutions on our Upgrade project. Right from the 1st initial communication, the entire team was dedicated to success."
+                </p>
+                <div class="sol-quote-author">
+                    <div class="sol-avatar">VM</div>
+                    <div>
+                        <strong>Vivek Makan</strong>
+                        <span>Director, Data &amp; Analytics</span>
+                        <span class="sol-company">Managed Healthcare Associates, Inc.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     BOTTOM CTA BAND
+     ═════════════════════════════════════════════ -->
+<section class="sol-cta-band" style="background: linear-gradient(135deg, #022c22 0%, #0f172a 60%, #0c4a6e 100%);">
+    <div class="sol-cta-glow sol-cta-glow-l" style="background:#06b6d4;"></div>
+    <div class="sol-cta-glow sol-cta-glow-r" style="background:#10b981;"></div>
+    <div class="container" style="text-align:center; position:relative; z-index:1;">
+        <div class="hero-badge" style="display:inline-flex; margin:0 auto 20px; background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.15); color:#e2e8f0;">
+            <i class="fas fa-rocket"></i> Cleanse Data Pipelines
+        </div>
+        <h2 style="font-size:clamp(26px,4vw,48px); font-weight:800; color:#f8fafc; margin-bottom:16px; line-height:1.2;">
+            Ready to unlock the power of trusted data?
+        </h2>
+        <p style="font-size:17px; color:#94a3b8; max-width:560px; margin:0 auto 40px; line-height:1.7;">
+            Connect with our Data Quality architects to profiling, cleansing, and validating your data systems in real-time.
+        </p>
+        <div style="display:flex; gap:16px; justify-content:center; flex-wrap:wrap;">
+            <a href="/contact-us" class="btn btn-primary btn-glow" style="padding:15px 32px; font-size:15px; background:linear-gradient(135deg,#06b6d4,#10b981); border:none;">
+                Book a Demonstration <i class="fas fa-calendar btn-icon"></i>
+            </a>
+            <a href="/solutions" class="btn" style="padding:15px 32px; font-size:15px; background:rgba(255,255,255,0.08); color:#e2e8f0; border:1px solid rgba(255,255,255,0.15);">
+                Explore All Solutions
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     STYLES (Inherits from base and data_strategy_detail)
+     ═════════════════════════════════════════════ -->
+<style>
+/* ── Hero ─────────────────────────────────── */
+.sol-hero {
+    min-height: 80vh;
+    padding-top: calc(var(--nav-height) + 80px);
+    padding-bottom: 80px;
+    position: relative;
+    overflow: hidden;
+}
+.sol-bg-mesh {
+    position: absolute;
+    inset: 0;
+    background-image:
+        radial-gradient(circle at 1px 1px, rgba(6,182,212,0.06) 1px, transparent 0);
+    background-size: 40px 40px;
+    pointer-events: none;
+}
+.sol-hero-grid {
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 60px;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+}
+@media (max-width:900px) {
+    .sol-hero-grid { grid-template-columns: 1fr; }
+    .sol-hero-visual { display: none; }
+}
+.sol-tag-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 28px;
+}
+.sol-tag-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+.sol-tag-pill i { color: #06b6d4; font-size: 11px; }
+
+/* ── Visual Card ──────────────────────────── */
+.sol-visual-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 24px;
+    overflow: hidden;
+    backdrop-filter: blur(12px);
+    animation: solFloat 5s ease-in-out infinite;
+}
+@keyframes solFloat {
+    0%,100% { transform: translateY(0); }
+    50%      { transform: translateY(-8px); }
+}
+.sol-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 20px;
+    background: rgba(255,255,255,0.02);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.sol-header-badge {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 700;
+}
+.sol-card-body { padding: 24px 20px; display: flex; flex-direction: column; gap: 20px; }
+.sol-metric-row { display: flex; gap: 10px; }
+.sol-metric {
+    flex: 1;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    padding: 14px 8px;
+    text-align: center;
+}
+.sol-metric .num { display: block; font-size: 22px; font-weight: 900; }
+.sol-metric .lbl { display: block; font-size: 9px; color: var(--text-muted); margin-top: 4px; text-transform: uppercase; }
+
+/* ── Stats Band ───────────────────────────── */
+.sol-stats-band {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    padding: 48px 0;
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+}
+.sol-stats-grid {
+    display: flex;
+    align-items: flex-start;
+}
+@media (max-width:768px) {
+    .sol-stats-grid { flex-direction: column; gap: 30px; }
+    .sol-stat-sep { display: none; }
+}
+.sol-stat-item { flex: 1; text-align: center; padding: 0 24px; }
+.sol-stat-num {
+    font-size: 48px;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 10px;
+}
+.sol-stat-label { font-size: 13.5px; color: var(--text-secondary); line-height: 1.5; }
+.sol-stat-sep { width: 1px; background: rgba(255,255,255,0.08); align-self: stretch; }
+
+/* ── Pillars Grid ─────────────────────────── */
+.sol-pillars-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+@media (max-width:960px) { .sol-pillars-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width:640px)  { .sol-pillars-grid { grid-template-columns: 1fr; } }
+.sol-pillar-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 30px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.sol-pillar-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--pc);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+.sol-pillar-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: var(--pcg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: var(--pc);
+    transition: transform 0.3s ease;
+}
+.sol-pillar-card:hover .sol-pillar-icon { transform: scale(1.1) rotate(-4deg); }
+.sol-pillar-title { font-size: 15px; font-weight: 800; color: var(--text-primary); }
+.sol-pillar-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+
+/* ── Case Study ───────────────────────────── */
+.sol-cs-section {
+    background: var(--bg-secondary);
+    padding: 80px 0;
+    position: relative;
+    overflow: hidden;
+}
+.sol-cs-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 60px;
+    align-items: center;
+}
+@media (max-width:900px) { .sol-cs-grid { grid-template-columns: 1fr; } .sol-cs-visual { display: none; } }
+.sol-cs-card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 24px;
+    padding: 36px 28px;
+    text-align: center;
+}
+.sol-cs-icon-ring {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+.sol-cs-stats { display: flex; gap: 16px; justify-content: center; margin-top: 16px; }
+.sol-cs-stat { display: flex; flex-direction: column; gap: 4px; }
+.sol-cs-num { font-size: 28px; font-weight: 900; }
+.sol-cs-stat span:last-child { font-size: 11px; color: var(--text-muted); }
+
+/* ── Capabilities Layout ──────────────────── */
+.sol-cap-layout {
+    display: grid;
+    grid-template-columns: 0.75fr 1.25fr;
+    gap: 60px;
+    align-items: center;
+}
+@media (max-width:900px) { .sol-cap-layout { grid-template-columns: 1fr; } .sol-cap-visual { display: none; } }
+
+.sol-cap-gears {
+    width: 260px;
+    height: 260px;
+    position: relative;
+    margin: 0 auto;
+}
+.gear { position: absolute; font-size: 54px; animation: dsSpin 10s linear infinite; }
+.gear-1 { top: 20px; left: 40px; }
+.gear-2 { bottom: 40px; right: 40px; font-size: 74px; animation-duration: 15s; animation-direction: reverse; }
+.gear-center {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    top: 90px;
+    left: 90px;
+    z-index: 2;
+}
+@keyframes dsSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+.sol-cap-list { display: flex; flex-direction: column; gap: 30px; }
+.sol-cap-item { display: flex; gap: 20px; }
+.sol-cap-num {
+    font-size: 18px;
+    font-weight: 900;
+    color: var(--ci);
+    background: rgba(6,182,212,0.06);
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.sol-cap-body h3 { font-size: 16px; font-weight: 800; color: var(--text-primary); margin-bottom: 6px; }
+.sol-cap-body p { font-size: 13.5px; color: var(--text-secondary); line-height: 1.6; }
+
+/* ── Case Study 2 ─────────────────────────── */
+.sol-cs2-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 30px;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+@media (max-width:768px) {
+    .sol-cs2-card { flex-direction: column; text-align: center; }
+    .sol-cs2-action { width: 100%; }
+    .sol-cs2-action a { width: 100%; justify-content: center; }
+}
+.sol-cs2-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 16px;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.sol-cs2-body { flex: 1; }
+.sol-cs2-body h4 { font-size: 18px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px; }
+.sol-cs2-body p { font-size: 13.5px; color: var(--text-secondary); margin: 0; line-height: 1.6; }
+
+/* ── Testimonials ─────────────────────────── */
+.sol-testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+}
+@media (max-width:768px) { .sol-testimonials-grid { grid-template-columns: 1fr; } }
+.sol-testimonial {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.sol-quote-icon { font-size: 24px; color: #06b6d4; opacity: 0.3; }
+.sol-quote-text { font-size: 14.5px; color: var(--text-secondary); line-height: 1.7; font-style: italic; flex: 1; }
+.sol-quote-author { display: flex; gap: 14px; align-items: center; }
+.sol-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #06b6d4, #10b981);
+    color: white;
+    font-weight: 700;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.sol-quote-author strong { display: block; font-size: 14px; color: var(--text-primary); }
+.sol-quote-author span { display: block; font-size: 11px; color: var(--text-muted); }
+.sol-quote-author .sol-company { color: #06b6d4; font-weight: 600; margin-top: 2px; }
+
+/* ── Bottom CTA Band ──────────────────────── */
+.sol-cta-band {
+    position: relative;
+    padding: 100px 0;
+    overflow: hidden;
+    border-top: 1px solid var(--border-color);
+}
+.sol-cta-glow {
+    position: absolute;
+    width: 350px;
+    height: 350px;
+    border-radius: 50%;
+    filter: blur(100px);
+    pointer-events: none;
+    opacity: 0.25;
+}
+</style>
+
+{% endblock %}
