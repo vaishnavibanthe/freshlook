@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Edit Job' if job else 'Post New Job' }} – Careers Admin{% endblock %}
+
+{% block content %}
+<div style="height: var(--nav-height); background-color: var(--bg-secondary);"></div>
+
+<div style="display: grid; grid-template-columns: 260px 1fr; gap: 28px; padding: 32px; max-width: 1400px; margin: 0 auto; align-items: start;">
+
+  {% include 'admin_sidebar.html' %}
+
+  <main>
+    <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 28px;">
+      <a href="/admin/careers" style="color: var(--text-tertiary); text-decoration: none; display: flex; align-items: center; gap: 6px; font-size: 13px; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 8px; transition: all 0.2s;"
+         onmouseover="this.style.borderColor='var(--accent-blue)'; this.style.color='var(--accent-blue)'"
+         onmouseout="this.style.borderColor='var(--border-color)'; this.style.color='var(--text-tertiary)'">
+        <i class="fas fa-arrow-left"></i> Back to Jobs
+      </a>
+      <h1 style="font-size: 22px; font-weight: 800; color: var(--text-primary); margin: 0;">
+        {{ 'Edit: ' + job.title if job else 'Post New Job Opening' }}
+      </h1>
+    </div>
+
+    {% if error %}
+    <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 10px; padding: 14px 18px; margin-bottom: 20px; color: #dc2626; font-size: 14px;">
+      <strong>Error:</strong> {{ error }}
+    </div>
+    {% endif %}
+
+    <form method="POST" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start;">
+
+      <!-- LEFT COLUMN -->
+      <div style="display: flex; flex-direction: column; gap: 18px;">
+
+        <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 14px; padding: 24px;">
+          <h2 style="font-size: 15px; font-weight: 700; margin: 0 0 18px; color: var(--text-primary); border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">
+            <i class="fas fa-file-alt" style="margin-right: 8px; color: #6d28d9;"></i>Job Details
+          </h2>
+
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            <div>
+              <label class="form-label" style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); display: block; margin-bottom: 6px;">
+                Job Title <span style="color: #dc2626;">*</span>
+              </label>
+              <input type="text" name="title" required class="form-control"
+                     value="{{ job.title if job else '' }}" placeholder="e.g. Senior Data Engineer"
+                     style="padding: 10px 14px; border-radius: 8px; font-size: 14px; width: 100%; box-sizing: border-box;">
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <div>
+                <label class="form-label" style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); display: block; margin-bottom: 6px;">
+                  Department <span style="color: #dc2626;">*</span>
+                </label>
+                <input type="text" name="department" required class="form-control" list="dept-list"
+                       value="{{ job.department if job else '' }}" placeholder="e.g. Delivery"
+                       style="padding: 10px 14px; border-radius: 8px; font-size: 14px; width: 100%; box-sizing: border-box;">
+                <datalist id="dept-list">
+                  <option value="Delivery">
+                  <option value="SAP Practice">
+                  <option value="AI CoE">
+                  <option value="Sales">
+                  <option value="Marketing">
+                  <option value="Office Support">
+                </datalist>
+              </div>
+              <div>
+                <label class="form-label" style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); display: block; margin-bottom: 6px;">
+                  Job Type
+                </label>
+                <select name="job_type" class="form-control" style="padding: 10px 14px; border-radius: 8px; font-size: 14px; width: 100%; box-sizing: border-box;">
+                  <option value="Full-Time" {% if not job or job.job_type == 'Full-Time' %}selected{% endif %}>Full-Time</option>
+                  <option value="Part-Time" {% if job and job.job_type == 'Part-Time' %}selected{% endif %}>Part-Time</option>
+                  <option value="Contract" {% if job and job.job_type == 'Contract' %}selected{% endif %}>Contract</option>
+                  <option value="Internship" {% if job and job.job_type == 'Internship' %}selected{% endif %}>Internship</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class="form-label" style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); display: block; margin-bottom: 6px;">
+                Location <span style="color: #dc2626;">*</span>
+              </label>
+              <input type="text" name="location" required class="form-control"
+                     value="{{ job.location if job else '' }}" placeholder="e.g. USA (Remote) or Bengaluru, India (Hybrid)"
+                     style="padding: 10px 14px; border-radius: 8px; font-size: 14px; width: 100%; box-sizing: border-box;">
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <div>
+                <label class="form-label" style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); display: block; margin-bottom: 6px;">
+                  Status
+                </label>
+                <select name="status" class="form-control" style="padding: 10px 14px; border-radius: 8px; font-size: 14px; width: 100%; box-sizing: border-box;">
+                  <option value="published" {% if not job or job.status == 'published' %}selected{% endif %}>Published</option>
+                  <option value="draft" {% if job and job.status == 'draft' %}selected{% endif %}>Draft</option>
+                </select>
+              </div>
+              <div>
+                <label class="form-label" style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); display: block; margin-bottom: 6px;">
+                  Posted Date
+                </label>
+                <input type="date" name="posted_date" class="form-control"
+                       value="{{ job.posted_date if job else '' }}"
+                       style="padding: 10px 14px; border-radius: 8px; font-size: 14px; width: 100%; box-sizing: border-box;">
+              </div>
+            </div>
+
+            <div>
+              <label class="form-label" style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); display: block; margin-bottom: 6px;">
+                Short Summary (shown on listing cards)
+              </label>
+              <textarea name="summary" class="form-control" rows="3" placeholder="1-2 sentence description for the job card..."
+                        style="padding: 10px 14px; border-radius: 8px; font-size: 14px; width: 100%; box-sizing: border-box; resize: vertical;">{{ job.summary if job else '' }}</textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Full Description -->
+        <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 14px; padding: 24px;">
+          <h2 style="font-size: 15px; font-weight: 700; margin: 0 0 14px; color: var(--text-primary); border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">
+            <i class="fas fa-align-left" style="margin-right: 8px; color: #6d28d9;"></i>Full Description
+          </h2>
+          <textarea name="description" class="form-control" rows="6" placeholder="Detailed role description paragraph..."
+                    style="padding: 10px 14px; border-radius: 8px; font-size: 14px; width: 100%; box-sizing: border-box; resize: vertical;">{{ job.description if job else '' }}</textarea>
+        </div>
+
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div style="display: flex; flex-direction: column; gap: 18px;">
+
+        <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 14px; padding: 24px;">
+          <h2 style="font-size: 15px; font-weight: 700; margin: 0 0 10px; color: var(--text-primary); border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">
+            <i class="fas fa-list-check" style="margin-right: 8px; color: #6d28d9;"></i>Responsibilities
+          </h2>
+          <p style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 10px;">Enter one responsibility per line. Each line becomes a bullet point.</p>
+          <textarea name="responsibilities" class="form-control" rows="8"
+                    placeholder="Design and implement ETL pipelines&#10;Collaborate with client stakeholders&#10;Mentor junior engineers"
+                    style="padding: 10px 14px; border-radius: 8px; font-size: 14px; width: 100%; box-sizing: border-box; resize: vertical;">{{ job.responsibilities if job else '' }}</textarea>
+        </div>
+
+        <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 14px; padding: 24px;">
+          <h2 style="font-size: 15px; font-weight: 700; margin: 0 0 10px; color: var(--text-primary); border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">
+            <i class="fas fa-star" style="margin-right: 8px; color: #6d28d9;"></i>Requirements & Qualifications
+          </h2>
+          <p style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 10px;">Enter one requirement per line.</p>
+          <textarea name="requirements" class="form-control" rows="8"
+                    placeholder="5+ years of data engineering experience&#10;Proficiency in Talend Studio&#10;Strong SQL skills"
+                    style="padding: 10px 14px; border-radius: 8px; font-size: 14px; width: 100%; box-sizing: border-box; resize: vertical;">{{ job.requirements if job else '' }}</textarea>
+        </div>
+
+        <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 14px; padding: 24px;">
+          <h2 style="font-size: 15px; font-weight: 700; margin: 0 0 14px; color: var(--text-primary); border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">
+            <i class="fas fa-circle-info" style="margin-right: 8px; color: #6d28d9;"></i>Additional Information
+          </h2>
+          <textarea name="additional_info" class="form-control" rows="4"
+                    placeholder="Benefits, travel requirements, EEO statement, etc."
+                    style="padding: 10px 14px; border-radius: 8px; font-size: 14px; width: 100%; box-sizing: border-box; resize: vertical;">{{ job.additional_info if job else '' }}</textarea>
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="display: flex; gap: 12px;">
+          <button type="submit" class="btn btn-primary"
+                  style="flex: 1; padding: 13px; border-radius: 10px; font-size: 14px; font-weight: 700; background: linear-gradient(135deg, #6d28d9, #d946ef); border: none; cursor: pointer;">
+            <i class="fas fa-save" style="margin-right: 8px;"></i>
+            {{ 'Update Job' if job else 'Post Job' }}
+          </button>
+          <a href="/admin/careers" class="btn btn-secondary"
+             style="padding: 13px 22px; border-radius: 10px; font-size: 14px; font-weight: 600; text-decoration: none; display: flex; align-items: center; gap: 8px;">
+            Cancel
+          </a>
+        </div>
+      </div>
+
+    </form>
+  </main>
+</div>
+{% endblock %}

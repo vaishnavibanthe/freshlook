@@ -1,120 +1,408 @@
 {% extends "base.html" %}
 
-{% block title %}Careers - Join Our Dynamic Team{% endblock %}
+{% block title %}Careers – Join ThinkArtha's Enterprise Data & AI Team{% endblock %}
+
+{% block extra_meta %}
+<meta name="description" content="Explore open opportunities at ThinkArtha. We're hiring data engineers, SAP consultants, AI engineers, and sales professionals globally. Apply today.">
+{% endblock %}
 
 {% block content %}
-<!-- Detail Hero -->
-<section class="hero" style="min-height: 60vh; padding-top: calc(var(--nav-height) + 60px); padding-bottom: 60px;">
-    <div class="hero-bg-glow hero-glow-1"></div>
-    <div class="container hero-grid" style="grid-template-columns: 1.2fr 0.8fr;">
-        <div class="hero-content">
-            <div class="hero-badge"><i class="fas fa-briefcase"></i> Careers at Artha</div>
-            <h1 class="hero-title" style="font-size: 48px;">
-                Be Part of a <br><span>Dynamic Team</span>
-            </h1>
-            <p class="hero-desc">
-                We are a growing family of over 330 certified engineers across multiple countries. Accelerate your career in data modernization, analytics, and Generative AI.
-            </p>
-        </div>
-        <div class="hero-visual">
-            <div class="ai-graphic-container" style="max-width: 280px; height: 280px;">
-                <div class="ai-node-circle circle-md"></div>
-                <div class="ai-core" style="width: 80px; height: 80px; background: var(--grad-cyan-blue);">
-                    <i class="fas fa-graduation-cap" style="font-size: 28px;"></i>
-                </div>
-            </div>
-        </div>
+<style>
+:root {
+  --ca-purple: #6d28d9;
+  --ca-violet: #7c3aed;
+  --ca-magenta: #d946ef;
+  --ca-cyan: #06b6d4;
+  --ca-border: rgba(109,40,217,0.15);
+}
+
+/* Hero */
+.careers-hero {
+  background: linear-gradient(135deg, #0f0f1a 0%, #1a0733 50%, #0d1a3a 100%);
+  padding: 100px 0 80px;
+  position: relative; overflow: hidden;
+}
+.careers-hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 800px 600px at 70% 50%, rgba(109,40,217,0.18) 0%, transparent 70%),
+              radial-gradient(ellipse 400px 400px at 20% 80%, rgba(6,182,212,0.1) 0%, transparent 70%);
+}
+.hero-kpi {
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px; padding: 20px 24px; text-align: center;
+  backdrop-filter: blur(10px);
+}
+.hero-kpi-num { font-size: 30px; font-weight: 800; background: linear-gradient(135deg, #a78bfa, #38bdf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.hero-kpi-label { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 4px; }
+
+/* Filter Bar */
+.careers-filter-bar {
+  background: var(--bg-primary); border-bottom: 1px solid var(--border-color);
+  padding: 20px 0; position: sticky; top: var(--nav-height); z-index: 100;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+.cf-input {
+  height: 40px; padding: 0 14px; border-radius: 8px;
+  border: 1.5px solid var(--border-color);
+  background: var(--bg-secondary); color: var(--text-primary);
+  font-size: 14px; outline: none; transition: border-color 0.2s; min-width: 160px;
+}
+.cf-input:focus { border-color: var(--ca-violet); }
+.cf-btn {
+  height: 40px; padding: 0 18px; border-radius: 8px; font-size: 13px; font-weight: 600;
+  border: 1.5px solid var(--ca-violet); color: var(--ca-violet);
+  background: transparent; cursor: pointer; transition: all 0.2s;
+}
+.cf-btn:hover, .cf-btn.active {
+  background: var(--ca-violet); color: #fff;
+}
+.cf-btn-reset {
+  height: 40px; padding: 0 14px; border-radius: 8px; font-size: 13px;
+  border: 1.5px solid var(--border-color); color: var(--text-secondary);
+  background: transparent; cursor: pointer; transition: all 0.2s;
+}
+.cf-btn-reset:hover { border-color: #dc2626; color: #dc2626; }
+
+/* Job Cards */
+.job-card-wrap {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 20px;
+}
+.job-card-new {
+  background: var(--bg-secondary); border: 1px solid var(--border-color);
+  border-radius: 16px; padding: 24px; cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+  display: flex; flex-direction: column; gap: 14px; text-decoration: none; color: inherit;
+}
+.job-card-new:hover {
+  border-color: var(--ca-violet);
+  box-shadow: 0 12px 32px rgba(109,40,217,0.12);
+  transform: translateY(-4px);
+}
+.jc-dept {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(109,40,217,0.08); color: var(--ca-violet);
+  border: 1px solid rgba(109,40,217,0.2);
+  padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.5px;
+  width: fit-content;
+}
+.jc-meta { display: flex; flex-wrap: wrap; gap: 10px; }
+.jc-meta-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 12px; color: var(--text-secondary); font-weight: 500;
+}
+.jc-summary { font-size: 14px; line-height: 1.65; color: var(--text-secondary); }
+.jc-footer {
+  display: flex; justify-content: space-between; align-items: center;
+  padding-top: 12px; border-top: 1px solid var(--border-color);
+}
+.jc-cta {
+  font-size: 13px; font-weight: 700; color: var(--ca-violet);
+  display: flex; align-items: center; gap: 6px; transition: gap 0.2s;
+}
+.job-card-new:hover .jc-cta { gap: 10px; }
+
+/* Culture Section */
+.culture-card {
+  background: var(--bg-secondary); border: 1px solid var(--border-color);
+  border-radius: 16px; padding: 28px; text-align: center;
+  transition: all 0.3s;
+}
+.culture-card:hover {
+  border-color: var(--ca-violet);
+  box-shadow: 0 8px 24px rgba(109,40,217,0.08);
+  transform: translateY(-3px);
+}
+.culture-icon {
+  width: 56px; height: 56px; border-radius: 16px;
+  display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;
+  font-size: 22px; color: #fff;
+}
+
+#job-count-badge {
+  background: rgba(109,40,217,0.08); color: var(--ca-violet);
+  border: 1px solid rgba(109,40,217,0.2);
+  padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700;
+  display: inline-block; margin-left: 10px;
+}
+</style>
+
+<!-- HERO -->
+<section class="careers-hero">
+  <div class="container" style="position: relative; z-index: 1;">
+    <div style="max-width: 700px;">
+      <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(109,40,217,0.15); border: 1px solid rgba(109,40,217,0.3); border-radius: 20px; padding: 6px 16px; margin-bottom: 28px;">
+        <i class="fas fa-rocket" style="color: #a78bfa; font-size: 13px;"></i>
+        <span style="color: #a78bfa; font-size: 13px; font-weight: 600;">We're Hiring Globally</span>
+      </div>
+      <h1 style="font-size: clamp(36px, 5vw, 54px); font-weight: 900; color: #fff; line-height: 1.2; letter-spacing: -1.5px; margin-bottom: 20px;">
+        Build Your Career at<br>
+        <span style="background: linear-gradient(90deg, #a78bfa, #38bdf8, #f0abfc); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">ThinkArtha</span>
+      </h1>
+      <p style="font-size: 18px; color: rgba(255,255,255,0.65); line-height: 1.7; margin-bottom: 36px; max-width: 600px;">
+        Join a team of passionate data engineers, cloud architects, SAP consultants, and AI innovators working on enterprise-scale programs for Fortune 500 clients worldwide.
+      </p>
+      <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+        <a href="#open-positions" class="btn btn-primary" style="background: linear-gradient(135deg, #6d28d9, #d946ef); border: none; padding: 14px 28px; border-radius: 10px; font-size: 15px; font-weight: 700;">
+          <i class="fas fa-search" style="margin-right: 8px;"></i>View Open Positions
+        </a>
+        <a href="mailto:careers@thinkartha.com" class="btn btn-outline" style="color: #fff; border-color: rgba(255,255,255,0.3); padding: 14px 28px; border-radius: 10px; font-size: 15px; font-weight: 600;">
+          <i class="fas fa-envelope" style="margin-right: 8px;"></i>Send Resume
+        </a>
+      </div>
     </div>
+
+    <!-- KPI row -->
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 56px; max-width: 700px;">
+      <div class="hero-kpi">
+        <div class="hero-kpi-num">{{ jobs|length }}+</div>
+        <div class="hero-kpi-label">Open Roles</div>
+      </div>
+      <div class="hero-kpi">
+        <div class="hero-kpi-num">4</div>
+        <div class="hero-kpi-label">Global Offices</div>
+      </div>
+      <div class="hero-kpi">
+        <div class="hero-kpi-label" style="font-size: 13px; color: rgba(255,255,255,0.5);">USA · India · Indonesia · Singapore</div>
+      </div>
+      <div class="hero-kpi">
+        <div class="hero-kpi-num">15+</div>
+        <div class="hero-kpi-label">Years of Excellence</div>
+      </div>
+    </div>
+  </div>
 </section>
 
-<!-- Why Work With Us (Culture Cards) -->
-<section class="section-alt" id="career-culture">
-    <div class="container">
-        <div class="section-header">
-            <span class="section-subtitle">Our Culture</span>
-            <h2 class="section-title">Why Build Your <span>Future at Artha</span></h2>
-        </div>
-        
-        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));">
-            <!-- Culture 1 -->
-            <div class="card">
-                <div class="card-icon-box"><i class="fas fa-globe"></i></div>
-                <h3 class="card-title">Global Perspective</h3>
-                <p class="card-desc">Collaborate on complex enterprise systems across 26 countries, gaining deep exposure to international methodologies and multi-cloud setups.</p>
-            </div>
-            
-            <!-- Culture 2 -->
-            <div class="card">
-                <div class="card-icon-box"><i class="fas fa-certificate"></i></div>
-                <h3 class="card-title">Professional Certification</h3>
-                <p class="card-desc">We fund and support certifications on leading technology stacks, including Talend, Qlik, Snowflake, AWS, Azure, and Databricks.</p>
-            </div>
-            
-            <!-- Culture 3 -->
-            <div class="card">
-                <div class="card-icon-box"><i class="fas fa-house-laptop"></i></div>
-                <h3 class="card-title">Adaptable & Diverse</h3>
-                <p class="card-desc">Work in multicultural environments that respect ethnic diversity, offering flexible remote-friendly configurations and transparent support.</p>
-            </div>
-        </div>
+<!-- CULTURE SECTION -->
+<section style="padding: 72px 0; background: var(--bg-primary);">
+  <div class="container">
+    <div style="text-align: center; max-width: 640px; margin: 0 auto 48px;">
+      <h2 class="section-title">Life at <span>ThinkArtha</span></h2>
+      <p class="section-desc">We foster a culture where curiosity drives innovation, collaboration fuels success, and every team member makes a meaningful impact on global enterprises.</p>
     </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+      <div class="culture-card">
+        <div class="culture-icon" style="background: linear-gradient(135deg, #6d28d9, #a78bfa);">
+          <i class="fas fa-chart-line"></i>
+        </div>
+        <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 8px; color: var(--text-primary);">Career Growth</h3>
+        <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">Structured learning paths, certifications, and mentorship from senior practitioners.</p>
+      </div>
+      <div class="culture-card">
+        <div class="culture-icon" style="background: linear-gradient(135deg, #0891b2, #06b6d4);">
+          <i class="fas fa-globe"></i>
+        </div>
+        <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 8px; color: var(--text-primary);">Global Exposure</h3>
+        <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">Work with Fortune 500 clients across North America, Asia Pacific, and Europe.</p>
+      </div>
+      <div class="culture-card">
+        <div class="culture-icon" style="background: linear-gradient(135deg, #d946ef, #f0abfc);">
+          <i class="fas fa-brain"></i>
+        </div>
+        <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 8px; color: var(--text-primary);">Cutting-edge Tech</h3>
+        <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">Work with Snowflake, Talend, Qlik, SAP, AWS, and the latest generative AI tools.</p>
+      </div>
+      <div class="culture-card">
+        <div class="culture-icon" style="background: linear-gradient(135deg, #059669, #34d399);">
+          <i class="fas fa-heart"></i>
+        </div>
+        <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 8px; color: var(--text-primary);">Work-Life Balance</h3>
+        <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">Flexible hybrid schedules, remote opportunities, and generous PTO policy.</p>
+      </div>
+      <div class="culture-card">
+        <div class="culture-icon" style="background: linear-gradient(135deg, #b45309, #f59e0b);">
+          <i class="fas fa-users"></i>
+        </div>
+        <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 8px; color: var(--text-primary);">Inclusive Teams</h3>
+        <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">A diverse, respectful environment where every perspective is celebrated and valued.</p>
+      </div>
+    </div>
+  </div>
 </section>
 
-<!-- Open Positions Listing -->
-<section class="section" id="openings">
-    <div class="container">
-        <div class="section-header">
-            <span class="section-subtitle">Open Opportunities</span>
-            <h2 class="section-title">Current <span>Job Openings</span></h2>
-            <p class="section-desc">Join our team of architects and engineers today. Send your CV to careers@thinkartha.com</p>
-        </div>
-        
-        <div class="faq-list">
-            <!-- Position 1 -->
-            <div class="faq-item">
-                <div class="faq-question">
-                    <span style="font-weight: 700;">Data Engineer (Talend / Qlik)</span>
-                    <span style="font-size: 13px; color: var(--text-tertiary); margin-left: 20px;"><i class="fas fa-map-marker-alt"></i> Naperville, IL / Remote</span>
-                </div>
-                <div class="faq-answer">
-                    <p style="margin-bottom: 12px;">We are looking for a Data Engineer with 3+ years of experience designing and managing ETL pipelines using Talend and Qlik. Experience with Snowflake is a major plus.</p>
-                    <a href="/contact-us" class="btn btn-secondary btn-icon" style="padding: 8px 16px; font-size: 13px;">Apply Now <i class="fas fa-chevron-right btn-icon"></i></a>
-                </div>
-            </div>
-            
-            <!-- Position 2 -->
-            <div class="faq-item">
-                <div class="faq-question">
-                    <span style="font-weight: 700;">Senior AI & LLM Systems Architect</span>
-                    <span style="font-size: 13px; color: var(--text-tertiary); margin-left: 20px;"><i class="fas fa-map-marker-alt"></i> Scottsdale, AZ / Remote</span>
-                </div>
-                <div class="faq-answer">
-                    <p style="margin-bottom: 12px;">Lead Generative AI initiatives. Deploy, secure, and monitor LLM hosts, prompt gateways, and vector search engines. FinOps audit experience is desired.</p>
-                    <a href="/contact-us" class="btn btn-secondary btn-icon" style="padding: 8px 16px; font-size: 13px;">Apply Now <i class="fas fa-chevron-right btn-icon"></i></a>
-                </div>
-            </div>
-            
-            <!-- Position 3 -->
-            <div class="faq-item">
-                <div class="faq-question">
-                    <span style="font-weight: 700;">MDM (Master Data Management) Analyst</span>
-                    <span style="font-size: 13px; color: var(--text-tertiary); margin-left: 20px;"><i class="fas fa-map-marker-alt"></i> Hyderabad, India</span>
-                </div>
-                <div class="faq-answer">
-                    <p style="margin-bottom: 12px;">Configure entity matching rules, golden profile models, and active stewardship workflows on Talend MDM. Strong SQL proficiency is required.</p>
-                    <a href="/contact-us" class="btn btn-secondary btn-icon" style="padding: 8px 16px; font-size: 13px;">Apply Now <i class="fas fa-chevron-right btn-icon"></i></a>
-                </div>
-            </div>
-        </div>
+<!-- FILTER BAR -->
+<div class="careers-filter-bar" id="open-positions">
+  <div class="container">
+    <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+      <div style="position: relative; flex: 1; min-width: 200px;">
+        <i class="fas fa-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-tertiary); font-size: 13px; pointer-events: none;"></i>
+        <input type="text" id="job-search" class="cf-input" placeholder="Search roles, skills..."
+               style="padding-left: 36px; width: 100%; box-sizing: border-box;">
+      </div>
+      <select id="filter-dept" class="cf-input" style="cursor: pointer;">
+        <option value="">All Departments</option>
+        {% for dept in departments %}
+        <option value="{{ dept }}">{{ dept }}</option>
+        {% endfor %}
+      </select>
+      <select id="filter-location" class="cf-input" style="cursor: pointer;">
+        <option value="">All Locations</option>
+        {% for geo in geographies %}
+        <option value="{{ geo }}">{{ geo }}</option>
+        {% endfor %}
+      </select>
+      <select id="filter-type" class="cf-input" style="cursor: pointer;">
+        <option value="">All Types</option>
+        {% for jt in job_types %}
+        <option value="{{ jt }}">{{ jt }}</option>
+        {% endfor %}
+      </select>
+      <button class="cf-btn-reset" id="filter-reset" onclick="resetFilters()">
+        <i class="fas fa-xmark" style="margin-right: 4px;"></i>Clear
+      </button>
+      <span id="job-count-badge">{{ jobs|length }} position{{ 's' if jobs|length != 1 }}</span>
     </div>
+  </div>
+</div>
+
+<!-- JOBS LISTING -->
+<section style="padding: 56px 0 80px; background: var(--bg-primary);">
+  <div class="container">
+    {% if jobs %}
+    <div class="job-card-wrap" id="jobs-grid">
+      {% for job in jobs %}
+      <a href="/careers/{{ job.slug }}" class="job-card-new"
+         data-title="{{ job.title|lower }}"
+         data-dept="{{ job.department }}"
+         data-location="{{ job.location }}"
+         data-type="{{ job.job_type }}"
+         data-summary="{{ (job.summary or '')|lower }}">
+
+        <div class="jc-dept">
+          <i class="fas fa-tag"></i>{{ job.department }}
+        </div>
+
+        <h3 style="font-size: 18px; font-weight: 700; color: var(--text-primary); line-height: 1.3; margin: 0;">
+          {{ job.title }}
+        </h3>
+
+        {% if job.summary %}
+        <p class="jc-summary">{{ job.summary[:130] }}{% if job.summary|length > 130 %}…{% endif %}</p>
+        {% endif %}
+
+        <div class="jc-meta">
+          <span class="jc-meta-chip">
+            <i class="fas fa-location-dot" style="color: var(--ca-violet); font-size: 11px;"></i>
+            {{ job.location }}
+          </span>
+          <span class="jc-meta-chip">
+            <i class="fas fa-briefcase" style="color: var(--ca-cyan); font-size: 11px;"></i>
+            {{ job.job_type }}
+          </span>
+          {% if job.posted_date %}
+          <span class="jc-meta-chip">
+            <i class="fas fa-calendar" style="color: var(--ca-magenta); font-size: 11px;"></i>
+            {{ job.posted_date }}
+          </span>
+          {% endif %}
+        </div>
+
+        <div class="jc-footer">
+          <span style="font-size: 12px; color: var(--text-tertiary);">ThinkArtha · {{ job.department }}</span>
+          <span class="jc-cta">
+            View Details <i class="fas fa-arrow-right" style="font-size: 11px;"></i>
+          </span>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+
+    <!-- No results state -->
+    <div id="no-jobs-msg" style="display: none; text-align: center; padding: 60px 20px;">
+      <i class="fas fa-search" style="font-size: 40px; color: var(--text-tertiary); margin-bottom: 16px;"></i>
+      <h3 style="font-size: 20px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">No Matching Positions</h3>
+      <p style="color: var(--text-secondary);">Try adjusting your filters or search terms, or <a href="mailto:careers@thinkartha.com" style="color: var(--ca-violet);">send us your resume</a>.</p>
+    </div>
+
+    {% else %}
+    <div style="text-align: center; padding: 80px 20px;">
+      <i class="fas fa-briefcase" style="font-size: 48px; color: var(--text-tertiary); margin-bottom: 20px;"></i>
+      <h3 style="font-size: 22px; font-weight: 700; color: var(--text-primary); margin-bottom: 10px;">No Open Positions Currently</h3>
+      <p style="color: var(--text-secondary); margin-bottom: 28px;">We're always looking for top talent. Send your resume to be considered for future openings.</p>
+      <a href="mailto:careers@thinkartha.com" class="btn btn-primary" style="background: linear-gradient(135deg, #6d28d9, #d946ef); border: none;">
+        <i class="fas fa-envelope" style="margin-right: 8px;"></i>careers@thinkartha.com
+      </a>
+    </div>
+    {% endif %}
+  </div>
 </section>
 
-<!-- Bottom CTA Banner -->
-<section class="section-alt" style="text-align: center;">
-    <div class="container">
-        <h2 class="section-title">Ready to <span>Drive Innovation?</span></h2>
-        <p class="section-desc" style="max-width: 600px; margin: 0 auto 30px;">We are always looking for passionate database administrators, cloud managers, and AI engineers. Send your profile.</p>
-        <a href="/contact-us" class="btn btn-primary btn-glow">Submit Your Application</a>
+<!-- BOTTOM CTA -->
+<section style="background: linear-gradient(135deg, #0f0f1a, #1a0733); padding: 72px 0; text-align: center;">
+  <div class="container" style="max-width: 680px; margin: 0 auto;">
+    <div style="background: rgba(109,40,217,0.12); border: 1px solid rgba(109,40,217,0.25); border-radius: 16px; padding: 48px;">
+      <i class="fas fa-envelope-open-text" style="font-size: 36px; color: #a78bfa; margin-bottom: 20px;"></i>
+      <h2 style="font-size: 28px; font-weight: 800; color: #fff; margin-bottom: 14px;">Don't See the Right Fit?</h2>
+      <p style="color: rgba(255,255,255,0.6); font-size: 15px; line-height: 1.7; margin-bottom: 28px;">
+        We're always open to talking with exceptional talent. Send your resume directly to our recruitment team and we'll be in touch when the right opportunity opens.
+      </p>
+      <a href="mailto:careers@thinkartha.com" class="btn btn-primary"
+         style="background: linear-gradient(135deg, #6d28d9, #d946ef); border: none; padding: 14px 32px; border-radius: 10px; font-size: 15px; font-weight: 700; display: inline-flex; align-items: center; gap: 10px;">
+        <i class="fas fa-envelope"></i>
+        careers@thinkartha.com
+      </a>
     </div>
+  </div>
 </section>
+
+<script>
+const jobCards = document.querySelectorAll('.job-card-new');
+const noJobsMsg = document.getElementById('no-jobs-msg');
+const countBadge = document.getElementById('job-count-badge');
+const searchInput = document.getElementById('job-search');
+const deptFilter = document.getElementById('filter-dept');
+const locationFilter = document.getElementById('filter-location');
+const typeFilter = document.getElementById('filter-type');
+
+function applyFilters() {
+  const search = (searchInput.value || '').toLowerCase().trim();
+  const dept = (deptFilter.value || '').toLowerCase();
+  const location = (locationFilter.value || '').toLowerCase();
+  const type = (typeFilter.value || '').toLowerCase();
+
+  let visible = 0;
+  jobCards.forEach(card => {
+    const title = card.dataset.title || '';
+    const cardDept = (card.dataset.dept || '').toLowerCase();
+    const cardLoc = (card.dataset.location || '').toLowerCase();
+    const cardType = (card.dataset.type || '').toLowerCase();
+    const summary = card.dataset.summary || '';
+
+    const matchSearch = !search || title.includes(search) || summary.includes(search) || cardDept.includes(search);
+    const matchDept = !dept || cardDept === dept.toLowerCase();
+    const matchLoc = !location || cardLoc.includes(location.toLowerCase());
+    const matchType = !type || cardType === type.toLowerCase();
+
+    const show = matchSearch && matchDept && matchLoc && matchType;
+    card.style.display = show ? '' : 'none';
+    if (show) visible++;
+  });
+
+  if (noJobsMsg) noJobsMsg.style.display = visible === 0 ? 'block' : 'none';
+  if (countBadge) countBadge.textContent = visible + ' position' + (visible !== 1 ? 's' : '');
+}
+
+function resetFilters() {
+  if (searchInput) searchInput.value = '';
+  if (deptFilter) deptFilter.value = '';
+  if (locationFilter) locationFilter.value = '';
+  if (typeFilter) typeFilter.value = '';
+  applyFilters();
+}
+
+if (searchInput) searchInput.addEventListener('input', applyFilters);
+if (deptFilter) deptFilter.addEventListener('change', applyFilters);
+if (locationFilter) locationFilter.addEventListener('change', applyFilters);
+if (typeFilter) typeFilter.addEventListener('change', applyFilters);
+
+// Smooth scroll to positions when using hero CTA
+document.querySelectorAll('a[href="#open-positions"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    document.getElementById('open-positions').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+</script>
 {% endblock %}

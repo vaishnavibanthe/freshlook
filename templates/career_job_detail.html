@@ -1,0 +1,343 @@
+{% extends "base.html" %}
+
+{% block title %}{{ job.title }} – Careers at ThinkArtha{% endblock %}
+
+{% block extra_meta %}
+<meta name="description" content="{{ job.summary }}">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "JobPosting",
+  "title": "{{ job.title }}",
+  "description": "{{ job.description | replace('"', '\\"') }}",
+  "datePosted": "{{ job.posted_date }}",
+  "employmentType": "{{ job.job_type | upper | replace('-', '_') }}",
+  "jobLocation": {
+    "@type": "Place",
+    "address": { "@type": "PostalAddress", "addressLocality": "{{ job.location }}" }
+  },
+  "hiringOrganization": {
+    "@type": "Organization",
+    "name": "ThinkArtha",
+    "sameAs": "https://www.thinkartha.com"
+  }
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<div style="height: var(--nav-height); background-color: var(--bg-secondary);"></div>
+
+<style>
+:root {
+  --ca-purple: #6d28d9;
+  --ca-violet: #7c3aed;
+  --ca-magenta: #d946ef;
+  --ca-cyan: #06b6d4;
+  --ca-border: rgba(109,40,217,0.15);
+}
+.ca-breadcrumb a { color: var(--text-tertiary); text-decoration: none; font-weight: 500; }
+.ca-breadcrumb a:hover { color: var(--ca-violet); }
+.ca-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(109,40,217,0.08); color: var(--ca-violet);
+  border: 1px solid rgba(109,40,217,0.2);
+  padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.ca-meta-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--bg-secondary); border: 1px solid var(--border-color);
+  padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 500;
+  color: var(--text-secondary);
+}
+.ca-section-head {
+  font-size: 16px; font-weight: 700; color: var(--text-primary);
+  border-left: 3px solid var(--ca-violet); padding-left: 12px;
+  margin: 32px 0 16px 0;
+}
+.ca-req-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+.ca-req-item {
+  display: flex; gap: 12px; align-items: flex-start;
+  font-size: 14.5px; line-height: 1.6; color: var(--text-secondary);
+}
+.ca-req-item::before {
+  content: '';
+  flex-shrink: 0; width: 20px; height: 20px; margin-top: 2px;
+  background: rgba(109,40,217,0.1); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%236d28d9'%3E%3Cpath fill-rule='evenodd' d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z' clip-rule='evenodd'/%3E%3C/svg%3E");
+  background-size: 12px; background-repeat: no-repeat; background-position: center;
+}
+/* Apply Form Sidebar */
+.ca-sidebar {
+  background: var(--bg-secondary); border: 1px solid var(--border-color);
+  border-radius: 16px; padding: 28px;
+  position: sticky; top: calc(var(--nav-height) + 24px);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+}
+.ca-form-label {
+  font-size: 12px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.5px; color: var(--text-secondary);
+  display: block; margin-bottom: 6px;
+}
+.ca-form-input {
+  width: 100%; padding: 10px 14px; border-radius: 8px;
+  border: 1.5px solid var(--border-color);
+  background: var(--bg-primary); color: var(--text-primary);
+  font-size: 14px; outline: none; transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+.ca-form-input:focus { border-color: var(--ca-violet); }
+.ca-form-input::placeholder { color: var(--text-tertiary); }
+.ca-file-label {
+  display: flex; align-items: center; gap: 10px;
+  border: 2px dashed var(--border-color); border-radius: 10px;
+  padding: 18px 16px; cursor: pointer; transition: all 0.2s;
+  color: var(--text-secondary); font-size: 13px; font-weight: 500;
+}
+.ca-file-label:hover { border-color: var(--ca-violet); color: var(--ca-violet); background: rgba(109,40,217,0.04); }
+.ca-error-alert {
+  background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px;
+  padding: 12px 16px; margin-bottom: 16px; font-size: 13px; color: #dc2626;
+}
+.ca-success-note {
+  background: rgba(109,40,217,0.06); border: 1px solid rgba(109,40,217,0.2);
+  border-radius: 10px; padding: 14px 16px; font-size: 13px; color: var(--ca-violet);
+  margin-bottom: 16px;
+}
+.ca-related-card {
+  display: block; text-decoration: none;
+  border: 1px solid var(--border-color); border-radius: 12px;
+  padding: 16px 18px; transition: all 0.25s; color: inherit;
+}
+.ca-related-card:hover {
+  border-color: var(--ca-violet);
+  box-shadow: 0 6px 20px rgba(109,40,217,0.1);
+  transform: translateY(-2px);
+}
+</style>
+
+<article style="padding: 56px 0 80px; background: var(--bg-primary);">
+  <div class="container" style="max-width: 1160px; display: grid; grid-template-columns: 1fr 380px; gap: 56px; align-items: start;">
+
+    <!-- LEFT: Job Details -->
+    <div>
+      <!-- Breadcrumb -->
+      <div class="ca-breadcrumb" style="display: flex; gap: 8px; font-size: 13px; margin-bottom: 24px; flex-wrap: wrap;">
+        <a href="/">Home</a><span style="color: var(--text-tertiary);">/</span>
+        <a href="/careers">Careers</a><span style="color: var(--text-tertiary);">/</span>
+        <span style="color: var(--text-primary);">{{ job.title }}</span>
+      </div>
+
+      <!-- Category Badge -->
+      <span class="ca-badge">{{ job.department }}</span>
+
+      <!-- Title -->
+      <h1 style="font-size: 36px; font-weight: 800; line-height: 1.25; letter-spacing: -0.8px; margin: 14px 0 20px; color: var(--text-primary);">
+        {{ job.title }}
+      </h1>
+
+      <!-- Meta chips -->
+      <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 32px;">
+        <span class="ca-meta-chip"><i class="fas fa-location-dot" style="color: var(--ca-violet); font-size: 12px;"></i> {{ job.location }}</span>
+        <span class="ca-meta-chip"><i class="fas fa-briefcase" style="color: var(--ca-cyan); font-size: 12px;"></i> {{ job.job_type }}</span>
+        {% if job.posted_date %}
+        <span class="ca-meta-chip"><i class="fas fa-calendar" style="color: var(--ca-magenta); font-size: 12px;"></i> Posted {{ job.posted_date }}</span>
+        {% endif %}
+      </div>
+
+      <!-- Summary -->
+      {% if job.summary %}
+      <div style="background: linear-gradient(135deg, rgba(109,40,217,0.06), rgba(6,182,212,0.04)); border: 1px solid var(--ca-border); border-radius: 14px; padding: 20px 24px; margin-bottom: 32px; font-size: 15px; line-height: 1.7; color: var(--text-secondary); font-weight: 500;">
+        {{ job.summary }}
+      </div>
+      {% endif %}
+
+      <!-- Description -->
+      {% if job.description %}
+      <h2 class="ca-section-head">About This Role</h2>
+      <p style="font-size: 15px; line-height: 1.75; color: var(--text-secondary); margin-bottom: 0;">{{ job.description }}</p>
+      {% endif %}
+
+      <!-- Responsibilities -->
+      {% if job.responsibilities %}
+      <h2 class="ca-section-head">Key Responsibilities</h2>
+      <ul class="ca-req-list">
+        {% for item in job.responsibilities %}
+        <li class="ca-req-item">{{ item }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+
+      <!-- Requirements -->
+      {% if job.requirements %}
+      <h2 class="ca-section-head">Requirements & Qualifications</h2>
+      <ul class="ca-req-list">
+        {% for item in job.requirements %}
+        <li class="ca-req-item">{{ item }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+
+      <!-- Additional Info -->
+      {% if job.additional_info %}
+      <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 18px 22px; margin-top: 32px; font-size: 14px; color: var(--text-secondary); line-height: 1.7;">
+        <strong style="display: block; margin-bottom: 6px; color: var(--text-primary); font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Additional Information</strong>
+        {{ job.additional_info }}
+      </div>
+      {% endif %}
+
+      <!-- Related Jobs -->
+      {% if related_jobs %}
+      <div style="margin-top: 56px; padding-top: 40px; border-top: 1px solid var(--border-color);">
+        <h3 style="font-size: 20px; font-weight: 700; color: var(--text-primary); margin-bottom: 20px;">Other Open Positions</h3>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          {% for rj in related_jobs %}
+          <a href="/careers/{{ rj.slug }}" class="ca-related-card">
+            <div style="display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap; gap: 8px;">
+              <div>
+                <div style="font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">{{ rj.title }}</div>
+                <div style="font-size: 13px; color: var(--text-secondary);">
+                  <i class="fas fa-location-dot" style="font-size: 11px; margin-right: 4px;"></i>{{ rj.location }}
+                  &nbsp;&nbsp;<i class="fas fa-tag" style="font-size: 11px; margin-right: 4px;"></i>{{ rj.department }}
+                </div>
+              </div>
+              <span class="ca-badge" style="font-size: 11px;">{{ rj.job_type }}</span>
+            </div>
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- RIGHT: Application Sidebar -->
+    <div class="ca-sidebar">
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+        <div style="width: 36px; height: 36px; background: linear-gradient(135deg, var(--ca-violet), var(--ca-magenta)); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+          <i class="fas fa-paper-plane" style="color: #fff; font-size: 14px;"></i>
+        </div>
+        <h2 style="font-size: 18px; font-weight: 800; margin: 0; color: var(--text-primary);">Apply for This Role</h2>
+      </div>
+      <p style="font-size: 13px; color: var(--text-secondary); margin: 8px 0 20px; line-height: 1.6;">Complete the form below. Our HR team reviews every application within 3–5 business days.</p>
+
+      <!-- Error Alert -->
+      {% if form_errors %}
+      <div class="ca-error-alert">
+        <strong>Please fix the following:</strong>
+        <ul style="margin: 6px 0 0; padding-left: 16px;">
+          {% for err in form_errors %}<li>{{ err }}</li>{% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+
+      <form action="/careers/{{ job.slug }}/apply" method="POST" enctype="multipart/form-data" id="career-apply-form" style="display: flex; flex-direction: column; gap: 14px;" novalidate>
+        <input type="hidden" name="job_id" value="{{ job.id }}">
+
+        <div>
+          <label class="ca-form-label" for="apply_name">Full Name <span style="color: #dc2626;">*</span></label>
+          <input type="text" id="apply_name" name="full_name" required class="ca-form-input"
+                 placeholder="Jane Smith" value="{{ (form_data or {}).get('full_name', '') }}">
+        </div>
+
+        <div>
+          <label class="ca-form-label" for="apply_email">Email Address <span style="color: #dc2626;">*</span></label>
+          <input type="email" id="apply_email" name="email" required class="ca-form-input"
+                 placeholder="jane@company.com" value="{{ (form_data or {}).get('email', '') }}">
+        </div>
+
+        <div>
+          <label class="ca-form-label" for="apply_phone">Phone Number</label>
+          <input type="tel" id="apply_phone" name="phone" class="ca-form-input"
+                 placeholder="+1 (555) 000-0000" value="{{ (form_data or {}).get('phone', '') }}">
+        </div>
+
+        <div>
+          <label class="ca-form-label" for="apply_linkedin">LinkedIn Profile URL</label>
+          <input type="url" id="apply_linkedin" name="linkedin_url" class="ca-form-input"
+                 placeholder="https://linkedin.com/in/username" value="{{ (form_data or {}).get('linkedin_url', '') }}">
+        </div>
+
+        <div>
+          <label class="ca-form-label" for="apply_cover">Cover Letter</label>
+          <textarea id="apply_cover" name="cover_letter" class="ca-form-input" rows="4"
+                    placeholder="Tell us why you're a great fit for this role..." style="resize: vertical;">{{ (form_data or {}).get('cover_letter', '') }}</textarea>
+        </div>
+
+        <!-- Resume Upload -->
+        <div>
+          <label class="ca-form-label">Resume / CV <span style="color: #dc2626;">*</span></label>
+          <label for="apply_resume" class="ca-file-label" id="resume-drop-label">
+            <i class="fas fa-cloud-arrow-up" style="font-size: 20px;"></i>
+            <span id="resume-label-text">
+              <strong>Click to upload</strong> or drag & drop<br>
+              <small style="opacity: 0.7;">PDF, DOC, DOCX — Max 5 MB</small>
+            </span>
+          </label>
+          <input type="file" id="apply_resume" name="resume" accept=".pdf,.doc,.docx"
+                 required style="display: none;"
+                 onchange="document.getElementById('resume-label-text').innerHTML='<strong>' + this.files[0].name + '</strong><br><small style=\'opacity:0.7;\'>Selected</small>'">
+        </div>
+
+        <!-- Consent -->
+        <div style="display: flex; gap: 10px; align-items: flex-start;">
+          <input type="checkbox" id="apply_consent" name="consent" value="yes" required
+                 style="margin-top: 2px; flex-shrink: 0; width: 16px; height: 16px; accent-color: var(--ca-violet);">
+          <label for="apply_consent" style="font-size: 12px; color: var(--text-secondary); line-height: 1.5; cursor: pointer;">
+            I consent to ThinkArtha storing my personal data and resume for recruitment purposes, in accordance with its Privacy Policy.
+          </label>
+        </div>
+
+        <button type="submit" id="apply-submit-btn" class="btn btn-primary"
+                style="padding: 14px; border-radius: 10px; font-size: 14px; font-weight: 700; width: 100%; margin-top: 4px; background: linear-gradient(135deg, var(--ca-violet), var(--ca-magenta)); border: none; cursor: pointer; letter-spacing: 0.3px;">
+          <i class="fas fa-paper-plane" style="margin-right: 8px;"></i>Submit Application
+        </button>
+      </form>
+
+      <div style="margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border-color); text-align: center; font-size: 12px; color: var(--text-tertiary);">
+        <i class="fas fa-lock" style="margin-right: 4px;"></i>Your data is encrypted and stored securely.
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<script>
+// Drag and drop for resume upload
+const dropLabel = document.getElementById('resume-drop-label');
+const resumeInput = document.getElementById('apply_resume');
+if (dropLabel && resumeInput) {
+  dropLabel.addEventListener('dragover', e => {
+    e.preventDefault();
+    dropLabel.style.borderColor = 'var(--ca-violet)';
+    dropLabel.style.background = 'rgba(109,40,217,0.06)';
+  });
+  dropLabel.addEventListener('dragleave', () => {
+    dropLabel.style.borderColor = '';
+    dropLabel.style.background = '';
+  });
+  dropLabel.addEventListener('drop', e => {
+    e.preventDefault();
+    if (e.dataTransfer.files.length) {
+      resumeInput.files = e.dataTransfer.files;
+      const f = e.dataTransfer.files[0];
+      document.getElementById('resume-label-text').innerHTML =
+        '<strong>' + f.name + '</strong><br><small style="opacity:0.7;">Selected</small>';
+    }
+    dropLabel.style.borderColor = '';
+    dropLabel.style.background = '';
+  });
+}
+
+// Prevent double-submit
+const form = document.getElementById('career-apply-form');
+const submitBtn = document.getElementById('apply-submit-btn');
+if (form && submitBtn) {
+  form.addEventListener('submit', function() {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:8px;"></i>Submitting...';
+  });
+}
+</script>
+{% endblock %}

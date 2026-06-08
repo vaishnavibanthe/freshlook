@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% block title %}Career Applications – Careers Admin{% endblock %}
+
+{% block content %}
+<div style="height: var(--nav-height); background-color: var(--bg-secondary);"></div>
+
+<div style="display: grid; grid-template-columns: 260px 1fr; gap: 28px; padding: 32px; max-width: 1400px; margin: 0 auto; align-items: start;">
+
+  {% include 'admin_sidebar.html' %}
+
+  <main>
+    <!-- Header -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; flex-wrap: wrap; gap: 14px;">
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <a href="/admin/careers" style="color: var(--text-tertiary); text-decoration: none; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; display: flex; align-items: center; gap: 6px;"
+           onmouseover="this.style.borderColor='var(--accent-blue)'; this.style.color='var(--accent-blue)'"
+           onmouseout="this.style.borderColor='var(--border-color)'; this.style.color='var(--text-tertiary)'">
+          <i class="fas fa-arrow-left"></i> Back
+        </a>
+        <div>
+          <h1 style="font-size: 22px; font-weight: 800; color: var(--text-primary); margin: 0 0 2px;">Applications</h1>
+          <p style="font-size: 13px; color: var(--text-secondary); margin: 0;">{{ applications|length }} total applications</p>
+        </div>
+      </div>
+      <a href="/admin/careers/applications/export" class="btn btn-secondary"
+         style="font-size: 13px; padding: 10px 18px; border-radius: 8px; display: flex; align-items: center; gap: 8px;">
+        <i class="fas fa-download"></i> Export CSV
+      </a>
+    </div>
+
+    <!-- Filters -->
+    <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 18px 20px; margin-bottom: 20px;">
+      <form method="GET" style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+        <select name="job_id" class="form-control" style="padding: 8px 12px; border-radius: 8px; font-size: 13px; min-width: 200px;">
+          <option value="">All Jobs</option>
+          {% for j in jobs %}
+          <option value="{{ j['id'] }}" {% if job_filter == j['id']|string %}selected{% endif %}>{{ j['title'] }}</option>
+          {% endfor %}
+        </select>
+        <select name="status" class="form-control" style="padding: 8px 12px; border-radius: 8px; font-size: 13px;">
+          <option value="">All Statuses</option>
+          <option value="new" {% if status_filter == 'new' %}selected{% endif %}>New</option>
+          <option value="reviewing" {% if status_filter == 'reviewing' %}selected{% endif %}>Reviewing</option>
+          <option value="shortlisted" {% if status_filter == 'shortlisted' %}selected{% endif %}>Shortlisted</option>
+          <option value="interviewing" {% if status_filter == 'interviewing' %}selected{% endif %}>Interviewing</option>
+          <option value="offered" {% if status_filter == 'offered' %}selected{% endif %}>Offered</option>
+          <option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>Rejected</option>
+        </select>
+        <button type="submit" class="btn btn-primary"
+                style="padding: 8px 18px; border-radius: 8px; font-size: 13px; background: linear-gradient(135deg, #6d28d9, #7c3aed); border: none; cursor: pointer;">
+          Filter
+        </button>
+        <a href="/admin/careers/applications"
+           style="font-size: 13px; color: var(--text-secondary); text-decoration: none; padding: 8px 14px; border: 1px solid var(--border-color); border-radius: 8px;">
+          Clear
+        </a>
+      </form>
+    </div>
+
+    <!-- Applications Table -->
+    <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden;">
+      {% if applications %}
+      <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+          <thead>
+            <tr style="border-bottom: 1px solid var(--border-color); background: var(--bg-primary);">
+              <th style="padding: 12px 20px; text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-tertiary);">#</th>
+              <th style="padding: 12px 16px; text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-tertiary);">Applicant</th>
+              <th style="padding: 12px 16px; text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-tertiary);">Job Applied</th>
+              <th style="padding: 12px 16px; text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-tertiary);">Status</th>
+              <th style="padding: 12px 16px; text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-tertiary);">Submitted</th>
+              <th style="padding: 12px 20px; text-align: right; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-tertiary);">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for app in applications %}
+            <tr style="border-bottom: 1px solid var(--border-color); transition: background 0.15s;"
+                onmouseover="this.style.background='var(--bg-primary)'" onmouseout="this.style.background=''">
+              <td style="padding: 14px 20px; font-size: 13px; color: var(--text-tertiary);">#{{ app['id'] }}</td>
+              <td style="padding: 14px 16px;">
+                <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 2px;">{{ app['full_name'] }}</div>
+                <div style="font-size: 12px; color: var(--text-secondary);">{{ app['email'] }}</div>
+                {% if app['phone'] %}
+                <div style="font-size: 12px; color: var(--text-tertiary);">{{ app['phone'] }}</div>
+                {% endif %}
+                {% if app['linkedin_url'] %}
+                <a href="{{ app['linkedin_url'] }}" target="_blank" style="font-size: 11px; color: #0a66c2; text-decoration: none;">
+                  <i class="fab fa-linkedin"></i> LinkedIn
+                </a>
+                {% endif %}
+              </td>
+              <td style="padding: 14px 16px; font-size: 13px; color: var(--text-secondary);">
+                {% if app['job_slug'] %}
+                <a href="/careers/{{ app['job_slug'] }}" target="_blank" style="color: #6d28d9; text-decoration: none; font-weight: 600;">{{ app['job_title_ref'] or app['job_title'] }}</a>
+                {% else %}
+                {{ app['job_title'] or '—' }}
+                {% endif %}
+              </td>
+              <td style="padding: 14px 16px;">
+                {% set status_styles = {
+                  'new': ('background:#dbeafe;color:#2563eb', '● New'),
+                  'reviewing': ('background:#fef3c7;color:#d97706', '● Reviewing'),
+                  'shortlisted': ('background:#ede9fe;color:#6d28d9', '● Shortlisted'),
+                  'interviewing': ('background:#d1fae5;color:#059669', '● Interviewing'),
+                  'offered': ('background:#dcfce7;color:#16a34a', '⭐ Offered'),
+                  'rejected': ('background:#fee2e2;color:#dc2626', '✕ Rejected')
+                } %}
+                {% set sty = status_styles.get(app['status'], ('background:var(--bg-secondary);color:var(--text-secondary)', app['status'])) %}
+                <span style="{{ sty[0] }}; border-radius: 20px; padding: 3px 10px; font-size: 11px; font-weight: 700; white-space: nowrap;">{{ sty[1] }}</span>
+              </td>
+              <td style="padding: 14px 16px; font-size: 12px; color: var(--text-secondary); white-space: nowrap;">{{ app['submitted_at'][:16] if app['submitted_at'] else '—' }}</td>
+              <td style="padding: 14px 20px; text-align: right;">
+                <div style="display: flex; gap: 8px; justify-content: flex-end; align-items: center; flex-wrap: wrap;">
+                  {% if app['resume_filename'] %}
+                  <a href="/admin/careers/applications/{{ app['id'] }}/download-resume"
+                     style="font-size: 12px; color: #16a34a; text-decoration: none; padding: 6px 10px; border-radius: 6px; border: 1px solid #bbf7d0; display: flex; align-items: center; gap: 5px;"
+                     title="Download Resume">
+                    <i class="fas fa-file-arrow-down"></i> CV
+                  </a>
+                  {% endif %}
+                  <button onclick="openStatusModal({{ app['id'] }}, '{{ app['status'] }}', '{{ (app['notes'] or '')|replace("'", "\\'") }}')"
+                          style="font-size: 12px; color: #6d28d9; background: none; border: 1px solid #ede9fe; padding: 6px 10px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+                    <i class="fas fa-pen"></i> Status
+                  </button>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div style="padding: 60px; text-align: center; color: var(--text-secondary);">
+        <i class="fas fa-inbox" style="font-size: 40px; margin-bottom: 16px; color: var(--text-tertiary);"></i>
+        <p>No applications found for the selected filters.</p>
+      </div>
+      {% endif %}
+    </div>
+  </main>
+</div>
+
+<!-- Status Update Modal -->
+<div id="status-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center;">
+  <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 18px; padding: 32px; max-width: 480px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+    <h2 style="font-size: 18px; font-weight: 800; color: var(--text-primary); margin: 0 0 20px;">Update Application Status</h2>
+    <form id="status-form" method="POST">
+      <div style="margin-bottom: 16px;">
+        <label style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); display: block; margin-bottom: 6px;">Status</label>
+        <select name="status" id="modal-status" class="form-control" style="padding: 10px 14px; border-radius: 8px; font-size: 14px; width: 100%;">
+          <option value="new">New</option>
+          <option value="reviewing">Reviewing</option>
+          <option value="shortlisted">Shortlisted</option>
+          <option value="interviewing">Interviewing</option>
+          <option value="offered">Offered</option>
+          <option value="rejected">Rejected</option>
+        </select>
+      </div>
+      <div style="margin-bottom: 20px;">
+        <label style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); display: block; margin-bottom: 6px;">Internal Notes</label>
+        <textarea name="notes" id="modal-notes" class="form-control" rows="4"
+                  placeholder="Add recruiter notes..."
+                  style="padding: 10px 14px; border-radius: 8px; font-size: 14px; width: 100%; box-sizing: border-box; resize: vertical;"></textarea>
+      </div>
+      <div style="display: flex; gap: 12px;">
+        <button type="submit" class="btn btn-primary"
+                style="flex: 1; padding: 12px; border-radius: 8px; font-weight: 700; background: linear-gradient(135deg, #6d28d9, #d946ef); border: none; cursor: pointer;">
+          Update Status
+        </button>
+        <button type="button" onclick="closeStatusModal()"
+                style="padding: 12px 20px; border-radius: 8px; font-size: 14px; border: 1px solid var(--border-color); color: var(--text-secondary); background: none; cursor: pointer;">
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function openStatusModal(appId, currentStatus, currentNotes) {
+  const modal = document.getElementById('status-modal');
+  const form = document.getElementById('status-form');
+  document.getElementById('modal-status').value = currentStatus;
+  document.getElementById('modal-notes').value = currentNotes;
+  form.action = '/admin/careers/applications/' + appId + '/status';
+  modal.style.display = 'flex';
+}
+function closeStatusModal() {
+  document.getElementById('status-modal').style.display = 'none';
+}
+document.getElementById('status-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeStatusModal();
+});
+</script>
+{% endblock %}

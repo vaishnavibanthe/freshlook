@@ -140,9 +140,8 @@ def seed_navigation():
     # Company
     insert_item("About Our Team", "/about-us", parent_id=abt_id, group_label="Company", description="Empower businesses with insightful innovations", sort_order=1)
     insert_item("Partners Ecosystem", "/partners", parent_id=abt_id, group_label="Company", description="Strategic alliances catering to all data requirements", sort_order=2)
-    insert_item("Client Placements", "/careers/clients", parent_id=abt_id, group_label="Company", description="Our legacy of success in staffing and delivery", sort_order=3)
-    insert_item("Careers", "/careers", parent_id=abt_id, group_label="Company", description="Be part of our dynamic enterprise consulting team", sort_order=4)
-    insert_item("Request a Demo", "/contact-us", parent_id=abt_id, group_label="Company", description="See our assessment framework in action", sort_order=5)
+    insert_item("Careers", "/careers", parent_id=abt_id, group_label="Company", description="Be part of our dynamic enterprise consulting team", sort_order=3)
+    insert_item("Request a Demo", "/contact-us", parent_id=abt_id, group_label="Company", description="See our assessment framework in action", sort_order=4)
 
     # 8. Create CTAs
     cursor.execute("""

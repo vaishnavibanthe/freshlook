@@ -237,7 +237,6 @@ def get_navigation_fallback():
                         'items': [
                             {'id': 9959, 'label': 'About Our Team', 'url': '/about-us', 'description': 'Empower businesses with insightful innovations', 'icon': None},
                             {'id': 99510, 'label': 'Partners Ecosystem', 'url': '/partners', 'description': 'Strategic alliances catering to all data requirements', 'icon': None},
-                            {'id': 99511, 'label': 'Client Placements', 'url': '/careers/clients', 'description': 'Our legacy of success in staffing and delivery', 'icon': None},
                             {'id': 99512, 'label': 'Careers', 'url': '/careers', 'description': 'Be part of our dynamic enterprise consulting team', 'icon': None},
                             {'id': 99513, 'label': 'Request a Demo', 'url': '/contact-us', 'description': 'See our assessment framework in action', 'icon': None}
                         ]
@@ -469,9 +468,355 @@ def artificial_intelligence():
 def about_us():
     return render_template('about_us.html', active_page='about_us')
 
+# ============================================================
+#  CAREERS MODULE – Public Routes
+# ============================================================
+
+CAREERS_UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'uploads', 'resumes')
+ALLOWED_RESUME_EXTENSIONS = {'pdf', 'doc', 'docx'}
+MAX_RESUME_SIZE_MB = 5
+
+def _allowed_resume(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_RESUME_EXTENSIONS
+
+def _get_career_jobs(status='published', department=None, location=None, job_type=None, search=None):
+    conn = get_db_connection()
+    query = "SELECT * FROM career_jobs WHERE status = ?"
+    params = [status]
+    if department:
+        query += " AND department = ?"
+        params.append(department)
+    if location:
+        query += " AND location LIKE ?"
+        params.append(f'%{location}%')
+    if job_type:
+        query += " AND job_type = ?"
+        params.append(job_type)
+    if search:
+        query += " AND (title LIKE ? OR summary LIKE ? OR department LIKE ?)"
+        params.extend([f'%{search}%', f'%{search}%', f'%{search}%'])
+    query += " ORDER BY posted_date DESC, id DESC"
+    rows = conn.execute(query, params).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
 @app.route('/careers')
 def careers():
-    return render_template('careers.html', active_page='careers')
+    import json as _json
+    jobs = _get_career_jobs()
+    departments = sorted(set(j['department'] for j in jobs))
+    locations_raw = [j['location'] for j in jobs]
+    geographies = sorted(set(
+        loc.split(',')[-1].strip() for loc in locations_raw
+    ))
+    job_types = sorted(set(j['job_type'] for j in jobs))
+    return render_template(
+        'careers.html',
+        active_page='careers',
+        jobs=jobs,
+        departments=departments,
+        geographies=geographies,
+        job_types=job_types,
+        json=_json
+    )
+
+@app.route('/careers/<slug>')
+def career_job_detail(slug):
+    import json as _json
+    conn = get_db_connection()
+    job = conn.execute("SELECT * FROM career_jobs WHERE slug = ? AND status = 'published'", (slug,)).fetchone()
+    conn.close()
+    if not job:
+        abort(404)
+    job = dict(job)
+    # Parse JSON arrays
+    for field in ['responsibilities', 'requirements']:
+        if job.get(field):
+            try:
+                job[field] = _json.loads(job[field])
+            except Exception:
+                job[field] = [job[field]]
+    # Related jobs (same department, excluding current)
+    related = _get_career_jobs()
+    related = [j for j in related if j['slug'] != slug][:3]
+    return render_template('career_job_detail.html', job=job, related_jobs=related, active_page='careers')
+
+@app.route('/careers/<slug>/apply', methods=['POST'])
+def career_apply(slug):
+    import json as _json
+    conn = get_db_connection()
+    job = conn.execute("SELECT * FROM career_jobs WHERE slug = ? AND status = 'published'", (slug,)).fetchone()
+    conn.close()
+    if not job:
+        abort(404)
+    job = dict(job)
+
+    full_name = request.form.get('full_name', '').strip()
+    email = request.form.get('email', '').strip()
+    phone = request.form.get('phone', '').strip()
+    linkedin_url = request.form.get('linkedin_url', '').strip()
+    cover_letter = request.form.get('cover_letter', '').strip()
+    consent = request.form.get('consent', '')
+
+    errors = []
+    if not full_name:
+        errors.append('Full name is required.')
+    if not email or '@' not in email:
+        errors.append('Valid email address is required.')
+    if not consent:
+        errors.append('You must consent to data processing.')
+
+    resume_file = request.files.get('resume')
+    resume_filename = None
+    resume_path = None
+    if not resume_file or resume_file.filename == '':
+        errors.append('Resume/CV upload is mandatory.')
+    elif not _allowed_resume(resume_file.filename):
+        errors.append('Resume must be a PDF, DOC, or DOCX file.')
+    else:
+        content = resume_file.read()
+        if len(content) > MAX_RESUME_SIZE_MB * 1024 * 1024:
+            errors.append(f'Resume file must be under {MAX_RESUME_SIZE_MB} MB.')
+        else:
+            resume_file.seek(0)
+            safe_name = secure_filename(resume_file.filename)
+            timestamp = int(time.time())
+            resume_filename = f"{timestamp}_{slug}_{safe_name}"
+            resume_path = os.path.join(CAREERS_UPLOAD_FOLDER, resume_filename)
+            os.makedirs(CAREERS_UPLOAD_FOLDER, exist_ok=True)
+            resume_file.save(resume_path)
+
+    if errors:
+        job_copy = dict(job)
+        for field in ['responsibilities', 'requirements']:
+            if job_copy.get(field):
+                try:
+                    job_copy[field] = _json.loads(job_copy[field])
+                except Exception:
+                    pass
+        related = _get_career_jobs()
+        related = [j for j in related if j['slug'] != slug][:3]
+        return render_template('career_job_detail.html', job=job_copy, related_jobs=related,
+                               active_page='careers', form_errors=errors,
+                               form_data={'full_name': full_name, 'email': email,
+                                          'phone': phone, 'linkedin_url': linkedin_url,
+                                          'cover_letter': cover_letter})
+
+    conn = get_db_connection()
+    conn.execute("""
+        INSERT INTO career_applications
+        (job_id, job_title, full_name, email, phone, linkedin_url, cover_letter,
+         resume_filename, resume_path, consent_given, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 'new')
+    """, (job['id'], job['title'], full_name, email, phone, linkedin_url, cover_letter,
+          resume_filename, resume_path))
+    conn.commit()
+    conn.close()
+
+    return render_template('career_apply_success.html', job=job, applicant_name=full_name,
+                           active_page='careers')
+
+
+# ============================================================
+#  CAREERS MODULE – Admin Routes
+# ============================================================
+
+def _careers_admin_required():
+    if 'logged_in' not in session:
+        return redirect('/admin/login')
+    return None
+
+@app.route('/admin/careers')
+def admin_careers_dashboard():
+    guard = _careers_admin_required()
+    if guard: return guard
+    conn = get_db_connection()
+    jobs = conn.execute("SELECT * FROM career_jobs ORDER BY id DESC").fetchall()
+    total_apps = conn.execute("SELECT COUNT(*) FROM career_applications").fetchone()[0]
+    new_apps = conn.execute("SELECT COUNT(*) FROM career_applications WHERE status='new'").fetchone()[0]
+    conn.close()
+    return render_template('admin_careers_jobs.html', jobs=jobs, total_apps=total_apps,
+                           new_apps=new_apps, active_admin='careers')
+
+@app.route('/admin/careers/jobs/new', methods=['GET', 'POST'])
+def admin_career_job_new():
+    guard = _careers_admin_required()
+    if guard: return guard
+    import json as _json
+    if request.method == 'POST':
+        slug = re.sub(r'[^a-z0-9-]', '-', request.form.get('title', '').lower().strip()).strip('-')
+        slug = re.sub(r'-+', '-', slug)
+        responsibilities = request.form.get('responsibilities', '').strip()
+        requirements = request.form.get('requirements', '').strip()
+        # Try to convert newline-separated text to JSON array
+        try:
+            resp_list = [r.strip() for r in responsibilities.splitlines() if r.strip()]
+            req_list = [r.strip() for r in requirements.splitlines() if r.strip()]
+            responsibilities = _json.dumps(resp_list)
+            requirements = _json.dumps(req_list)
+        except Exception:
+            pass
+        conn = get_db_connection()
+        try:
+            conn.execute("""
+                INSERT INTO career_jobs (slug, title, department, location, job_type, summary,
+                    description, responsibilities, requirements, additional_info, status, posted_date)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                slug, request.form.get('title'), request.form.get('department'),
+                request.form.get('location'), request.form.get('job_type', 'Full-Time'),
+                request.form.get('summary'), request.form.get('description'),
+                responsibilities, requirements, request.form.get('additional_info'),
+                request.form.get('status', 'published'),
+                request.form.get('posted_date', datetime.now().strftime('%Y-%m-%d'))
+            ))
+            conn.commit()
+        except Exception as e:
+            conn.close()
+            return render_template('admin_career_job_edit.html', job=None,
+                                   error=str(e), active_admin='careers')
+        conn.close()
+        return redirect('/admin/careers')
+    return render_template('admin_career_job_edit.html', job=None, active_admin='careers')
+
+@app.route('/admin/careers/jobs/<int:job_id>/edit', methods=['GET', 'POST'])
+def admin_career_job_edit(job_id):
+    guard = _careers_admin_required()
+    if guard: return guard
+    import json as _json
+    conn = get_db_connection()
+    job = conn.execute("SELECT * FROM career_jobs WHERE id = ?", (job_id,)).fetchone()
+    if not job:
+        conn.close()
+        abort(404)
+    job = dict(job)
+    if request.method == 'POST':
+        responsibilities = request.form.get('responsibilities', '').strip()
+        requirements = request.form.get('requirements', '').strip()
+        try:
+            resp_list = [r.strip() for r in responsibilities.splitlines() if r.strip()]
+            req_list = [r.strip() for r in requirements.splitlines() if r.strip()]
+            responsibilities = _json.dumps(resp_list)
+            requirements = _json.dumps(req_list)
+        except Exception:
+            pass
+        conn2 = get_db_connection()
+        conn2.execute("""
+            UPDATE career_jobs SET title=?, department=?, location=?, job_type=?, summary=?,
+            description=?, responsibilities=?, requirements=?, additional_info=?, status=?,
+            posted_date=?, updated_at=datetime('now') WHERE id=?
+        """, (
+            request.form.get('title'), request.form.get('department'),
+            request.form.get('location'), request.form.get('job_type', 'Full-Time'),
+            request.form.get('summary'), request.form.get('description'),
+            responsibilities, requirements, request.form.get('additional_info'),
+            request.form.get('status', 'published'),
+            request.form.get('posted_date'), job_id
+        ))
+        conn2.commit()
+        conn2.close()
+        return redirect('/admin/careers')
+    # Format JSON arrays as newline-separated text for editing
+    for field in ['responsibilities', 'requirements']:
+        if job.get(field):
+            try:
+                items = _json.loads(job[field])
+                job[field] = '\n'.join(items)
+            except Exception:
+                pass
+    conn.close()
+    return render_template('admin_career_job_edit.html', job=job, active_admin='careers')
+
+@app.route('/admin/careers/jobs/<int:job_id>/delete', methods=['POST', 'GET'])
+def admin_career_job_delete(job_id):
+    guard = _careers_admin_required()
+    if guard: return guard
+    conn = get_db_connection()
+    conn.execute("DELETE FROM career_jobs WHERE id = ?", (job_id,))
+    conn.commit()
+    conn.close()
+    return redirect('/admin/careers')
+
+@app.route('/admin/careers/applications')
+def admin_career_applications():
+    guard = _careers_admin_required()
+    if guard: return guard
+    job_filter = request.args.get('job_id', '')
+    status_filter = request.args.get('status', '')
+    conn = get_db_connection()
+    query = """
+        SELECT a.*, j.title as job_title_ref, j.slug as job_slug
+        FROM career_applications a
+        LEFT JOIN career_jobs j ON a.job_id = j.id
+        WHERE 1=1
+    """
+    params = []
+    if job_filter:
+        query += " AND a.job_id = ?"
+        params.append(job_filter)
+    if status_filter:
+        query += " AND a.status = ?"
+        params.append(status_filter)
+    query += " ORDER BY a.submitted_at DESC"
+    applications = conn.execute(query, params).fetchall()
+    jobs = conn.execute("SELECT id, title FROM career_jobs ORDER BY title").fetchall()
+    conn.close()
+    return render_template('admin_career_applications.html', applications=applications,
+                           jobs=jobs, job_filter=job_filter, status_filter=status_filter,
+                           active_admin='careers')
+
+@app.route('/admin/careers/applications/<int:app_id>/status', methods=['POST'])
+def admin_career_app_status(app_id):
+    guard = _careers_admin_required()
+    if guard: return guard
+    new_status = request.form.get('status', 'new')
+    notes = request.form.get('notes', '')
+    conn = get_db_connection()
+    conn.execute("""
+        UPDATE career_applications SET status=?, notes=?, updated_at=datetime('now')
+        WHERE id=?
+    """, (new_status, notes, app_id))
+    conn.commit()
+    conn.close()
+    return redirect('/admin/careers/applications')
+
+@app.route('/admin/careers/applications/<int:app_id>/download-resume')
+def admin_career_download_resume(app_id):
+    guard = _careers_admin_required()
+    if guard: return guard
+    conn = get_db_connection()
+    app_row = conn.execute("SELECT * FROM career_applications WHERE id = ?", (app_id,)).fetchone()
+    conn.close()
+    if not app_row or not app_row['resume_path']:
+        abort(404)
+    return send_file(app_row['resume_path'], as_attachment=True,
+                     download_name=app_row['resume_filename'])
+
+@app.route('/admin/careers/applications/export')
+def admin_career_export_applications():
+    guard = _careers_admin_required()
+    if guard: return guard
+    conn = get_db_connection()
+    rows = conn.execute("""
+        SELECT a.id, a.full_name, a.email, a.phone, a.linkedin_url,
+               j.title as job, a.status, a.submitted_at, a.resume_filename
+        FROM career_applications a
+        LEFT JOIN career_jobs j ON a.job_id = j.id
+        ORDER BY a.submitted_at DESC
+    """).fetchall()
+    conn.close()
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(['ID', 'Name', 'Email', 'Phone', 'LinkedIn', 'Job Applied', 'Status', 'Submitted', 'Resume'])
+    for row in rows:
+        writer.writerow([row['id'], row['full_name'], row['email'], row['phone'],
+                         row['linkedin_url'], row['job'], row['status'],
+                         row['submitted_at'], row['resume_filename']])
+    output.seek(0)
+    resp = make_response(output.getvalue())
+    resp.headers['Content-Type'] = 'text/csv'
+    resp.headers['Content-Disposition'] = 'attachment; filename=career_applications.csv'
+    return resp
 
 @app.route('/solutions')
 def solutions_index():
@@ -655,7 +1000,7 @@ def privacy_policy():
 
 @app.route('/careers/clients')
 def careers_clients():
-    return render_template('careers_clients.html', active_page='careers')
+    return redirect('/careers', 301)
 
 @app.route('/artha-advantage/ai-sniffguard')
 def ai_sniffguard_landing():
