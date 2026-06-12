@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}SEO Control Center - Audits Log{% endblock %}
+
+{% block content %}
+<div style="height: var(--nav-height); background-color: var(--bg-secondary);"></div>
+
+<section class="section-alt" style="padding-top: 40px; min-height: 90vh;">
+    <div class="container" style="display: grid; grid-template-columns: 280px 1fr; gap: 40px; align-items: start;">
+        {% include 'admin_sidebar.html' %}
+        
+        <div>
+            <!-- Header -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
+                <div>
+                    <h2 style="font-size: 28px; font-weight: 800; letter-spacing: -0.5px; margin: 0;">Crawl & Audits History</h2>
+                    <p style="color: var(--text-tertiary); font-size: 14px; margin-top: 4px;">Run dynamic crawlers scans to check title lengths, schema markup validity, and direct answers support.</p>
+                </div>
+                <form action="/admin/seo/audit" method="POST">
+                    <button type="submit" class="btn btn-primary btn-glow" style="padding: 10px 22px; font-size: 13px;">
+                        <i class="fas fa-arrows-rotate btn-icon" style="margin-left: 0; margin-right: 8px;"></i> Trigger New Scan
+                    </button>
+                </form>
+            </div>
+            
+            <div style="background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); padding: 32px; box-shadow: var(--glass-shadow); margin-bottom: 40px;">
+                <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 24px;">Previous Audit Reports</h3>
+                
+                {% if audits %}
+                <div style="display: flex; flex-direction: column; gap: 20px;">
+                    {% for audit in audits %}
+                    <div style="border: 1px solid var(--border-color); padding: 20px; border-radius: var(--border-radius-md); background-color: var(--bg-secondary);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <span style="font-size: 14px; font-weight: 700;">Scan Date: {{ audit.run_date }}</span>
+                            <span style="font-size: 13px; font-weight: 700; color: #10b981; background-color: rgba(16, 185, 129, 0.1); padding: 4px 12px; border-radius: 99px;">
+                                SEO Health: {{ audit.health_score }}%
+                            </span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 12px; font-size: 13px;">
+                            <div><strong>Audited Pages:</strong> {{ audit.pages_audited }}</div>
+                            <div style="color: #ef4444;"><strong>Errors:</strong> {{ audit.critical_errors }}</div>
+                            <div style="color: #f59e0b;"><strong>Warnings:</strong> {{ audit.warnings }}</div>
+                            <div style="color: var(--accent-blue);"><strong>Opportunities:</strong> {{ audit.opportunities }}</div>
+                        </div>
+                        
+                        <!-- Collapsible detail details -->
+                        <details style="font-size: 12.5px; color: var(--text-secondary);">
+                            <summary style="cursor: pointer; font-weight: 700; color: var(--accent-blue); padding: 4px 0;">View issues log details</summary>
+                            <div style="margin-top: 10px; border-top: 1px solid var(--border-color); padding-top: 10px;">
+                                {% if audit.audit_results_json %}
+                                    <ul style="list-style: none; padding-left: 0; display: flex; flex-direction: column; gap: 6px;">
+                                    {% for item in load_json_helper(audit.audit_results_json) %}
+                                        {% if item.issues %}
+                                        <li style="padding: 6px 10px; background-color: var(--bg-primary); border-radius: 4px; border-left: 3px solid #ef4444;">
+                                            <strong>{{ item.path }}</strong>: {{ item.issues|join(', ') }}
+                                        </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <p>No issue logs saved for this run.</p>
+                                {% endif %}
+                            </div>
+                        </details>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p style="color: var(--text-tertiary); text-align: center; padding: 20px 0;">No audit records found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

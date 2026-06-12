@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}SEO Control Center - Analytics{% endblock %}
+
+{% block content %}
+<div style="height: var(--nav-height); background-color: var(--bg-secondary);"></div>
+
+<section class="section-alt" style="padding-top: 40px; min-height: 90vh;">
+    <div class="container" style="display: grid; grid-template-columns: 280px 1fr; gap: 40px; align-items: start;">
+        {% include 'admin_sidebar.html' %}
+        
+        <div>
+            <!-- Header -->
+            <div style="margin-bottom: 32px;">
+                <h2 style="font-size: 28px; font-weight: 800; letter-spacing: -0.5px; margin: 0;">Referral Search & AI Analytics</h2>
+                <p style="color: var(--text-tertiary); font-size: 14px; margin-top: 4px;">Track user sessions and form submission conversions originating from search engines (Google, Bing) and AI systems (ChatGPT, Copilot, Perplexity) separately.</p>
+            </div>
+            
+            <!-- Summary Stats Widgets -->
+            <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 40px; text-align: left;">
+                {% set search_visits = 0 %}
+                {% set search_convs = 0 %}
+                {% set ai_visits = 0 %}
+                {% set ai_convs = 0 %}
+                {% set direct_visits = 0 %}
+                {% set direct_convs = 0 %}
+                
+                {% for row in summary %}
+                    {% if row.referral_type == 'Search Engine' %}
+                        {% set search_visits = row.total_visits %}
+                        {% set search_convs = row.total_conversions %}
+                    {% elif row.referral_type == 'AI Assistant' %}
+                        {% set ai_visits = row.total_visits %}
+                        {% set ai_convs = row.total_conversions %}
+                    {% else %}
+                        {% set direct_visits = direct_visits + row.total_visits %}
+                        {% set direct_convs = direct_convs + row.total_conversions %}
+                    {% endif %}
+                {% endfor %}
+                
+                <div style="background-color: var(--bg-primary); border: 1px solid var(--border-color); padding: 24px; border-radius: var(--border-radius-md); box-shadow: var(--card-shadow);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <span style="font-size: 12px; color: var(--text-tertiary); font-weight: 700; text-transform: uppercase;">Search Engine Referral Traffic</span>
+                        <i class="fas fa-magnifying-glass" style="color: var(--accent-blue); font-size: 18px;"></i>
+                    </div>
+                    <span style="font-size: 32px; font-weight: 800;">{{ search_visits }}</span>
+                    <div style="font-size:12.5px; color:var(--text-secondary); margin-top:8px;">Conversions: <strong>{{ search_convs or 0 }}</strong></div>
+                </div>
+                
+                <div style="background-color: var(--bg-primary); border: 1px solid var(--border-color); padding: 24px; border-radius: var(--border-radius-md); box-shadow: var(--card-shadow);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <span style="font-size: 12px; color: var(--text-tertiary); font-weight: 700; text-transform: uppercase;">AI Assistant Referral Traffic</span>
+                        <i class="fas fa-brain" style="color: var(--accent-indigo); font-size: 18px;"></i>
+                    </div>
+                    <span style="font-size: 32px; font-weight: 800; color: var(--accent-indigo);">{{ ai_visits }}</span>
+                    <div style="font-size:12.5px; color:var(--text-secondary); margin-top:8px;">Conversions: <strong>{{ ai_convs or 0 }}</strong></div>
+                </div>
+                
+                <div style="background-color: var(--bg-primary); border: 1px solid var(--border-color); padding: 24px; border-radius: var(--border-radius-md); box-shadow: var(--card-shadow);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <span style="font-size: 12px; color: var(--text-tertiary); font-weight: 700; text-transform: uppercase;">Other / Direct Traffic</span>
+                        <i class="fas fa-arrow-pointer" style="color: #10b981; font-size: 18px;"></i>
+                    </div>
+                    <span style="font-size: 32px; font-weight: 800;">{{ direct_visits }}</span>
+                    <div style="font-size:12.5px; color:var(--text-secondary); margin-top:8px;">Conversions: <strong>{{ direct_convs or 0 }}</strong></div>
+                </div>
+            </div>
+
+            <!-- Recent referrals log -->
+            <div style="background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); padding: 24px; box-shadow: var(--glass-shadow); overflow-x: auto; text-align: left;">
+                <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">Recent Traffic Log</h3>
+                
+                {% if traffic %}
+                <table style="width:100%; border-collapse:collapse; text-align:left; font-size:12.5px;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid var(--border-color); color: var(--text-secondary); font-weight:600;">
+                            <th style="padding:10px;">Referrer Domain</th>
+                            <th style="padding:10px;">Referral Type</th>
+                            <th style="padding:10px;">Landing Page</th>
+                            <th style="padding:10px; text-align:center;">Conversion</th>
+                            <th style="padding:10px; text-align:right;">Date/Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for t in traffic %}
+                        <tr style="border-bottom: 1px solid var(--border-color);" onmouseover="this.style.backgroundColor='var(--bg-secondary)'" onmouseout="this.style.backgroundColor='transparent'">
+                            <td style="padding:10px; font-weight:600; font-family:monospace;">{{ t.source_domain or 'Direct / Unknown' }}</td>
+                            <td style="padding:10px;">
+                                <span style="font-weight:700; color:{% if t.referral_type == 'AI Assistant' %}var(--accent-indigo){% elif t.referral_type == 'Search Engine' %}var(--accent-blue){% else %}inherit{% endif %};">
+                                    {{ t.referral_type }}
+                                </span>
+                            </td>
+                            <td style="padding:10px; font-family:monospace;">{{ t.landing_page }}</td>
+                            <td style="padding:10px; text-align:center;">
+                                {% if t.converted == 1 %}
+                                <span style="font-weight:800; color:#10b981; background:rgba(16, 185, 129, 0.1); padding:2px 8px; border-radius:12px; font-size:11px;">CONVERTED</span>
+                                {% else %}
+                                <span style="color:var(--text-tertiary); font-size:11px;">No Conversion</span>
+                                {% endif %}
+                            </td>
+                            <td style="padding:10px; text-align:right; color:var(--text-tertiary);">{{ t.timestamp }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p style="text-align:center; color:var(--text-tertiary); padding:20px 0;">No visitor traffic logs recorded.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

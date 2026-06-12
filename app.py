@@ -36,6 +36,91 @@ serializer = URLSafeTimedSerializer(app.secret_key)
 from crm import crm_bp
 app.register_blueprint(crm_bp)
 
+@app.before_request
+def handle_seo_and_referrals():
+    # 1. Skip static assets, admin routes, CRM routes
+    path = request.path
+    if path.startswith('/static/') or path.startswith('/admin') or path.startswith('/api/') or path.startswith('/crm'):
+        return
+
+    # 2. Check for redirect override
+    try:
+        conn = sqlite3.connect('blog.db')
+        conn.row_factory = sqlite3.Row
+        redirect_row = conn.execute("SELECT * FROM seo_redirects WHERE source_path = ? AND is_active = 1", (path,)).fetchone()
+        conn.close()
+        if redirect_row:
+            target = redirect_row['target_path']
+            code = redirect_row['redirect_type'] or 301
+            return redirect(target, code=code)
+    except Exception as e:
+        print(f"Error checking redirects: {e}")
+
+    # 3. Log traffic and referral source
+    try:
+        referrer = request.referrer or ''
+        source_domain = ''
+        referral_type = 'Direct'
+        
+        if referrer:
+            from urllib.parse import urlparse
+            parsed = urlparse(referrer)
+            source_domain = parsed.netloc.lower()
+            
+            # Identify search engines
+            search_engines = ['google.com', 'bing.com', 'yahoo.com', 'duckduckgo.com', 'baidu.com', 'yandex.ru']
+            # Identify AI search assistants
+            ai_referrers = ['chatgpt.com', 'openai.com', 'perplexity.ai', 'gemini.google.com', 'copilot.microsoft.com', 'claude.ai', 'anthropic.com']
+            
+            if any(se in source_domain for se in search_engines):
+                referral_type = 'Search Engine'
+            elif any(ai in source_domain for ai in ai_referrers):
+                referral_type = 'AI Assistant'
+            else:
+                referral_type = 'Referral'
+
+        # Also capture UTMs
+        utm_source = request.args.get('utm_source', '')
+        utm_medium = request.args.get('utm_medium', '')
+        utm_campaign = request.args.get('utm_campaign', '')
+        
+        # Simple IP hash for unique tracking (privacy compliant)
+        import hashlib
+        ip_hash = hashlib.sha256((request.remote_addr or '127.0.0.1').encode('utf-8')).hexdigest()[:16]
+        
+        # Log to db if not a duplicate visit in this session
+        session_key = f"logged_visit_{path}_{referral_type}"
+        if not session.get(session_key):
+            conn = sqlite3.connect('blog.db')
+            conn.execute("""
+                INSERT INTO seo_traffic_logs (source_domain, referral_type, referrer_header, landing_page, utm_source, utm_medium, utm_campaign, ip_hash)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """, (source_domain, referral_type, referrer, path, utm_source, utm_medium, utm_campaign, ip_hash))
+            conn.commit()
+            conn.close()
+            session[session_key] = True
+            session['last_traffic_log_path'] = path
+    except Exception as e:
+        print(f"Error logging traffic: {e}")
+
+def mark_referral_conversion():
+    try:
+        # Check if we logged a visit
+        last_path = session.get('last_traffic_log_path')
+        if last_path:
+            conn = sqlite3.connect('blog.db')
+            # Update the latest visit record for this session
+            conn.execute("""
+                UPDATE seo_traffic_logs 
+                SET converted = 1 
+                WHERE landing_page = ? AND converted = 0 
+                ORDER BY id DESC LIMIT 1
+            """, (last_path,))
+            conn.commit()
+            conn.close()
+    except Exception as e:
+        print(f"Error marking conversion: {e}")
+
 def forward_to_crm_wrapper(email, first_name, last_name, company, phone, job_title, geography, country, industry, message, source_form, source_page, cta_clicked, lead_source, utm_source, utm_medium, utm_campaign, utm_term, utm_content, referrer, ip_address, user_agent, consent_status=0):
     try:
         from crm.models import forward_lead_to_crm
@@ -47,6 +132,7 @@ def forward_to_crm_wrapper(email, first_name, last_name, company, phone, job_tit
             utm_term=utm_term, utm_content=utm_content, referrer=referrer,
             ip_address=ip_address, user_agent=user_agent, consent_status=consent_status
         )
+        mark_referral_conversion()
     except Exception as e:
         print(f"Error forwarding lead to CRM: {e}")
 
@@ -548,6 +634,27 @@ def inject_global_data():
             print(f"Error fetching case study {slug}: {e}")
         return None
 
+    seo_page = None
+    google_verification = ''
+    bing_verification = ''
+    try:
+        conn = get_db_connection()
+        row = conn.execute("SELECT * FROM seo_pages WHERE route_slug = ?", (request.path,)).fetchone()
+        if row:
+            seo_page = dict(row)
+        
+        g_row = conn.execute("SELECT value FROM seo_settings WHERE key = 'google_verification'").fetchone()
+        if g_row:
+            google_verification = g_row['value']
+            
+        b_row = conn.execute("SELECT value FROM seo_settings WHERE key = 'bing_verification'").fetchone()
+        if b_row:
+            bing_verification = b_row['value']
+            
+        conn.close()
+    except Exception as e:
+        print(f"Error injecting SEO data: {e}")
+
     return {
         'nav_solutions': SOLUTIONS_DATA,
         'nav_industries': INDUSTRIES_DATA,
@@ -562,7 +669,10 @@ def inject_global_data():
         'nav_jobs': JOBS_DATA,
         'load_json_helper': load_json_helper,
         'get_case_study': get_case_study,
-        'navigation_menu': load_navigation_menu()
+        'navigation_menu': load_navigation_menu(),
+        'seo_page_override': seo_page,
+        'google_verification': google_verification,
+        'bing_verification': bing_verification
     }
 
 @app.template_filter('load_json')
@@ -2802,6 +2912,445 @@ def universal_search():
     total_count = len(results['blogs']) + len(results['case_studies']) + len(results['services'])
     
     return render_template('search_results.html', q=q, results=results, total_count=total_count, active_page='none')
+
+# ==========================================================================
+# Dynamic Robots.txt and XML Sitemap Handlers
+# ==========================================================================
+
+@app.route('/robots.txt')
+def robots_txt():
+    try:
+        conn = get_db_connection()
+        row = conn.execute("SELECT value FROM seo_settings WHERE key = 'robots_policy'").fetchone()
+        conn.close()
+        
+        policy = json.loads(row['value']) if row else {}
+    except Exception as e:
+        print(f"Error fetching robots policy: {e}")
+        policy = {
+            'Googlebot': {'allowed': True},
+            'Bingbot': {'allowed': True},
+            'OAI-SearchBot': {'allowed': True},
+            'GPTBot': {'allowed': False},
+            '*': {'allowed': True}
+        }
+        
+    lines = []
+    
+    # Render user-agent rules
+    for ua, rules in policy.items():
+        lines.append(f"User-agent: {ua}")
+        if rules.get('allowed', True):
+            lines.append("Allow: /")
+        else:
+            lines.append("Disallow: /")
+        if rules.get('crawl_delay'):
+            lines.append(f"Crawl-delay: {rules['crawl_delay']}")
+        lines.append("")
+        
+    # Standard disallowed private areas
+    lines.append("# Private Areas")
+    lines.append("Disallow: /admin/")
+    lines.append("Disallow: /crm/")
+    lines.append("Disallow: /api/")
+    lines.append("")
+    
+    # Sitemap reference
+    lines.append("Sitemap: https://www.thinkartha.com/sitemap.xml")
+    
+    response = make_response("\n".join(lines))
+    response.headers["Content-Type"] = "text/plain"
+    return response
+
+@app.route('/sitemap.xml')
+def sitemap_index():
+    xml = []
+    xml.append('<?xml version="1.0" encoding="UTF-8"?>')
+    xml.append('<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
+    
+    sub_sitemaps = ['main', 'services', 'industries', 'case_studies', 'blogs', 'jobs']
+    now_str = datetime.now().strftime('%Y-%m-%d')
+    
+    for s in sub_sitemaps:
+        xml.append('  <sitemap>')
+        xml.append(f'    <loc>https://www.thinkartha.com/sitemap_{s}.xml</loc>')
+        xml.append(f'    <lastmod>{now_str}</lastmod>')
+        xml.append('  </sitemap>')
+        
+    xml.append('</sitemapindex>')
+    
+    response = make_response("\n".join(xml))
+    response.headers["Content-Type"] = "application/xml"
+    return response
+
+@app.route('/sitemap_main.xml')
+def sitemap_main():
+    conn = get_db_connection()
+    pages = conn.execute("SELECT * FROM seo_pages WHERE sitemap_inclusion = 1 AND robots_directive LIKE '%index%'").fetchall()
+    conn.close()
+    
+    xml = []
+    xml.append('<?xml version="1.0" encoding="UTF-8"?>')
+    xml.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
+    
+    for p in pages:
+        slug = p['route_slug']
+        if any(prefix in slug for prefix in ['/blogs/', '/case-studies/', '/careers/']) and slug not in ['/blogs', '/case-studies', '/careers']:
+            continue
+            
+        xml.append('  <url>')
+        xml.append(f'    <loc>https://www.thinkartha.com{slug}</loc>')
+        last_mod = p['last_updated'] or datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        xml.append(f'    <lastmod>{last_mod[:10]}</lastmod>')
+        xml.append(f'    <priority>{p["sitemap_priority"] or 0.8}</priority>')
+        xml.append('  </url>')
+        
+    xml.append('</urlset>')
+    
+    response = make_response("\n".join(xml))
+    response.headers["Content-Type"] = "application/xml"
+    return response
+
+@app.route('/sitemap_services.xml')
+def sitemap_services():
+    xml = []
+    xml.append('<?xml version="1.0" encoding="UTF-8"?>')
+    xml.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
+    
+    xml.append('  <url>')
+    xml.append('    <loc>https://www.thinkartha.com/solutions</loc>')
+    xml.append(f'    <lastmod>{datetime.now().strftime("%Y-%m-%d")}</lastmod>')
+    xml.append('    <priority>0.8</priority>')
+    xml.append('  </url>')
+    
+    for slug in SOLUTIONS_DATA.keys():
+        path = f'/solutions/{slug}'
+        priority = 0.7
+        last_mod = datetime.now().strftime("%Y-%m-%d")
+        
+        try:
+            conn = get_db_connection()
+            row = conn.execute("SELECT * FROM seo_pages WHERE route_slug = ?", (path,)).fetchone()
+            conn.close()
+            if row:
+                if row['sitemap_inclusion'] == 0 or 'noindex' in (row['robots_directive'] or ''):
+                    continue
+                priority = row['sitemap_priority'] or 0.7
+                if row['last_updated']:
+                    last_mod = row['last_updated']
+        except Exception:
+            pass
+            
+        xml.append('  <url>')
+        xml.append(f'    <loc>https://www.thinkartha.com{path}</loc>')
+        xml.append(f'    <lastmod>{last_mod[:10]}</lastmod>')
+        xml.append(f'    <priority>{priority}</priority>')
+        xml.append('  </url>')
+        
+    xml.append('</urlset>')
+    
+    response = make_response("\n".join(xml))
+    response.headers["Content-Type"] = "application/xml"
+    return response
+
+@app.route('/sitemap_industries.xml')
+def sitemap_industries():
+    xml = []
+    xml.append('<?xml version="1.0" encoding="UTF-8"?>')
+    xml.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
+    
+    xml.append('  <url>')
+    xml.append('    <loc>https://www.thinkartha.com/industries</loc>')
+    xml.append(f'    <lastmod>{datetime.now().strftime("%Y-%m-%d")}</lastmod>')
+    xml.append('    <priority>0.8</priority>')
+    xml.append('  </url>')
+    
+    for slug in INDUSTRIES_DATA.keys():
+        path = f'/industries/{slug}'
+        priority = 0.7
+        last_mod = datetime.now().strftime("%Y-%m-%d")
+        
+        try:
+            conn = get_db_connection()
+            row = conn.execute("SELECT * FROM seo_pages WHERE route_slug = ?", (path,)).fetchone()
+            conn.close()
+            if row:
+                if row['sitemap_inclusion'] == 0 or 'noindex' in (row['robots_directive'] or ''):
+                    continue
+                priority = row['sitemap_priority'] or 0.7
+                if row['last_updated']:
+                    last_mod = row['last_updated']
+        except Exception:
+            pass
+            
+        xml.append('  <url>')
+        xml.append(f'    <loc>https://www.thinkartha.com{path}</loc>')
+        xml.append(f'    <lastmod>{last_mod[:10]}</lastmod>')
+        xml.append(f'    <priority>{priority}</priority>')
+        xml.append('  </url>')
+        
+    try:
+        conn = get_db_connection()
+        m_pages = conn.execute("SELECT * FROM industry_microsite_pages WHERE status = 'Published' AND noindex = 0").fetchall()
+        conn.close()
+        for p in m_pages:
+            xml.append('  <url>')
+            xml.append(f'    <loc>https://www.thinkartha.com{p["url"]}</loc>')
+            last_mod = p['updated_at'] or datetime.now().strftime('%Y-%m-%d')
+            xml.append(f'    <lastmod>{last_mod[:10]}</lastmod>')
+            xml.append('    <priority>0.7</priority>')
+            xml.append('  </url>')
+    except Exception:
+        pass
+        
+    xml.append('</urlset>')
+    
+    response = make_response("\n".join(xml))
+    response.headers["Content-Type"] = "application/xml"
+    return response
+
+@app.route('/sitemap_case_studies.xml')
+def sitemap_case_studies():
+    xml = []
+    xml.append('<?xml version="1.0" encoding="UTF-8"?>')
+    xml.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
+    
+    xml.append('  <url>')
+    xml.append('    <loc>https://www.thinkartha.com/case-studies</loc>')
+    xml.append(f'    <lastmod>{datetime.now().strftime("%Y-%m-%d")}</lastmod>')
+    xml.append('    <priority>0.8</priority>')
+    xml.append('  </url>')
+    
+    try:
+        conn = get_db_connection()
+        studies = conn.execute("SELECT * FROM case_studies WHERE status = 'Published'").fetchall()
+        conn.close()
+        
+        for s in studies:
+            path = f'/case-studies/{s["slug"]}'
+            priority = 0.6
+            last_mod = s['updated_at'] or datetime.now().strftime('%Y-%m-%d')
+            
+            try:
+                conn = get_db_connection()
+                row = conn.execute("SELECT * FROM seo_pages WHERE route_slug = ?", (path,)).fetchone()
+                conn.close()
+                if row:
+                    if row['sitemap_inclusion'] == 0 or 'noindex' in (row['robots_directive'] or ''):
+                        continue
+                    priority = row['sitemap_priority'] or 0.6
+                    if row['last_updated']:
+                        last_mod = row['last_updated']
+            except Exception:
+                pass
+                
+            xml.append('  <url>')
+            xml.append(f'    <loc>https://www.thinkartha.com{path}</loc>')
+            xml.append(f'    <lastmod>{last_mod[:10]}</lastmod>')
+            xml.append(f'    <priority>{priority}</priority>')
+            xml.append('  </url>')
+    except Exception:
+        pass
+        
+    xml.append('</urlset>')
+    
+    response = make_response("\n".join(xml))
+    response.headers["Content-Type"] = "application/xml"
+    return response
+
+@app.route('/sitemap_blogs.xml')
+def sitemap_blogs():
+    xml = []
+    xml.append('<?xml version="1.0" encoding="UTF-8"?>')
+    xml.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
+    
+    xml.append('  <url>')
+    xml.append('    <loc>https://www.thinkartha.com/blogs</loc>')
+    xml.append(f'    <lastmod>{datetime.now().strftime("%Y-%m-%d")}</lastmod>')
+    xml.append('    <priority>0.8</priority>')
+    xml.append('  </url>')
+    
+    try:
+        conn = get_db_connection()
+        blogs = conn.execute("SELECT * FROM posts WHERE status = 'Published'").fetchall()
+        conn.close()
+        
+        for b in blogs:
+            path = f'/blogs/{b["slug"]}'
+            priority = 0.6
+            last_mod = datetime.now().strftime('%Y-%m-%d')
+            try:
+                dt = datetime.strptime(b['date'], '%b %d, %Y')
+                last_mod = dt.strftime('%Y-%m-%d')
+            except Exception:
+                pass
+                
+            try:
+                conn = get_db_connection()
+                row = conn.execute("SELECT * FROM seo_pages WHERE route_slug = ?", (path,)).fetchone()
+                conn.close()
+                if row:
+                    if row['sitemap_inclusion'] == 0 or 'noindex' in (row['robots_directive'] or ''):
+                        continue
+                    priority = row['sitemap_priority'] or 0.6
+                    if row['last_updated']:
+                        last_mod = row['last_updated']
+            except Exception:
+                pass
+                
+            xml.append('  <url>')
+            xml.append(f'    <loc>https://www.thinkartha.com{path}</loc>')
+            xml.append(f'    <lastmod>{last_mod[:10]}</lastmod>')
+            xml.append(f'    <priority>{priority}</priority>')
+            xml.append('  </url>')
+    except Exception:
+        pass
+        
+    xml.append('</urlset>')
+    
+    response = make_response("\n".join(xml))
+    response.headers["Content-Type"] = "application/xml"
+    return response
+
+@app.route('/sitemap_jobs.xml')
+def sitemap_jobs():
+    xml = []
+    xml.append('<?xml version="1.0" encoding="UTF-8"?>')
+    xml.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
+    
+    xml.append('  <url>')
+    xml.append('    <loc>https://www.thinkartha.com/careers</loc>')
+    xml.append(f'    <lastmod>{datetime.now().strftime("%Y-%m-%d")}</lastmod>')
+    xml.append('    <priority>0.8</priority>')
+    xml.append('  </url>')
+    
+    try:
+        conn = get_db_connection()
+        jobs = conn.execute("SELECT * FROM career_jobs WHERE status = 'published'").fetchall()
+        conn.close()
+        
+        for j in jobs:
+            path = f'/careers/{j["slug"]}'
+            priority = 0.5
+            last_mod = j['posted_date'] or datetime.now().strftime('%Y-%m-%d')
+            
+            try:
+                conn = get_db_connection()
+                row = conn.execute("SELECT * FROM seo_pages WHERE route_slug = ?", (path,)).fetchone()
+                conn.close()
+                if row:
+                    if row['sitemap_inclusion'] == 0 or 'noindex' in (row['robots_directive'] or ''):
+                        continue
+                    priority = row['sitemap_priority'] or 0.5
+                    if row['last_updated']:
+                        last_mod = row['last_updated']
+            except Exception:
+                pass
+                
+            xml.append('  <url>')
+            xml.append(f'    <loc>https://www.thinkartha.com{path}</loc>')
+            xml.append(f'    <lastmod>{last_mod[:10]}</lastmod>')
+            xml.append(f'    <priority>{priority}</priority>')
+            xml.append('  </url>')
+    except Exception:
+        pass
+        
+    xml.append('</urlset>')
+    
+    response = make_response("\n".join(xml))
+    response.headers["Content-Type"] = "application/xml"
+    return response
+
+# ==========================================================================
+# IndexNow Support and Verification Route
+# ==========================================================================
+
+def submit_to_indexnow(url, action='update'):
+    try:
+        conn = get_db_connection()
+        key_row = conn.execute("SELECT value FROM seo_settings WHERE key = 'indexnow_key'").fetchone()
+        enabled_row = conn.execute("SELECT value FROM seo_settings WHERE key = 'indexnow_enabled'").fetchone()
+        conn.close()
+        
+        if not enabled_row or enabled_row['value'] != '1':
+            return False
+            
+        key = key_row['value'] if key_row else None
+        if not key:
+            return False
+            
+        import urllib.request
+        import json
+        
+        indexnow_url = "https://api.indexnow.org/IndexNow"
+        data = {
+            "host": "www.thinkartha.com",
+            "key": key,
+            "keyLocation": f"https://www.thinkartha.com/{key}.txt",
+            "urlList": [url]
+        }
+        
+        req_body = json.dumps(data).encode('utf-8')
+        req = urllib.request.Request(
+            indexnow_url,
+            data=req_body,
+            headers={"Content-Type": "application/json; charset=utf-8"},
+            method='POST'
+        )
+        
+        response_code = 0
+        error_message = ""
+        try:
+            with urllib.request.urlopen(req, timeout=10) as response:
+                response_code = response.getcode()
+                status = "Success" if response_code == 200 else "Failed"
+        except Exception as e_http:
+            status = "Failed"
+            if hasattr(e_http, 'code'):
+                response_code = e_http.code
+                error_message = f"HTTP Error {e_http.code}"
+            else:
+                error_message = str(e_http)
+                
+        conn = get_db_connection()
+        conn.execute("""
+            INSERT INTO seo_indexnow_logs (url, action, status, response_code, error_message)
+            VALUES (?, ?, ?, ?, ?)
+        """, (url, action, status, response_code, error_message))
+        conn.commit()
+        conn.close()
+        
+        return status == "Success"
+    except Exception as e:
+        print(f"Error submitting to IndexNow: {e}")
+        try:
+            conn = get_db_connection()
+            conn.execute("""
+                INSERT INTO seo_indexnow_logs (url, action, status, response_code, error_message)
+                VALUES (?, ?, 'Failed', 0, ?)
+            """, (url, action, str(e)))
+            conn.commit()
+            conn.close()
+        except Exception:
+            pass
+        return False
+
+@app.route('/<string:key_file>.txt')
+def indexnow_verification(key_file):
+    try:
+        conn = get_db_connection()
+        row = conn.execute("SELECT value FROM seo_settings WHERE key = 'indexnow_key'").fetchone()
+        conn.close()
+        
+        db_key = row['value'] if row else None
+        if db_key and key_file == db_key:
+            response = make_response(db_key)
+            response.headers["Content-Type"] = "text/plain"
+            return response
+    except Exception as e:
+        print(f"Error serving IndexNow verification key: {e}")
+        
+    abort(404)
 
 # 4. Wordpress-style Admin Dashboard Routes
 @app.route('/admin/login', methods=['GET', 'POST'])
@@ -6285,6 +6834,550 @@ def admin_tokens_data():
         })
         
     return jsonify(data)
+
+
+# ==========================================================================
+# SEO & AEO Admin Control Center Routes
+# ==========================================================================
+
+def run_publishing_quality_gate(p):
+    results = {
+        'critical': [],
+        'warning': [],
+        'opportunity': []
+    }
+    
+    # 1. Title checks
+    title = p.get('seo_title', '') or ''
+    if not title:
+        results['critical'].append("Missing SEO Title tag")
+    elif len(title) < 10:
+        results['critical'].append("SEO Title is extremely short")
+    elif len(title) < 30 or len(title) > 65:
+        results['warning'].append(f"SEO Title length is {len(title)} chars (recommended 30-65)")
+        
+    if title and any(kw in title.lower() for kw in ['todo', 'placeholder', 'draft', '[', ']']):
+        results['warning'].append("SEO Title contains placeholder text")
+        
+    # 2. Meta description checks
+    desc = p.get('meta_description', '') or ''
+    if not desc:
+        results['critical'].append("Missing meta description")
+    elif len(desc) < 70 or len(desc) > 160:
+        results['warning'].append(f"Description length is {len(desc)} chars (recommended 70-160)")
+        
+    if desc and any(kw in desc.lower() for kw in ['todo', 'placeholder', 'draft', '[', ']']):
+        results['warning'].append("Meta description contains placeholder text")
+        
+    # 3. H1 checks
+    h1 = p.get('h1', '') or ''
+    if not h1:
+        results['warning'].append("Missing H1 heading override")
+    elif any(kw in h1.lower() for kw in ['todo', 'placeholder', 'draft', '[', ']']):
+        results['warning'].append("H1 heading contains placeholder text")
+        
+    # 4. Canonical checks
+    canonical = p.get('canonical_url', '') or ''
+    if canonical and not (canonical.startswith('http://') or canonical.startswith('https://')):
+        results['warning'].append("Canonical URL must be absolute (starting with http/https)")
+        
+    # 5. Schema validation
+    schema = p.get('schema_json', '') or ''
+    if schema:
+        try:
+            parsed = json.loads(schema)
+            if not parsed.get('@context'):
+                results['warning'].append("Custom schema JSON-LD is missing '@context'")
+            if not parsed.get('@type'):
+                results['warning'].append("Custom schema JSON-LD is missing '@type'")
+        except Exception:
+            results['warning'].append("Custom Schema is not valid JSON-LD format")
+            
+    # 6. E-E-A-T authorship warnings
+    if not p.get('author_name'):
+        results['warning'].append("Missing Author name for E-E-A-T trust signals")
+    if not p.get('reviewer_name'):
+        results['warning'].append("Missing Subject-matter reviewer for E-E-A-T trust signals")
+    if not p.get('last_reviewed_date'):
+        results['warning'].append("Missing Last reviewed date")
+        
+    # 7. AEO / GEO quick answer checks
+    quick_ans = p.get('aeo_quick_answer', '') or ''
+    if not quick_ans:
+        results['opportunity'].append("Missing AEO Quick Answer block")
+    else:
+        words = len(quick_ans.split())
+        if words < 40 or words > 80:
+            results['opportunity'].append(f"Quick Answer is {words} words (recommended 40-80)")
+        if any(ph in quick_ans.lower() for ph in ['[audience]', '[problem]', 'todo']):
+            results['opportunity'].append("Quick Answer contains unresolved template/placeholder brackets")
+            
+    # 8. Key facts checks
+    key_facts = p.get('aeo_key_facts', '') or ''
+    if not key_facts or key_facts in ('[]', 'None'):
+        results['opportunity'].append("Key Facts grid is empty")
+    else:
+        try:
+            facts = json.loads(key_facts)
+            if not isinstance(facts, list) or len(facts) == 0:
+                results['opportunity'].append("Key Facts is empty or not an array")
+        except Exception:
+            results['opportunity'].append("Key Facts is not valid JSON array format")
+            
+    # 9. FAQ / Conversational QA checks
+    questions = p.get('aeo_questions', '') or ''
+    if not questions or questions in ('[]', 'None'):
+        results['opportunity'].append("FAQ QA Accordion list is empty")
+    else:
+        try:
+            q_list = json.loads(questions)
+            if not isinstance(q_list, list) or len(q_list) < 4:
+                results['opportunity'].append(f"Conversational QA has only {len(q_list) if isinstance(q_list, list) else 0} items (recommended 4-8)")
+        except Exception:
+            results['opportunity'].append("Conversational QA is not valid JSON array format")
+            
+    return results
+
+def calculate_page_scores(page):
+    # Dynamic SEO Score calculations
+    seo = 0
+    if page.get('seo_title'): seo += 20
+    if page.get('meta_description'):
+        desc_len = len(page['meta_description'])
+        if 70 <= desc_len <= 160: seo += 20
+        else: seo += 10
+    if page.get('canonical_url'): seo += 15
+    if page.get('h1'): seo += 15
+    if page.get('schema_json'): seo += 15
+    if page.get('robots_directive'): seo += 10
+    if page.get('sitemap_inclusion') == 1: seo += 5
+    
+    # Dynamic AEO Score calculations
+    aeo = 0
+    if page.get('aeo_quick_answer'):
+        ans_len = len(page['aeo_quick_answer'].split())
+        if 40 <= ans_len <= 80: aeo += 30
+        else: aeo += 15
+    if page.get('aeo_key_facts'):
+        try:
+            facts = json.loads(page['aeo_key_facts'])
+            if len(facts) > 0: aeo += 20
+        except Exception:
+            pass
+    if page.get('aeo_questions'):
+        try:
+            qs = json.loads(page['aeo_questions'])
+            if len(qs) >= 4: aeo += 30
+            elif len(qs) > 0: aeo += 15
+        except Exception:
+            pass
+    if page.get('author_name') or page.get('reviewer_name'): aeo += 10
+    if page.get('last_reviewed_date'): aeo += 10
+    
+    return seo, aeo
+
+@app.route('/admin/seo')
+def admin_seo_dashboard():
+    if not check_admin_auth():
+        return redirect('/admin/login')
+        
+    conn = get_db_connection()
+    pages_count = conn.execute("SELECT COUNT(*) FROM seo_pages").fetchone()[0]
+    redirects_count = conn.execute("SELECT COUNT(*) FROM seo_redirects").fetchone()[0]
+    
+    # Calculate average scores
+    scores_row = conn.execute("SELECT AVG(seo_score) as avg_seo, AVG(aeo_score) as avg_aeo FROM seo_pages").fetchone()
+    avg_seo = int(scores_row['avg_seo'] or 0)
+    avg_aeo = int(scores_row['avg_aeo'] or 0)
+    
+    # Crawlers policy status
+    crawlers_row = conn.execute("SELECT value FROM seo_settings WHERE key = 'robots_policy'").fetchone()
+    crawlers = json.loads(crawlers_row['value']) if crawlers_row else {}
+    
+    gptbot_allowed = crawlers.get('GPTBot', {}).get('allowed', False)
+    searchbot_allowed = crawlers.get('OAI-SearchBot', {}).get('allowed', True)
+    
+    # Fetch recent audits
+    recent_audits = conn.execute("SELECT * FROM seo_audits ORDER BY id DESC LIMIT 5").fetchall()
+    
+    # IndexNow key
+    key_row = conn.execute("SELECT value FROM seo_settings WHERE key = 'indexnow_key'").fetchone()
+    indexnow_key = key_row['value'] if key_row else ''
+    
+    conn.close()
+    
+    return render_template(
+        'admin/seo/dashboard.html',
+        pages_count=pages_count,
+        redirects_count=redirects_count,
+        avg_seo=avg_seo,
+        avg_aeo=avg_aeo,
+        gptbot_allowed=gptbot_allowed,
+        searchbot_allowed=searchbot_allowed,
+        recent_audits=recent_audits,
+        indexnow_key=indexnow_key
+    )
+
+@app.route('/admin/seo/audit', methods=['GET', 'POST'])
+def admin_seo_audit():
+    if not check_admin_auth():
+        return redirect('/admin/login')
+        
+    conn = get_db_connection()
+    
+    # Pre-sync dynamic pages: Ensure all posts, case studies, jobs, and microsite pages have seo_pages records
+    posts = conn.execute("SELECT slug, title FROM posts WHERE status = 'Published'").fetchall()
+    for p in posts:
+        slug = f"/blogs/{p['slug']}"
+        conn.execute("""
+            INSERT OR IGNORE INTO seo_pages (route_slug, seo_title, meta_description, canonical_url, h1, robots_directive, sitemap_inclusion, sitemap_priority, content_status)
+            VALUES (?, ?, ?, ?, ?, 'index, follow', 1, 0.6, 'Published')
+        """, (slug, f"{p['title']} | Artha Solutions Blog", f"Read our latest article: {p['title']}.", f"https://www.thinkartha.com{slug}", p['title']))
+        
+    studies = conn.execute("SELECT slug, title, card_summary FROM case_studies WHERE status = 'Published'").fetchall()
+    for s in studies:
+        slug = f"/case-studies/{s['slug']}"
+        conn.execute("""
+            INSERT OR IGNORE INTO seo_pages (route_slug, seo_title, meta_description, canonical_url, h1, robots_directive, sitemap_inclusion, sitemap_priority, content_status)
+            VALUES (?, ?, ?, ?, ?, 'index, follow', 1, 0.7, 'Published')
+        """, (slug, f"{s['title']} | ThinkArtha Case Studies", s['card_summary'] or f"Case study detail for: {s['title']}.", f"https://www.thinkartha.com{slug}", s['title']))
+        
+    jobs = conn.execute("SELECT slug, title, summary FROM career_jobs WHERE status = 'published'").fetchall()
+    for j in jobs:
+        slug = f"/careers/{j['slug']}"
+        conn.execute("""
+            INSERT OR IGNORE INTO seo_pages (route_slug, seo_title, meta_description, canonical_url, h1, robots_directive, sitemap_inclusion, sitemap_priority, content_status)
+            VALUES (?, ?, ?, ?, ?, 'index, follow', 1, 0.5, 'Published')
+        """, (slug, f"{j['title']} Careers Opportunity | Artha Solutions", j['summary'] or f"Job position detail for: {j['title']}.", f"https://www.thinkartha.com{slug}", j['title']))
+        
+    microsites = conn.execute("SELECT url, title, seo_title, seo_description FROM industry_microsite_pages WHERE status = 'Published'").fetchall()
+    for m in microsites:
+        conn.execute("""
+            INSERT OR IGNORE INTO seo_pages (route_slug, seo_title, meta_description, canonical_url, h1, robots_directive, sitemap_inclusion, sitemap_priority, content_status)
+            VALUES (?, ?, ?, ?, ?, 'index, follow', 1, 0.8, 'Published')
+        """, (m['url'], m['seo_title'] or f"{m['title']} | Artha Solutions", m['seo_description'] or f"Dynamic industry page for {m['title']}.", f"https://www.thinkartha.com{m['url']}", m['title']))
+
+    conn.commit()
+    
+    if request.method == 'POST':
+        # Perform live audit / score recalculation over all routes
+        all_pages = conn.execute("SELECT * FROM seo_pages").fetchall()
+        
+        pages_audited = len(all_pages)
+        total_seo = 0
+        total_aeo = 0
+        critical_errors = 0
+        warnings = 0
+        opportunities = 0
+        results = []
+        
+        for p in all_pages:
+            p_dict = dict(p)
+            seo_score, aeo_score = calculate_page_scores(p_dict)
+            
+            # Update individual page scores in DB
+            conn.execute("UPDATE seo_pages SET seo_score = ?, aeo_score = ? WHERE id = ?", (seo_score, aeo_score, p['id']))
+            
+            # Collect details of issues via Quality Gate
+            gate_results = run_publishing_quality_gate(p_dict)
+            critical_errors += len(gate_results['critical'])
+            warnings += len(gate_results['warning'])
+            opportunities += len(gate_results['opportunity'])
+            issues = gate_results['critical'] + gate_results['warning'] + gate_results['opportunity']
+                
+            total_seo += seo_score
+            total_aeo += aeo_score
+            
+            results.append({
+                'path': p['route_slug'],
+                'seo_score': seo_score,
+                'aeo_score': aeo_score,
+                'issues': issues
+            })
+            
+        conn.commit()
+        
+        health_score = int(total_seo / pages_audited) if pages_audited > 0 else 0
+        aeo_avg = int(total_aeo / pages_audited) if pages_audited > 0 else 0
+        
+        # Save audit report
+        conn.execute("""
+            INSERT INTO seo_audits 
+            (run_date, health_score, technical_score, content_score, schema_score, page_exp_score, aeo_score, pages_audited, critical_errors, warnings, opportunities, audit_results_json)
+            VALUES (?, ?, ?, ?, ?, 80, ?, ?, ?, ?, ?, ?)
+        """, (
+            datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            health_score, health_score, health_score, health_score, aeo_avg,
+            pages_audited, critical_errors, warnings, opportunities, json.dumps(results)
+        ))
+        conn.commit()
+        
+        conn.close()
+        return redirect('/admin/seo')
+        
+    recent_audits = conn.execute("SELECT * FROM seo_audits ORDER BY id DESC LIMIT 10").fetchall()
+    conn.close()
+    return render_template('admin/seo/audit.html', audits=recent_audits)
+
+@app.route('/admin/seo/pages')
+def admin_seo_pages():
+    if not check_admin_auth():
+        return redirect('/admin/login')
+        
+    conn = get_db_connection()
+    pages = conn.execute("SELECT * FROM seo_pages ORDER BY id DESC").fetchall()
+    conn.close()
+    return render_template('admin/seo/pages.html', pages=pages)
+
+@app.route('/admin/seo/pages/edit/<int:page_id>', methods=['GET', 'POST'])
+def admin_seo_page_edit(page_id):
+    if not check_admin_auth():
+        return redirect('/admin/login')
+        
+    conn = get_db_connection()
+    page = conn.execute("SELECT * FROM seo_pages WHERE id = ?", (page_id,)).fetchone()
+    
+    if not page:
+        conn.close()
+        abort(404)
+        
+    page = dict(page)
+    
+    # Quality gate checks on validation warnings
+    warnings_list = []
+    
+    if request.method == 'POST':
+        seo_title = request.form.get('seo_title', '').strip()
+        meta_description = request.form.get('meta_description', '').strip()
+        canonical_url = request.form.get('canonical_url', '').strip()
+        h1 = request.form.get('h1', '').strip()
+        breadcrumb_title = request.form.get('breadcrumb_title', '').strip()
+        og_title = request.form.get('og_title', '').strip()
+        og_description = request.form.get('og_description', '').strip()
+        og_image = request.form.get('og_image', '').strip()
+        robots_directive = request.form.get('robots_directive', 'index, follow').strip()
+        sitemap_inclusion = int(request.form.get('sitemap_inclusion', 1))
+        sitemap_priority = float(request.form.get('sitemap_priority', 0.5))
+        schema_json = request.form.get('schema_json', '').strip()
+        aeo_quick_answer = request.form.get('aeo_quick_answer', '').strip()
+        aeo_key_facts = request.form.get('aeo_key_facts', '[]').strip()
+        aeo_questions = request.form.get('aeo_questions', '[]').strip()
+        author_name = request.form.get('author_name', '').strip()
+        author_role = request.form.get('author_role', '').strip()
+        author_expertise = request.form.get('author_expertise', '').strip()
+        reviewer_name = request.form.get('reviewer_name', '').strip()
+        reviewer_role = request.form.get('reviewer_role', '').strip()
+        reviewer_expertise = request.form.get('reviewer_expertise', '').strip()
+        last_reviewed_date = request.form.get('last_reviewed_date', '').strip()
+        content_status = request.form.get('content_status', 'Draft').strip()
+        
+        # Compile page data dictionary
+        p_dict = {
+            'seo_title': seo_title, 'meta_description': meta_description, 'canonical_url': canonical_url,
+            'h1': h1, 'schema_json': schema_json, 'robots_directive': robots_directive,
+            'sitemap_inclusion': sitemap_inclusion, 'sitemap_priority': sitemap_priority,
+            'aeo_quick_answer': aeo_quick_answer, 'aeo_key_facts': aeo_key_facts, 'aeo_questions': aeo_questions,
+            'author_name': author_name, 'author_role': author_role, 'author_expertise': author_expertise,
+            'reviewer_name': reviewer_name, 'reviewer_role': reviewer_role, 'reviewer_expertise': reviewer_expertise,
+            'last_reviewed_date': last_reviewed_date
+        }
+        
+        # Validations (Quality Gates)
+        gate_results = run_publishing_quality_gate(p_dict)
+        warnings_list = gate_results['critical'] + gate_results['warning'] + gate_results['opportunity']
+        
+        seo_score, aeo_score = calculate_page_scores(p_dict)
+        
+        now_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        conn.execute("""
+            UPDATE seo_pages 
+            SET seo_title = ?, meta_description = ?, canonical_url = ?, h1 = ?, breadcrumb_title = ?,
+                og_title = ?, og_description = ?, og_image = ?, robots_directive = ?, sitemap_inclusion = ?,
+                sitemap_priority = ?, schema_json = ?, aeo_quick_answer = ?, aeo_key_facts = ?, aeo_questions = ?,
+                author_name = ?, author_role = ?, author_expertise = ?, reviewer_name = ?, reviewer_role = ?,
+                reviewer_expertise = ?, last_reviewed_date = ?, content_status = ?, seo_score = ?, aeo_score = ?,
+                last_updated = ?, updated_at = ?
+            WHERE id = ?
+        """, (
+            seo_title, meta_description, canonical_url, h1, breadcrumb_title,
+            og_title, og_description, og_image, robots_directive, sitemap_inclusion,
+            sitemap_priority, schema_json, aeo_quick_answer, aeo_key_facts, aeo_questions,
+            author_name, author_role, author_expertise, reviewer_name, reviewer_role,
+            reviewer_expertise, last_reviewed_date, content_status, seo_score, aeo_score,
+            now_str, now_str, page_id
+        ))
+        conn.commit()
+        
+        # Trigger IndexNow automatically if page is Published
+        if content_status == 'Published':
+            full_url = f"https://www.thinkartha.com{page['route_slug']}"
+            submit_to_indexnow(full_url, action='update')
+            
+        conn.close()
+        
+        if warnings_list:
+            # Re-read page record and render edit view with errors
+            conn = get_db_connection()
+            page = conn.execute("SELECT * FROM seo_pages WHERE id = ?", (page_id,)).fetchone()
+            page = dict(page)
+            conn.close()
+            return render_template('admin/seo/page_edit.html', page=page, errors=warnings_list, success=True)
+            
+        return redirect('/admin/seo/pages')
+        
+    conn.close()
+    return render_template('admin/seo/page_edit.html', page=page)
+
+@app.route('/admin/seo/redirects', methods=['GET', 'POST'])
+def admin_seo_redirects():
+    if not check_admin_auth():
+        return redirect('/admin/login')
+        
+    conn = get_db_connection()
+    
+    if request.method == 'POST':
+        source = request.form.get('source_path', '').strip()
+        target = request.form.get('target_path', '').strip()
+        code = int(request.form.get('redirect_type', 301))
+        
+        if source and target:
+            try:
+                conn.execute("""
+                    INSERT INTO seo_redirects (source_path, target_path, redirect_type, is_active)
+                    VALUES (?, ?, ?, 1)
+                """, (source, target, code))
+                conn.commit()
+            except Exception as e:
+                print(f"Error adding redirect: {e}")
+                
+        return redirect('/admin/seo/redirects')
+        
+    redirects = conn.execute("SELECT * FROM seo_redirects ORDER BY id DESC").fetchall()
+    conn.close()
+    return render_template('admin/seo/redirects.html', redirects=redirects)
+
+@app.route('/admin/seo/redirects/delete/<int:r_id>')
+def admin_seo_redirect_delete(r_id):
+    if not check_admin_auth():
+        return redirect('/admin/login')
+        
+    conn = get_db_connection()
+    conn.execute("DELETE FROM seo_redirects WHERE id = ?", (r_id,))
+    conn.commit()
+    conn.close()
+    return redirect('/admin/seo/redirects')
+
+@app.route('/admin/seo/crawlers', methods=['GET', 'POST'])
+def admin_seo_crawlers():
+    if not check_admin_auth():
+        return redirect('/admin/login')
+        
+    conn = get_db_connection()
+    
+    if request.method == 'POST':
+        google_verification = request.form.get('google_verification', '').strip()
+        bing_verification = request.form.get('bing_verification', '').strip()
+        
+        gptbot_allowed = request.form.get('gptbot_allowed') == '1'
+        searchbot_allowed = request.form.get('searchbot_allowed') == '1'
+        
+        policy = {
+            'Googlebot': {'allowed': True, 'crawl_delay': None},
+            'Bingbot': {'allowed': True, 'crawl_delay': None},
+            'OAI-SearchBot': {'allowed': searchbot_allowed, 'crawl_delay': None},
+            'GPTBot': {'allowed': gptbot_allowed, 'crawl_delay': None},
+            '*': {'allowed': True, 'crawl_delay': None}
+        }
+        
+        conn.execute("INSERT OR REPLACE INTO seo_settings (key, value) VALUES ('google_verification', ?)", (google_verification,))
+        conn.execute("INSERT OR REPLACE INTO seo_settings (key, value) VALUES ('bing_verification', ?)", (bing_verification,))
+        conn.execute("INSERT OR REPLACE INTO seo_settings (key, value) VALUES ('robots_policy', ?)", (json.dumps(policy),))
+        conn.commit()
+        
+        return redirect('/admin/seo/crawlers')
+        
+    # Fetch current
+    g_row = conn.execute("SELECT value FROM seo_settings WHERE key = 'google_verification'").fetchone()
+    b_row = conn.execute("SELECT value FROM seo_settings WHERE key = 'bing_verification'").fetchone()
+    p_row = conn.execute("SELECT value FROM seo_settings WHERE key = 'robots_policy'").fetchone()
+    conn.close()
+    
+    google_verification = g_row['value'] if g_row else ''
+    bing_verification = b_row['value'] if b_row else ''
+    policy = json.loads(p_row['value']) if p_row else {}
+    
+    gptbot_allowed = policy.get('GPTBot', {}).get('allowed', False)
+    searchbot_allowed = policy.get('OAI-SearchBot', {}).get('allowed', True)
+    
+    return render_template(
+        'admin/seo/crawlers.html',
+        google_verification=google_verification,
+        bing_verification=bing_verification,
+        gptbot_allowed=gptbot_allowed,
+        searchbot_allowed=searchbot_allowed
+    )
+
+@app.route('/admin/seo/indexnow', methods=['GET', 'POST'])
+def admin_seo_indexnow():
+    if not check_admin_auth():
+        return redirect('/admin/login')
+        
+    conn = get_db_connection()
+    
+    if request.method == 'POST':
+        action_type = request.form.get('action_type', 'update')
+        url = request.form.get('url', '').strip()
+        if url:
+            submit_to_indexnow(url, action=action_type)
+        return redirect('/admin/seo/indexnow')
+        
+    logs = conn.execute("SELECT * FROM seo_indexnow_logs ORDER BY id DESC LIMIT 50").fetchall()
+    key_row = conn.execute("SELECT value FROM seo_settings WHERE key = 'indexnow_key'").fetchone()
+    conn.close()
+    
+    indexnow_key = key_row['value'] if key_row else ''
+    
+    return render_template(
+        'admin/seo/indexnow.html',
+        logs=logs,
+        indexnow_key=indexnow_key
+    )
+
+@app.route('/admin/seo/analytics')
+def admin_seo_analytics():
+    if not check_admin_auth():
+        return redirect('/admin/login')
+        
+    conn = get_db_connection()
+    
+    # Traffic metrics breakdown
+    summary = conn.execute("""
+        SELECT 
+            referral_type, 
+            COUNT(*) as total_visits, 
+            SUM(converted) as total_conversions
+        FROM seo_traffic_logs
+        GROUP BY referral_type
+    """).fetchall()
+    
+    recent_traffic = conn.execute("""
+        SELECT * FROM seo_traffic_logs ORDER BY id DESC LIMIT 50
+    """).fetchall()
+    
+    conn.close()
+    return render_template('admin/seo/analytics.html', summary=summary, traffic=recent_traffic)
+
+@app.route('/admin/seo/performance')
+def admin_seo_performance():
+    if not check_admin_auth():
+        return redirect('/admin/login')
+        
+    conn = get_db_connection()
+    row = conn.execute("SELECT value FROM seo_settings WHERE key = 'performance_budget'").fetchone()
+    conn.close()
+    
+    budget = json.loads(row['value']) if row else {}
+    return render_template('admin/seo/performance.html', budget=budget)
 
 
 # Custom 404 Handler

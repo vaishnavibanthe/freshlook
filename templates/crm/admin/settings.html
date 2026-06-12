@@ -2,11 +2,211 @@
 
 {% block title %}System Settings | ThinkArtha CRM{% endblock %}
 
+{% block extra_head %}
+<style>
+    /* ── Appearance Card ── */
+    .appearance-card {
+        max-width: 680px;
+        margin-bottom: 24px;
+    }
+
+    .theme-presets {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-top: 4px;
+    }
+
+    .theme-preset-tile {
+        border-radius: 12px;
+        border: 2px solid var(--border-crm);
+        overflow: hidden;
+        cursor: pointer;
+        transition: border-color 0.25s ease, transform 0.2s ease, box-shadow 0.25s ease;
+        position: relative;
+        user-select: none;
+    }
+
+    .theme-preset-tile:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+
+    .theme-preset-tile.selected {
+        border-color: var(--accent-cyan);
+        box-shadow: 0 0 0 1px var(--accent-cyan), 0 8px 24px rgba(6,182,212,0.2);
+    }
+
+    .theme-preset-tile .tile-check {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: var(--accent-cyan);
+        color: #fff;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        z-index: 2;
+    }
+
+    .theme-preset-tile.selected .tile-check {
+        display: flex;
+    }
+
+    .tile-preview {
+        padding: 14px 14px 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    /* Dark preview colours */
+    .tile-dark .tile-preview {
+        background: #050b14;
+    }
+    .tile-dark .tile-bar {
+        height: 8px;
+        border-radius: 4px;
+        background: rgba(6,182,212,0.25);
+    }
+    .tile-dark .tile-bar-short {
+        width: 55%;
+        height: 6px;
+        border-radius: 4px;
+        background: rgba(22,45,80,0.8);
+    }
+    .tile-dark .tile-btn-row {
+        display: flex; gap: 6px; margin-top: 4px;
+    }
+    .tile-dark .tile-btn {
+        height: 10px;
+        width: 36px;
+        border-radius: 3px;
+        background: linear-gradient(90deg, #06b6d4, #7c3aed);
+    }
+    .tile-dark .tile-sidebar {
+        position: absolute;
+        left: 0; top: 0; bottom: 0;
+        width: 28px;
+        background: #091322;
+        border-right: 1px solid rgba(22,45,80,0.6);
+    }
+
+    /* Light preview colours */
+    .tile-light .tile-preview {
+        background: #f8fafc;
+    }
+    .tile-light .tile-bar {
+        height: 8px;
+        border-radius: 4px;
+        background: rgba(8,145,178,0.2);
+    }
+    .tile-light .tile-bar-short {
+        width: 55%;
+        height: 6px;
+        border-radius: 4px;
+        background: #cbd5e1;
+    }
+    .tile-light .tile-btn-row {
+        display: flex; gap: 6px; margin-top: 4px;
+    }
+    .tile-light .tile-btn {
+        height: 10px;
+        width: 36px;
+        border-radius: 3px;
+        background: linear-gradient(90deg, #0891b2, #6d28d9);
+    }
+    .tile-light .tile-sidebar {
+        position: absolute;
+        left: 0; top: 0; bottom: 0;
+        width: 28px;
+        background: #fff;
+        border-right: 1px solid #e2e8f0;
+    }
+
+    .tile-preview-inner {
+        margin-left: 34px;
+        position: relative;
+    }
+
+    .tile-label {
+        padding: 10px 14px 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-crm-secondary);
+        border-top: 1px solid var(--border-crm);
+        background: var(--bg-card);
+    }
+
+    .tile-label i {
+        color: var(--accent-cyan);
+        font-size: 14px;
+    }
+
+    body.light-theme .tile-label {
+        border-top-color: #e2e8f0;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="crm-header-bar">
     <div class="crm-title-section">
         <h1>System Settings</h1>
-        <p>Configure SMTP outbound mailers, duplicate detection filters, and auto-assignment rules</p>
+        <p>Configure appearance, SMTP mailers, duplicate detection and auto-assignment rules</p>
+    </div>
+</div>
+
+<!-- ── Appearance Card ── -->
+<div class="crm-card appearance-card">
+    <div class="crm-card-title">
+        <span><i class="fas fa-palette" style="color: var(--accent-cyan); margin-right: 8px;"></i>Appearance & Display</span>
+        <span id="theme-status-badge" style="font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; background: rgba(6,182,212,0.12); color: var(--accent-cyan); letter-spacing: 0.5px; text-transform: uppercase;"></span>
+    </div>
+
+    <p style="font-size: 13px; color: var(--text-crm-secondary); margin-bottom: 18px;">
+        Choose your preferred interface colour scheme. The preference is saved locally per browser.
+    </p>
+
+    <div class="theme-presets">
+        <!-- Dark Tile -->
+        <div class="theme-preset-tile tile-dark" id="tile-dark" onclick="applyTheme('dark')" title="Switch to Dark Mode">
+            <div class="tile-preview" style="position: relative; height: 90px; overflow: hidden;">
+                <div class="tile-sidebar"></div>
+                <div class="tile-preview-inner">
+                    <div class="tile-bar"></div>
+                    <div class="tile-bar-short"></div>
+                    <div class="tile-btn-row"><div class="tile-btn"></div></div>
+                </div>
+            </div>
+            <div class="tile-label">
+                <i class="fas fa-moon"></i> Dark Mode
+            </div>
+            <div class="tile-check"><i class="fas fa-check"></i></div>
+        </div>
+
+        <!-- Light Tile -->
+        <div class="theme-preset-tile tile-light" id="tile-light" onclick="applyTheme('light')" title="Switch to Light Mode">
+            <div class="tile-preview" style="position: relative; height: 90px; overflow: hidden;">
+                <div class="tile-sidebar"></div>
+                <div class="tile-preview-inner">
+                    <div class="tile-bar"></div>
+                    <div class="tile-bar-short"></div>
+                    <div class="tile-btn-row"><div class="tile-btn"></div></div>
+                </div>
+            </div>
+            <div class="tile-label">
+                <i class="fas fa-sun"></i> Light Mode
+            </div>
+            <div class="tile-check"><i class="fas fa-check"></i></div>
+        </div>
     </div>
 </div>
 
@@ -83,4 +283,55 @@
         </div>
     </form>
 </div>
+
+<script>
+    function applyTheme(theme) {
+        // Reuse the base_crm toggleTheme logic via localStorage + manual apply
+        localStorage.setItem('crm-theme', theme);
+        const body = document.body;
+        const checkbox = document.getElementById('theme-toggle-checkbox');
+        const knobIcon = document.getElementById('theme-knob-icon');
+        const labelDark = document.getElementById('label-dark');
+        const labelLight = document.getElementById('label-light');
+        const mobIcon = document.getElementById('mobile-theme-toggle-btn') ? document.getElementById('mobile-theme-toggle-btn').querySelector('i') : null;
+
+        if (theme === 'light') {
+            body.classList.add('light-theme');
+            if (checkbox) checkbox.checked = true;
+            if (knobIcon) { knobIcon.classList.remove('fa-moon'); knobIcon.classList.add('fa-sun'); }
+            if (labelDark) labelDark.classList.remove('active-label');
+            if (labelLight) labelLight.classList.add('active-label');
+            if (mobIcon) { mobIcon.classList.remove('fa-moon'); mobIcon.classList.add('fa-sun'); }
+        } else {
+            body.classList.remove('light-theme');
+            if (checkbox) checkbox.checked = false;
+            if (knobIcon) { knobIcon.classList.remove('fa-sun'); knobIcon.classList.add('fa-moon'); }
+            if (labelDark) labelDark.classList.add('active-label');
+            if (labelLight) labelLight.classList.remove('active-label');
+            if (mobIcon) { mobIcon.classList.remove('fa-sun'); mobIcon.classList.add('fa-moon'); }
+        }
+        syncTileSelection(theme);
+    }
+
+    function syncTileSelection(theme) {
+        const tileDark = document.getElementById('tile-dark');
+        const tileLight = document.getElementById('tile-light');
+        const badge = document.getElementById('theme-status-badge');
+        if (!tileDark || !tileLight) return;
+
+        if (theme === 'light') {
+            tileDark.classList.remove('selected');
+            tileLight.classList.add('selected');
+            if (badge) badge.textContent = '☀ Light Mode Active';
+        } else {
+            tileLight.classList.remove('selected');
+            tileDark.classList.add('selected');
+            if (badge) badge.textContent = '🌙 Dark Mode Active';
+        }
+    }
+
+    // Init on page load
+    const currentTheme = localStorage.getItem('crm-theme') || 'dark';
+    syncTileSelection(currentTheme);
+</script>
 {% endblock %}

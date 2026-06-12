@@ -185,6 +185,18 @@
                 </ul>
             </div>
             
+            <!-- Group 4: SEO & AEO Control -->
+            <div>
+                <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text-tertiary); letter-spacing: 1px; display: block; margin-bottom: 8px; padding-left: 12px;">SEO & AEO Control</span>
+                <ul style="list-style: none; display: flex; flex-direction: column; gap: 4px; padding: 0; margin: 0;">
+                    <li>
+                        <a href="/admin/seo" class="tab-btn {% if request.path.startswith('/admin/seo') %}active{% endif %}" style="display: flex; align-items: center; gap: 10px; font-size: 13px; padding: 8px 12px; border-radius: 6px; width: 100%; transition: all 0.2s; text-decoration: none; text-align: left; {% if request.path.startswith('/admin/seo') %}{% else %}background: none; color: var(--text-secondary);{% endif %}" onmouseover="if(!this.classList.contains('active')) this.style.color='var(--accent-blue)'" onmouseout="if(!this.classList.contains('active')) this.style.color='var(--text-secondary)'">
+                            <i class="fas fa-magnifying-glass-chart" style="width: 16px;"></i> SEO Control Center
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
         </div>
     </div>
 

@@ -186,6 +186,7 @@
         .crm-main {
             margin-left: 260px;
             flex: 1;
+            min-width: 0;
             padding: 30px;
             display: flex;
             flex-direction: column;
@@ -481,6 +482,85 @@
             color: var(--accent-cyan) !important;
         }
 
+        /* ── Theme Toggle Switch ── */
+        .theme-toggle-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .theme-toggle-label {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: var(--text-crm-muted);
+            text-transform: uppercase;
+            transition: color 0.3s ease;
+            user-select: none;
+        }
+
+        .theme-toggle-label.active-label {
+            color: var(--accent-cyan);
+        }
+
+        .theme-switch {
+            position: relative;
+            width: 44px;
+            height: 22px;
+            flex-shrink: 0;
+        }
+
+        .theme-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+            position: absolute;
+        }
+
+        .theme-switch-track {
+            position: absolute;
+            inset: 0;
+            border-radius: 999px;
+            background: rgba(22, 45, 80, 0.7);
+            border: 1px solid var(--border-crm);
+            cursor: pointer;
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+
+        .theme-switch input:checked + .theme-switch-track {
+            background: rgba(8, 145, 178, 0.25);
+            border-color: var(--accent-cyan);
+        }
+
+        .theme-switch-knob {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--text-crm-muted);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            font-size: 8px;
+            color: #000;
+        }
+
+        .theme-switch input:checked + .theme-switch-track .theme-switch-knob {
+            transform: translateX(22px);
+            background: var(--accent-cyan);
+            color: #0f172a;
+        }
+
+        body.light-theme .theme-switch-track {
+            background: rgba(241, 245, 249, 0.9);
+            border-color: #cbd5e1;
+        }
+
         @media (max-width: 992px) {
             .crm-sidebar {
                 transform: translateX(-260px);
@@ -499,6 +579,96 @@
                 display: flex;
             }
         }
+        
+        /* ── Global Header Top Bar ── */
+        .crm-global-top-bar {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-crm, rgba(255,255,255,0.08));
+        }
+        
+        .dash-theme-pill {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            background: rgba(9, 19, 34, 0.7);
+            border: 1.5px solid rgba(22, 45, 80, 0.8);
+            border-radius: 999px;
+            padding: 4px;
+            cursor: pointer;
+            gap: 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            user-select: none;
+            overflow: hidden;
+            min-width: 160px;
+        }
+        .dash-theme-pill:hover {
+            box-shadow: 0 6px 28px rgba(6,182,212,0.25), inset 0 1px 0 rgba(255,255,255,0.08);
+            border-color: rgba(6,182,212,0.5);
+        }
+        .dash-theme-option {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 16px;
+            border-radius: 999px;
+            font-size: 12.5px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            transition: color 0.3s ease;
+            flex: 1;
+            justify-content: center;
+            white-space: nowrap;
+        }
+        .dash-theme-option i {
+            font-size: 13px;
+            transition: transform 0.4s ease;
+        }
+        .dash-theme-slider {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: calc(50% - 4px);
+            height: calc(100% - 8px);
+            border-radius: 999px;
+            background: linear-gradient(135deg, #0d1b31, #091322);
+            border: 1px solid rgba(6,182,212,0.35);
+            box-shadow: 0 0 12px rgba(6,182,212,0.25);
+            transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+            z-index: 1;
+        }
+        /* Dark mode active = left side highlighted */
+        .dash-theme-pill.mode-dark .dash-dark { color: var(--accent-cyan, #06b6d4); }
+        .dash-theme-pill.mode-dark .dash-dark i { transform: rotate(-20deg) scale(1.15); }
+        .dash-theme-pill.mode-dark .dash-light { color: var(--text-crm-muted, #94a3b8); }
+        .dash-theme-pill.mode-dark .dash-theme-slider { transform: translateX(0); }
+        /* Light mode active = right side highlighted */
+        .dash-theme-pill.mode-light .dash-light { color: #f59e0b; }
+        .dash-theme-pill.mode-light .dash-light i { transform: rotate(20deg) scale(1.2); }
+        .dash-theme-pill.mode-light .dash-dark { color: var(--text-crm-muted, #94a3b8); }
+        .dash-theme-pill.mode-light .dash-theme-slider {
+            transform: translateX(calc(100% + 0px));
+            background: linear-gradient(135deg, #fffbeb, #fef3c7);
+            border-color: rgba(245,158,11,0.4);
+            box-shadow: 0 0 12px rgba(245,158,11,0.3);
+        }
+        body.light-theme .dash-theme-pill {
+            background: rgba(255,255,255,0.9);
+            border-color: #cbd5e1;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        body.light-theme .dash-theme-pill:hover {
+            box-shadow: 0 6px 28px rgba(245,158,11,0.2);
+            border-color: rgba(245,158,11,0.5);
+        }
+        body.light-theme .dash-theme-pill.mode-dark .dash-dark { color: var(--accent-cyan, #06b6d4); }
+        body.light-theme .dash-theme-pill.mode-light .dash-dark { color: var(--text-crm-muted, #94a3b8); }
     </style>
     {% block extra_head %}{% endblock %}
 </head>
@@ -524,9 +694,6 @@
                 <div class="crm-brand-logo">ThinkArtha<span>CRM</span></div>
                 <div class="crm-brand-sub">workspace</div>
             </div>
-            <button id="theme-toggle-btn" class="theme-btn" title="Toggle Light/Dark Theme" style="background: none; border: none; color: var(--text-crm-secondary); cursor: pointer; font-size: 16px; padding: 4px; display: flex; align-items: center; justify-content: center;">
-                <i class="fas fa-moon"></i>
-            </button>
         </div>
         
         {% if current_crm_user %}
@@ -662,6 +829,20 @@
 
     <!-- Main Workspace -->
     <div class="crm-main">
+        <!-- Global Top Bar with Theme Switcher -->
+        <div class="crm-global-top-bar">
+            <div class="dash-theme-pill" id="crm-global-theme-pill" onclick="toggleTheme()" title="Toggle Dark / Light theme" role="button" aria-label="Toggle theme">
+                <div class="dash-theme-option dash-dark" id="crm-dark-opt">
+                    <i class="fas fa-moon"></i>
+                    <span>Dark</span>
+                </div>
+                <div class="dash-theme-option dash-light" id="crm-light-opt">
+                    <i class="fas fa-sun"></i>
+                    <span>Light</span>
+                </div>
+                <div class="dash-theme-slider" id="crm-theme-slider"></div>
+            </div>
+        </div>
         
         <!-- Alerts flash section -->
         <div class="crm-alerts">
@@ -702,38 +883,31 @@
         }, 5000);
 
         // Theme Switcher Logic
-        const themeToggleBtn = document.getElementById('theme-toggle-btn');
         const mobileThemeToggleBtn = document.getElementById('mobile-theme-toggle-btn');
+        const globalThemePill = document.getElementById('crm-global-theme-pill');
         const bodyEl = document.body;
 
         function updateThemeUI(theme) {
-            const deskIcon = themeToggleBtn ? themeToggleBtn.querySelector('i') : null;
             const mobIcon = mobileThemeToggleBtn ? mobileThemeToggleBtn.querySelector('i') : null;
 
             if (theme === 'light') {
                 bodyEl.classList.add('light-theme');
-                if (deskIcon) {
-                    deskIcon.classList.remove('fa-moon');
-                    deskIcon.classList.add('fa-sun');
-                }
-                if (mobIcon) {
-                    mobIcon.classList.remove('fa-moon');
-                    mobIcon.classList.add('fa-sun');
+                if (mobIcon) { mobIcon.classList.remove('fa-moon'); mobIcon.classList.add('fa-sun'); }
+                if (globalThemePill) {
+                    globalThemePill.classList.remove('mode-dark');
+                    globalThemePill.classList.add('mode-light');
                 }
             } else {
                 bodyEl.classList.remove('light-theme');
-                if (deskIcon) {
-                    deskIcon.classList.remove('fa-sun');
-                    deskIcon.classList.add('fa-moon');
-                }
-                if (mobIcon) {
-                    mobIcon.classList.remove('fa-sun');
-                    mobIcon.classList.add('fa-moon');
+                if (mobIcon) { mobIcon.classList.remove('fa-sun'); mobIcon.classList.add('fa-moon'); }
+                if (globalThemePill) {
+                    globalThemePill.classList.remove('mode-light');
+                    globalThemePill.classList.add('mode-dark');
                 }
             }
         }
 
-        // Initialize theme from storage or system preference
+        // Initialize theme from localStorage (default: dark)
         const savedTheme = localStorage.getItem('crm-theme') || 'dark';
         updateThemeUI(savedTheme);
 
@@ -741,11 +915,11 @@
             const nextTheme = bodyEl.classList.contains('light-theme') ? 'dark' : 'light';
             localStorage.setItem('crm-theme', nextTheme);
             updateThemeUI(nextTheme);
+            // Dispatch dynamic charts refresh event
+            window.dispatchEvent(new CustomEvent('crmThemeChanged', { detail: nextTheme }));
         }
 
-        if (themeToggleBtn) {
-            themeToggleBtn.addEventListener('click', toggleTheme);
-        }
+        // Mobile header button
         if (mobileThemeToggleBtn) {
             mobileThemeToggleBtn.addEventListener('click', toggleTheme);
         }

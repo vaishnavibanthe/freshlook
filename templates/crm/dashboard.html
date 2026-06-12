@@ -8,7 +8,7 @@
         <h1>Sales CRM Dashboard</h1>
         <p>Real-time deal pipeline, lead activities, and team performance overview</p>
     </div>
-    <div class="crm-actions-section">
+    <div class="crm-actions-section" style="display:flex; align-items:center; gap:16px;">
         <a href="{{ url_for('crm.new_lead') }}" class="btn-crm btn-crm-primary">
             <i class="fas fa-plus"></i> New CRM Lead
         </a>
@@ -17,6 +17,8 @@
 
 <!-- Quick Stats Summary Grid -->
 <style>
+    /* Styles removed (now defined globally in base_crm.html) */
+
     .stats-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -273,6 +275,12 @@
 <!-- Load ChartJS CDN -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    // ── Listen to Global Theme Changes to Redraw Charts ──
+    window.addEventListener('crmThemeChanged', () => {
+        updateAllCharts();
+    });
+</script>
+<script>
     // Quick async task complete check
     function completeTask(taskId, checkbox) {
         if (!checkbox.checked) return;
@@ -310,19 +318,32 @@
         '#6366f1'  // Indigo
     ];
 
+    function getThemeChartColors() {
+        const isLight = document.body.classList.contains('light-theme');
+        return {
+            tickColor:   isLight ? '#475569' : '#94a3b8',
+            gridColor:   isLight ? 'rgba(71,85,105,0.12)' : 'rgba(22,45,80,0.2)',
+            legendColor: isLight ? '#0f172a' : '#e2e8f0',
+            barCyan:     isLight ? 'rgba(8,145,178,0.55)'   : 'rgba(6,182,212,0.6)',
+            borderCyan:  isLight ? '#0891b2' : '#06b6d4',
+            barPurple:   isLight ? 'rgba(109,40,217,0.55)'  : 'rgba(124,58,237,0.6)',
+            borderPurple:isLight ? '#6d28d9' : '#7c3aed',
+        };
+    }
+
     // Stage Chart
     const stageCtx = document.getElementById('stageChart').getContext('2d');
     const stageLabels = [{% for item in opps_by_stage %}'{{ item.label }}',{% endfor %}];
     const stageData = [{% for item in opps_by_stage %}{{ item.value }},{% endfor %}];
-    new Chart(stageCtx, {
+    const stageChart = new Chart(stageCtx, {
         type: 'bar',
         data: {
             labels: stageLabels.length ? stageLabels : ['Prospecting', 'Discovery', 'Solution Fit', 'Proposal', 'Negotiation'],
             datasets: [{
                 label: 'Pipeline Value ($)',
                 data: stageData.length ? stageData : [50000, 75000, 120000, 90000, 45000],
-                backgroundColor: 'rgba(6, 182, 212, 0.6)',
-                borderColor: '#06b6d4',
+                backgroundColor: getThemeChartColors().barCyan,
+                borderColor: getThemeChartColors().borderCyan,
                 borderWidth: 1.5,
                 borderRadius: 4
             }]
@@ -332,8 +353,8 @@
             maintainAspectRatio: false,
             plugins: { legend: { display: false } },
             scales: {
-                y: { grid: { color: 'rgba(22, 45, 80, 0.2)' }, ticks: { color: '#94a3b8' } },
-                x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+                y: { grid: { color: getThemeChartColors().gridColor }, ticks: { color: getThemeChartColors().tickColor } },
+                x: { grid: { display: false }, ticks: { color: getThemeChartColors().tickColor } }
             }
         }
     });
@@ -342,7 +363,7 @@
     const sourceCtx = document.getElementById('sourceChart').getContext('2d');
     const sourceLabels = [{% for item in leads_by_source %}'{{ item.label }}',{% endfor %}];
     const sourceData = [{% for item in leads_by_source %}{{ item.value }},{% endfor %}];
-    new Chart(sourceCtx, {
+    const sourceChart = new Chart(sourceCtx, {
         type: 'doughnut',
         data: {
             labels: sourceLabels.length ? sourceLabels : ['Contact Form', 'Assessment', 'Healthcare', 'Imported', 'Manual'],
@@ -356,7 +377,7 @@
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { position: 'right', labels: { color: '#e2e8f0', boxWidth: 12 } }
+                legend: { position: 'right', labels: { color: getThemeChartColors().legendColor, boxWidth: 12 } }
             }
         }
     });
@@ -365,7 +386,7 @@
     const partnerCtx = document.getElementById('partnerChart').getContext('2d');
     const partnerLabels = [{% for item in pipeline_by_partner %}'{{ item.label }}',{% endfor %}];
     const partnerData = [{% for item in pipeline_by_partner %}{{ item.value }},{% endfor %}];
-    new Chart(partnerCtx, {
+    const partnerChart = new Chart(partnerCtx, {
         type: 'pie',
         data: {
             labels: partnerLabels.length ? partnerLabels : ['Qlik', 'Talend', 'AWS', 'Snowflake', 'No Partner'],
@@ -379,7 +400,7 @@
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { position: 'right', labels: { color: '#e2e8f0', boxWidth: 12 } }
+                legend: { position: 'right', labels: { color: getThemeChartColors().legendColor, boxWidth: 12 } }
             }
         }
     });
@@ -388,15 +409,15 @@
     const productCtx = document.getElementById('productChart').getContext('2d');
     const productLabels = [{% for item in pipeline_by_product %}'{{ item.label }}',{% endfor %}];
     const productData = [{% for item in pipeline_by_product %}{{ item.value }},{% endfor %}];
-    new Chart(productCtx, {
+    const productChart = new Chart(productCtx, {
         type: 'bar',
         data: {
             labels: productLabels.length ? productLabels : ['AI Readiness', 'MDM', 'SAP Integration', 'CDC Snowflake'],
             datasets: [{
                 label: 'Pipeline Value ($)',
                 data: productData.length ? productData : [120000, 85000, 110000, 75000],
-                backgroundColor: 'rgba(124, 58, 237, 0.6)',
-                borderColor: '#7c3aed',
+                backgroundColor: getThemeChartColors().barPurple,
+                borderColor: getThemeChartColors().borderPurple,
                 borderWidth: 1.5,
                 borderRadius: 4
             }]
@@ -407,10 +428,35 @@
             indexAxis: 'y',
             plugins: { legend: { display: false } },
             scales: {
-                y: { grid: { display: false }, ticks: { color: '#94a3b8' } },
-                x: { grid: { color: 'rgba(22, 45, 80, 0.2)' }, ticks: { color: '#94a3b8' } }
+                y: { grid: { display: false }, ticks: { color: getThemeChartColors().tickColor } },
+                x: { grid: { color: getThemeChartColors().gridColor }, ticks: { color: getThemeChartColors().tickColor } }
             }
         }
     });
+
+    // Update all charts when theme changes
+    function updateAllCharts() {
+        const c = getThemeChartColors();
+        // Stage
+        stageChart.data.datasets[0].backgroundColor = c.barCyan;
+        stageChart.data.datasets[0].borderColor = c.borderCyan;
+        stageChart.options.scales.y.grid.color = c.gridColor;
+        stageChart.options.scales.y.ticks.color = c.tickColor;
+        stageChart.options.scales.x.ticks.color = c.tickColor;
+        stageChart.update();
+        // Source
+        sourceChart.options.plugins.legend.labels.color = c.legendColor;
+        sourceChart.update();
+        // Partner
+        partnerChart.options.plugins.legend.labels.color = c.legendColor;
+        partnerChart.update();
+        // Product
+        productChart.data.datasets[0].backgroundColor = c.barPurple;
+        productChart.data.datasets[0].borderColor = c.borderPurple;
+        productChart.options.scales.y.ticks.color = c.tickColor;
+        productChart.options.scales.x.grid.color = c.gridColor;
+        productChart.options.scales.x.ticks.color = c.tickColor;
+        productChart.update();
+    }
 </script>
 {% endblock %}

@@ -1,0 +1,263 @@
+{% extends "base.html" %}
+
+{% block title %}Configure Overrides - {{ page.route_slug }}{% endblock %}
+
+{% block content %}
+<div style="height: var(--nav-height); background-color: var(--bg-secondary);"></div>
+
+<section class="section-alt" style="padding-top: 40px; min-height: 90vh;">
+    <div class="container" style="display: grid; grid-template-columns: 280px 1fr; gap: 40px; align-items: start;">
+        {% include 'admin_sidebar.html' %}
+        
+        <div>
+            <!-- Header -->
+            <div style="margin-bottom: 32px;">
+                <a href="/admin/seo/pages" style="color: var(--accent-blue); text-decoration: none; font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 12px;">
+                    <i class="fas fa-arrow-left"></i> Back to Page Overrides
+                </a>
+                <h2 style="font-size: 28px; font-weight: 800; letter-spacing: -0.5px; margin: 0;">Configure Search & AI Settings</h2>
+                <p style="color: var(--text-tertiary); font-size: 14px; margin-top: 4px;">Modifying overrides for: <strong style="color: var(--text-secondary);">{{ page.route_slug }}</strong></p>
+            </div>
+
+            <!-- Quality Gates Warning Alerts -->
+            {% if errors %}
+            <div style="background-color: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); padding: 16px; border-radius: var(--border-radius-md); margin-bottom: 24px; color: #ef4444; font-size: 14px;">
+                <h4 style="margin: 0 0 8px 0; font-weight: 700;">Audit Quality Gate Warnings:</h4>
+                <ul style="margin: 0; padding-left: 20px;">
+                    {% for error in errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            {% if success %}
+            <div style="background-color: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); padding: 16px; border-radius: var(--border-radius-md); margin-bottom: 24px; color: #10b981; font-size: 14px; font-weight: 600;">
+                Changes saved successfully. Score has been updated.
+            </div>
+            {% endif %}
+
+            <!-- Tabs Navigation -->
+            <div style="display: flex; gap: 8px; border-bottom: 2px solid var(--border-color); margin-bottom: 30px; padding-bottom: 0;">
+                <button type="button" class="tab-link active" onclick="switchSeoTab(event, 'tab-seo')" style="background: none; border: none; color: var(--text-secondary); font-size: 14.5px; font-weight: 700; padding: 12px 18px; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s;">
+                    Traditional SEO
+                </button>
+                <button type="button" class="tab-link" onclick="switchSeoTab(event, 'tab-aeo')" style="background: none; border: none; color: var(--text-secondary); font-size: 14.5px; font-weight: 700; padding: 12px 18px; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s;">
+                    AEO / GEO Answers
+                </button>
+                <button type="button" class="tab-link" onclick="switchSeoTab(event, 'tab-eeat')" style="background: none; border: none; color: var(--text-secondary); font-size: 14.5px; font-weight: 700; padding: 12px 18px; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s;">
+                    E-E-A-T Signals
+                </button>
+                <button type="button" class="tab-link" onclick="switchSeoTab(event, 'tab-schema')" style="background: none; border: none; color: var(--text-secondary); font-size: 14.5px; font-weight: 700; padding: 12px 18px; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s;">
+                    JSON-LD Schema
+                </button>
+            </div>
+
+            <style>
+                .tab-link.active {
+                    color: var(--accent-blue) !important;
+                    border-bottom-color: var(--accent-blue) !important;
+                }
+                .form-sec {
+                    margin-bottom: 24px;
+                    text-align: left;
+                }
+                .form-sec label {
+                    display: block;
+                    font-size: 13.5px;
+                    font-weight: 700;
+                    color: var(--text-secondary);
+                    margin-bottom: 8px;
+                }
+                .form-sec input[type="text"], .form-sec select, .form-sec textarea {
+                    width: 100%;
+                    background-color: var(--bg-secondary);
+                    border: 1px solid var(--border-color);
+                    border-radius: 6px;
+                    padding: 12px 16px;
+                    color: var(--text-primary);
+                    outline: none;
+                    font-size: 14px;
+                    transition: border-color 0.2s;
+                }
+                .form-sec input[type="text"]:focus, .form-sec select:focus, .form-sec textarea:focus {
+                    border-color: var(--accent-blue);
+                }
+            </style>
+
+            <form action="/admin/seo/pages/edit/{{ page.id }}" method="POST">
+                <!-- Tab: Traditional SEO -->
+                <div id="tab-seo" class="tab-content" style="display: block;">
+                    <div style="background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); padding: 32px; box-shadow: var(--glass-shadow); margin-bottom: 32px;">
+                        <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 24px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">Search Metadata</h3>
+                        
+                        <div class="form-sec">
+                            <label for="seo_title">SEO Title Tag (Recommended length: 50-60 chars)</label>
+                            <input type="text" id="seo_title" name="seo_title" value="{{ page.seo_title or '' }}" placeholder="Artha Solutions | ...">
+                        </div>
+                        
+                        <div class="form-sec">
+                            <label for="meta_description">Meta Description Tag (Recommended length: 120-160 chars)</label>
+                            <textarea id="meta_description" name="meta_description" rows="3" placeholder="Artha Solutions helps ...">{{ page.meta_description or '' }}</textarea>
+                        </div>
+                        
+                        <div class="form-sec">
+                            <label for="canonical_url">Canonical URL (Leave empty to use request path URL)</label>
+                            <input type="text" id="canonical_url" name="canonical_url" value="{{ page.canonical_url or '' }}" placeholder="https://www.thinkartha.com{{ page.route_slug }}">
+                        </div>
+
+                        <div class="form-sec">
+                            <label for="h1">Primary H1 Heading Override</label>
+                            <input type="text" id="h1" name="h1" value="{{ page.h1 or '' }}" placeholder="Heading Title">
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div class="form-sec">
+                                <label for="robots_directive">Meta Robots Tag</label>
+                                <select id="robots_directive" name="robots_directive">
+                                    <option value="index, follow" {% if page.robots_directive == 'index, follow' %}selected{% endif %}>Index, Follow (Standard Indexable)</option>
+                                    <option value="noindex, nofollow" {% if page.robots_directive == 'noindex, nofollow' %}selected{% endif %}>Noindex, Nofollow (Blocked/Hidden)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-sec">
+                                <label for="sitemap_inclusion">Inclusion in XML Sitemap</label>
+                                <select id="sitemap_inclusion" name="sitemap_inclusion">
+                                    <option value="1" {% if page.sitemap_inclusion == 1 %}selected{% endif %}>Yes, include page</option>
+                                    <option value="0" {% if page.sitemap_inclusion == 0 %}selected{% endif %}>No, exclude page</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-sec">
+                            <label for="sitemap_priority">Sitemap Priority (0.1 to 1.0)</label>
+                            <input type="text" id="sitemap_priority" name="sitemap_priority" value="{{ page.sitemap_priority or '0.5' }}" style="width: 150px;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: AEO / GEO -->
+                <div id="tab-aeo" class="tab-content" style="display: none;">
+                    <div style="background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); padding: 32px; box-shadow: var(--glass-shadow); margin-bottom: 32px;">
+                        <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 24px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">Answer Engine optimization details</h3>
+                        
+                        <div class="form-sec">
+                            <label for="aeo_quick_answer">"Quick Answer" Block (Ideal: 40-80 words concise factual answer summary)</label>
+                            <textarea id="aeo_quick_answer" name="aeo_quick_answer" rows="4" placeholder="Artha Solutions helps [audience] solve [problem] by implementing [approach]. This enables [outcome]...">{{ page.aeo_quick_answer or '' }}</textarea>
+                        </div>
+                        
+                        <div class="form-sec">
+                            <label for="aeo_key_facts">Key Facts (JSON array format, e.g. [{"label":"Who it is for","value":"Manufacturers"},{"label":"Focus Area","value":"Supply chain MDM"}])</label>
+                            <textarea id="aeo_key_facts" name="aeo_key_facts" rows="4" style="font-family: monospace; font-size: 13px;">{{ page.aeo_key_facts or '[]' }}</textarea>
+                        </div>
+                        
+                        <div class="form-sec">
+                            <label for="aeo_questions">Conversational Q&A List (JSON array format, e.g. [{"question":"What problem does this solve?","answer":"Clean master codes..."},...])</label>
+                            <textarea id="aeo_questions" name="aeo_questions" rows="6" style="font-family: monospace; font-size: 13px;">{{ page.aeo_questions or '[]' }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: E-E-A-T -->
+                <div id="tab-eeat" class="tab-content" style="display: none;">
+                    <div style="background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); padding: 32px; box-shadow: var(--glass-shadow); margin-bottom: 32px;">
+                        <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 24px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">Expertise and Trust Signals</h3>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div class="form-sec">
+                                <label for="author_name">Author Name</label>
+                                <input type="text" id="author_name" name="author_name" value="{{ page.author_name or '' }}" placeholder="Name">
+                            </div>
+                            <div class="form-sec">
+                                <label for="reviewer_name">Subject-Matter Reviewer</label>
+                                <input type="text" id="reviewer_name" name="reviewer_name" value="{{ page.reviewer_name or '' }}" placeholder="Reviewer Name">
+                            </div>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div class="form-sec">
+                                <label for="author_role">Author Role</label>
+                                <input type="text" id="author_role" name="author_role" value="{{ page.author_role or '' }}" placeholder="e.g. Senior Data Architect">
+                            </div>
+                            <div class="form-sec">
+                                <label for="reviewer_role">Reviewer Role</label>
+                                <input type="text" id="reviewer_role" name="reviewer_role" value="{{ page.reviewer_role or '' }}" placeholder="e.g. Director of AI Strategy">
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div class="form-sec">
+                                <label for="author_expertise">Author Expertise Summary</label>
+                                <input type="text" id="author_expertise" name="author_expertise" value="{{ page.author_expertise or '' }}" placeholder="e.g. 15+ years MDM, cloud architecture">
+                            </div>
+                            <div class="form-sec">
+                                <label for="reviewer_expertise">Reviewer Expertise Summary</label>
+                                <input type="text" id="reviewer_expertise" name="reviewer_expertise" value="{{ page.reviewer_expertise or '' }}" placeholder="e.g. Generative AI governance expert">
+                            </div>
+                        </div>
+                        
+                        <div class="form-sec">
+                            <label for="last_reviewed_date">Last Reviewed Date</label>
+                            <input type="text" id="last_reviewed_date" name="last_reviewed_date" value="{{ page.last_reviewed_date or '' }}" placeholder="YYYY-MM-DD" style="width: 200px;">
+                        </div>
+
+                        <div class="form-sec">
+                            <label for="content_status">Publishing Workflow Status</label>
+                            <select id="content_status" name="content_status">
+                                <option value="Draft" {% if page.content_status == 'Draft' %}selected{% endif %}>Draft</option>
+                                <option value="SEO Review" {% if page.content_status == 'SEO Review' %}selected{% endif %}>SEO Review</option>
+                                <option value="Subject-Matter Review" {% if page.content_status == 'Subject-Matter Review' %}selected{% endif %}>Subject-Matter Review</option>
+                                <option value="Approved" {% if page.content_status == 'Approved' %}selected{% endif %}>Approved</option>
+                                <option value="Published" {% if page.content_status == 'Published' %}selected{% endif %}>Published</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: JSON-LD -->
+                <div id="tab-schema" class="tab-content" style="display: none;">
+                    <div style="background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); padding: 32px; box-shadow: var(--glass-shadow); margin-bottom: 32px;">
+                        <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 24px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">Custom JSON-LD Schema block</h3>
+                        
+                        <div class="form-sec">
+                            <label for="schema_json">Custom JSON-LD Schema (Valid JSON format only, enclosing script tags are added automatically in frontend template)</label>
+                            <textarea id="schema_json" name="schema_json" rows="12" style="font-family: monospace; font-size: 13px;" placeholder='{
+  "@context": "https://schema.org",
+  "@type": "Service",
+  "name": "Consulting Services",
+  "provider": {
+    "@type": "Organization",
+    "name": "Artha Solutions"
+  }
+}'>{{ page.schema_json or '' }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Submit Actions -->
+                <div style="display: flex; gap: 12px; margin-bottom: 40px; text-align: left;">
+                    <button type="submit" class="btn btn-primary" style="padding: 12px 28px;">Save Settings</button>
+                    <a href="/admin/seo/pages" class="btn btn-secondary" style="padding: 12px 28px; text-decoration: none; display: inline-flex; align-items: center;">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<script>
+    // Tab switching controller
+    function switchSeoTab(evt, tabId) {
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tab-content");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+        tablinks = document.getElementsByClassName("tab-link");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].classList.remove("active");
+        }
+        document.getElementById(tabId).style.display = "block";
+        evt.currentTarget.classList.add("active");
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}SEO Control Center - Page Overrides{% endblock %}
+
+{% block content %}
+<div style="height: var(--nav-height); background-color: var(--bg-secondary);"></div>
+
+<section class="section-alt" style="padding-top: 40px; min-height: 90vh;">
+    <div class="container" style="display: grid; grid-template-columns: 280px 1fr; gap: 40px; align-items: start;">
+        {% include 'admin_sidebar.html' %}
+        
+        <div>
+            <!-- Header -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
+                <div>
+                    <h2 style="font-size: 28px; font-weight: 800; letter-spacing: -0.5px; margin: 0;">Page Metadata & AEO Overrides</h2>
+                    <p style="color: var(--text-tertiary); font-size: 14px; margin-top: 4px;">Select any indexable URL route to configure custom title tags, descriptions, breadcrumbs, schema blocks, and direct answers.</p>
+                </div>
+            </div>
+            
+            <div style="background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); padding: 32px; box-shadow: var(--glass-shadow); overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13.5px;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid var(--border-color); color: var(--text-secondary); font-weight: 600;">
+                            <th style="padding: 12px 16px;">Route Slug</th>
+                            <th style="padding: 12px 16px;">SEO Title Override</th>
+                            <th style="padding: 12px 16px; text-align: center;">SEO Score</th>
+                            <th style="padding: 12px 16px; text-align: center;">AEO Score</th>
+                            <th style="padding: 12px 16px; text-align: center;">Status</th>
+                            <th style="padding: 12px 16px; text-align: right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if pages %}
+                            {% for page in pages %}
+                            <tr style="border-bottom: 1px solid var(--border-color); transition: var(--transition-fast);" onmouseover="this.style.backgroundColor='var(--bg-secondary)'" onmouseout="this.style.backgroundColor='transparent'">
+                                <td style="padding: 16px; font-weight: 700; color: var(--accent-blue);">
+                                    <a href="{{ page.route_slug }}" target="_blank" style="color: inherit; text-decoration: none;">
+                                        {{ page.route_slug }} <i class="fas fa-arrow-up-right-from-square" style="font-size: 10px; margin-left: 4px;"></i>
+                                    </a>
+                                </td>
+                                <td style="padding: 16px; max-width: 250px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
+                                    {{ page.seo_title or '(Using default site title)' }}
+                                </td>
+                                <td style="padding: 16px; text-align: center; font-weight: 700; color: {% if page.seo_score >= 80 %}#10b981{% elif page.seo_score >= 50 %}#f59e0b{% else %}#ef4444{% endif %};">
+                                    {{ page.seo_score }}%
+                                </td>
+                                <td style="padding: 16px; text-align: center; font-weight: 700; color: {% if page.aeo_score >= 80 %}#10b981{% elif page.aeo_score >= 50 %}#f59e0b{% else %}#ef4444{% endif %};">
+                                    {{ page.aeo_score }}%
+                                </td>
+                                <td style="padding: 16px; text-align: center;">
+                                    <span class="ai-card-tag {% if page.content_status == 'Published' %}ai-tag-existing{% else %}ai-tag-new{% endif %}" style="margin:0; font-size: 10.5px; padding: 2px 8px;">
+                                        {{ page.content_status or 'Draft' }}
+                                    </span>
+                                </td>
+                                <td style="padding: 16px; text-align: right; white-space: nowrap;">
+                                    <a href="/admin/seo/pages/edit/{{ page.id }}" class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px; border-radius: 8px;" title="Edit Overrides">
+                                        <i class="fas fa-pen-to-square" style="margin-right: 4px;"></i> Configure
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="6" style="text-align: center; padding: 40px 0; color: var(--text-tertiary);">No routes indexed yet. Click "Run Audit & Sync" on dashboard to import website routes.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

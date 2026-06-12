@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}SEO Control Center - AI Crawlers Policy{% endblock %}
+
+{% block content %}
+<div style="height: var(--nav-height); background-color: var(--bg-secondary);"></div>
+
+<section class="section-alt" style="padding-top: 40px; min-height: 90vh;">
+    <div class="container" style="display: grid; grid-template-columns: 280px 1fr; gap: 40px; align-items: start;">
+        {% include 'admin_sidebar.html' %}
+        
+        <div>
+            <!-- Header -->
+            <div style="margin-bottom: 32px;">
+                <h2 style="font-size: 28px; font-weight: 800; letter-spacing: -0.5px; margin: 0;">AI Crawlers & Verification Keys</h2>
+                <p style="color: var(--text-tertiary); font-size: 14px; margin-top: 4px;">Configure crawl preferences for search spiders (Google, Bing), AI answers discovery spiders (OAI-SearchBot), and AI training spiders (GPTBot) independently.</p>
+            </div>
+            
+            <form action="/admin/seo/crawlers" method="POST" style="text-align: left;">
+                <div style="background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); padding: 32px; box-shadow: var(--glass-shadow); margin-bottom: 32px;">
+                    <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 24px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">Webmaster Verification Tokens</h3>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label style="display:block; font-size:13px; font-weight:700; color:var(--text-secondary); margin-bottom:8px;">Google Search Console Token (e.g. google-site-verification)</label>
+                        <input type="text" name="google_verification" value="{{ google_verification }}" placeholder="Paste verification string here" style="width:100%; background:var(--bg-secondary); border:1px solid var(--border-color); padding:12px; border-radius:6px; color:var(--text-primary); outline:none;">
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label style="display:block; font-size:13px; font-weight:700; color:var(--text-secondary); margin-bottom:8px;">Bing Webmaster Tools Token (e.g. msvalidate.01)</label>
+                        <input type="text" name="bing_verification" value="{{ bing_verification }}" placeholder="Paste verification string here" style="width:100%; background:var(--bg-secondary); border:1px solid var(--border-color); padding:12px; border-radius:6px; color:var(--text-primary); outline:none;">
+                    </div>
+                </div>
+
+                <div style="background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); padding: 32px; box-shadow: var(--glass-shadow); margin-bottom: 32px;">
+                    <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 24px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">AI Spiders Rules</h3>
+                    
+                    <div style="margin-bottom: 24px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h4 style="margin:0; font-size:15px; font-weight:700;">OpenAI SearchBot (OAI-SearchBot)</h4>
+                            <p style="margin:4px 0 0 0; font-size:13px; color:var(--text-tertiary);">Used for real-time ChatGPT Search inclusion. Recommended to ALLOW for discoverability.</p>
+                        </div>
+                        <select name="searchbot_allowed" style="background:var(--bg-secondary); border:1px solid var(--border-color); padding:10px; border-radius:6px; color:var(--text-primary); font-weight:700; outline:none;">
+                            <option value="1" {% if searchbot_allowed %}selected{% endif %}>ALLOW Crawl</option>
+                            <option value="0" {% if not searchbot_allowed %}selected{% endif %}>DISALLOW Crawl</option>
+                        </select>
+                    </div>
+
+                    <div style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h4 style="margin:0; font-size:15px; font-weight:700;">OpenAI Training Bot (GPTBot)</h4>
+                            <p style="margin:4px 0 0 0; font-size:13px; color:var(--text-tertiary);">Used to scrape site content for model training. Recommended to DISALLOW based on preferences.</p>
+                        </div>
+                        <select name="gptbot_allowed" style="background:var(--bg-secondary); border:1px solid var(--border-color); padding:10px; border-radius:6px; color:var(--text-primary); font-weight:700; outline:none;">
+                            <option value="1" {% if gptbot_allowed %}selected{% endif %}>ALLOW Crawl</option>
+                            <option value="0" {% if not gptbot_allowed %}selected{% endif %}>DISALLOW Crawl</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 12px; margin-bottom: 40px;">
+                    <button type="submit" class="btn btn-primary" style="padding: 12px 28px;">Save Crawler Settings</button>
+                    <a href="/admin/seo" class="btn btn-secondary" style="padding: 12px 28px; text-decoration: none;">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}
