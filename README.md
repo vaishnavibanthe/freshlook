@@ -26,6 +26,10 @@ A lean, focus-driven system for tele-callers and sales managers:
 - **Campaign Execution**: Allocation of leads, campaign progress tracking, and group-level ownership.
 - **Leaderboards**: Ranked telecaller performance displays, tracking first/last calls and call count details.
 - **MEDDIC CRM**: Complete integration for Opportunity qualification (Metrics, Economic Buyer, Decision Criteria, Decision Process, Identify Pain, Champion).
+- **Dynamic Permission Templates**: Access templates mapping role scopes (import/export restrictions, table views, caller actions) to team members.
+- **Templates Builder**: Reusable SMS and Email template management panel with dynamic client placeholder tokens.
+- **TeleCRM settings**: Manage simulated telephony auto-dialer delay, connector timeout, SMS provider configurations, and group SMTP mapping.
+- **Analytics conversion funnel**: Conversion dashboard tracking leads from raw list imports to connected, spoken, scheduled, and SQL converted states.
 
 ### 3. Careers Module
 - **Job Postings**: DB-backed job details with recruiter ownership mapping.
@@ -50,13 +54,17 @@ Key tables in the database include:
 - `career_applications`: Candidate submission details, resume file paths, and notification statuses.
 - `timeline_activities`: Historical action logging for accounts, opportunities, and leads.
 - `telecrm_contacts` / `telecrm_campaigns`: Targets for calling campaigns and caller rankings.
+- `telecrm_permission_templates`: Profile scopes for dynamic role permissions.
+- `telecrm_templates`: SMS and Email templates and placeholder markers.
+- `telecrm_sms_logs`: Outgoing text log tracker.
+- `telecrm_settings`: Auto-dialer delays, gateways, and group SMTP properties.
 - `case_studies` / `case_study_leads`: Metadata, tech stack tag mappings, and PDF download request histories.
 
 ---
 
 ## 🚀 Recent Implementations & History
 
-1. **TeleCRM Upgrades**: Enhanced dialing benches, first/last-call tracking, and caller statistics panels.
+1. **TeleCRM Advanced Blueprints**: Seeded database-driven permission profiles, constructed a drag-and-drop SMS/Email templates builder, resolved placeholders via API rendering, added settings panel configurations, and added Lead Source Conversion Funnels inside performance analytics dashboard.
 2. **Case Study Landing Pages**: Re-designed Case Study listing pages, dynamic PDF download verification tokens, and background banners.
 3. **Careers Module Poster Notifications**: Integrated job-specific recruiter notification fields and backend email wrappers.
 4. **Public Site Validation Framework**: Implemented global JavaScript capture-phase interceptors and backend helpers in `app.py`.

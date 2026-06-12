@@ -1,0 +1,242 @@
+{% extends 'crm/base_crm.html' %}
+
+{% block title %}Campaign Registry | ThinkArtha CRM{% endblock %}
+
+{% block content %}
+<style>
+    .campaigns-stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+        margin-bottom: 24px;
+    }
+    
+    .campaign-stat-card {
+        background-color: var(--bg-card);
+        border: 1px solid var(--border-crm);
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        backdrop-filter: blur(8px);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .campaign-stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        background: rgba(6, 182, 212, 0.1);
+        color: var(--accent-cyan);
+    }
+    
+    .campaign-stat-title {
+        font-size: 11.5px;
+        color: var(--text-crm-secondary);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 4px;
+        font-weight: 600;
+    }
+    
+    .campaign-stat-value {
+        font-size: 22px;
+        font-weight: 800;
+        color: #ffffff;
+    }
+
+    .campaign-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13.5px;
+    }
+
+    .campaign-table th {
+        color: var(--text-crm-secondary);
+        font-weight: 600;
+        padding: 14px;
+        border-bottom: 2px solid var(--border-crm);
+        text-align: left;
+    }
+
+    .campaign-table td {
+        padding: 14px;
+        border-bottom: 1px solid var(--border-crm);
+        color: var(--text-crm-primary);
+        text-align: left;
+    }
+
+    .campaign-table tr {
+        transition: background-color 0.2s ease;
+    }
+
+    .campaign-table tr:hover td {
+        background-color: rgba(22, 45, 80, 0.2);
+    }
+
+    /* Progress Bar */
+    .progress-track {
+        width: 100%;
+        height: 6px;
+        background-color: rgba(22, 45, 80, 0.5);
+        border-radius: 3px;
+        margin-top: 6px;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+        border-radius: 3px;
+        transition: width 0.3s ease;
+    }
+</style>
+
+<div class="crm-header-bar">
+    <div class="crm-title-section">
+        <h1>Campaign & List Registry</h1>
+        <p>Manage list allocations, track campaign completion progress, and audit team activities</p>
+    </div>
+    
+    <div class="crm-actions-section" style="display: flex; gap: 10px;">
+        <a href="{{ url_for('crm.telecrm_import_page') }}" class="btn-crm btn-crm-primary">
+            <i class="fas fa-plus"></i> Import & Allocate Campaign
+        </a>
+    </div>
+</div>
+
+<!-- Stats Grid -->
+<div class="campaigns-stats-grid">
+    <div class="campaign-stat-card">
+        <div class="campaign-stat-icon">
+            <i class="fas fa-bullhorn"></i>
+        </div>
+        <div>
+            <div class="campaign-stat-title">Total Campaigns</div>
+            <div class="campaign-stat-value">{{ campaigns|length }}</div>
+        </div>
+    </div>
+    <div class="campaign-stat-card">
+        <div class="campaign-stat-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+            <i class="fas fa-toggle-on"></i>
+        </div>
+        <div>
+            <div class="campaign-stat-title">Active Campaigns</div>
+            <div class="campaign-stat-value">
+                {% set active_cnt = namespace(value=0) %}
+                {% for c in campaigns %}
+                    {% if c.status == 'Active' or c.campaign_status == 'Active' %}
+                        {% set active_cnt.value = active_cnt.value + 1 %}
+                    {% endif %}
+                {% endfor %}
+                {{ active_cnt.value }}
+            </div>
+        </div>
+    </div>
+    <div class="campaign-stat-card">
+        <div class="campaign-stat-icon" style="background: rgba(124, 58, 237, 0.1); color: var(--accent-purple);">
+            <i class="fas fa-users"></i>
+        </div>
+        <div>
+            <div class="campaign-stat-title">Aggregated Leads</div>
+            <div class="campaign-stat-value">
+                {% set lead_cnt = namespace(value=0) %}
+                {% for c in campaigns %}
+                    {% set lead_cnt.value = lead_cnt.value + (c.total_contacts or 0) %}
+                {% endfor %}
+                {{ lead_cnt.value }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Campaigns Registry Table -->
+<div class="crm-card">
+    <div class="crm-card-title">All Uploaded Campaigns</div>
+    
+    <div style="overflow-x: auto;">
+        <table class="campaign-table">
+            <thead>
+                <tr>
+                    <th>Campaign Info</th>
+                    <th>Target Solution / Partner</th>
+                    <th>Geography</th>
+                    <th>Contacts Allocated</th>
+                    <th>Execution Progress</th>
+                    <th>Status</th>
+                    <th style="text-align: right;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for campaign in campaigns %}
+                <tr>
+                    <td>
+                        <a href="{{ url_for('crm.telecrm_campaign_detail', campaign_id=campaign.id) }}" style="color: #ffffff; font-weight: 700; text-decoration: none; font-size: 14px;" class="theme-btn">
+                            {{ campaign.name }}
+                        </a>
+                        <div style="font-size: 11px; color: var(--text-crm-secondary); margin-top: 3px;">
+                            Code: <strong>{{ campaign.campaign_name or '-' }}</strong> &bull; Uploaded by: {{ campaign.uploader_name or 'System' }}
+                        </div>
+                    </td>
+                    <td>
+                        <span style="font-weight: 600;">{{ campaign.product_name or 'Unmapped' }}</span>
+                        {% if campaign.partner_name %}
+                        <div style="font-size: 11px; color: var(--accent-cyan); margin-top: 2px;">
+                            <i class="fas fa-handshake"></i> {{ campaign.partner_name }}
+                        </div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span style="font-size: 12.5px;">{{ campaign.geography or '-' }}</span>
+                    </td>
+                    <td>
+                        <div style="font-weight: 700;">{{ campaign.assigned_count or 0 }} / {{ campaign.total_contacts or 0 }}</div>
+                        <div style="font-size: 10.5px; color: var(--text-crm-secondary); margin-top: 2px;">
+                            Duplicates: {{ campaign.duplicate_count or 0 }}
+                        </div>
+                    </td>
+                    <td>
+                        {% set cmp_pct = campaign.overall_completion_percentage or 0.0 %}
+                        <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 600;">
+                            <span>{{ campaign.completed_count or 0 }} Completed</span>
+                            <span style="color: var(--accent-cyan);">{{ cmp_pct }}%</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-fill" style="width: {{ cmp_pct }}%;"></div>
+                        </div>
+                    </td>
+                    <td>
+                        {% set st = campaign.status or 'Active' %}
+                        <span class="badge-status {% if st == 'Active' %}qualified{% elif st == 'Completed' %}converted{% else %}nurture{% endif %}">
+                            {{ st }}
+                        </span>
+                    </td>
+                    <td style="text-align: right;">
+                        <div style="display: inline-flex; gap: 8px;">
+                            <a href="{{ url_for('crm.telecrm_campaign_detail', campaign_id=campaign.id) }}" class="btn-crm btn-crm-secondary" style="padding: 6px 12px; font-size: 12px;" title="View Allocations & Reports">
+                                <i class="fas fa-cog"></i> Manage
+                            </a>
+                            <a href="{{ url_for('crm.campaign_dialing_workspace', campaign_id=campaign.id) }}" class="btn-crm btn-crm-primary" style="padding: 6px 12px; font-size: 12px;" title="Open Dialing Workbench">
+                                <i class="fas fa-phone-alt"></i> Call
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" style="text-align: center; color: var(--text-crm-muted); padding: 40px;">
+                        <i class="fas fa-bullhorn" style="font-size: 32px; margin-bottom: 12px; display: block; opacity: 0.3;"></i>
+                        No campaigns found. Import a file to get started.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

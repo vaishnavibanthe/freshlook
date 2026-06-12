@@ -412,27 +412,420 @@ def telecrm_send_email(contact_id):
     return redirect(url_for('crm.campaign_dialing_workspace', campaign_id=campaign_id, contact_id=contact_id))
 
 # ----------------------------------------------------
-# TeleCRM Dashboard / Home
+# TeleCRM Dashboard / Home Redirect
 # ----------------------------------------------------
 @crm_bp.route('/telecrm')
 @crm_bp.route('/telecrm/dashboard')
 @crm_login_required
 @role_required('Platform Admin', 'Group Admin', 'Telecaller Manager', 'Telecaller')
 def telecrm_dashboard():
+    return redirect(url_for('crm.telecrm_campaigns'))
+
+# ----------------------------------------------------
+# TeleCRM Campaigns Registry Section
+# ----------------------------------------------------
+@crm_bp.route('/telecrm/campaigns')
+@crm_login_required
+@role_required('Platform Admin', 'Group Admin', 'Telecaller Manager')
+def telecrm_campaigns():
     user = g.crm_user
     role = user['role']
     
-    # Render standard dashboard page
-    # Fetch campaigns list
     if role == 'Platform Admin':
-        campaigns = db_query("SELECT * FROM telecrm_lists ORDER BY id DESC")
+        campaigns = db_query('''
+            SELECT c.*, 
+                   p.name as product_name,
+                   part.name as partner_name,
+                   u.name as uploader_name
+            FROM telecrm_lists c
+            LEFT JOIN product_solutions p ON c.product_solution_id = p.id
+            LEFT JOIN partners part ON c.partner_id = part.id
+            LEFT JOIN crm_users u ON c.uploaded_by = u.id
+            ORDER BY c.id DESC
+        ''')
     else:
-        campaigns = db_query("SELECT * FROM telecrm_lists WHERE group_id = ? ORDER BY id DESC", (user['group_id'],))
+        campaigns = db_query('''
+            SELECT c.*, 
+                   p.name as product_name,
+                   part.name as partner_name,
+                   u.name as uploader_name
+            FROM telecrm_lists c
+            LEFT JOIN product_solutions p ON c.product_solution_id = p.id
+            LEFT JOIN partners part ON c.partner_id = part.id
+            LEFT JOIN crm_users u ON c.uploaded_by = u.id
+            WHERE c.group_id = ?
+            ORDER BY c.id DESC
+        ''', (user['group_id'],))
         
     return render_template(
-        'telecrm/dashboard.html',
+        'telecrm/campaigns.html',
         campaigns=campaigns,
-        active_page='telecrm_dashboard'
+        active_page='telecrm_campaigns'
+    )
+
+# ----------------------------------------------------
+# TeleCRM Campaign Detail & Allocation & Reporting
+# ----------------------------------------------------
+@crm_bp.route('/telecrm/campaigns/<int:campaign_id>')
+@crm_login_required
+@role_required('Platform Admin', 'Group Admin', 'Telecaller Manager', 'Telecaller')
+def telecrm_campaign_detail(campaign_id):
+    if not check_campaign_access(campaign_id):
+        flash("Campaign not found or access denied.", "error")
+        return redirect(url_for('crm.telecrm_campaigns'))
+        
+    user = g.crm_user
+    role = user['role']
+    group_id = user['group_id']
+    
+    # Fetch campaign metadata
+    campaign = db_query_one('''
+        SELECT c.*, 
+               p.name as product_name,
+               part.name as partner_name,
+               u.name as uploader_name,
+               cg.name as group_name
+        FROM telecrm_lists c
+        LEFT JOIN product_solutions p ON c.product_solution_id = p.id
+        LEFT JOIN partners part ON c.partner_id = part.id
+        LEFT JOIN crm_users u ON c.uploaded_by = u.id
+        LEFT JOIN crm_groups cg ON c.group_id = cg.id
+        WHERE c.id = ?
+    ''', (campaign_id,))
+    
+    if not campaign:
+        flash("Campaign not found.", "error")
+        return redirect(url_for('crm.telecrm_campaigns'))
+        
+    # Fetch caller performance allocations in this campaign
+    allocations = db_query('''
+        SELECT al.*, u.name as telecaller_name
+        FROM telecrm_allocation_logs al
+        JOIN crm_users u ON al.telecaller_id = u.id
+        WHERE al.telecrm_list_id = ?
+    ''', (campaign_id,))
+    
+    # Fetch available callers for this group/all to show in allocations form
+    if role == 'Platform Admin':
+        callers = db_query("SELECT id, name FROM crm_users WHERE role = 'Telecaller' AND is_active = 1")
+    else:
+        callers = db_query("SELECT id, name FROM crm_users WHERE role = 'Telecaller' AND is_active = 1 AND group_id = ?", (group_id,))
+        
+    # Detailed campaign statistics
+    stats = db_query_one('''
+        SELECT COUNT(*) as total_cnt,
+               SUM(CASE WHEN assigned_telecaller_id IS NOT NULL THEN 1 ELSE 0 END) as assigned_cnt,
+               SUM(is_finalized) as completed_cnt,
+               SUM(call_attempt_count) as total_attempts,
+               SUM(connected_call_count) as total_connected,
+               SUM(spoken_call_count) as total_spoken,
+               SUM(CASE WHEN meeting_status = 'Scheduled' THEN 1 ELSE 0 END) as total_meetings_sched,
+               SUM(CASE WHEN sql_status IN ('SQL Approved', 'Converted to Opportunity') THEN 1 ELSE 0 END) as total_sqls
+        FROM telecrm_contacts
+        WHERE telecrm_list_id = ?
+    ''', (campaign_id,))
+    
+    total = stats['total_cnt'] or 0
+    assigned = stats['assigned_cnt'] or 0
+    completed = stats['completed_cnt'] or 0
+    dialed = stats['total_attempts'] or 0
+    spoken = stats['total_spoken'] or 0
+    meetings_sched = stats['total_meetings_sched'] or 0
+    converted = stats['total_sqls'] or 0
+    completion_pct = round((completed / total) * 100, 1) if total > 0 else 0.0
+    
+    # Outcome breakdown (dispositions) specific to this campaign
+    disp_stats = db_query('''
+        SELECT last_disposition as label, COUNT(*) as value
+        FROM telecrm_contacts
+        WHERE telecrm_list_id = ? AND last_disposition IS NOT NULL AND last_disposition != ''
+        GROUP BY last_disposition
+        ORDER BY value DESC
+    ''', (campaign_id,))
+    
+    # Team performance specific to this campaign
+    team_performance = db_query('''
+        SELECT u.name,
+               COUNT(tc.id) as assigned,
+               SUM(tc.call_attempt_count) as dialed,
+               SUM(tc.spoken_call_count) as spoken,
+               SUM(CASE WHEN tc.meeting_status = 'Scheduled' THEN 1 ELSE 0 END) as scheduled,
+               SUM(CASE WHEN tc.sql_status IN ('SQL Approved', 'Converted to Opportunity') THEN 1 ELSE 0 END) as converted,
+               SUM(tc.is_finalized) as completed
+        FROM crm_users u
+        LEFT JOIN telecrm_contacts tc ON tc.assigned_telecaller_id = u.id AND tc.telecrm_list_id = ?
+        WHERE u.role = 'Telecaller' AND u.is_active = 1
+          AND (u.group_id = ? OR ? = 'Platform Admin')
+        GROUP BY u.id
+        HAVING assigned > 0
+    ''', (campaign_id, group_id, role))
+    
+    for row in team_performance:
+        tot = row['assigned'] or 0
+        row['completion_percentage'] = round((row['completed'] / tot * 100), 1) if tot > 0 else 0.0
+        
+    # Contacts listing with filter support
+    search_q = request.args.get('search', '').strip()
+    status_f = request.args.get('status', '').strip()
+    caller_f = request.args.get('caller_id', '').strip()
+    
+    where_clauses = ["telecrm_list_id = ?"]
+    params = [campaign_id]
+    
+    if search_q:
+        where_clauses.append("(full_name LIKE ? OR company LIKE ? OR email LIKE ? OR phone LIKE ?)")
+        q_wild = f"%{search_q}%"
+        params.extend([q_wild, q_wild, q_wild, q_wild])
+    if status_f:
+        where_clauses.append("dialing_status = ?")
+        params.append(status_f)
+    if caller_f:
+        where_clauses.append("assigned_telecaller_id = ?")
+        params.append(int(caller_f))
+        
+    # Query contacts
+    contacts = db_query(f'''
+        SELECT tc.*, u.name as caller_name
+        FROM telecrm_contacts tc
+        LEFT JOIN crm_users u ON tc.assigned_telecaller_id = u.id
+        WHERE {' AND '.join(where_clauses)}
+        ORDER BY tc.id ASC
+        LIMIT 100
+    ''', params)
+    
+    return render_template(
+        'telecrm/campaign_detail.html',
+        campaign=campaign,
+        allocations=allocations,
+        callers=callers,
+        contacts=contacts,
+        assigned=assigned,
+        completed=completed,
+        dialed=dialed,
+        spoken=spoken,
+        meetings_sched=meetings_sched,
+        converted=converted,
+        completion_pct=completion_pct,
+        disp_stats=disp_stats,
+        team_performance=team_performance,
+        search_q=search_q,
+        status_f=status_f,
+        caller_f=caller_f,
+        active_page='telecrm_campaigns'
+    )
+
+# ----------------------------------------------------
+# TeleCRM Analytics & Performance Reporting Section
+# ----------------------------------------------------
+@crm_bp.route('/telecrm/analytics')
+@crm_login_required
+@role_required('Platform Admin', 'Group Admin', 'Telecaller Manager', 'Telecaller')
+def telecrm_analytics():
+    user = g.crm_user
+    role = user['role']
+    group_id = user['group_id']
+    
+    # Fetch lists for campaign filter
+    if role == 'Platform Admin':
+        campaign_options = db_query("SELECT id, name, campaign_name FROM telecrm_lists ORDER BY id DESC")
+    else:
+        campaign_options = db_query("SELECT id, name, campaign_name FROM telecrm_lists WHERE group_id = ? ORDER BY id DESC", (group_id,))
+        
+    campaign_id = request.args.get('campaign_id', '').strip()
+    if campaign_id:
+        campaign_id = int(campaign_id)
+    else:
+        campaign_id = None
+        
+    # Validate and build filter clauses
+    where_clauses = []
+    params = []
+    
+    if role != 'Platform Admin':
+        where_clauses.append("group_id = ?")
+        params.append(group_id)
+    if campaign_id:
+        where_clauses.append("telecrm_list_id = ?")
+        params.append(campaign_id)
+        
+    where_sql = f"WHERE {' AND '.join(where_clauses)}" if where_clauses else ""
+    
+    # Calculate aggregated stats
+    stats = db_query_one(f'''
+        SELECT COUNT(*) as total_cnt,
+               SUM(CASE WHEN assigned_telecaller_id IS NOT NULL THEN 1 ELSE 0 END) as assigned_cnt,
+               SUM(is_finalized) as completed_cnt,
+               SUM(call_attempt_count) as total_attempts,
+               SUM(connected_call_count) as total_connected,
+               SUM(spoken_call_count) as total_spoken,
+               SUM(CASE WHEN meeting_status = 'Scheduled' THEN 1 ELSE 0 END) as total_meetings_sched,
+               SUM(CASE WHEN sql_status IN ('SQL Approved', 'Converted to Opportunity') THEN 1 ELSE 0 END) as total_sqls
+        FROM telecrm_contacts
+        {where_sql}
+    ''', params)
+    
+    total = stats['total_cnt'] or 0
+    assigned = stats['assigned_cnt'] or 0
+    completed = stats['completed_cnt'] or 0
+    dialed = stats['total_attempts'] or 0
+    spoken = stats['total_spoken'] or 0
+    meetings_sched = stats['total_meetings_sched'] or 0
+    converted = stats['total_sqls'] or 0
+    completion_pct = round((completed / assigned) * 100, 1) if assigned > 0 else 0.0
+    
+    # Team performance aggregations
+    team_performance = db_query(f'''
+        SELECT u.name,
+               COUNT(tc.id) as assigned,
+               SUM(tc.call_attempt_count) as dialed,
+               SUM(tc.spoken_call_count) as spoken,
+               SUM(CASE WHEN tc.meeting_status = 'Scheduled' THEN 1 ELSE 0 END) as scheduled,
+               SUM(CASE WHEN tc.sql_status IN ('SQL Approved', 'Converted to Opportunity') THEN 1 ELSE 0 END) as converted,
+               SUM(tc.is_finalized) as completed
+        FROM crm_users u
+        LEFT JOIN telecrm_contacts tc ON tc.assigned_telecaller_id = u.id {f"AND tc.telecrm_list_id = {campaign_id}" if campaign_id else ""}
+        WHERE u.role = 'Telecaller' AND u.is_active = 1
+          {f"AND u.group_id = {group_id}" if role != 'Platform Admin' else ""}
+        GROUP BY u.id
+        HAVING assigned > 0
+    ''')
+    
+    for row in team_performance:
+        tot = row['assigned'] or 0
+        row['completion_percentage'] = round((row['completed'] / tot * 100), 1) if tot > 0 else 0.0
+        
+    # Call Outcome Breakdown
+    where_cl_outcomes = []
+    params_outcomes = []
+    if role != 'Platform Admin':
+        where_cl_outcomes.append("group_id = ?")
+        params_outcomes.append(group_id)
+    if campaign_id:
+        where_cl_outcomes.append("telecrm_list_id = ?")
+        params_outcomes.append(campaign_id)
+        
+    where_outcomes_sql = f"WHERE {' AND '.join(where_cl_outcomes)}" if where_cl_outcomes else ""
+    
+    disp_stats = db_query(f'''
+        SELECT last_disposition as label, COUNT(*) as value
+        FROM telecrm_contacts
+        {where_outcomes_sql}
+        GROUP BY last_disposition
+        HAVING label IS NOT NULL AND label != ''
+        ORDER BY value DESC
+    ''', params_outcomes)
+    
+    # Individual details for log-in telecaller today's schedules
+    followups_today = 0
+    if role == 'Telecaller':
+        today_str = datetime.utcnow().strftime('%Y-%m-%d')
+        followups_row = db_query_one('''
+            SELECT COUNT(*) as cnt
+            FROM telecrm_contacts
+            WHERE assigned_telecaller_id = ? AND next_followup_at LIKE ?
+        ''', (user['id'], f"{today_str}%"))
+        followups_today = followups_row['cnt'] if followups_row else 0
+        
+    is_caller = (role == 'Telecaller')
+    
+    # Calculate Lead Source Funnel Data
+    funnel_data = db_query(f'''
+        SELECT COALESCE(NULLIF(source, ''), 'Direct / Unknown') as label,
+               COUNT(*) as total,
+               SUM(CASE WHEN connected_call_count > 0 THEN 1 ELSE 0 END) as connected,
+               SUM(CASE WHEN spoken_call_count > 0 THEN 1 ELSE 0 END) as spoken,
+               SUM(CASE WHEN meeting_status = 'Scheduled' THEN 1 ELSE 0 END) as scheduled,
+               SUM(CASE WHEN sql_status IN ('SQL Approved', 'Converted to Opportunity') THEN 1 ELSE 0 END) as sql_conversions
+        FROM telecrm_contacts
+        {where_sql}
+        GROUP BY label
+        ORDER BY total DESC
+    ''', params)
+
+    for row in funnel_data:
+        tot = row['total'] or 1
+        row['connected_pct'] = round((row['connected'] / tot) * 100, 1)
+        row['spoken_pct'] = round((row['spoken'] / tot) * 100, 1)
+        row['scheduled_pct'] = round((row['scheduled'] / tot) * 100, 1)
+        row['sql_conversions_pct'] = round((row['sql_conversions'] / tot) * 100, 1)
+
+    # Activity Timeline Logs
+    call_where_list = []
+    call_params_list = []
+    if role != 'Platform Admin':
+        call_where_list.append("u.group_id = ?")
+        call_params_list.append(group_id)
+    if campaign_id:
+        call_where_list.append("c.campaign_id = ?")
+        call_params_list.append(campaign_id)
+    
+    call_where_str = f"AND {' AND '.join(call_where_list)}" if call_where_list else ""
+    
+    daily_calls = db_query(f'''
+        SELECT SUBSTR(c.created_at, 1, 10) as stat_date, COUNT(*) as call_count
+        FROM telecrm_calls c
+        JOIN crm_users u ON c.telecaller_id = u.id
+        WHERE 1=1 {call_where_str}
+        GROUP BY stat_date
+        ORDER BY stat_date DESC
+        LIMIT 14
+    ''', call_params_list)
+    
+    log_where_list = []
+    log_params_list = []
+    if role != 'Platform Admin':
+        log_where_list.append("u.group_id = ?")
+        log_params_list.append(group_id)
+    if campaign_id:
+        log_where_list.append("l.campaign_id = ?")
+        log_params_list.append(campaign_id)
+        
+    log_where_str = f"AND {' AND '.join(log_where_list)}" if log_where_list else ""
+    
+    daily_logs = db_query(f'''
+        SELECT SUBSTR(l.created_at, 1, 10) as stat_date,
+               SUM(CASE WHEN l.channel = 'SMS' THEN 1 ELSE 0 END) as sms_count,
+               SUM(CASE WHEN l.channel = 'Email' THEN 1 ELSE 0 END) as email_count
+        FROM telecrm_channel_logs l
+        JOIN crm_users u ON l.user_id = u.id
+        WHERE 1=1 {log_where_str}
+        GROUP BY stat_date
+        ORDER BY stat_date DESC
+        LIMIT 14
+    ''', log_params_list)
+    
+    activity_dict = {}
+    for r in daily_calls:
+        dt = r['stat_date']
+        activity_dict[dt] = {'date': dt, 'calls': r['call_count'], 'sms': 0, 'emails': 0}
+        
+    for r in daily_logs:
+        dt = r['stat_date']
+        if dt not in activity_dict:
+            activity_dict[dt] = {'date': dt, 'calls': 0, 'sms': 0, 'emails': 0}
+        activity_dict[dt]['sms'] = r['sms_count'] or 0
+        activity_dict[dt]['emails'] = r['email_count'] or 0
+        
+    activity_log = sorted(activity_dict.values(), key=lambda x: x['date'], reverse=True)
+
+    return render_template(
+        'telecrm/analytics.html',
+        campaign_options=campaign_options,
+        campaign_id=campaign_id,
+        assigned=assigned,
+        completed=completed,
+        dialed=dialed,
+        spoken=spoken,
+        meetings_sched=meetings_sched,
+        converted=converted,
+        completion_pct=completion_pct,
+        team_performance=team_performance,
+        disp_stats=disp_stats,
+        followups_today=followups_today,
+        is_caller=is_caller,
+        funnel_data=funnel_data,
+        activity_log=activity_log,
+        active_page='telecrm_analytics'
     )
 
 # ----------------------------------------------------
@@ -2158,3 +2551,243 @@ def api_leaderboard_export():
         mimetype="text/csv",
         headers={"Content-disposition": f"attachment; filename=telecaller_leaderboard_{period}.csv"}
     )
+
+
+# ----------------------------------------------------
+# TeleCRM Templates CRUD & Rendering Section
+# ----------------------------------------------------
+
+@crm_bp.route('/telecrm/templates', methods=['GET', 'POST'])
+@crm_login_required
+@role_required('Platform Admin', 'Group Admin', 'Telecaller Manager')
+def telecrm_templates_mgmt():
+    user = g.crm_user
+    if request.method == 'POST':
+        action = request.form.get('action')
+        template_id = request.form.get('template_id')
+        template_type = request.form.get('type')
+        name = request.form.get('name')
+        subject = request.form.get('subject') if template_type == 'Email' else None
+        body = request.form.get('body')
+        is_active = int(request.form.get('is_active', 1))
+        now_str = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+
+        if action == 'create':
+            db_execute('''
+                INSERT INTO telecrm_templates (type, name, subject, body, created_by, is_active, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (template_type, name, subject, body, user['id'], is_active, now_str, now_str))
+            flash(f"Template '{name}' created successfully.", "success")
+        elif action == 'edit':
+            db_execute('''
+                UPDATE telecrm_templates
+                SET type = ?, name = ?, subject = ?, body = ?, is_active = ?, updated_at = ?
+                WHERE id = ?
+            ''', (template_type, name, subject, body, is_active, now_str, template_id))
+            flash(f"Template '{name}' updated successfully.", "success")
+        return redirect(url_for('crm.telecrm_templates_mgmt'))
+
+    templates = db_query('''
+        SELECT t.*, u.name as creator_name
+        FROM telecrm_templates t
+        LEFT JOIN crm_users u ON t.created_by = u.id
+        ORDER BY t.type ASC, t.name ASC
+    ''')
+    return render_template('crm/telecrm/templates.html', templates=templates, active_page='telecrm_templates')
+
+@crm_bp.route('/telecrm/templates/delete/<int:template_id>', methods=['POST'])
+@crm_login_required
+@role_required('Platform Admin', 'Group Admin', 'Telecaller Manager')
+def telecrm_template_delete(template_id):
+    db_execute("DELETE FROM telecrm_templates WHERE id = ?", (template_id,))
+    flash("Template deleted successfully.", "success")
+    return redirect(url_for('crm.telecrm_templates_mgmt'))
+
+@crm_bp.route('/api/telecrm/templates')
+@crm_login_required
+def api_get_templates():
+    template_type = request.args.get('type')  # 'SMS' or 'Email'
+    if template_type:
+        templates = db_query("SELECT id, type, name, subject, body FROM telecrm_templates WHERE type = ? AND is_active = 1 ORDER BY name ASC", (template_type,))
+    else:
+        templates = db_query("SELECT id, type, name, subject, body FROM telecrm_templates WHERE is_active = 1 ORDER BY type ASC, name ASC")
+    return jsonify({'status': 'success', 'templates': templates})
+
+@crm_bp.route('/api/telecrm/templates/render/<int:template_id>')
+@crm_login_required
+def api_render_template(template_id):
+    contact_id = request.args.get('contact_id')
+    template = db_query_one("SELECT * FROM telecrm_templates WHERE id = ?", (template_id,))
+    if not template:
+        return jsonify({'status': 'error', 'message': 'Template not found'}), 404
+    
+    subject = template.get('subject') or ''
+    body = template.get('body') or ''
+    
+    # If contact_id is provided, resolve placeholders
+    if contact_id:
+        contact = db_query_one("SELECT * FROM telecrm_contacts WHERE id = ?", (contact_id,))
+        if contact:
+            # Let's resolve placeholders
+            # placeholder mapping helper
+            def resolve(text, c, u):
+                if not text:
+                    return ""
+                # Compute first_name from full_name if first_name not in contact
+                first_name = c.get('full_name', '').split(' ')[0] if c.get('full_name') else ''
+                replacements = {
+                    '{first_name}': first_name,
+                    '{full_name}': c.get('full_name') or '',
+                    '{company}': c.get('company') or '',
+                    '{phone}': c.get('phone') or '',
+                    '{email}': c.get('email') or '',
+                    '{job_title}': c.get('job_title') or '',
+                    '{user_name}': u.get('name') or '',
+                    '{user_email}': u.get('email') or '',
+                }
+                for k, v in replacements.items():
+                    text = text.replace(k, str(v))
+                return text
+            
+            subject = resolve(subject, contact, g.crm_user)
+            body = resolve(body, contact, g.crm_user)
+            
+    return jsonify({
+        'status': 'success',
+        'template_id': template_id,
+        'subject': subject,
+        'body': body
+    })
+
+@crm_bp.route('/api/telecrm/contacts/<int:contact_id>/send-sms', methods=['POST'])
+@crm_login_required
+def api_send_sms(contact_id):
+    if not check_telecrm_contact_access(contact_id):
+        return jsonify({'status': 'error', 'message': 'Access denied.'}), 403
+        
+    message_body = request.form.get('message_body') or request.json.get('message_body') if request.is_json else request.form.get('message_body')
+    if not message_body:
+        return jsonify({'status': 'error', 'message': 'Message body is required.'}), 400
+        
+    contact = db_query_one("SELECT * FROM telecrm_contacts WHERE id = ?", (contact_id,))
+    if not contact:
+        return jsonify({'status': 'error', 'message': 'Contact not found.'}), 404
+        
+    recipient_phone = contact['phone']
+    user_id = g.crm_user['id']
+    campaign_id = contact['telecrm_list_id']
+    now_str = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+    
+    # Insert SMS log
+    db_execute('''
+        INSERT INTO telecrm_sms_logs (telecrm_contact_id, sender_user_id, recipient_phone, message_body, status, sent_at)
+        VALUES (?, ?, ?, ?, 'Sent', ?)
+    ''', (contact_id, user_id, recipient_phone, message_body, now_str))
+    
+    # Also log to channel logs for unified tracking
+    db_execute('''
+        INSERT INTO telecrm_channel_logs (
+            telecrm_contact_id, campaign_id, user_id, channel, direction, recipient, subject, body, status, sent_at, created_at
+        ) VALUES (?, ?, ?, 'SMS', 'Outgoing', ?, NULL, ?, 'Sent', ?, ?)
+    ''', (contact_id, campaign_id, user_id, recipient_phone, message_body, now_str, now_str))
+    
+    # Update daily sms_sent stat
+    update_user_daily_stat(user_id, campaign_id, now_str[:10], {'sms_sent': 1})
+    
+    # Log timeline activity
+    log_timeline_activity('telecrm_contact', contact_id, 'SMS Sent', "SMS Outgoing", message_body[:150], user_id)
+    
+    return jsonify({'status': 'success', 'message': 'SMS successfully logged and sent.'})
+
+
+# ----------------------------------------------------
+# TeleCRM Settings & Configurations Section
+# ----------------------------------------------------
+
+@crm_bp.route('/telecrm/settings', methods=['GET', 'POST'])
+@crm_login_required
+@role_required('Platform Admin', 'Group Admin', 'Telecaller Manager')
+def telecrm_settings():
+    user = g.crm_user
+    group_id = user['group_id']
+    
+    if request.method == 'POST':
+        tgt_group_id = request.form.get('group_id')
+        # If user is not Platform Admin, they can only edit their own group settings
+        if user['role'] != 'Platform Admin':
+            tgt_group_id = group_id
+            
+        autodialer_delay = int(request.form.get('autodialer_delay_seconds', 5))
+        call_timeout = int(request.form.get('call_timeout_seconds', 30))
+        sms_provider = request.form.get('sms_gateway_provider', 'MockGateway')
+        sms_key = request.form.get('sms_api_key', '')
+        smtp_host = request.form.get('group_smtp_host', '')
+        smtp_port = int(request.form.get('group_smtp_port', 587))
+        smtp_username = request.form.get('group_smtp_username', '')
+        smtp_password = request.form.get('group_smtp_password', '')
+        
+        now_str = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+        
+        # Check if settings exist for target group
+        existing = db_query_one("SELECT id FROM telecrm_settings WHERE group_id = ?", (tgt_group_id,))
+        if existing:
+            db_execute('''
+                UPDATE telecrm_settings
+                SET autodialer_delay_seconds = ?, call_timeout_seconds = ?, sms_gateway_provider = ?, sms_api_key = ?,
+                    group_smtp_host = ?, group_smtp_port = ?, group_smtp_username = ?, group_smtp_password = ?, updated_at = ?
+                WHERE group_id = ?
+            ''', (autodialer_delay, call_timeout, sms_provider, sms_key, smtp_host, smtp_port, smtp_username, smtp_password, now_str, tgt_group_id))
+        else:
+            db_execute('''
+                INSERT INTO telecrm_settings (group_id, autodialer_delay_seconds, call_timeout_seconds, sms_gateway_provider, sms_api_key, group_smtp_host, group_smtp_port, group_smtp_username, group_smtp_password, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (tgt_group_id, autodialer_delay, call_timeout, sms_provider, sms_key, smtp_host, smtp_port, smtp_username, smtp_password, now_str))
+            
+        flash("TeleCRM Settings updated successfully.", "success")
+        return redirect(url_for('crm.telecrm_settings'))
+        
+    # GET method
+    groups = db_query("SELECT id, name FROM crm_groups ORDER BY name ASC")
+    
+    # Query current group settings
+    if user['role'] == 'Platform Admin':
+        # Admin can view settings for all groups or select a group, we will query all settings
+        group_settings = db_query('''
+            SELECT s.*, g.name as group_name
+            FROM telecrm_settings s
+            JOIN crm_groups g ON s.group_id = g.id
+        ''')
+    else:
+        group_settings = db_query('''
+            SELECT s.*, g.name as group_name
+            FROM telecrm_settings s
+            JOIN crm_groups g ON s.group_id = g.id
+            WHERE s.group_id = ?
+        ''', (group_id,))
+        
+    return render_template(
+        'crm/telecrm/settings.html',
+        settings=group_settings,
+        groups=groups,
+        active_page='telecrm_settings'
+    )
+
+@crm_bp.route('/api/telecrm/settings')
+@crm_login_required
+def api_get_settings():
+    group_id = g.crm_user['group_id']
+    settings = db_query_one("SELECT * FROM telecrm_settings WHERE group_id = ?", (group_id,))
+    if not settings:
+        # Return default values
+        settings = {
+            'autodialer_delay_seconds': 5,
+            'call_timeout_seconds': 30,
+            'sms_gateway_provider': 'MockGateway',
+            'sms_api_key': '',
+            'group_smtp_host': '',
+            'group_smtp_port': 587,
+            'group_smtp_username': '',
+            'group_smtp_password': ''
+        }
+    return jsonify({'status': 'success', 'settings': dict(settings)})
+

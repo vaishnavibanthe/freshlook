@@ -1,3 +1,4 @@
+import json
 from flask import render_template, request, redirect, url_for, flash, jsonify, g, session
 from datetime import datetime
 from werkzeug.security import generate_password_hash
@@ -29,6 +30,7 @@ def admin_users():
             sales_head_id = request.form.get('sales_head_id') or None
             geography = request.form.get('geography')
             department = request.form.get('department')
+            permission_template_id = request.form.get('permission_template_id') or None
             
             if not name or not email or not password or not role:
                 flash("Name, email, password and role are mandatory.", "error")
@@ -46,9 +48,9 @@ def admin_users():
                 
             password_hash = generate_password_hash(password)
             db_execute('''
-                INSERT INTO crm_users (name, email, password_hash, role, group_id, manager_id, sales_head_id, geography, department, is_active, created_at, updated_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?)
-            ''', (name, email, password_hash, role, group_id, manager_id, sales_head_id, geography, department, now_str, now_str))
+                INSERT INTO crm_users (name, email, password_hash, role, group_id, manager_id, sales_head_id, geography, department, permission_template_id, is_active, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?)
+            ''', (name, email, password_hash, role, group_id, manager_id, sales_head_id, geography, department, permission_template_id, now_str, now_str))
             
             flash(f"User {name} created successfully.", "success")
             return redirect(url_for('crm.admin_users'))
@@ -64,6 +66,7 @@ def admin_users():
             sales_head_id = request.form.get('sales_head_id') or None
             geography = request.form.get('geography')
             department = request.form.get('department')
+            permission_template_id = request.form.get('permission_template_id') or None
             is_active = 1 if request.form.get('is_active') == '1' else 0
             
             # If Group Admin, restrict to their group
@@ -86,15 +89,15 @@ def admin_users():
                 password_hash = generate_password_hash(password)
                 db_execute('''
                     UPDATE crm_users 
-                    SET name=?, email=?, password_hash=?, role=?, group_id=?, manager_id=?, sales_head_id=?, geography=?, department=?, is_active=?, updated_at=?
+                    SET name=?, email=?, password_hash=?, role=?, group_id=?, manager_id=?, sales_head_id=?, geography=?, department=?, permission_template_id=?, is_active=?, updated_at=?
                     WHERE id=?
-                ''', (name, email, password_hash, role, group_id, manager_id, sales_head_id, geography, department, is_active, now_str, user_id))
+                ''', (name, email, password_hash, role, group_id, manager_id, sales_head_id, geography, department, permission_template_id, is_active, now_str, user_id))
             else:
                 db_execute('''
                     UPDATE crm_users 
-                    SET name=?, email=?, role=?, group_id=?, manager_id=?, sales_head_id=?, geography=?, department=?, is_active=?, updated_at=?
+                    SET name=?, email=?, role=?, group_id=?, manager_id=?, sales_head_id=?, geography=?, department=?, permission_template_id=?, is_active=?, updated_at=?
                     WHERE id=?
-                ''', (name, email, role, group_id, manager_id, sales_head_id, geography, department, is_active, now_str, user_id))
+                ''', (name, email, role, group_id, manager_id, sales_head_id, geography, department, permission_template_id, is_active, now_str, user_id))
                 
             flash(f"User {name} updated.", "success")
             return redirect(url_for('crm.admin_users'))
@@ -113,14 +116,28 @@ def admin_users():
             
     # Read users based on role
     if user['role'] == 'Platform Admin':
-        users = db_query("SELECT u.*, g.name as group_name FROM crm_users u LEFT JOIN crm_groups g ON u.group_id = g.id ORDER BY u.id DESC")
+        users = db_query('''
+            SELECT u.*, g.name as group_name, p.name as permission_template_name 
+            FROM crm_users u 
+            LEFT JOIN crm_groups g ON u.group_id = g.id 
+            LEFT JOIN telecrm_permission_templates p ON u.permission_template_id = p.id
+            ORDER BY u.id DESC
+        ''')
         groups = db_query("SELECT * FROM crm_groups")
     else: # Group Admin
-        users = db_query("SELECT u.*, g.name as group_name FROM crm_users u LEFT JOIN crm_groups g ON u.group_id = g.id WHERE u.group_id = ? ORDER BY u.id DESC", (user['group_id'],))
+        users = db_query('''
+            SELECT u.*, g.name as group_name, p.name as permission_template_name 
+            FROM crm_users u 
+            LEFT JOIN crm_groups g ON u.group_id = g.id 
+            LEFT JOIN telecrm_permission_templates p ON u.permission_template_id = p.id
+            WHERE u.group_id = ? 
+            ORDER BY u.id DESC
+        ''', (user['group_id'],))
         groups = db_query("SELECT * FROM crm_groups WHERE id = ?", (user['group_id'],))
         
     potential_managers = db_query("SELECT id, name FROM crm_users WHERE role IN ('Manager / Sales Manager', 'Sales Head', 'Platform Admin') AND is_active = 1")
     potential_heads = db_query("SELECT id, name FROM crm_users WHERE role IN ('Sales Head', 'Platform Admin') AND is_active = 1")
+    permission_templates = db_query("SELECT id, name FROM telecrm_permission_templates ORDER BY name ASC")
     
     return render_template(
         'admin/users.html',
@@ -128,7 +145,117 @@ def admin_users():
         groups=groups,
         managers=potential_managers,
         heads=potential_heads,
+        permission_templates=permission_templates,
         active_page='admin_users'
+    )
+
+# ----------------------------------------------------
+# Dynamic Permission Templates CRUD
+# ----------------------------------------------------
+@crm_bp.route('/admin/crm/permission-templates', methods=['GET', 'POST'])
+@crm_login_required
+@role_required('Platform Admin')
+def admin_permission_templates():
+    now_str = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+    
+    if request.method == 'POST':
+        action = request.form.get('action')
+        name = request.form.get('name', '').strip()
+        desc = request.form.get('description', '').strip()
+        
+        # Access checkboxes
+        leads_all = 1 if request.form.get('access_leads_see_all') else 0
+        leads_imp = 1 if request.form.get('access_leads_import') else 0
+        leads_exp = 1 if request.form.get('access_leads_export') else 0
+        leads_del = 1 if request.form.get('access_leads_delete') else 0
+        call_rec = 1 if request.form.get('access_calling_recordings') else 0
+        call_auto = 1 if request.form.get('access_calling_autodialer') else 0
+        rep_view = 1 if request.form.get('access_reports_view') else 0
+        auto_cfg = 1 if request.form.get('access_automations_configure') else 0
+        
+        # View Columns settings
+        hidden_cols = request.form.getlist('view_hidden_columns')
+        default_cols = request.form.getlist('view_default_columns')
+        
+        hidden_json = json.dumps(hidden_cols)
+        default_json = json.dumps(default_cols)
+        
+        if not name:
+            flash("Permission template name is required.", "error")
+            return redirect(url_for('crm.admin_permission_templates'))
+            
+        if action == 'create':
+            # Check unique name
+            existing = db_query_one("SELECT id FROM telecrm_permission_templates WHERE name = ?", (name,))
+            if existing:
+                flash("A permission template with that name already exists.", "error")
+                return redirect(url_for('crm.admin_permission_templates'))
+                
+            db_execute('''
+                INSERT INTO telecrm_permission_templates (
+                    name, description, access_leads_see_all, access_leads_import, access_leads_export,
+                    access_leads_delete, access_calling_recordings, access_calling_autodialer,
+                    access_reports_view, access_automations_configure, view_hidden_columns, view_default_columns,
+                    created_at, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (name, desc, leads_all, leads_imp, leads_exp, leads_del, call_rec, call_auto, rep_view, auto_cfg, hidden_json, default_json, now_str, now_str))
+            
+            flash(f"Permission template {name} created successfully.", "success")
+            
+        elif action == 'edit':
+            template_id = request.form.get('template_id')
+            db_execute('''
+                UPDATE telecrm_permission_templates 
+                SET name=?, description=?, access_leads_see_all=?, access_leads_import=?, access_leads_export=?,
+                    access_leads_delete=?, access_calling_recordings=?, access_calling_autodialer=?,
+                    access_reports_view=?, access_automations_configure=?, view_hidden_columns=?, view_default_columns=?,
+                    updated_at=?
+                WHERE id=?
+            ''', (name, desc, leads_all, leads_imp, leads_exp, leads_del, call_rec, call_auto, rep_view, auto_cfg, hidden_json, default_json, now_str, template_id))
+            
+            flash(f"Permission template {name} updated.", "success")
+            
+        return redirect(url_for('crm.admin_permission_templates'))
+        
+    templates = db_query("SELECT * FROM telecrm_permission_templates ORDER BY id DESC")
+    
+    # Hidden and default column choices based on Lead/Contact fields
+    col_choices = [
+        ('full_name', 'Full Name'),
+        ('company', 'Company'),
+        ('email', 'Email'),
+        ('phone', 'Phone Number'),
+        ('alternate_phone', 'Alternate Phone'),
+        ('job_title', 'Job Title'),
+        ('geography', 'Geography'),
+        ('country', 'Country'),
+        ('industry', 'Industry'),
+        ('website', 'Website'),
+        ('linkedin_profile', 'LinkedIn Profile'),
+        ('dialing_status', 'Dialing Status'),
+        ('last_disposition', 'Last Disposition'),
+        ('assigned_telecaller_id', 'Assigned Telecaller')
+    ]
+    
+    # Parse JSON list fields for display in templates
+    parsed_templates = []
+    for t in templates:
+        t_dict = dict(t)
+        try:
+            t_dict['hidden_cols_list'] = json.loads(t_dict['view_hidden_columns']) if t_dict['view_hidden_columns'] else []
+        except:
+            t_dict['hidden_cols_list'] = []
+        try:
+            t_dict['default_cols_list'] = json.loads(t_dict['view_default_columns']) if t_dict['view_default_columns'] else []
+        except:
+            t_dict['default_cols_list'] = []
+        parsed_templates.append(t_dict)
+        
+    return render_template(
+        'admin/permission_templates.html',
+        templates=parsed_templates,
+        col_choices=col_choices,
+        active_page='admin_permissions'
     )
 
 # ----------------------------------------------------

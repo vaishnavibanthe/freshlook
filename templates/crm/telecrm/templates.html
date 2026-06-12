@@ -1,0 +1,345 @@
+{% extends 'crm/base_crm.html' %}
+
+{% block title %}Templates Builder | ThinkArtha CRM{% endblock %}
+
+{% block content %}
+<style>
+    .templates-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin-bottom: 24px;
+    }
+    
+    .template-card {
+        background-color: var(--bg-card);
+        border: 1px solid var(--border-crm);
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+    
+    .template-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        border-color: var(--accent-cyan);
+    }
+
+    .template-type-badge {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .badge-sms {
+        background-color: rgba(59, 130, 246, 0.2);
+        color: #3b82f6;
+        border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+
+    .badge-email {
+        background-color: rgba(168, 85, 247, 0.2);
+        color: #a855f7;
+        border: 1px solid rgba(168, 85, 247, 0.3);
+    }
+
+    .template-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #ffffff;
+        margin-bottom: 4px;
+        padding-right: 60px;
+    }
+
+    .template-subject {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--accent-cyan);
+        margin-bottom: 12px;
+    }
+
+    .template-body-preview {
+        font-size: 13px;
+        color: var(--text-crm-secondary);
+        margin-bottom: 16px;
+        flex: 1;
+        background: rgba(0,0,0,0.15);
+        padding: 10px;
+        border-radius: 6px;
+        white-space: pre-wrap;
+        font-family: monospace;
+        max-height: 120px;
+        overflow-y: auto;
+    }
+
+    .template-meta {
+        font-size: 11.5px;
+        color: var(--text-crm-muted);
+        border-top: 1px solid var(--border-crm);
+        padding-top: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.8);
+        z-index: 1000;
+        backdrop-filter: blur(5px);
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        overflow-y: auto;
+    }
+
+    .modal-card {
+        background-color: var(--bg-sidebar);
+        border: 1px solid var(--border-crm);
+        border-radius: 12px;
+        width: 100%;
+        max-width: 650px;
+        padding: 24px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .placeholder-btn {
+        background-color: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border-crm);
+        color: var(--text-crm-primary);
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-family: monospace;
+    }
+
+    .placeholder-btn:hover {
+        background-color: var(--accent-cyan);
+        color: #000;
+        border-color: var(--accent-cyan);
+    }
+
+    .placeholder-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 8px;
+        padding: 8px;
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 6px;
+        border: 1px solid var(--border-crm);
+    }
+</style>
+
+<div class="crm-header-bar">
+    <div class="crm-title-section">
+        <h1>Templates Builder</h1>
+        <p>Design messaging templates for SMS and Email notifications with dynamic placeholders</p>
+    </div>
+    
+    <div class="crm-actions-section">
+        <button class="btn-crm btn-crm-primary" onclick="openCreateModal()">
+            <i class="fas fa-plus"></i> Create Template
+        </button>
+    </div>
+</div>
+
+<!-- Category Tabs -->
+<div class="crm-tabs-bar" style="margin-bottom: 24px;">
+    <button class="crm-tab-btn active" id="tab-all" onclick="filterTemplates('all')">All Templates</button>
+    <button class="crm-tab-btn" id="tab-sms" onclick="filterTemplates('sms')">SMS</button>
+    <button class="crm-tab-btn" id="tab-email" onclick="filterTemplates('email')">Email</button>
+</div>
+
+<div class="templates-grid" id="templates-container">
+    {% for t in templates %}
+    <div class="template-card" data-type="{{ t.type|lower }}">
+        <span class="template-type-badge badge-{{ t.type|lower }}">{{ t.type }}</span>
+        <div>
+            <div class="template-title">{{ t.name }}</div>
+            {% if t.type == 'Email' %}
+            <div class="template-subject"><i class="fas fa-envelope-open-text"></i> {{ t.subject }}</div>
+            {% else %}
+            <div class="template-subject"><i class="fas fa-sms"></i> SMS Text</div>
+            {% endif %}
+            <div class="template-body-preview">{{ t.body }}</div>
+        </div>
+        
+        <div>
+            <div class="template-meta">
+                <span>By: {{ t.creator_name or 'System' }}</span>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn-crm btn-crm-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="openEditModal({{ t|tojson }})">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <form method="POST" action="{{ url_for('crm.telecrm_template_delete', template_id=t.id) }}" onsubmit="return confirm('Are you sure you want to delete this template?');" style="display: inline;">
+                        <button type="submit" class="btn-crm" style="padding: 6px 12px; font-size: 12px; background-color: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3);">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Create/Edit Modal -->
+<div class="modal-overlay" id="template-modal">
+    <div class="modal-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 id="modal-title" style="font-size: 18px; font-weight: 700; color: #ffffff;">Create Template</h3>
+            <button onclick="closeModal()" style="background: none; border: none; color: var(--text-crm-secondary); font-size: 18px; cursor: pointer;"><i class="fas fa-times"></i></button>
+        </div>
+        
+        <form id="template-form" method="POST" action="{{ url_for('crm.telecrm_templates_mgmt') }}">
+            <input type="hidden" name="action" id="form-action" value="create">
+            <input type="hidden" name="template_id" id="form-template-id">
+            
+            <div class="form-group">
+                <label class="form-label">Template Type</label>
+                <select name="type" id="field-type" class="form-control" onchange="toggleSubjectField()" required>
+                    <option value="SMS">SMS Message</option>
+                    <option value="Email">Email Template</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Template Name</label>
+                <input type="text" name="name" id="field-name" class="form-control" placeholder="e.g. Lead Follow-up Introduction" required>
+            </div>
+
+            <div class="form-group" id="group-subject" style="display: none;">
+                <label class="form-label">Email Subject</label>
+                <input type="text" name="subject" id="field-subject" class="form-control" placeholder="e.g. Discovery Session with ThinkArtha">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Message Body</label>
+                <textarea name="body" id="field-body" class="form-control" placeholder="Enter message text here..." style="min-height: 150px; font-family: monospace;" required></textarea>
+                
+                <label class="form-label" style="margin-top: 10px;">Insert Placeholders (Click to insert at cursor)</label>
+                <div class="placeholder-container">
+                    <button type="button" class="placeholder-btn" onclick="insertPlaceholder('{first_name}')">{first_name}</button>
+                    <button type="button" class="placeholder-btn" onclick="insertPlaceholder('{full_name}')">{full_name}</button>
+                    <button type="button" class="placeholder-btn" onclick="insertPlaceholder('{company}')">{company}</button>
+                    <button type="button" class="placeholder-btn" onclick="insertPlaceholder('{phone}')">{phone}</button>
+                    <button type="button" class="placeholder-btn" onclick="insertPlaceholder('{email}')">{email}</button>
+                    <button type="button" class="placeholder-btn" onclick="insertPlaceholder('{job_title}')">{job_title}</button>
+                    <button type="button" class="placeholder-btn" onclick="insertPlaceholder('{user_name}')">{user_name}</button>
+                    <button type="button" class="placeholder-btn" onclick="insertPlaceholder('{user_email}')">{user_email}</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Status</label>
+                <select name="is_active" id="field-active" class="form-control">
+                    <option value="1">Active</option>
+                    <option value="0">Inactive</option>
+                </select>
+            </div>
+            
+            <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid var(--border-crm); padding-top: 20px; margin-top: 20px;">
+                <button type="button" class="btn-crm btn-crm-secondary" onclick="closeModal()">Cancel</button>
+                <button type="submit" class="btn-crm btn-crm-primary">Save Template</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function filterTemplates(type) {
+        document.querySelectorAll('.crm-tab-btn').forEach(btn => btn.classList.remove('active'));
+        
+        if (type === 'all') {
+            document.getElementById('tab-all').classList.add('active');
+            document.querySelectorAll('.template-card').forEach(c => c.style.display = 'flex');
+        } else if (type === 'sms') {
+            document.getElementById('tab-sms').classList.add('active');
+            document.querySelectorAll('.template-card').forEach(c => {
+                c.style.display = c.getAttribute('data-type') === 'sms' ? 'flex' : 'none';
+            });
+        } else if (type === 'email') {
+            document.getElementById('tab-email').classList.add('active');
+            document.querySelectorAll('.template-card').forEach(c => {
+                c.style.display = c.getAttribute('data-type') === 'email' ? 'flex' : 'none';
+            });
+        }
+    }
+
+    function toggleSubjectField() {
+        const typeSelect = document.getElementById('field-type');
+        const subjectGroup = document.getElementById('group-subject');
+        if (typeSelect.value === 'Email') {
+            subjectGroup.style.display = 'block';
+            document.getElementById('field-subject').required = true;
+        } else {
+            subjectGroup.style.display = 'none';
+            document.getElementById('field-subject').required = false;
+        }
+    }
+
+    function insertPlaceholder(placeholder) {
+        const bodyTextarea = document.getElementById('field-body');
+        const startPos = bodyTextarea.selectionStart;
+        const endPos = bodyTextarea.selectionEnd;
+        const text = bodyTextarea.value;
+        
+        bodyTextarea.value = text.substring(0, startPos) + placeholder + text.substring(endPos, text.length);
+        bodyTextarea.focus();
+        bodyTextarea.selectionStart = startPos + placeholder.length;
+        bodyTextarea.selectionEnd = startPos + placeholder.length;
+    }
+
+    function openCreateModal() {
+        document.getElementById('modal-title').textContent = "Create Template";
+        document.getElementById('form-action').value = "create";
+        document.getElementById('form-template-id').value = "";
+        
+        document.getElementById('field-type').value = "SMS";
+        document.getElementById('field-name').value = "";
+        document.getElementById('field-subject').value = "";
+        document.getElementById('field-body').value = "";
+        document.getElementById('field-active').value = "1";
+        
+        toggleSubjectField();
+        document.getElementById('template-modal').style.display = 'flex';
+    }
+
+    function openEditModal(t) {
+        document.getElementById('modal-title').textContent = "Edit Template";
+        document.getElementById('form-action').value = "edit";
+        document.getElementById('form-template-id').value = t.id;
+        
+        document.getElementById('field-type').value = t.type;
+        document.getElementById('field-name').value = t.name;
+        document.getElementById('field-subject').value = t.subject || "";
+        document.getElementById('field-body').value = t.body;
+        document.getElementById('field-active').value = t.is_active.toString();
+        
+        toggleSubjectField();
+        document.getElementById('template-modal').style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('template-modal').style.display = 'none';
+    }
+</script>
+{% endblock %}

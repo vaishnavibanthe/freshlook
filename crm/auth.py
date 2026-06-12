@@ -10,13 +10,30 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
-# Helper to fetch current crm user
+# Helper to fetch current crm user with dynamic permissions joined
 def get_current_user():
     user_id = session.get('crm_user_id')
     if not user_id:
         return None
     conn = get_db_connection()
-    user = conn.execute("SELECT u.*, g.name as group_name FROM crm_users u LEFT JOIN crm_groups g ON u.group_id = g.id WHERE u.id = ?", (user_id,)).fetchone()
+    user = conn.execute('''
+        SELECT u.*, g.name as group_name,
+               p.name as permission_template_name,
+               p.access_leads_see_all,
+               p.access_leads_import,
+               p.access_leads_export,
+               p.access_leads_delete,
+               p.access_calling_recordings,
+               p.access_calling_autodialer,
+               p.access_reports_view,
+               p.access_automations_configure,
+               p.view_hidden_columns,
+               p.view_default_columns
+        FROM crm_users u 
+        LEFT JOIN crm_groups g ON u.group_id = g.id 
+        LEFT JOIN telecrm_permission_templates p ON u.permission_template_id = p.id
+        WHERE u.id = ?
+    ''', (user_id,)).fetchone()
     conn.close()
     return dict(user) if user else None
 
@@ -66,6 +83,40 @@ def role_required(*allowed_roles):
                 return redirect(url_for('crm.telecrm_dashboard'))
             else:
                 return redirect(url_for('crm.crm_dashboard'))
+        return decorated_function
+    return decorator
+
+# Decorator for template-based permission checks
+def permission_required(permission_name):
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if 'crm_user_id' not in session:
+                return redirect(url_for('crm.crm_login'))
+            
+            user = get_current_user()
+            if not user or not user.get('is_active'):
+                session.clear()
+                return redirect(url_for('crm.crm_login'))
+            
+            role = user.get('role')
+            # Platform Admin always has bypass
+            if role == 'Platform Admin':
+                g.crm_user = user
+                return f(*args, **kwargs)
+                
+            # Check the template permission flag
+            has_permission = user.get(permission_name) == 1
+            if has_permission:
+                g.crm_user = user
+                return f(*args, **kwargs)
+                
+            flash("You do not have the required permission to access this resource.", "error")
+            # Redirect to appropriate home page
+            if role == 'Telecaller':
+                return redirect(url_for('crm.telecrm_dialing_workbench'))
+            else:
+                return redirect(url_for('crm.telecrm_dashboard'))
         return decorated_function
     return decorator
 

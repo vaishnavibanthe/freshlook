@@ -1,0 +1,335 @@
+{% extends 'crm/base_crm.html' %}
+
+{% block title %}Permission Templates Management | ThinkArtha CRM{% endblock %}
+
+{% block content %}
+<style>
+    .perm-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin-bottom: 24px;
+    }
+    
+    .perm-card {
+        background-color: var(--bg-card);
+        border: 1px solid var(--border-crm);
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .perm-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #ffffff;
+        margin-bottom: 8px;
+    }
+
+    .perm-desc {
+        font-size: 13px;
+        color: var(--text-crm-secondary);
+        margin-bottom: 16px;
+        flex: 1;
+    }
+
+    .perm-meta {
+        font-size: 11.5px;
+        color: var(--text-crm-muted);
+        border-top: 1px solid var(--border-crm);
+        padding-top: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.8);
+        z-index: 1000;
+        backdrop-filter: blur(5px);
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        overflow-y: auto;
+    }
+
+    .modal-card {
+        background-color: var(--bg-sidebar);
+        border: 1px solid var(--border-crm);
+        border-radius: 12px;
+        width: 100%;
+        max-width: 650px;
+        padding: 24px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .tab-nav {
+        display: flex;
+        gap: 10px;
+        border-bottom: 1px solid var(--border-crm);
+        margin-bottom: 20px;
+    }
+
+    .tab-btn {
+        background: none;
+        border: none;
+        color: var(--text-crm-secondary);
+        padding: 10px 16px;
+        font-size: 13.5px;
+        font-weight: 600;
+        cursor: pointer;
+        border-bottom: 3px solid transparent;
+        transition: all 0.2s ease;
+    }
+
+    .tab-btn.active {
+        color: var(--accent-cyan);
+        border-bottom-color: var(--accent-cyan);
+    }
+
+    .modal-tab-content {
+        display: none;
+    }
+
+    .modal-tab-content.active {
+        display: block;
+    }
+
+    .checkbox-group {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13.5px;
+        color: var(--text-crm-primary);
+    }
+</style>
+
+<div class="crm-header-bar">
+    <div class="crm-title-section">
+        <h1>Permission Templates Settings</h1>
+        <p>Define access profiles, column visibility, and interface mappings for team roles</p>
+    </div>
+    
+    <div class="crm-actions-section">
+        <button class="btn-crm btn-crm-primary" onclick="openCreateModal()">
+            <i class="fas fa-plus"></i> Create Permission Profile
+        </button>
+    </div>
+</div>
+
+<div class="perm-grid">
+    {% for t in templates %}
+    <div class="perm-card">
+        <div>
+            <div class="perm-title">{{ t.name }}</div>
+            <div class="perm-desc">{{ t.description or 'No description provided.' }}</div>
+        </div>
+        
+        <div>
+            <div class="perm-meta">
+                <span>Created: {{ t.created_at[:10] }}</span>
+                <button class="btn-crm btn-crm-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="openEditModal({{ t|tojson }})">
+                    <i class="fas fa-edit"></i> Edit Profile
+                </button>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Add/Edit Modal Overlay -->
+<div class="modal-overlay" id="permission-modal">
+    <div class="modal-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 id="modal-title" style="font-size: 18px; font-weight: 700; color: #ffffff;">Create Permission Template</h3>
+            <button onclick="closeModal()" style="background: none; border: none; color: var(--text-crm-secondary); font-size: 18px; cursor: pointer;"><i class="fas fa-times"></i></button>
+        </div>
+        
+        <form id="template-form" method="POST" action="{{ url_for('crm.admin_permission_templates') }}">
+            <input type="hidden" name="action" id="form-action" value="create">
+            <input type="hidden" name="template_id" id="form-template-id">
+            
+            <!-- Modal Tab Navigation -->
+            <div class="tab-nav">
+                <button type="button" class="tab-btn active" onclick="switchModalTab('meta')">Metadata</button>
+                <button type="button" class="tab-btn" onclick="switchModalTab('access')">Access Rules</button>
+                <button type="button" class="tab-btn" onclick="switchModalTab('columns')">View Layout</button>
+            </div>
+            
+            <!-- Tab: Metadata -->
+            <div id="modal-tab-meta" class="modal-tab-content active">
+                <div class="form-group">
+                    <label class="form-label">Template Name</label>
+                    <input type="text" name="name" id="field-name" class="form-control" placeholder="e.g. Executive Caller Profile" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea name="description" id="field-desc" class="form-control" placeholder="Brief outline of access roles..." style="min-height: 100px;"></textarea>
+                </div>
+            </div>
+            
+            <!-- Tab: Access Rules -->
+            <div id="modal-tab-access" class="modal-tab-content">
+                <h4 style="font-size: 14px; font-weight: 700; color: var(--accent-cyan); margin-bottom: 12px; border-bottom: 1px solid var(--border-crm); padding-bottom: 6px;">Leads & Contacts Access</h4>
+                <div class="checkbox-group">
+                    <label class="checkbox-item">
+                        <input type="checkbox" name="access_leads_see_all" id="chk-leads-see-all"> Can see all leads
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" name="access_leads_import" id="chk-leads-import"> Can import lists
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" name="access_leads_export" id="chk-leads-export"> Can export csv lists
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" name="access_leads_delete" id="chk-leads-delete"> Can delete contacts
+                    </label>
+                </div>
+                
+                <h4 style="font-size: 14px; font-weight: 700; color: var(--accent-cyan); margin-bottom: 12px; border-bottom: 1px solid var(--border-crm); padding-bottom: 6px; margin-top: 18px;">Calling & Communications</h4>
+                <div class="checkbox-group">
+                    <label class="checkbox-item">
+                        <input type="checkbox" name="access_calling_recordings" id="chk-calling-rec"> Can audit call logs
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" name="access_calling_autodialer" id="chk-calling-auto"> Can make workbench calls
+                    </label>
+                </div>
+
+                <h4 style="font-size: 14px; font-weight: 700; color: var(--accent-cyan); margin-bottom: 12px; border-bottom: 1px solid var(--border-crm); padding-bottom: 6px; margin-top: 18px;">Reports & Settings</h4>
+                <div class="checkbox-group">
+                    <label class="checkbox-item">
+                        <input type="checkbox" name="access_reports_view" id="chk-reports-view"> Can view performance reports
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" name="access_automations_configure" id="chk-auto-cfg"> Can reallocate lists
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Tab: View Layout -->
+            <div id="modal-tab-columns" class="modal-tab-content">
+                <div class="form-group">
+                    <label class="form-label">Excluded Columns (Hidden from User Table views)</label>
+                    <div class="checkbox-group" style="margin-top: 8px;">
+                        {% for val, name in col_choices %}
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="view_hidden_columns" value="{{ val }}" class="hidden-col-checkbox"> {{ name }}
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <div class="form-group" style="border-top: 1px solid var(--border-crm); padding-top: 16px; margin-top: 16px;">
+                    <label class="form-label">Mandatory Columns (Enabled by default in workspace)</label>
+                    <div class="checkbox-group" style="margin-top: 8px;">
+                        {% for val, name in col_choices %}
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="view_default_columns" value="{{ val }}" class="default-col-checkbox"> {{ name }}
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            
+            <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid var(--border-crm); padding-top: 20px; margin-top: 20px;">
+                <button type="button" class="btn-crm btn-crm-secondary" onclick="closeModal()">Cancel</button>
+                <button type="submit" class="btn-crm btn-crm-primary">Save Profile</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Tab switching controller
+    function switchModalTab(tabId) {
+        document.querySelectorAll('#template-form .tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('#template-form .modal-tab-content').forEach(c => c.classList.remove('active'));
+        
+        // Find triggering button
+        const clickedBtn = Array.from(document.querySelectorAll('#template-form .tab-btn')).find(b => b.textContent.toLowerCase().includes(tabId));
+        if (clickedBtn) clickedBtn.classList.add('active');
+        
+        const contentDiv = document.getElementById(`modal-tab-${tabId}`);
+        if (contentDiv) contentDiv.classList.add('active');
+    }
+
+    function openCreateModal() {
+        document.getElementById('modal-title').textContent = "Create Permission Template";
+        document.getElementById('form-action').value = "create";
+        document.getElementById('form-template-id').value = "";
+        
+        document.getElementById('field-name').value = "";
+        document.getElementById('field-desc').value = "";
+        
+        // Reset check boxes
+        document.getElementById('chk-leads-see-all').checked = false;
+        document.getElementById('chk-leads-import').checked = false;
+        document.getElementById('chk-leads-export').checked = false;
+        document.getElementById('chk-leads-delete').checked = false;
+        document.getElementById('chk-calling-rec').checked = false;
+        document.getElementById('chk-calling-auto').checked = false;
+        document.getElementById('chk-reports-view').checked = false;
+        document.getElementById('chk-auto-cfg').checked = false;
+        
+        document.querySelectorAll('.hidden-col-checkbox').forEach(cb => cb.checked = false);
+        document.querySelectorAll('.default-col-checkbox').forEach(cb => cb.checked = false);
+        
+        switchModalTab('meta');
+        document.getElementById('permission-modal').style.display = 'flex';
+    }
+
+    function openEditModal(t) {
+        document.getElementById('modal-title').textContent = "Edit Permission Profile";
+        document.getElementById('form-action').value = "edit";
+        document.getElementById('form-template-id').value = t.id;
+        
+        document.getElementById('field-name').value = t.name;
+        document.getElementById('field-desc').value = t.description || "";
+        
+        document.getElementById('chk-leads-see-all').checked = (t.access_leads_see_all === 1);
+        document.getElementById('chk-leads-import').checked = (t.access_leads_import === 1);
+        document.getElementById('chk-leads-export').checked = (t.access_leads_export === 1);
+        document.getElementById('chk-leads-delete').checked = (t.access_leads_delete === 1);
+        document.getElementById('chk-calling-rec').checked = (t.access_calling_recordings === 1);
+        document.getElementById('chk-calling-auto').checked = (t.access_calling_autodialer === 1);
+        document.getElementById('chk-reports-view').checked = (t.access_reports_view === 1);
+        document.getElementById('chk-auto-cfg').checked = (t.access_automations_configure === 1);
+        
+        // hidden columns
+        const hiddenCols = t.hidden_cols_list || [];
+        document.querySelectorAll('.hidden-col-checkbox').forEach(cb => {
+            cb.checked = hiddenCols.includes(cb.value);
+        });
+
+        // default columns
+        const defaultCols = t.default_cols_list || [];
+        document.querySelectorAll('.default-col-checkbox').forEach(cb => {
+            cb.checked = defaultCols.includes(cb.value);
+        });
+        
+        switchModalTab('meta');
+        document.getElementById('permission-modal').style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('permission-modal').style.display = 'none';
+    }
+</script>
+{% endblock %}

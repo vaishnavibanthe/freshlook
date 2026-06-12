@@ -389,7 +389,7 @@ def telecrm_confirm_import():
     session.pop('telecrm_import_preview_rows', None)
     
     flash(f"Import complete: {imported_count} contacts added, {overwritten_count} updated, {skipped_count} skipped.", "success")
-    return redirect(url_for('crm.telecrm_dashboard'))
+    return redirect(url_for('crm.telecrm_campaign_detail', campaign_id=list_id))
 
 # ----------------------------------------------------
 # Allocation API for existing lists

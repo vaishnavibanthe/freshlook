@@ -1,0 +1,676 @@
+{% extends 'crm/base_crm.html' %}
+
+{% block title %}{{ campaign.name }} | Campaign Detail | ThinkArtha CRM{% endblock %}
+
+{% block content %}
+<style>
+    .campaign-header-card {
+        background: linear-gradient(135deg, rgba(13, 27, 49, 0.95), rgba(9, 19, 34, 0.9));
+        border: 1px solid var(--border-crm);
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 24px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .campaign-header-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -20%;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, transparent 70%);
+        pointer-events: none;
+    }
+
+    .detail-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 24px;
+        margin-bottom: 24px;
+    }
+
+    @media (max-width: 992px) {
+        .detail-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* Tab styles */
+    .tab-nav {
+        display: flex;
+        gap: 10px;
+        border-bottom: 1px solid var(--border-crm);
+        margin-bottom: 24px;
+        padding-bottom: 2px;
+    }
+
+    .tab-btn {
+        background: none;
+        border: none;
+        color: var(--text-crm-secondary);
+        padding: 10px 20px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        border-bottom: 3px solid transparent;
+        transition: all 0.2s ease;
+    }
+
+    .tab-btn:hover {
+        color: #ffffff;
+    }
+
+    .tab-btn.active {
+        color: var(--accent-cyan);
+        border-bottom-color: var(--accent-cyan);
+    }
+
+    .tab-content {
+        display: none;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    /* Stats widgets */
+    .camp-stats-summary {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 15px;
+        margin-bottom: 24px;
+    }
+
+    .camp-stat-mini {
+        background: rgba(9, 19, 34, 0.4);
+        border: 1px solid var(--border-crm);
+        border-radius: 8px;
+        padding: 14px;
+        text-align: center;
+    }
+
+    .camp-stat-mini-val {
+        font-size: 18px;
+        font-weight: 800;
+        color: #ffffff;
+        margin-top: 4px;
+    }
+
+    .progress-conic {
+        position: relative;
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: conic-gradient(var(--accent-cyan) calc({{ completion_pct }} * 1%), rgba(22, 45, 80, 0.4) 0);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 12px auto;
+    }
+
+    .progress-conic::after {
+        content: '{{ completion_pct }}%';
+        position: absolute;
+        width: 84px;
+        height: 84px;
+        border-radius: 50%;
+        background-color: var(--bg-sidebar);
+        color: #ffffff;
+        font-size: 16px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .allocation-total-bar {
+        padding: 12px;
+        background: rgba(6, 182, 212, 0.05);
+        border: 1px dashed var(--accent-cyan);
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 14px;
+        text-align: center;
+        color: var(--accent-cyan);
+        margin-top: 14px;
+    }
+
+    .allocation-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        background-color: rgba(22, 45, 80, 0.15);
+        border: 1px solid var(--border-crm);
+        border-radius: 6px;
+        margin-bottom: 10px;
+    }
+
+    .contact-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+
+    .contact-table th {
+        color: var(--text-crm-secondary);
+        font-weight: 600;
+        padding: 12px;
+        border-bottom: 2px solid var(--border-crm);
+        text-align: left;
+    }
+
+    .contact-table td {
+        padding: 12px;
+        border-bottom: 1px solid var(--border-crm);
+        color: var(--text-crm-primary);
+        text-align: left;
+    }
+
+    .contact-table tr:hover td {
+        background-color: rgba(22, 45, 80, 0.2);
+    }
+</style>
+
+<!-- Campaign Header Details -->
+<div class="campaign-header-card">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
+        <div>
+            <span class="badge-status {% if campaign.status == 'Active' %}qualified{% else %}converted{% endif %}" style="margin-bottom: 8px;">
+                Campaign {{ campaign.status }}
+            </span>
+            <h1 style="font-size: 26px; font-weight: 800; color: #ffffff; margin-bottom: 6px;">{{ campaign.name }}</h1>
+            <p style="font-size: 13.5px; color: var(--text-crm-secondary); max-width: 700px;">
+                {{ campaign.description or 'No description provided.' }}
+            </p>
+            
+            <div style="display: flex; gap: 20px; margin-top: 16px; flex-wrap: wrap; font-size: 12px; color: var(--text-crm-secondary);">
+                <div>Code: <strong style="color: #ffffff;">{{ campaign.campaign_name or '-' }}</strong></div>
+                <div>Geography: <strong style="color: #ffffff;">{{ campaign.geography or 'All' }}</strong></div>
+                <div>Target Product: <strong style="color: #ffffff;">{{ campaign.product_name or 'Not Mapped' }}</strong></div>
+                {% if campaign.partner_name %}
+                <div>Partner: <strong style="color: var(--accent-cyan);">{{ campaign.partner_name }}</strong></div>
+                {% endif %}
+                <div>Business Group: <strong style="color: #ffffff;">{{ campaign.group_name or 'ThinkArtha Core' }}</strong></div>
+            </div>
+        </div>
+        
+        <div>
+            <a href="{{ url_for('crm.campaign_dialing_workspace', campaign_id=campaign.id) }}" class="btn-crm btn-crm-primary" style="box-shadow: 0 4px 15px rgba(6,182,212,0.35);">
+                <i class="fas fa-phone-alt"></i> Dialing Workspace
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Tab Navigation -->
+<div class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('allocations')"><i class="fas fa-sliders-h"></i> Allocations & Queue</button>
+    <button class="tab-btn" onclick="switchTab('contacts')"><i class="fas fa-users"></i> Contacts Registry ({{ total }})</button>
+    <button class="tab-btn" onclick="switchTab('reporting')"><i class="fas fa-chart-pie"></i> Campaign Performance</button>
+</div>
+
+<!-- Tab 1: Allocations & Queue Details -->
+<div id="tab-allocations" class="tab-content active">
+    <div class="detail-grid">
+        
+        <!-- Left panel: Allocations Summary -->
+        <div class="crm-card">
+            <div class="crm-card-title">Campaign Queue Distribution</div>
+            
+            <p style="font-size: 13px; color: var(--text-crm-secondary); margin-bottom: 20px;">
+                Review telecaller assignments and allocation ratios. Adjust caller percentages below to redistribute unassigned leads or reallocate queue weights.
+            </p>
+            
+            <!-- Existing Allocations Table -->
+            <div style="overflow-x: auto; margin-bottom: 24px;">
+                <table class="performance-table">
+                    <thead>
+                        <tr>
+                            <th>Telecaller Agent</th>
+                            <th style="text-align: right;">Target Ratio</th>
+                            <th style="text-align: right;">Leads Assigned</th>
+                            <th>Status Progress</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for al in allocations %}
+                        <tr>
+                            <td style="font-weight: 600;">{{ al.telecaller_name }}</td>
+                            <td style="text-align: right; font-weight: 700; color: var(--accent-cyan);">{{ al.allocation_percentage }}%</td>
+                            <td style="text-align: right; font-weight: 700;">{{ al.assigned_count }}</td>
+                            <td>
+                                {% set caller_total = al.assigned_count %}
+                                {% set caller_done = namespace(value=0) %}
+                                {% for row in team_performance %}
+                                    {% if row.name == al.telecaller_name %}
+                                        {% set caller_done.value = row.completed %}
+                                    {% endif %}
+                                {% endfor %}
+                                <div style="font-size: 11px; color: var(--text-crm-secondary);">
+                                    Completed: {{ caller_done.value }} / {{ caller_total }}
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" style="text-align: center; color: var(--text-crm-muted); padding: 20px;">No telecaller agents allocated to this campaign yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            {% if current_crm_user.role != 'Telecaller' %}
+            <!-- Allocation Config Form -->
+            <div style="border-top: 1px solid var(--border-crm); padding-top: 24px; margin-top: 24px;">
+                <h3 style="font-size: 15px; font-weight: 700; color: #ffffff; margin-bottom: 12px;">Redistribute / Allocate Contacts</h3>
+                <form id="campaign-realloc-form">
+                    <div id="allocations-list-container">
+                        {% for caller in callers %}
+                        <div class="allocation-row" data-caller-id="{{ caller.id }}">
+                            <span style="font-size: 13px; font-weight: 600;">{{ caller.name }}</span>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                {% set current_val = 0 %}
+                                {% for al in allocations %}
+                                    {% if al.telecaller_id == caller.id %}
+                                        {% set current_val = al.allocation_percentage|int %}
+                                    {% endif %}
+                                {% endfor %}
+                                <input type="number" min="0" max="100" value="{{ current_val }}" class="form-control allocation-input" style="width: 80px; text-align: right; padding: 6px;" onchange="recalculateAllocations()">
+                                <span style="font-size: 12px; color: var(--text-crm-secondary);">%</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="allocation-total-bar" id="allocation-total-label">Total Allocated: 0%</div>
+                    
+                    <button type="button" class="btn-crm btn-crm-primary" id="btn-submit-alloc" style="width: 100%; justify-content: center; margin-top: 18px;" onclick="commitAllocations()">
+                        <i class="fas fa-save"></i> Save & Reallocate Queue
+                    </button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Right panel: Quick Progress & Reallocation tools -->
+        <div>
+            <!-- Conic Progress -->
+            <div class="crm-card" style="text-align: center;">
+                <div class="crm-card-title" style="justify-content: center;">Campaign Completion</div>
+                <div class="progress-conic"></div>
+                <div style="font-size: 13px; color: var(--text-crm-secondary);">
+                    <div>Assigned: <strong>{{ assigned }}</strong> &bull; Completed: <strong>{{ completed }}</strong></div>
+                    <div style="margin-top: 6px;">Total Contacts: <strong>{{ campaign.total_contacts }}</strong></div>
+                </div>
+            </div>
+            
+            {% if current_crm_user.role != 'Telecaller' %}
+            <!-- Quick Reassign Tool -->
+            <div class="crm-card">
+                <div class="crm-card-title">Quick Queue Transfer</div>
+                <p style="font-size: 12px; color: var(--text-crm-secondary); margin-bottom: 14px;">
+                    Instantly transfer untouched dialing queues from one telecaller agent to another.
+                </p>
+                
+                <div class="form-group">
+                    <label class="form-label">Source Agent</label>
+                    <select id="transfer-source" class="form-control">
+                        <option value="">Unassigned Contacts Only</option>
+                        {% for caller in callers %}
+                        <option value="{{ caller.id }}">{{ caller.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Destination Agent</label>
+                    <select id="transfer-target" class="form-control" required>
+                        <option value="">Select Target Caller...</option>
+                        {% for caller in callers %}
+                        <option value="{{ caller.id }}">{{ caller.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Reassign Scope</label>
+                    <select id="transfer-scope" class="form-control">
+                        <option value="all_untouched" selected>Untouched contacts only (0 calls dialed)</option>
+                        <option value="percentage">Percentage subset of active contacts</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" id="transfer-pct-group" style="display: none;">
+                    <label class="form-label">Percentage to Transfer</label>
+                    <input type="number" id="transfer-percentage" class="form-control" min="1" max="100" value="25">
+                </div>
+                
+                <button type="button" class="btn-crm btn-crm-secondary" style="width: 100%; justify-content: center; margin-top: 10px;" onclick="executeQuickTransfer()">
+                    <i class="fas fa-exchange-alt"></i> Execute Transfer
+                </button>
+            </div>
+            {% endif %}
+        </div>
+        
+    </div>
+</div>
+
+<!-- Tab 2: Contacts Registry List -->
+<div id="tab-contacts" class="tab-content">
+    <div class="crm-card">
+        <div class="crm-card-title">Contacts Mapping List</div>
+        
+        <!-- Filters -->
+        <form method="GET" action="{{ url_for('crm.telecrm_campaign_detail', campaign_id=campaign.id) }}" style="display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; align-items: flex-end;">
+            <input type="hidden" name="tab" value="contacts">
+            
+            <div class="form-group" style="flex: 1; min-width: 200px; margin-bottom: 0;">
+                <label class="form-label">Search Contact / Company</label>
+                <input type="text" name="search" class="form-control" placeholder="Search by name, company, email..." value="{{ search_q }}">
+            </div>
+            
+            <div class="form-group" style="width: 180px; margin-bottom: 0;">
+                <label class="form-label">Dialing Status</label>
+                <select name="status" class="form-control">
+                    <option value="">All Statuses</option>
+                    <option value="Not Dialed" {% if status_f == 'Not Dialed' %}selected{% endif %}>Not Dialed</option>
+                    <option value="Call Unanswered" {% if status_f == 'Call Unanswered' %}selected{% endif %}>Call Unanswered</option>
+                    <option value="Call Back Later" {% if status_f == 'Call Back Later' %}selected{% endif %}>Call Back Later</option>
+                    <option value="Busy" {% if status_f == 'Busy' %}selected{% endif %}>Busy</option>
+                    <option value="Interested" {% if status_f == 'Interested' %}selected{% endif %}>Interested</option>
+                    <option value="Meeting Scheduled" {% if status_f == 'Meeting Scheduled' %}selected{% endif %}>Meeting Scheduled</option>
+                    <option value="Meeting Completed" {% if status_f == 'Meeting Completed' %}selected{% endif %}>Meeting Completed</option>
+                    <option value="SQL Marked" {% if status_f == 'SQL Marked' %}selected{% endif %}>SQL Marked</option>
+                </select>
+            </div>
+            
+            <div class="form-group" style="width: 180px; margin-bottom: 0;">
+                <label class="form-label">Assigned Telecaller</label>
+                <select name="caller_id" class="form-control">
+                    <option value="">All Callers</option>
+                    {% for caller in callers %}
+                    <option value="{{ caller.id }}" {% if caller_f|int == caller.id %}selected{% endif %}>{{ caller.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div style="display: flex; gap: 8px;">
+                <button type="submit" class="btn-crm btn-crm-primary"><i class="fas fa-filter"></i> Apply</button>
+                <a href="{{ url_for('crm.telecrm_campaign_detail', campaign_id=campaign.id) }}" class="btn-crm btn-crm-secondary">Reset</a>
+            </div>
+        </form>
+        
+        <!-- Contacts List Table -->
+        <div style="overflow-x: auto;">
+            <table class="contact-table">
+                <thead>
+                    <tr>
+                        <th>Contact Name</th>
+                        <th>Business Email / Phone</th>
+                        <th>Company</th>
+                        <th>Assigned Caller</th>
+                        <th>Dialing Status</th>
+                        <th>Last Action Log</th>
+                        <th style="text-align: right;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for contact in contacts %}
+                    <tr>
+                        <td>
+                            <strong style="color: #ffffff;">{{ contact.full_name }}</strong>
+                            <div style="font-size: 11px; color: var(--text-crm-secondary); margin-top: 2px;">{{ contact.job_title or '-' }}</div>
+                        </td>
+                        <td>
+                            <div>{{ contact.email or '-' }}</div>
+                            <div style="font-size: 11px; color: var(--text-crm-secondary); margin-top: 2px;">{{ contact.phone or '-' }}</div>
+                        </td>
+                        <td>
+                            <strong>{{ contact.company or '-' }}</strong>
+                        </td>
+                        <td>
+                            <span style="font-size: 12.5px; font-weight: 600;">{{ contact.caller_name or 'Unassigned' }}</span>
+                        </td>
+                        <td>
+                            {% set dial_st = contact.dialing_status or 'Not Dialed' %}
+                            <span class="badge-status {% if dial_st == 'Not Dialed' %}new{% elif dial_st in ('Interested', 'Meeting Scheduled') %}qualified{% elif dial_st == 'SQL Marked' %}converted{% else %}nurture{% endif %}">
+                                {{ dial_st }}
+                            </span>
+                        </td>
+                        <td>
+                            <span style="font-size: 12px; color: var(--text-crm-secondary);">{{ contact.last_disposition or 'No attempts' }}</span>
+                        </td>
+                        <td style="text-align: right;">
+                            <a href="{{ url_for('crm.telecrm_contact_detail', contact_id=contact.id) }}" class="btn-crm btn-crm-secondary" style="padding: 4px 8px; font-size: 11.5px;">
+                                <i class="fas fa-user"></i> View Profile
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" style="text-align: center; color: var(--text-crm-muted); padding: 30px;">No contacts matched the filtering criteria.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Tab 3: Campaign Performance Reporting -->
+<div id="tab-reporting" class="tab-content">
+    <div class="detail-grid">
+        
+        <!-- Left panel: Reports & Outcomes -->
+        <div class="crm-card">
+            <div class="crm-card-title">
+                <span>Call Outcomes (Dispositions) Breakdown</span>
+                <a href="{{ url_for('crm.api_campaign_export', campaign_id=campaign.id) }}" class="btn-crm btn-crm-secondary" style="font-size: 12px; padding: 6px 12px;">
+                    <i class="fas fa-file-export"></i> Export Campaign Contacts
+                </a>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 12px; max-height: 400px; overflow-y: auto;">
+                {% for row in disp_stats %}
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background-color: rgba(22, 45, 80, 0.15); border-radius: 6px; border: 1px solid rgba(22, 45, 80, 0.2);">
+                    <span style="font-size: 13.5px; font-weight: 600; color: #ffffff;">{{ row.label }}</span>
+                    <span style="background-color: var(--accent-cyan); color: #000000; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px;">{{ row.value }}</span>
+                </div>
+                {% else %}
+                <div style="color: var(--text-crm-muted); text-align: center; padding: 30px;">No calls attempted in this campaign yet.</div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Right panel: Mapped Caller Performance in this Campaign -->
+        <div class="crm-card">
+            <div class="crm-card-title">Campaign Caller Performance</div>
+            <div style="overflow-x: auto;">
+                <table class="performance-table">
+                    <thead>
+                        <tr>
+                            <th>Agent</th>
+                            <th>Assigned</th>
+                            <th>Dials</th>
+                            <th>Meetings</th>
+                            <th>SQLs</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in team_performance %}
+                        <tr>
+                            <td style="font-weight: 600;">{{ row.name }}</td>
+                            <td>{{ row.assigned }}</td>
+                            <td>{{ row.dialed }}</td>
+                            <td>{{ row.scheduled }}</td>
+                            <td style="font-weight: 700; color: #10b981;">{{ row.converted }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" style="text-align: center; color: var(--text-crm-muted); padding: 20px;">No calling agents mapped.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+<script>
+    // Tab switching controller
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        
+        // Find triggering button
+        const clickedBtn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.textContent.toLowerCase().includes(tabId));
+        if (clickedBtn) clickedBtn.classList.add('active');
+        
+        const contentDiv = document.getElementById(`tab-${tabId}`);
+        if (contentDiv) contentDiv.classList.add('active');
+        
+        // Update URL query string
+        const url = new URL(window.location);
+        url.searchParams.set('tab', tabId);
+        window.history.pushState({}, '', url);
+    }
+    
+    // Auto toggle tab on load if specified in URL query
+    window.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const activeTab = urlParams.get('tab') || 'allocations';
+        switchTab(activeTab);
+        
+        const transferScope = document.getElementById('transfer-scope');
+        if (transferScope) {
+            transferScope.addEventListener('change', () => {
+                const pctGroup = document.getElementById('transfer-pct-group');
+                pctGroup.style.display = (transferScope.value === 'percentage') ? 'block' : 'none';
+            });
+        }
+        
+        recalculateAllocations();
+    });
+
+    // Recalculate percentage weights
+    function recalculateAllocations() {
+        const inputs = document.querySelectorAll('.allocation-input');
+        if (!inputs.length) return;
+        
+        let total = 0;
+        let mapping = {};
+        
+        inputs.forEach(input => {
+            const val = parseInt(input.value) || 0;
+            total += val;
+            const callerId = input.closest('.allocation-row').getAttribute('data-caller-id');
+            mapping[callerId] = val;
+        });
+        
+        const label = document.getElementById('allocation-total-label');
+        if (label) {
+            label.textContent = `Total Weight Specified: ${total}%`;
+            
+            const submitBtn = document.getElementById('btn-submit-alloc');
+            if (total === 100) {
+                label.style.border = '1.5px solid #10b981';
+                label.style.color = '#10b981';
+                label.style.background = 'rgba(16, 185, 129, 0.05)';
+                submitBtn.disabled = false;
+                submitBtn.style.opacity = '1';
+            } else {
+                label.style.border = '1.5px dashed var(--accent-cyan)';
+                label.style.color = 'var(--accent-cyan)';
+                label.style.background = 'rgba(6, 182, 212, 0.05)';
+                submitBtn.disabled = true;
+                submitBtn.style.opacity = '0.5';
+            }
+        }
+    }
+
+    // Save Caller queue weights and execute allocation
+    function commitAllocations() {
+        const inputs = document.querySelectorAll('.allocation-input');
+        let mapping = {};
+        inputs.forEach(input => {
+            const val = parseInt(input.value) || 0;
+            const callerId = input.closest('.allocation-row').getAttribute('data-caller-id');
+            mapping[callerId] = val;
+        });
+
+        fetch(`/api/admin/telecrm/lists/{{ campaign.id }}/allocate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ allocation: mapping })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert(`Allocation successfully completed! Distributed ${data.allocated_count} contacts.`);
+                window.location.reload();
+            } else {
+                alert(data.message || "Failed to update allocations.");
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Error sending allocation weights request to server.");
+        });
+    }
+
+    // Transfer untouched contacts queue between agents
+    function executeQuickTransfer() {
+        const srcCallerId = document.getElementById('transfer-source').value;
+        const targetCallerId = document.getElementById('transfer-target').value;
+        const type = document.getElementById('transfer-scope').value;
+        const pct = document.getElementById('transfer-percentage').value;
+
+        if (!targetCallerId) {
+            alert("Please select a target destination agent.");
+            return;
+        }
+
+        const payload = {
+            source_caller_id: srcCallerId ? parseInt(srcCallerId) : null,
+            target_caller_id: parseInt(targetCallerId),
+            reallocate_type: type,
+            percentage: parseInt(pct)
+        };
+
+        function sendTransferRequest(forceVal = false) {
+            payload.force = forceVal;
+            fetch(`/api/telecrm/campaigns/{{ campaign.id }}/reallocate`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert(data.message);
+                    window.location.reload();
+                } else if (data.status === 'warning_required') {
+                    if (confirm(data.message)) {
+                        sendTransferRequest(true); // force reassign
+                    }
+                } else {
+                    alert(data.message || "Queue reallocation failed.");
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert("Error calling reallocation api.");
+            });
+        }
+
+        sendTransferRequest(false);
+    }
+</script>
+{% endblock %}

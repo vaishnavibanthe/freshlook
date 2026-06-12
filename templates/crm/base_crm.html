@@ -567,13 +567,28 @@
                 <li class="crm-nav-header">TeleCRM / Calling</li>
                 {% if role in ('Platform Admin', 'Group Admin', 'Telecaller Manager') %}
                 <li>
-                    <a href="{{ url_for('crm.telecrm_dashboard') }}" class="crm-nav-link {% if active_page == 'telecrm_dashboard' %}active{% endif %}">
-                        <i class="fas fa-headset"></i> TeleCRM Home
+                    <a href="{{ url_for('crm.telecrm_campaigns') }}" class="crm-nav-link {% if active_page == 'telecrm_campaigns' %}active{% endif %}">
+                        <i class="fas fa-bullhorn"></i> Campaigns
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('crm.telecrm_analytics') }}" class="crm-nav-link {% if active_page == 'telecrm_analytics' %}active{% endif %}">
+                        <i class="fas fa-chart-bar"></i> Analytics
                     </a>
                 </li>
                 <li>
                     <a href="{{ url_for('crm.telecrm_import_page') }}" class="crm-nav-link {% if active_page == 'telecrm_import' %}active{% endif %}">
                         <i class="fas fa-file-upload"></i> Upload & Allocate
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('crm.telecrm_templates_mgmt') }}" class="crm-nav-link {% if active_page == 'telecrm_templates' %}active{% endif %}">
+                        <i class="fas fa-paste"></i> Templates Builder
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('crm.telecrm_settings') }}" class="crm-nav-link {% if active_page == 'telecrm_settings' %}active{% endif %}">
+                        <i class="fas fa-sliders-h"></i> TeleCRM Settings
                     </a>
                 </li>
                 {% endif %}
@@ -599,6 +614,13 @@
                         <i class="fas fa-users-cog"></i> User Registry
                     </a>
                 </li>
+                {% if role == 'Platform Admin' %}
+                <li>
+                    <a href="{{ url_for('crm.admin_permission_templates') }}" class="crm-nav-link {% if active_page == 'admin_permissions' %}active{% endif %}">
+                        <i class="fas fa-user-lock"></i> Permission Templates
+                    </a>
+                </li>
+                {% endif %}
                 {% if role == 'Platform Admin' %}
                 <li>
                     <a href="{{ url_for('crm.admin_groups') }}" class="crm-nav-link {% if active_page == 'admin_groups' %}active{% endif %}">
