@@ -32,11 +32,70 @@ app.jinja_env.auto_reload = False
 
 serializer = URLSafeTimedSerializer(app.secret_key)
 
+# Register CRM Blueprint
+from crm import crm_bp
+app.register_blueprint(crm_bp)
+
+def forward_to_crm_wrapper(email, first_name, last_name, company, phone, job_title, geography, country, industry, message, source_form, source_page, cta_clicked, lead_source, utm_source, utm_medium, utm_campaign, utm_term, utm_content, referrer, ip_address, user_agent, consent_status=0):
+    try:
+        from crm.models import forward_lead_to_crm
+        forward_lead_to_crm(
+            email=email, first_name=first_name, last_name=last_name, company=company, phone=phone,
+            job_title=job_title, geography=geography, country=country, industry=industry, message=message,
+            source_form=source_form, source_page=source_page, cta_clicked=cta_clicked, lead_source=lead_source,
+            utm_source=utm_source, utm_medium=utm_medium, utm_campaign=utm_campaign,
+            utm_term=utm_term, utm_content=utm_content, referrer=referrer,
+            ip_address=ip_address, user_agent=user_agent, consent_status=consent_status
+        )
+    except Exception as e:
+        print(f"Error forwarding lead to CRM: {e}")
+
+PERSONAL_DOMAINS = {
+    'gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'rediffmail.com',
+    'protonmail.com', 'icloud.com', 'aol.com', 'mail.com', 'gmx.com',
+    'yandex.com', 'zoho.com', 'proton.me', 'live.com', 'yahoo.co.in', 'hotmail.co.uk',
+    'msn.com', 'comcast.net', 'yahoo.com.br', 'yahoo.co.jp', 'yahoo.fr', 'ymail.com',
+    'mailinator.com', '123mail.org', 'fastmail.fm', 'web.de', 'gmx.net', 'libero.it',
+    'wanadoo.fr', 'orange.fr', 'rambler.ru', 'mail.ru', 'mac.com', 'me.com'
+}
+
+def is_corporate_email(email):
+    email = (email or '').strip().lower()
+    if '@' not in email:
+        return False
+    parts = email.split('@')
+    if len(parts) != 2:
+        return False
+    domain = parts[1].strip()
+    if domain in PERSONAL_DOMAINS:
+        return False
+    return True
+
+def validate_phone_number(phone):
+    phone = (phone or '').strip()
+    if not phone:
+        return True
+    if not re.match(r'^\+?[0-9\s.\-()]+$', phone):
+        return False
+    digits = ''.join(c for c in phone if c.isdigit())
+    if len(digits) < 7 or len(digits) > 15:
+        return False
+    if len(set(digits)) < 3:
+        return False
+    for i in range(len(digits) - 5):
+        substring = digits[i:i+6]
+        diffs = [int(substring[j+1]) - int(substring[j]) for j in range(5)]
+        if all(d == 1 for d in diffs) or all(d == -1 for d in diffs):
+            return False
+    return True
+
+
+
 # Global rate limiting cache for downloads: {ip: [timestamps]}
 DOWNLOAD_RATE_LIMIT = {}
 
 def get_db_connection():
-    conn = sqlite3.connect('blog.db')
+    conn = sqlite3.connect('blog.db', timeout=30.0)
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -63,6 +122,126 @@ def get_db_webinars():
     finally:
         conn.close()
     return WEBINARS_DATA
+
+def categorize_content(text, tool_calls_str):
+    combined = (text or "") + " " + (tool_calls_str or "")
+    combined_lower = combined.lower()
+    
+    if any(k in combined_lower for k in ["admin_", "admin/", "admin"]):
+        return "Admin Features"
+    elif any(k in combined_lower for k in ["career", "job", "apply", "resume", "cv"]):
+        return "Careers Section"
+    elif any(k in combined_lower for k in ["case_study", "case_studies", "case-studies", "success story", "success_story"]):
+        return "Case Studies"
+    elif any(k in combined_lower for k in ["about_us", "about-us", "about us", "fetch_about"]):
+        return "About Us Modernization"
+    elif any(k in combined_lower for k in ["style.css", "design", "css", "layout", "aesthetic", "glow", "orbit"]):
+        return "Design & Aesthetics"
+    elif any(k in combined_lower for k in ["app.py", "content_store.py", "db_connection", "sqlite"]):
+        return "Core Backend & Data"
+    else:
+        return "General / Infrastructure"
+
+def sync_token_usage():
+    import glob
+    brain_dir = "/Users/amit/.gemini/antigravity-ide/brain"
+    pattern = os.path.join(brain_dir, "*", ".system_generated", "logs", "transcript.jsonl")
+    log_files = glob.glob(pattern)
+    if not log_files:
+        return
+    # Find the most recently modified transcript log file
+    log_files.sort(key=lambda x: os.path.getmtime(x), reverse=True)
+    log_file = log_files[0]
+    
+    if not os.path.exists(log_file):
+        return
+        
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Get max step_index
+    try:
+        cursor.execute("SELECT MAX(step_index) FROM token_usage")
+        row = cursor.fetchone()
+        max_step_index = row[0] if (row and row[0] is not None) else -1
+    except Exception as e:
+        max_step_index = -1
+    
+    new_rows = []
+    try:
+        with open(log_file, 'r', encoding='utf-8') as f:
+            for line in f:
+                if not line.strip():
+                    continue
+                try:
+                    data = json.loads(line)
+                    step_index = data.get("step_index")
+                    if step_index is None or step_index <= max_step_index:
+                        continue
+                    
+                    timestamp = data.get("created_at")
+                    content = data.get("content") or ""
+                    thinking = data.get("thinking") or ""
+                    tool_calls = data.get("tool_calls")
+                    tool_calls_str = json.dumps(tool_calls) if tool_calls else ""
+                    
+                    # Estimate tokens
+                    content_tok = len(content) / 4.0
+                    thinking_tok = len(thinking) / 4.0
+                    tool_tok = len(tool_calls_str) / 4.0
+                    
+                    user_tokens = 0
+                    system_tokens = 0
+                    completion_tokens = 0
+                    thinking_tokens = thinking_tok
+                    
+                    source = data.get("source")
+                    msg_type = data.get("type")
+                    
+                    if source == "USER_EXPLICIT":
+                        user_tokens = content_tok
+                    elif source in ("SYSTEM", "TOOL"):
+                        system_tokens = content_tok
+                    elif source == "MODEL":
+                        completion_tokens = content_tok + tool_tok
+                    else:
+                        if msg_type == "USER_INPUT":
+                            user_tokens = content_tok
+                        elif msg_type == "PLANNER_RESPONSE":
+                            completion_tokens = content_tok + tool_tok
+                        else:
+                            system_tokens = content_tok
+                            
+                    category = categorize_content(content, tool_calls_str)
+                    
+                    new_rows.append((
+                        step_index,
+                        timestamp,
+                        category,
+                        user_tokens,
+                        system_tokens,
+                        completion_tokens,
+                        thinking_tokens
+                    ))
+                except Exception:
+                    continue
+    except Exception as e:
+        print(f"Error reading transcript.jsonl: {e}")
+        conn.close()
+        return
+        
+    if new_rows:
+        try:
+            cursor.executemany("""
+                INSERT OR IGNORE INTO token_usage 
+                (step_index, timestamp, category, user_tokens, system_tokens, completion_tokens, thinking_tokens)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            """, new_rows)
+            conn.commit()
+        except Exception as e:
+            print(f"Error inserting token usage records: {e}")
+            
+    conn.close()
 
 # Inject data registries into template contexts globally
 def get_navigation_fallback():
@@ -235,7 +414,7 @@ def get_navigation_fallback():
                     {
                         'label': 'Company',
                         'items': [
-                            {'id': 9959, 'label': 'About Our Team', 'url': '/about-us', 'description': 'Empower businesses with insightful innovations', 'icon': None},
+                            {'id': 9959, 'label': 'About Artha Solutions', 'url': '/about-us', 'description': 'Empower businesses with insightful innovations', 'icon': None},
                             {'id': 99510, 'label': 'Partners Ecosystem', 'url': '/partners', 'description': 'Strategic alliances catering to all data requirements', 'icon': None},
                             {'id': 99512, 'label': 'Careers', 'url': '/careers', 'description': 'Be part of our dynamic enterprise consulting team', 'icon': None},
                             {'id': 99513, 'label': 'Request a Demo', 'url': '/contact-us', 'description': 'See our assessment framework in action', 'icon': None}
@@ -495,6 +674,340 @@ MAX_RESUME_SIZE_MB = 5
 def _allowed_resume(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_RESUME_EXTENSIONS
 
+def generate_expiring_resume_url(app_id):
+    from itsdangerous import URLSafeTimedSerializer
+    serializer = URLSafeTimedSerializer(app.config.get('SECRET_KEY', 'default_careers_secret_key_2026'))
+    token = serializer.dumps({'app_id': app_id}, salt='careers-resume-download')
+    try:
+        from flask import has_request_context
+        if has_request_context():
+            host_url = request.host_url
+        else:
+            host_url = 'http://127.0.0.1:5050/'
+    except Exception:
+        host_url = 'http://127.0.0.1:5050/'
+    host_url = host_url.rstrip('/')
+    return f"{host_url}/api/admin/careers/applications/download/{token}"
+
+def format_email_body(poster_name, app_data, download_url=None):
+    cover_letter = app_data.get('cover_letter') or 'Not provided'
+    job_title = app_data.get('job_title') or 'N/A'
+    job_location = app_data.get('job_location') or 'N/A'
+    job_id = app_data.get('job_id') or 'N/A'
+    job_dept = app_data.get('job_dept') or 'N/A'
+    job_type = app_data.get('job_type') or 'N/A'
+    
+    try:
+        from flask import has_request_context
+        if has_request_context():
+            host_url = request.host_url
+        else:
+            host_url = 'http://127.0.0.1:5050/'
+    except Exception:
+        host_url = 'http://127.0.0.1:5050/'
+    admin_url = f"{host_url.rstrip('/')}/admin/careers/applications?open_notif={app_data['id']}"
+
+    if download_url:
+        resume_section = f"The candidate's resume/CV could not be attached due to size limits. You can download it securely using this expiring link (valid for 24 hours):\n{download_url}"
+    else:
+        resume_section = "The candidate’s resume/CV is attached to this email."
+
+    body = f"""Hello {poster_name or 'Job Poster'},
+
+A new candidate has applied for the following position:
+
+Job: {job_title}
+Location: {job_location}
+Job Reference: {job_id}
+
+Candidate Details:
+Name: {app_data['full_name']}
+Email: {app_data['email']}
+Phone: {app_data['phone'] or 'Not provided'}
+Current Location: Not provided
+Experience: Not provided
+Current Company: Not provided
+Notice Period: Not provided
+LinkedIn: {app_data['linkedin_url'] or 'Not provided'}
+
+Cover Letter:
+{cover_letter}
+
+{resume_section}
+
+View Application:
+{admin_url}
+
+Regards,
+Artha Solutions Careers Portal"""
+    return body
+
+def update_application_notification_status(app_id, status, error_msg, recipient, cc):
+    now_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    conn = get_db_connection()
+    try:
+        row = conn.execute("SELECT notification_attempt_count FROM career_applications WHERE id = ?", (app_id,)).fetchone()
+        attempts = row[0] if row else 0
+        new_attempts = attempts + 1
+        
+        final_status = status
+        if status == 'Failed' and new_attempts < 3:
+            final_status = 'Retrying'
+            
+        conn.execute("""
+            UPDATE career_applications
+            SET notification_status = ?,
+                notification_error = ?,
+                notification_attempt_count = ?,
+                last_notification_attempt_at = ?,
+                notification_sent_at = ?
+            WHERE id = ?
+        """, (
+            final_status, error_msg, new_attempts, now_str,
+            (now_str if status == 'Sent' else None),
+            app_id
+        ))
+        conn.commit()
+    except Exception as e:
+        print(f"Error updating application notification status: {e}")
+    finally:
+        conn.close()
+
+def _log_notification_attempt(conn, app_id, job_id, recipient, cc, subject, status, attachment_name, error_message, triggered_by):
+    now_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    conn.execute("""
+        INSERT INTO job_application_notification_logs
+        (job_application_id, job_id, recipient, cc, subject, status, attachment_name, attempted_at, sent_at, error_message, triggered_by)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, (
+        app_id, job_id, recipient, cc, subject, status, attachment_name,
+        now_str, (now_str if status == 'Sent' else None),
+        error_message, triggered_by
+    ))
+
+def send_career_application_notification(app_id, recipient_override=None, cc_override=None, triggered_by='System'):
+    import os
+    import smtplib
+    from email.mime.multipart import MIMEMultipart
+    from email.mime.text import MIMEText
+    from email.mime.application import MIMEApplication
+    from crm.utils import decrypt_smtp_password
+
+    conn = get_db_connection()
+    try:
+        app_row = conn.execute("""
+            SELECT a.*, 
+                   j.id as job_id_ref, j.title as job_title, j.location as job_location, j.posted_date, j.job_type, j.department as job_dept,
+                   j.job_poster_name, j.job_poster_email, j.secondary_notification_email, j.notification_cc,
+                   j.application_notification_enabled
+            FROM career_applications a
+            LEFT JOIN career_jobs j ON a.job_id = j.id
+            WHERE a.id = ?
+        """, (app_id,)).fetchone()
+
+        if not app_row:
+            return False, "Application not found."
+            
+        app_data = dict(app_row)
+        
+        if triggered_by == 'System' and not app_data.get('application_notification_enabled', 1):
+            return True, "Notification disabled for this job."
+
+        if recipient_override:
+            recipient_val = recipient_override
+            cc_val = cc_override
+        else:
+            recipient_val = app_data.get('notification_recipient')
+            cc_val = app_data.get('notification_cc')
+            
+            if not recipient_val:
+                recipients = []
+                if app_data.get('job_poster_email'):
+                    recipients.append(app_data['job_poster_email'].strip())
+                if app_data.get('secondary_notification_email'):
+                    recipients.append(app_data['secondary_notification_email'].strip())
+                recipient_val = ",".join(recipients) if recipients else None
+                cc_val = app_data.get('notification_cc') or None
+                
+                conn.execute("""
+                    UPDATE career_applications 
+                    SET notification_recipient = ?, notification_cc = ?
+                    WHERE id = ?
+                """, (recipient_val, cc_val, app_id))
+                conn.commit()
+                app_data['notification_recipient'] = recipient_val
+                app_data['notification_cc'] = cc_val
+
+        if not recipient_val:
+            error_msg = "No recipient email configured for job poster."
+            update_application_notification_status(app_id, 'Failed', error_msg, recipient_val, cc_val)
+            _log_notification_attempt(conn, app_id, app_data['job_id'], recipient_val, cc_val, "", "Failed", None, error_msg, triggered_by)
+            conn.commit()
+            return False, error_msg
+
+        settings_row = conn.execute("SELECT * FROM crm_settings LIMIT 1").fetchone()
+        if not settings_row:
+            error_msg = "SMTP settings missing in database."
+            update_application_notification_status(app_id, 'Failed', error_msg, recipient_val, cc_val)
+            _log_notification_attempt(conn, app_id, app_data['job_id'], recipient_val, cc_val, "", "Failed", None, error_msg, triggered_by)
+            conn.commit()
+            return False, error_msg
+
+        settings = dict(settings_row)
+        smtp_host = settings.get('smtp_host')
+        smtp_port = settings.get('smtp_port') or 587
+        smtp_username = settings.get('smtp_username')
+        from_email = settings.get('from_email') or smtp_username
+        smtp_password = decrypt_smtp_password(settings.get('smtp_password_encrypted', ''))
+
+        if not smtp_host:
+            error_msg = "SMTP host not configured."
+            update_application_notification_status(app_id, 'Failed', error_msg, recipient_val, cc_val)
+            _log_notification_attempt(conn, app_id, app_data['job_id'], recipient_val, cc_val, "", "Failed", None, error_msg, triggered_by)
+            conn.commit()
+            return False, error_msg
+
+        job_title = app_data.get('job_title') or 'N/A'
+        job_location = app_data.get('job_location') or 'N/A'
+        subject = f"New Application: {app_data['full_name']} – {job_title} – {job_location}"
+
+        resume_path = app_data.get('resume_path')
+        resume_filename = app_data.get('resume_filename')
+        original_name = None
+        if resume_filename:
+            parts = resume_filename.split('_', 2)
+            original_name = parts[2] if len(parts) > 2 else resume_filename
+
+        file_size = 0
+        if resume_path and os.path.exists(resume_path):
+            file_size = os.path.getsize(resume_path)
+
+        download_url = None
+        resume_attached = True
+        if file_size > 3.5 * 1024 * 1024:
+            resume_attached = False
+            download_url = generate_expiring_resume_url(app_id)
+
+        def try_smtp_send(attach_file, url_link):
+            msg = MIMEMultipart()
+            msg['From'] = from_email
+            msg['To'] = recipient_val
+            if cc_val:
+                msg['Cc'] = cc_val
+            msg['Subject'] = subject
+
+            body = format_email_body(app_data.get('job_poster_name'), app_data, url_link)
+            msg.attach(MIMEText(body, 'plain'))
+
+            if attach_file and resume_path and os.path.exists(resume_path):
+                with open(resume_path, 'rb') as f:
+                    part = MIMEApplication(f.read(), Name=original_name)
+                part['Content-Disposition'] = f'attachment; filename="{original_name}"'
+                msg.attach(part)
+
+            recipients = [e.strip() for e in recipient_val.split(',') if e.strip()]
+            if cc_val:
+                recipients.extend([e.strip() for e in cc_val.split(',') if e.strip()])
+
+            if int(smtp_port) == 465:
+                server = smtplib.SMTP_SSL(smtp_host, int(smtp_port), timeout=10)
+            else:
+                server = smtplib.SMTP(smtp_host, int(smtp_port), timeout=10)
+                server.starttls()
+
+            if smtp_username and smtp_password:
+                server.login(smtp_username, smtp_password)
+
+            server.sendmail(from_email, recipients, msg.as_string())
+            server.quit()
+
+        try:
+            try_smtp_send(resume_attached, download_url)
+            status = 'Sent'
+            err_details = None
+        except Exception as smtp_err:
+            smtp_err_str = str(smtp_err)
+            if resume_attached and ("size" in smtp_err_str.lower() or "limit" in smtp_err_str.lower() or "552" in smtp_err_str):
+                try:
+                    download_url = generate_expiring_resume_url(app_id)
+                    try_smtp_send(False, download_url)
+                    status = 'Sent'
+                    err_details = f"Sent with link fallback. Original error: {smtp_err_str}"
+                except Exception as retry_err:
+                    status = 'Failed'
+                    err_details = f"Failed on fallback retry: {retry_err}"
+            else:
+                status = 'Failed'
+                err_details = smtp_err_str
+
+        update_application_notification_status(app_id, status, err_details, recipient_val, cc_val)
+        _log_notification_attempt(
+            conn, app_id, app_data['job_id'], recipient_val, cc_val, subject, status,
+            (original_name if (status == 'Sent' and not download_url) else None),
+            err_details, triggered_by
+        )
+        conn.commit()
+
+        if status == 'Sent':
+            return True, None
+        else:
+            return False, err_details
+
+    except Exception as outer_err:
+        print(f"Exception in send_career_application_notification: {outer_err}")
+        return False, str(outer_err)
+    finally:
+        conn.close()
+
+SCHEDULER_STARTED = False
+
+def init_notification_scheduler(app_instance):
+    global SCHEDULER_STARTED
+    if SCHEDULER_STARTED:
+        return
+    SCHEDULER_STARTED = True
+    
+    import time
+    import threading
+    
+    def retry_loop():
+        time.sleep(15)
+        while True:
+            try:
+                with app_instance.app_context():
+                    conn = get_db_connection()
+                    rows = conn.execute("""
+                        SELECT id, last_notification_attempt_at FROM career_applications
+                        WHERE (notification_status = 'Pending' OR notification_status = 'Retrying')
+                          AND notification_attempt_count < 3
+                    """).fetchall()
+                    
+                    for row in rows:
+                        app_id = row['id']
+                        last_attempt = row['last_notification_attempt_at']
+                        should_retry = False
+                        if not last_attempt:
+                            should_retry = True
+                        else:
+                            try:
+                                attempt_dt = datetime.strptime(last_attempt, '%Y-%m-%d %H:%M:%S')
+                                elapsed = (datetime.now() - attempt_dt).total_seconds()
+                                if elapsed >= 300:
+                                    should_retry = True
+                            except Exception:
+                                should_retry = True
+                                
+                        if should_retry:
+                            print(f"Scheduler: Retrying notification for application #{app_id}...")
+                            send_career_application_notification(app_id, triggered_by='System')
+                    conn.close()
+            except Exception as loop_err:
+                print(f"Error in scheduler retry loop: {loop_err}")
+            time.sleep(60)
+
+    t = threading.Thread(target=retry_loop, daemon=True)
+    t.start()
+
 def _get_career_jobs(status='published', department=None, location=None, job_type=None, search=None):
     conn = get_db_connection()
     query = "SELECT * FROM career_jobs WHERE status = ?"
@@ -579,6 +1092,8 @@ def career_apply(slug):
         errors.append('Full name is required.')
     if not email or '@' not in email:
         errors.append('Valid email address is required.')
+    if phone and not validate_phone_number(phone):
+        errors.append('Invalid phone number format or test number detected.')
     if not consent:
         errors.append('You must consent to data processing.')
 
@@ -595,12 +1110,31 @@ def career_apply(slug):
             errors.append(f'Resume file must be under {MAX_RESUME_SIZE_MB} MB.')
         else:
             resume_file.seek(0)
-            safe_name = secure_filename(resume_file.filename)
-            timestamp = int(time.time())
-            resume_filename = f"{timestamp}_{slug}_{safe_name}"
-            resume_path = os.path.join(CAREERS_UPLOAD_FOLDER, resume_filename)
-            os.makedirs(CAREERS_UPLOAD_FOLDER, exist_ok=True)
-            resume_file.save(resume_path)
+            
+            # Content signature scan / magic bytes check
+            is_valid_file = True
+            ext = resume_file.filename.rsplit('.', 1)[1].lower() if '.' in resume_file.filename else ''
+            
+            if not content or len(content) == 0:
+                errors.append('Uploaded resume file is empty.')
+                is_valid_file = False
+            elif ext == 'pdf' and not content.startswith(b'%PDF'):
+                errors.append('Invalid PDF file structure.')
+                is_valid_file = False
+            elif ext == 'docx' and not content.startswith(b'PK\x03\x04'):
+                errors.append('Invalid DOCX file structure.')
+                is_valid_file = False
+            elif ext == 'doc' and not content.startswith(b'\xd0\xcf\x11\xe0') and not content.startswith(b'PK\x03\x04'):
+                errors.append('Invalid DOC file structure.')
+                is_valid_file = False
+                
+            if is_valid_file:
+                safe_name = secure_filename(resume_file.filename)
+                timestamp = int(time.time())
+                resume_filename = f"{timestamp}_{slug}_{safe_name}"
+                resume_path = os.path.join(CAREERS_UPLOAD_FOLDER, resume_filename)
+                os.makedirs(CAREERS_UPLOAD_FOLDER, exist_ok=True)
+                resume_file.save(resume_path)
 
     if errors:
         job_copy = dict(job)
@@ -619,15 +1153,51 @@ def career_apply(slug):
                                           'cover_letter': cover_letter})
 
     conn = get_db_connection()
-    conn.execute("""
+    # Resolve locked notification recipients for the application
+    recipients = []
+    if job.get('job_poster_email'):
+        recipients.append(job['job_poster_email'].strip())
+    if job.get('secondary_notification_email'):
+        recipients.append(job['secondary_notification_email'].strip())
+    app_recipient = ",".join(recipients) if recipients else None
+    app_cc = job.get('notification_cc') or None
+
+    cursor = conn.cursor()
+    cursor.execute("""
         INSERT INTO career_applications
         (job_id, job_title, full_name, email, phone, linkedin_url, cover_letter,
-         resume_filename, resume_path, consent_given, status)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 'new')
+         resume_filename, resume_path, consent_given, status,
+         notification_recipient, notification_cc, notification_status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 'new', ?, ?, 'Pending')
     """, (job['id'], job['title'], full_name, email, phone, linkedin_url, cover_letter,
-          resume_filename, resume_path))
+          resume_filename, resume_path, app_recipient, app_cc))
+    app_id = cursor.lastrowid
     conn.commit()
     conn.close()
+
+    # Trigger email notification asynchronously in a background thread
+    import threading
+    threading.Thread(
+        target=send_career_application_notification,
+        args=(app_id,),
+        kwargs={'triggered_by': 'System'},
+        daemon=True
+    ).start()
+
+    # Split name for CRM
+    name_parts = (full_name or "").strip().split(' ', 1)
+    c_first_name = name_parts[0]
+    c_last_name = name_parts[1] if len(name_parts) > 1 else ''
+    
+    # Forward to CRM (conditional settings check is inside wrapper)
+    forward_to_crm_wrapper(
+        email=email, first_name=c_first_name, last_name=c_last_name, company='', phone=phone, job_title=job['title'],
+        geography='', country='', industry='', message=f"Applied for {job['title']}\nLinkedIn: {linkedin_url}\nCover Letter: {cover_letter}",
+        source_form=f"Career Job Application - {job['title']}",
+        source_page=f"/careers/{slug}", cta_clicked='Submit Application', lead_source='Careers Website',
+        utm_source='', utm_medium='', utm_campaign='', utm_term='', utm_content='',
+        referrer='', ip_address=request.remote_addr or 'unknown', user_agent=request.headers.get('User-Agent', ''), consent_status=1
+    )
 
     return render_template('career_apply_success.html', job=job, applicant_name=full_name,
                            active_page='careers')
@@ -659,6 +1229,11 @@ def admin_career_job_new():
     guard = _careers_admin_required()
     if guard: return guard
     import json as _json
+
+    conn_rec = get_db_connection()
+    recruiters = [dict(r) for r in conn_rec.execute("SELECT id, name, email, department FROM crm_users WHERE is_active = 1").fetchall()]
+    conn_rec.close()
+
     if request.method == 'POST':
         slug = re.sub(r'[^a-z0-9-]', '-', request.form.get('title', '').lower().strip()).strip('-')
         slug = re.sub(r'-+', '-', slug)
@@ -676,24 +1251,34 @@ def admin_career_job_new():
         try:
             conn.execute("""
                 INSERT INTO career_jobs (slug, title, department, location, job_type, summary,
-                    description, responsibilities, requirements, additional_info, status, posted_date)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    description, responsibilities, requirements, additional_info, status, posted_date,
+                    job_poster_name, job_poster_email, job_poster_phone, job_poster_department,
+                    job_poster_user_id, secondary_notification_email, notification_cc, application_notification_enabled)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 slug, request.form.get('title'), request.form.get('department'),
                 request.form.get('location'), request.form.get('job_type', 'Full-Time'),
                 request.form.get('summary'), request.form.get('description'),
                 responsibilities, requirements, request.form.get('additional_info'),
                 request.form.get('status', 'published'),
-                request.form.get('posted_date', datetime.now().strftime('%Y-%m-%d'))
+                request.form.get('posted_date', datetime.now().strftime('%Y-%m-%d')),
+                request.form.get('job_poster_name'),
+                request.form.get('job_poster_email'),
+                request.form.get('job_poster_phone') or None,
+                request.form.get('job_poster_department') or None,
+                int(request.form.get('job_poster_user_id')) if request.form.get('job_poster_user_id') else None,
+                request.form.get('secondary_notification_email') or None,
+                request.form.get('notification_cc') or None,
+                int(request.form.get('application_notification_enabled', 1))
             ))
             conn.commit()
         except Exception as e:
             conn.close()
-            return render_template('admin_career_job_edit.html', job=None,
+            return render_template('admin_career_job_edit.html', job=None, recruiters=recruiters,
                                    error=str(e), active_admin='careers')
         conn.close()
         return redirect('/admin/careers')
-    return render_template('admin_career_job_edit.html', job=None, active_admin='careers')
+    return render_template('admin_career_job_edit.html', job=None, recruiters=recruiters, active_admin='careers')
 
 @app.route('/admin/careers/jobs/<int:job_id>/edit', methods=['GET', 'POST'])
 def admin_career_job_edit(job_id):
@@ -706,6 +1291,11 @@ def admin_career_job_edit(job_id):
         conn.close()
         abort(404)
     job = dict(job)
+
+    conn_rec = get_db_connection()
+    recruiters = [dict(r) for r in conn_rec.execute("SELECT id, name, email, department FROM crm_users WHERE is_active = 1").fetchall()]
+    conn_rec.close()
+
     if request.method == 'POST':
         responsibilities = request.form.get('responsibilities', '').strip()
         requirements = request.form.get('requirements', '').strip()
@@ -720,14 +1310,26 @@ def admin_career_job_edit(job_id):
         conn2.execute("""
             UPDATE career_jobs SET title=?, department=?, location=?, job_type=?, summary=?,
             description=?, responsibilities=?, requirements=?, additional_info=?, status=?,
-            posted_date=?, updated_at=datetime('now') WHERE id=?
+            posted_date=?, job_poster_name=?, job_poster_email=?, job_poster_phone=?,
+            job_poster_department=?, job_poster_user_id=?, secondary_notification_email=?,
+            notification_cc=?, application_notification_enabled=?, updated_at=datetime('now')
+            WHERE id=?
         """, (
             request.form.get('title'), request.form.get('department'),
             request.form.get('location'), request.form.get('job_type', 'Full-Time'),
             request.form.get('summary'), request.form.get('description'),
             responsibilities, requirements, request.form.get('additional_info'),
             request.form.get('status', 'published'),
-            request.form.get('posted_date'), job_id
+            request.form.get('posted_date'),
+            request.form.get('job_poster_name'),
+            request.form.get('job_poster_email'),
+            request.form.get('job_poster_phone') or None,
+            request.form.get('job_poster_department') or None,
+            int(request.form.get('job_poster_user_id')) if request.form.get('job_poster_user_id') else None,
+            request.form.get('secondary_notification_email') or None,
+            request.form.get('notification_cc') or None,
+            int(request.form.get('application_notification_enabled', 1)),
+            job_id
         ))
         conn2.commit()
         conn2.close()
@@ -741,7 +1343,7 @@ def admin_career_job_edit(job_id):
             except Exception:
                 pass
     conn.close()
-    return render_template('admin_career_job_edit.html', job=job, active_admin='careers')
+    return render_template('admin_career_job_edit.html', job=job, recruiters=recruiters, active_admin='careers')
 
 @app.route('/admin/careers/jobs/<int:job_id>/delete', methods=['POST', 'GET'])
 def admin_career_job_delete(job_id):
@@ -776,9 +1378,10 @@ def admin_career_applications():
     query += " ORDER BY a.submitted_at DESC"
     applications = conn.execute(query, params).fetchall()
     jobs = conn.execute("SELECT id, title FROM career_jobs ORDER BY title").fetchall()
+    recruiters = conn.execute("SELECT id, name, email, department FROM crm_users WHERE is_active = 1").fetchall()
     conn.close()
     return render_template('admin_career_applications.html', applications=applications,
-                           jobs=jobs, job_filter=job_filter, status_filter=status_filter,
+                           jobs=jobs, recruiters=[dict(r) for r in recruiters], job_filter=job_filter, status_filter=status_filter,
                            active_admin='careers')
 
 @app.route('/admin/careers/applications/<int:app_id>/status', methods=['POST'])
@@ -833,6 +1436,99 @@ def admin_career_export_applications():
     resp.headers['Content-Type'] = 'text/csv'
     resp.headers['Content-Disposition'] = 'attachment; filename=career_applications.csv'
     return resp
+
+@app.route('/api/admin/careers/applications/<int:app_id>/notification-log')
+def api_admin_career_notification_log(app_id):
+    guard = _careers_admin_required()
+    if guard:
+        return jsonify({'status': 'error', 'message': 'Unauthorized'}), 401
+    conn = get_db_connection()
+    logs = conn.execute("""
+        SELECT * FROM job_application_notification_logs
+        WHERE job_application_id = ?
+        ORDER BY id DESC
+    """, (app_id,)).fetchall()
+    conn.close()
+    return jsonify({
+        'status': 'success',
+        'logs': [dict(log) for log in logs]
+    })
+
+@app.route('/api/admin/careers/applications/<int:app_id>/resend-notification', methods=['POST'])
+def api_admin_career_resend_notification(app_id):
+    guard = _careers_admin_required()
+    if guard: return redirect('/admin/login')
+    
+    user_name = session.get('crm_user_name') or session.get('username') or 'Admin'
+    success, err = send_career_application_notification(app_id, triggered_by=f"Admin: {user_name}")
+    if success:
+        flash("Application notification resent successfully.", "success")
+    else:
+        flash(f"Failed to resend notification: {err}", "error")
+        
+    return redirect('/admin/careers/applications')
+
+@app.route('/api/admin/careers/applications/<int:app_id>/forward-to-recruiter', methods=['POST'])
+def api_admin_career_forward_to_recruiter(app_id):
+    guard = _careers_admin_required()
+    if guard: return redirect('/admin/login')
+    
+    rec_id = request.form.get('recruiter_user_id')
+    forward_email = request.form.get('forward_email', '').strip()
+    
+    target_email = None
+    target_name = None
+    
+    if rec_id:
+        conn = get_db_connection()
+        user = conn.execute("SELECT name, email FROM crm_users WHERE id = ?", (rec_id,)).fetchone()
+        conn.close()
+        if user:
+            target_email = user['email']
+            target_name = user['name']
+            
+    if not target_email and forward_email:
+        target_email = forward_email
+        target_name = forward_email.split('@')[0]
+        
+    if not target_email:
+        flash("Please select a recruiter or specify a valid email to forward.", "error")
+        return redirect('/admin/careers/applications')
+        
+    user_name = session.get('crm_user_name') or session.get('username') or 'Admin'
+    
+    success, err = send_career_application_notification(
+        app_id, 
+        recipient_override=target_email, 
+        triggered_by=f"Forwarded by {user_name} to {target_name}"
+    )
+    if success:
+        flash(f"Application successfully forwarded to {target_name} ({target_email}).", "success")
+    else:
+        flash(f"Failed to forward application: {err}", "error")
+        
+    return redirect('/admin/careers/applications')
+
+@app.route('/api/admin/careers/applications/download/<token>')
+def api_admin_career_download_resume_by_token(token):
+    from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
+    serializer = URLSafeTimedSerializer(app.config.get('SECRET_KEY', 'default_careers_secret_key_2026'))
+    try:
+        data = serializer.loads(token, salt='careers-resume-download', max_age=86400) # Valid for 24 hours
+        app_id = data['app_id']
+    except SignatureExpired:
+        abort(403, description="This download link has expired.")
+    except BadSignature:
+        abort(403, description="Invalid download token.")
+
+    conn = get_db_connection()
+    app_row = conn.execute("SELECT * FROM career_applications WHERE id = ?", (app_id,)).fetchone()
+    conn.close()
+    if not app_row or not app_row['resume_path']:
+        abort(404)
+        
+    return send_file(app_row['resume_path'], as_attachment=True,
+                     download_name=app_row['resume_filename'])
 
 @app.route('/solutions')
 def solutions_index():
@@ -1013,6 +1709,19 @@ def industries_banking():
 @app.route('/privacy-policy')
 def privacy_policy():
     return render_template('privacy_policy.html', active_page='home')
+
+@app.route('/clients')
+def clients_page():
+    import json
+    import os
+    try:
+        json_path = os.path.join(app.root_path, 'clients_by_industry.json')
+        with open(json_path, 'r', encoding='utf-8') as f:
+            clients_data = json.load(f)
+    except Exception as e:
+        app.logger.error(f"Error loading clients mapping: {e}")
+        clients_data = {}
+    return render_template('clients.html', clients_data=clients_data, active_page='about_us')
 
 @app.route('/careers/clients')
 def careers_clients():
@@ -1554,18 +2263,7 @@ def submit_resource_lead():
     if not email:
         return jsonify({'status': 'error', 'message': 'Business email is required.'}), 400
         
-    PERSONAL_DOMAINS = {
-        'gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'rediffmail.com',
-        'protonmail.com', 'icloud.com', 'aol.com', 'mail.com', 'gmx.com',
-        'yandex.com', 'zoho.com', 'proton.me', 'live.com', 'yahoo.co.in', 'hotmail.co.uk'
-    }
-    
-    email_parts = email.split('@')
-    if len(email_parts) != 2:
-        return jsonify({'status': 'error', 'message': 'Invalid email format.'}), 400
-        
-    domain = email_parts[1].lower().strip()
-    if domain in PERSONAL_DOMAINS:
+    if not is_corporate_email(email):
         return jsonify({'status': 'error', 'message': 'Please use your official company business email address. Gmail/Yahoo/Outlook and other personal domains are not accepted.'}), 400
         
     conn = get_db_connection()
@@ -1581,6 +2279,17 @@ def submit_resource_lead():
     ))
     conn.commit()
     conn.close()
+    
+    # Forward to CRM
+    forward_to_crm_wrapper(
+        email=email, first_name=first_name, last_name=last_name, company=company, phone='', job_title='',
+        geography='', country='', industry='', message=f"Registered for {resource_type}: {resource_title}",
+        source_form=f"{resource_type} Lead Form",
+        source_page=f"/{resource_type.lower()}s/{resource_slug}" if resource_type else f"/resources/{resource_slug}",
+        cta_clicked='Register/Download', lead_source='Website',
+        utm_source='', utm_medium='', utm_campaign='', utm_term='', utm_content='',
+        referrer=source_info, ip_address=ip, user_agent=request.headers.get('User-Agent', ''), consent_status=1
+    )
     
     return jsonify({
         'status': 'success',
@@ -1827,7 +2536,28 @@ def case_study_detail(slug):
     if post['status'] != 'Published' and not is_admin:
         abort(404)
         
-    return render_template('case_study_detail.html', post=post, is_admin=is_admin, active_page='case-studies')
+    # Resolve background banner image URL based on industry vertical
+    banner_url = None
+    if post['banner_path']:
+        banner_url = post['banner_path']
+    else:
+        ind = (post['industry'] or '').lower()
+        if 'bfsi' in ind or 'bank' in ind or 'finance' in ind or 'insurance' in ind:
+            banner_url = '/static/img/case-studies/industries/BFSI.jpg'
+        elif 'health' in ind or 'pharma' in ind or 'clinical' in ind or 'medical' in ind:
+            banner_url = '/static/img/case-studies/industries/Healthcare.jpg'
+        elif 'manufact' in ind or 'factory' in ind or 'automotive' in ind:
+            banner_url = '/static/img/case-studies/industries/Manufacturing.jpg'
+        elif 'retail' in ind or 'commerce' in ind or 'consumer' in ind or 'goods' in ind:
+            banner_url = '/static/img/case-studies/industries/Retail.jpg'
+        elif 'telecom' in ind or 'network' in ind:
+            banner_url = '/static/img/case-studies/industries/Telecom.jpg'
+        elif 'hospit' in ind or 'hotel' in ind or 'travel' in ind or 'tourism' in ind:
+            banner_url = '/static/img/case-studies/industries/Hospitality.jpg'
+        else:
+            banner_url = '/static/img/case-studies/industries/BFSI.jpg'
+            
+    return render_template('case_study_detail.html', post=post, is_admin=is_admin, active_page='case-studies', banner_url=banner_url)
 
 @app.route('/api/case-studies')
 def api_case_studies_list():
@@ -1871,19 +2601,11 @@ def case_study_gated_download(slug):
     if not email:
         return jsonify({'status': 'error', 'message': 'Business email is required.'}), 400
         
-    PERSONAL_DOMAINS = {
-        'gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'rediffmail.com',
-        'protonmail.com', 'icloud.com', 'aol.com', 'mail.com', 'gmx.com',
-        'yandex.com', 'zoho.com', 'proton.me', 'live.com', 'yahoo.co.in', 'hotmail.co.uk'
-    }
-    
-    email_parts = email.split('@')
-    if len(email_parts) != 2:
-        return jsonify({'status': 'error', 'message': 'Invalid email format.'}), 400
-        
-    domain = email_parts[1].lower().strip()
-    if domain in PERSONAL_DOMAINS:
+    if not is_corporate_email(email):
         return jsonify({'status': 'error', 'message': 'Please use your official company business email address. Gmail/Yahoo/Outlook and other personal domains are not accepted.'}), 400
+        
+    if phone and not validate_phone_number(phone):
+        return jsonify({'status': 'error', 'message': 'Invalid phone number format or test number detected.'}), 400
         
     conn = get_db_connection()
     study = conn.execute("SELECT id, title, pdf_file_path FROM case_studies WHERE slug = ?", (slug,)).fetchone()
@@ -1916,6 +2638,16 @@ def case_study_gated_download(slug):
     conn.close()
     
     print(f"[CRM Webhook Sync] New Qualified Lead: {email} ({company or 'No Company'}) downloaded '{study['title']}' at {now_str}")
+    
+    # Forward to CRM
+    forward_to_crm_wrapper(
+        email=email, first_name=first_name, last_name=last_name, company=company, phone=phone, job_title=job_title,
+        geography='', country=country, industry='', message=f"Downloaded Case Study: {study['title']}",
+        source_form='Case Study Download Form',
+        source_page=source_url or f"/case-studies/{slug}", cta_clicked='Download PDF', lead_source='Website',
+        utm_source=utm_source, utm_medium=utm_medium, utm_campaign=utm_campaign, utm_term=utm_term, utm_content=utm_content,
+        referrer=referrer, ip_address=ip, user_agent=user_agent, consent_status=consent
+    )
     
     token_payload = {
         'case_study_id': study['id'],
@@ -2288,8 +3020,10 @@ def admin_post_new():
         keywords = request.form.get('keywords', '')
         seo_score = int(request.form.get('seo_score', 0))
         
-        # Simple auto summary
-        summary = content[:150] + '...' if len(content) > 150 else content
+        # Simple auto summary (stripping HTML tags first)
+        clean_content = re.sub(r'<[^>]*>', ' ', content)
+        clean_content = ' '.join(clean_content.split())
+        summary = clean_content[:150] + '...' if len(clean_content) > 150 else clean_content
         
         conn = get_db_connection()
         try:
@@ -2331,7 +3065,10 @@ def admin_post_edit(post_id):
         keywords = request.form.get('keywords')
         seo_score = int(request.form.get('seo_score', 0))
         
-        summary = content[:150] + '...' if len(content) > 150 else content
+        # Simple auto summary (stripping HTML tags first)
+        clean_content = re.sub(r'<[^>]*>', ' ', content)
+        clean_content = ' '.join(clean_content.split())
+        summary = clean_content[:150] + '...' if len(clean_content) > 150 else clean_content
         
         try:
             conn.execute('''
@@ -2517,6 +3254,18 @@ def admin_case_study_new():
                     cover_image_file.save(save_path)
                     thumbnail_path = f"/static/img/case-studies/uploads/{filename}"
             
+            banner_path = request.form.get('banner_path')
+            banner_image_file = request.files.get('banner_image_file')
+            if banner_image_file and banner_image_file.filename:
+                os.makedirs('static/img/case-studies/uploads', exist_ok=True)
+                _, ext = os.path.splitext(banner_image_file.filename)
+                ext = ext.lower()
+                if ext in ['.png', '.jpg', '.jpeg', '.gif', '.webp']:
+                    filename = f"{slug or title.lower().replace(' ', '-')}-banner{ext}"
+                    save_path = os.path.join('static/img/case-studies/uploads', filename)
+                    banner_image_file.save(save_path)
+                    banner_path = f"/static/img/case-studies/uploads/{filename}"
+            
             now_str = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
             
             conn = get_db_connection()
@@ -2532,15 +3281,15 @@ def admin_case_study_new():
                     implementation_approach, business_outcomes, key_metrics, quote, executive_summary,
                     ai_summary, card_summary, detail_content, faq_json, tags, seo_title, seo_description,
                     seo_keywords, canonical_url, og_title, og_description, schema_json, created_at, updated_at,
-                    thumbnail_path
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    thumbnail_path, banner_path
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ''', (
                     title, unique_slug, status, featured, client_name, client_display_name, is_client_anonymized,
                     industry, region, solution_area, technologies, business_challenge, solution_summary,
                     implementation_approach, business_outcomes, key_metrics, quote, executive_summary,
                     ai_summary, card_summary or executive_summary[:180] + '...', detail_content, faq_json, tags,
                     seo_title, seo_description, seo_keywords, canonical_url, og_title, og_description, schema_json,
-                    now_str, now_str, thumbnail_path
+                    now_str, now_str, thumbnail_path, banner_path
                 ))
                 new_id = cursor.lastrowid
                 conn.commit()
@@ -2607,6 +3356,18 @@ def admin_case_study_edit(study_id):
                 cover_image_file.save(save_path)
                 thumbnail_path = f"/static/img/case-studies/uploads/{filename}"
                 
+        banner_path = request.form.get('banner_path')
+        banner_image_file = request.files.get('banner_image_file')
+        if banner_image_file and banner_image_file.filename:
+            os.makedirs('static/img/case-studies/uploads', exist_ok=True)
+            _, ext = os.path.splitext(banner_image_file.filename)
+            ext = ext.lower()
+            if ext in ['.png', '.jpg', '.jpeg', '.gif', '.webp']:
+                filename = f"{slug}-banner{ext}"
+                save_path = os.path.join('static/img/case-studies/uploads', filename)
+                banner_image_file.save(save_path)
+                banner_path = f"/static/img/case-studies/uploads/{filename}"
+                
         now_str = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
         published_at = post['published_at']
         if status == 'Published' and not published_at:
@@ -2626,7 +3387,7 @@ def admin_case_study_edit(study_id):
             'ai_summary': ai_summary, 'card_summary': card_summary, 'detail_content': detail_content,
             'faq_json': faq_json, 'tags': tags, 'seo_title': seo_title, 'seo_description': seo_description,
             'seo_keywords': seo_keywords, 'og_title': og_title, 'og_description': og_description,
-            'schema_json': schema_json, 'thumbnail_path': thumbnail_path
+            'schema_json': schema_json, 'thumbnail_path': thumbnail_path, 'banner_path': banner_path
         }
         
         changes = []
@@ -2653,7 +3414,7 @@ def admin_case_study_edit(study_id):
                 implementation_approach = ?, business_outcomes = ?, key_metrics = ?, quote = ?, executive_summary = ?,
                 ai_summary = ?, card_summary = ?, detail_content = ?, faq_json = ?, tags = ?, seo_title = ?, seo_description = ?,
                 seo_keywords = ?, og_title = ?, og_description = ?, schema_json = ?, updated_at = ?, published_at = ?,
-                thumbnail_path = ?
+                thumbnail_path = ?, banner_path = ?
             WHERE id = ?
             ''', (
                 title, slug, status, featured, client_name, client_display_name, is_client_anonymized,
@@ -2661,7 +3422,7 @@ def admin_case_study_edit(study_id):
                 implementation_approach, business_outcomes, key_metrics, quote, executive_summary,
                 ai_summary, card_summary, detail_content, faq_json, tags, seo_title, seo_description,
                 seo_keywords, og_title, og_description, schema_json, now_str, published_at,
-                thumbnail_path, study_id
+                thumbnail_path, banner_path, study_id
             ))
             conn.commit()
             conn.close()
@@ -2788,15 +3549,36 @@ def admin_case_study_export_leads():
 @app.route('/contact-us', methods=['GET', 'POST'])
 def contact_us():
     if request.method == 'POST':
-        name = request.form.get('name')
-        email = request.form.get('email')
-        subject = request.form.get('subject')
-        message = request.form.get('message')
+        name = request.form.get('name', '').strip()
+        email = request.form.get('email', '').strip()
+        subject = request.form.get('subject', '').strip()
+        message = request.form.get('message', '').strip()
+        
+        if not name or not email or not subject or not message:
+            return jsonify({'status': 'error', 'message': 'All fields are required.'}), 400
+            
+        if not is_corporate_email(email):
+            return jsonify({'status': 'error', 'message': 'Please use your official company business email address. Personal email domains are not accepted.'}), 400
+        
+        # Split name
+        name_parts = (name or "").strip().split(' ', 1)
+        first_name = name_parts[0]
+        last_name = name_parts[1] if len(name_parts) > 1 else ''
+        
+        forward_to_crm_wrapper(
+            email=email, first_name=first_name, last_name=last_name, company='', phone='', job_title='',
+            geography='', country='', industry='', message=f"Subject: {subject}\nMessage: {message}", source_form='Contact Form',
+            source_page='/contact-us', cta_clicked='Submit Message', lead_source='Website',
+            utm_source='', utm_medium='', utm_campaign='', utm_term='', utm_content='',
+            referrer='', ip_address=request.remote_addr or 'unknown', user_agent=request.headers.get('User-Agent', ''), consent_status=1
+        )
+        
         return jsonify({
             'status': 'success',
             'message': f'Thank you, {name}! Your message regarding "{subject}" has been successfully sent. We will get back to you shortly.'
         })
     return render_template('contact_us.html', active_page='contact_us')
+
 
 # ==========================================================================
 # Healthcare Microsite Frontend Routes & Helpers
@@ -2934,19 +3716,11 @@ def healthcare_submit_lead():
     if not email:
         return jsonify({'status': 'error', 'message': 'Business email is required.'}), 400
         
-    PERSONAL_DOMAINS = {
-        'gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'rediffmail.com',
-        'protonmail.com', 'icloud.com', 'aol.com', 'mail.com', 'gmx.com',
-        'yandex.com', 'zoho.com', 'proton.me', 'live.com', 'yahoo.co.in', 'hotmail.co.uk'
-    }
-    
-    email_parts = email.split('@')
-    if len(email_parts) != 2:
-        return jsonify({'status': 'error', 'message': 'Invalid email format.'}), 400
-        
-    domain = email_parts[1].lower().strip()
-    if domain in PERSONAL_DOMAINS:
+    if not is_corporate_email(email):
         return jsonify({'status': 'error', 'message': 'Please use your official company business email address. Gmail/Yahoo/Outlook and other personal domains are not accepted.'}), 400
+        
+    if phone and not validate_phone_number(phone):
+        return jsonify({'status': 'error', 'message': 'Invalid phone number format or test number detected.'}), 400
         
     utm_source = request.form.get('utm_source', '')
     utm_medium = request.form.get('utm_medium', '')
@@ -2969,6 +3743,16 @@ def healthcare_submit_lead():
     ))
     conn.commit()
     conn.close()
+    
+    # Forward to CRM
+    forward_to_crm_wrapper(
+        email=email, first_name=first_name, last_name=last_name, company=company, phone=phone, job_title=job_title,
+        geography='', country=country, industry='Healthcare', message=message, source_form=f"Healthcare Form ({source_page})",
+        source_page=source_page, cta_clicked=cta_clicked, lead_source='Website',
+        utm_source=utm_source, utm_medium=utm_medium, utm_campaign=utm_campaign, utm_term='', utm_content='',
+        referrer=referrer, ip_address=ip, user_agent=user_agent, consent_status=consent
+    )
+
     
     return jsonify({'status': 'success', 'message': 'Thank you! Your request has been received. A healthcare data advisor will reach out shortly.'})
 
@@ -3454,17 +4238,11 @@ def ai_submit_lead():
         return jsonify({'status': 'error', 'message': 'Business email is required.'}), 400
         
     # Personal domain validation
-    personal_domains = [
-        'gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'rediffmail.com',
-        'protonmail.com', 'icloud.com', 'aol.com', 'mail.com', 'gmx.com',
-        'yandex.com', 'zoho.com', 'proton.me', 'live.com', 'yahoo.co.in', 'hotmail.co.uk'
-    ]
-    if '@' not in email:
-        return jsonify({'status': 'error', 'message': 'Invalid email address.'}), 400
+    if not is_corporate_email(email):
+        return jsonify({'status': 'error', 'message': 'Please use your official company business email address. Gmail/Yahoo/Outlook and other personal domains are not accepted.'}), 400
         
-    domain = email.split('@')[1]
-    if domain in personal_domains:
-        return jsonify({'status': 'error', 'message': 'Please use your corporate business email address.'}), 400
+    if phone and not validate_phone_number(phone):
+        return jsonify({'status': 'error', 'message': 'Invalid phone number format or test number detected.'}), 400
         
     # UTM parameter extraction
     utm_source = request.form.get('utm_source', '')
@@ -3489,6 +4267,15 @@ def ai_submit_lead():
     ))
     conn.commit()
     conn.close()
+    
+    # Forward to CRM
+    forward_to_crm_wrapper(
+        email=email, first_name=first_name, last_name=last_name, company=company, phone=phone, job_title=job_title,
+        geography='', country=country, industry='AI / Technology', message=message, source_form=f"AI Form ({source_page})",
+        source_page=source_page, cta_clicked=cta_clicked, lead_source='Website',
+        utm_source=utm_source, utm_medium=utm_medium, utm_campaign=utm_campaign, utm_term='', utm_content='',
+        referrer=referrer, ip_address=ip or 'unknown', user_agent=user_agent, consent_status=consent
+    )
     
     return jsonify({'status': 'success', 'message': 'Thank you! Your request has been received. An AI solutions advisor will reach out shortly.'})
 
@@ -3757,18 +4544,11 @@ def manufacturing_submit_lead():
     if not email:
         return jsonify({'status': 'error', 'message': 'Business email is required.'}), 400
         
-    # Personal domain validation
-    personal_domains = [
-        'gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'rediffmail.com',
-        'protonmail.com', 'icloud.com', 'aol.com', 'mail.com', 'gmx.com',
-        'yandex.com', 'zoho.com', 'proton.me', 'live.com', 'yahoo.co.in', 'hotmail.co.uk'
-    ]
-    if '@' not in email:
-        return jsonify({'status': 'error', 'message': 'Invalid email address.'}), 400
+    if not is_corporate_email(email):
+        return jsonify({'status': 'error', 'message': 'Please use your official company business email address. Gmail/Yahoo/Outlook and other personal domains are not accepted.'}), 400
         
-    domain = email.split('@')[1]
-    if domain in personal_domains:
-        return jsonify({'status': 'error', 'message': 'Please use your corporate business email address.'}), 400
+    if phone and not validate_phone_number(phone):
+        return jsonify({'status': 'error', 'message': 'Invalid phone number format or test number detected.'}), 400
         
     # UTM parameter extraction
     utm_source = request.form.get('utm_source', '')
@@ -3795,6 +4575,16 @@ def manufacturing_submit_lead():
     ))
     conn.commit()
     conn.close()
+    
+    # Forward to CRM
+    forward_to_crm_wrapper(
+        email=email, first_name=first_name, last_name=last_name, company=company, phone=phone, job_title=job_title,
+        geography='', country=country, industry='Manufacturing', message=f"Area of Interest: {area_of_interest}\nMessage: {message}",
+        source_form=f"Manufacturing Form ({source_page})",
+        source_page=source_page, cta_clicked=cta_clicked, lead_source='Website',
+        utm_source=utm_source, utm_medium=utm_medium, utm_campaign=utm_campaign, utm_term=utm_term, utm_content=utm_content,
+        referrer=referrer, ip_address=ip or 'unknown', user_agent=user_agent, consent_status=consent
+    )
     
     return jsonify({'status': 'success', 'message': 'Thank you! Your request has been received. A manufacturing data advisor will reach out shortly.'})
 
@@ -4201,15 +4991,11 @@ def bfsi_submit_lead():
     if not email:
         return jsonify({'status': 'error', 'message': 'Business email is required.'}), 400
         
-    # Personal domain validation
-    personal_domains = [
-        'gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'rediffmail.com',
-        'protonmail.com', 'icloud.com', 'aol.com', 'mail.com', 'gmx.com',
-        'yandex.com', 'zoho.com', 'proton.me', 'live.com', 'yahoo.co.in', 'hotmail.co.uk'
-    ]
-    domain = email.split('@')[1]
-    if domain in personal_domains:
-        return jsonify({'status': 'error', 'message': 'Please use your corporate business email address. Personal email domains are not accepted.'}), 400
+    if not is_corporate_email(email):
+        return jsonify({'status': 'error', 'message': 'Please use your official company business email address. Gmail/Yahoo/Outlook and other personal domains are not accepted.'}), 400
+        
+    if phone and not validate_phone_number(phone):
+        return jsonify({'status': 'error', 'message': 'Invalid phone number format or test number detected.'}), 400
 
     utm_source = request.args.get('utm_source') or request.form.get('utm_source')
     utm_medium = request.args.get('utm_medium') or request.form.get('utm_medium')
@@ -4236,6 +5022,16 @@ def bfsi_submit_lead():
     ))
     conn.commit()
     conn.close()
+    
+    # Forward to CRM
+    forward_to_crm_wrapper(
+        email=email, first_name=first_name, last_name=last_name, company=company, phone=phone, job_title=job_title,
+        geography='', country=country, industry='BFSI', message=f"Area of Interest: {area_of_interest}\nMessage: {message}",
+        source_form=f"BFSI Form ({source_page})",
+        source_page=source_page, cta_clicked=cta_clicked, lead_source='Website',
+        utm_source=utm_source, utm_medium=utm_medium, utm_campaign=utm_campaign, utm_term=utm_term, utm_content=utm_content,
+        referrer=referrer, ip_address=ip_address or 'unknown', user_agent=user_agent, consent_status=consent
+    )
     
     return jsonify({'status': 'success', 'message': 'Thank you! Your request has been received. A BFSI data advisor will reach out shortly.'})
 
@@ -4658,20 +5454,11 @@ def retail_submit_lead():
     if not email:
         return jsonify({'status': 'error', 'message': 'Business email is required.'}), 400
         
-    # Personal domain validation
-    personal_domains = [
-        'gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'rediffmail.com',
-        'protonmail.com', 'icloud.com', 'aol.com', 'mail.com', 'gmx.com',
-        'yandex.com', 'zoho.com', 'proton.me', 'live.com', 'yahoo.co.in', 'hotmail.co.uk'
-    ]
-    
-    email_parts = email.split('@')
-    if len(email_parts) != 2:
-        return jsonify({'status': 'error', 'message': 'Invalid email format.'}), 400
+    if not is_corporate_email(email):
+        return jsonify({'status': 'error', 'message': 'Please use your official company business email address. Gmail/Yahoo/Outlook and other personal domains are not accepted.'}), 400
         
-    domain = email_parts[1]
-    if domain in personal_domains:
-        return jsonify({'status': 'error', 'message': 'Please use your official company business email address. Personal email domains such as Gmail/Yahoo/Outlook are not accepted.'}), 400
+    if phone and not validate_phone_number(phone):
+        return jsonify({'status': 'error', 'message': 'Invalid phone number format or test number detected.'}), 400
 
     utm_source = request.args.get('utm_source') or request.form.get('utm_source')
     utm_medium = request.args.get('utm_medium') or request.form.get('utm_medium')
@@ -4698,6 +5485,16 @@ def retail_submit_lead():
     ))
     conn.commit()
     conn.close()
+    
+    # Forward to CRM
+    forward_to_crm_wrapper(
+        email=email, first_name=first_name, last_name=last_name, company=company, phone=phone, job_title=job_title,
+        geography='', country=country, industry='Retail', message=f"Area of Interest: {area_of_interest}\nMessage: {message}",
+        source_form=f"Retail Form ({source_page})",
+        source_page=source_page, cta_clicked=cta_clicked, lead_source='Website',
+        utm_source=utm_source, utm_medium=utm_medium, utm_campaign=utm_campaign, utm_term=utm_term, utm_content=utm_content,
+        referrer=referrer, ip_address=ip_address or 'unknown', user_agent=user_agent, consent_status=consent
+    )
     
     return jsonify({'status': 'success', 'message': 'Thank you! Your request has been received. A ThinkArtha retail data expert will contact you shortly.'})
 
@@ -5375,11 +6172,127 @@ def admin_publish_navigation():
         return redirect('/admin/navigation')
     return jsonify({'success': True})
 
+@app.route('/admin/tokens')
+def admin_tokens():
+    if not check_admin_auth():
+        return redirect('/admin/login')
+        
+    sync_token_usage()
+    
+    conn = get_db_connection()
+    # Get aggregated stats
+    try:
+        totals = conn.execute("""
+            SELECT 
+                SUM(user_tokens) as user_total,
+                SUM(system_tokens) as system_total,
+                SUM(completion_tokens) as completion_total,
+                SUM(thinking_tokens) as thinking_total
+            FROM token_usage
+        """).fetchone()
+    except Exception:
+        totals = None
+        
+    user_tot = totals['user_total'] if (totals and totals['user_total'] is not None) else 0
+    sys_tot = totals['system_total'] if (totals and totals['system_total'] is not None) else 0
+    comp_tot = totals['completion_total'] if (totals and totals['completion_total'] is not None) else 0
+    think_tot = totals['thinking_total'] if (totals and totals['thinking_total'] is not None) else 0
+    grand_total = user_tot + sys_tot + comp_tot + think_tot
+    
+    # Breakdown by category
+    try:
+        categories = conn.execute("""
+            SELECT 
+                category,
+                SUM(user_tokens) as user_total,
+                SUM(system_tokens) as system_total,
+                SUM(completion_tokens) as completion_total,
+                SUM(thinking_tokens) as thinking_total,
+                SUM(user_tokens + system_tokens + completion_tokens + thinking_tokens) as total
+            FROM token_usage
+            GROUP BY category
+            ORDER BY total DESC
+        """).fetchall()
+    except Exception:
+        categories = []
+        
+    # Recent activity
+    try:
+        recent_activity = conn.execute("""
+            SELECT 
+                step_index,
+                timestamp,
+                category,
+                user_tokens,
+                system_tokens,
+                completion_tokens,
+                thinking_tokens,
+                (user_tokens + system_tokens + completion_tokens + thinking_tokens) as total_tokens
+            FROM token_usage
+            ORDER BY step_index DESC
+            LIMIT 15
+        """).fetchall()
+    except Exception:
+        recent_activity = []
+        
+    conn.close()
+    
+    return render_template(
+        'admin_tokens.html',
+        grand_total=int(grand_total),
+        user_tot=int(user_tot),
+        sys_tot=int(sys_tot),
+        comp_tot=int(comp_tot),
+        think_tot=int(think_tot),
+        categories=categories,
+        recent_activity=recent_activity
+    )
+
+@app.route('/admin/tokens/data')
+def admin_tokens_data():
+    if not check_admin_auth():
+        return jsonify({'error': 'Unauthorized'}), 401
+        
+    conn = get_db_connection()
+    try:
+        rows = conn.execute("""
+            SELECT 
+                substr(timestamp, 1, 10) as date_val,
+                category,
+                SUM(user_tokens) as user_tot,
+                SUM(system_tokens) as system_tot,
+                SUM(completion_tokens) as completion_tot,
+                SUM(thinking_tokens) as thinking_tot
+            FROM token_usage
+            GROUP BY date_val, category
+            ORDER BY date_val ASC
+        """).fetchall()
+    except Exception as e:
+        rows = []
+        
+    conn.close()
+    
+    data = []
+    for r in rows:
+        data.append({
+            'date': r['date_val'],
+            'category': r['category'],
+            'user_tokens': r['user_tot'] or 0,
+            'system_tokens': r['system_tot'] or 0,
+            'completion_tokens': r['completion_tot'] or 0,
+            'thinking_tokens': r['thinking_tot'] or 0,
+            'total_tokens': (r['user_tot'] or 0) + (r['system_tot'] or 0) + (r['completion_tot'] or 0) + (r['thinking_tot'] or 0)
+        })
+        
+    return jsonify(data)
+
 
 # Custom 404 Handler
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('base.html', active_page='none'), 404
+
+init_notification_scheduler(app)
 
 if __name__ == '__main__':
     app.run(debug=True, use_reloader=False, host='127.0.0.1', port=5050)

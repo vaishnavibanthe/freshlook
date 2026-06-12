@@ -10495,3 +10495,17 @@ body.dark-hero-nav .header.scrolled-past-hero .nav-link .fa-chevron-down {
     color: var(--text-tertiary) !important;
 }
 
+/* Public Forms Validation UI Styles */
+.is-invalid {
+    border-color: #dc2626 !important;
+    box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.2) !important;
+}
+
+.validation-error-msg {
+    color: #dc2626 !important;
+    font-size: 12px !important;
+    display: block !important;
+    margin-top: 4px !important;
+    font-weight: 500 !important;
+}
+

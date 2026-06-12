@@ -1,0 +1,536 @@
+{% extends 'crm/base_crm.html' %}
+
+{% block title %}{{ contact.full_name }} | Workbench Calling | ThinkArtha CRM{% endblock %}
+
+{% block content %}
+<style>
+    .workbench-summary-bar {
+        background-color: var(--bg-card);
+        border: 1px solid var(--border-crm);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+    
+    .workbench-profile {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+    
+    .workbench-avatar {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        font-weight: bold;
+        color: #ffffff;
+    }
+
+    .workbench-names h2 {
+        font-size: 18px;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .workbench-names span {
+        font-size: 13px;
+        color: var(--text-crm-secondary);
+    }
+    
+    .workbench-actions-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        margin-bottom: 24px;
+    }
+    
+    @media (max-width: 992px) {
+        .workbench-actions-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    /* Tabs Control */
+    .tab-navigation {
+        display: flex;
+        border-bottom: 1px solid var(--border-crm);
+        margin-bottom: 24px;
+        gap: 6px;
+        overflow-x: auto;
+    }
+    
+    .tab-btn {
+        background: none;
+        border: none;
+        padding: 12px 18px;
+        color: var(--text-crm-secondary);
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        position: relative;
+        transition: color 0.2s ease;
+        white-space: nowrap;
+    }
+    
+    .tab-btn:hover {
+        color: #ffffff;
+    }
+    
+    .tab-btn.active {
+        color: var(--accent-cyan);
+    }
+    
+    .tab-btn.active::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 2.5px;
+        background-color: var(--accent-cyan);
+        border-radius: 2px;
+    }
+    
+    .tab-pane {
+        display: none;
+    }
+    
+    .tab-pane.active {
+        display: block;
+    }
+
+    .call-history-log {
+        padding: 12px;
+        background-color: rgba(22, 45, 80, 0.15);
+        border: 1px solid var(--border-crm);
+        border-radius: 8px;
+        margin-bottom: 12px;
+    }
+</style>
+
+<!-- Summary Header Bar -->
+<div class="workbench-summary-bar">
+    <div class="workbench-profile">
+        <div class="workbench-avatar">{{ contact.full_name[0]|upper }}</div>
+        <div class="workbench-names">
+            <h2>
+                {{ contact.full_name }}
+                <span style="font-size: 11px; padding: 2px 8px; border-radius: 10px; background-color: rgba(6, 182, 212, 0.15); color: var(--accent-cyan);">{{ contact.dialing_status }}</span>
+            </h2>
+            <span>{{ contact.company or '-' }} &bull; {{ contact.job_title or 'No Job Mapped' }} &bull; {{ contact.geography or '-' }}</span>
+        </div>
+    </div>
+    
+    <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+        <div class="meddic-widget">
+            <div class="meddic-widget-score" style="font-size: 18px; color: #ffffff;">{{ contact.phone or '-' }}</div>
+            <div class="meddic-widget-label"><i class="fas fa-phone-alt"></i> Phone Number</div>
+        </div>
+        <div class="meddic-widget" style="border-left-color: #3b82f6;">
+            <div class="meddic-widget-score" style="font-size: 18px; color: #ffffff;">{{ contact.email }}</div>
+            <div class="meddic-widget-label"><i class="fas fa-envelope"></i> Email Address</div>
+        </div>
+    </div>
+    
+    <div>
+        <a href="{{ url_for('crm.telecrm_dialing_workbench') }}" class="btn-crm btn-crm-secondary">
+            <i class="fas fa-arrow-left"></i> Workbench List
+        </a>
+    </div>
+</div>
+
+<!-- Primary Action Forms Grid -->
+<div class="workbench-actions-grid">
+    
+    <!-- 1. Log Disposition -->
+    <div class="crm-card" style="margin-bottom: 0;">
+        <div class="crm-card-title">1. Log Call Disposition</div>
+        <form action="{{ url_for('crm.log_call_disposition', contact_id=contact.id) }}" method="POST">
+            <div class="form-group">
+                <label class="form-label">Call Disposition Status</label>
+                <select name="disposition" class="form-control" required>
+                    <option value="" disabled selected>-- Select Outcome --</option>
+                    <option value="Dialed - No Answer">Dialed - No Answer</option>
+                    <option value="Dialed - Busy">Dialed - Busy</option>
+                    <option value="Dialed - Wrong Number">Dialed - Wrong Number</option>
+                    <option value="Dialed - Invalid Number">Dialed - Invalid Number</option>
+                    <option value="Connected - Gatekeeper">Connected - Gatekeeper</option>
+                    <option value="Connected - Relevant Person Not Available">Connected - Relevant Person Not Available</option>
+                    <option value="Spoken - Not Interested">Spoken - Not Interested</option>
+                    <option value="Spoken - Call Back Later">Spoken - Call Back Later</option>
+                    <option value="Spoken - Interested">Spoken - Interested</option>
+                    <option value="Spoken - Information Requested">Spoken - Information Requested</option>
+                    <option value="Do Not Contact">Do Not Contact</option>
+                    <option value="Duplicate">Duplicate</option>
+                </select>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div class="form-group">
+                    <label class="form-label">Prospect Interest Level</label>
+                    <select name="interest_level" class="form-control">
+                        <option value="Low">Low</option>
+                        <option value="Medium">Medium</option>
+                        <option value="High">High</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Next Call Date (Optional)</label>
+                    <input type="date" name="next_followup_date" class="form-control">
+                </div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div class="form-group">
+                    <label class="form-label">Map Solution Discussed</label>
+                    <select name="product_solution_id" class="form-control">
+                        <option value="">None</option>
+                        {% for p in products %}
+                        <option value="{{ p.id }}" {% if contact.product_solution_id == p.id %}selected{% endif %}>{{ p.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Map Partner Mapped</label>
+                    <select name="partner_id" class="form-control">
+                        <option value="">None</option>
+                        {% for pt in partners %}
+                        <option value="{{ pt.id }}" {% if contact.partner_id == pt.id %}selected{% endif %}>{{ pt.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Call Outcome details / Comments</label>
+                <textarea name="outcome_note" class="form-control" rows="2" placeholder="Detail caller notes, response notes..."></textarea>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                <label class="checkbox-label" style="font-size: 12px;">
+                    <input type="checkbox" name="contact_validated" value="yes" {% if contact.contact_validation_status == 'Validated' %}checked{% endif %}>
+                    Mark contact validated
+                </label>
+                <button type="submit" class="btn-crm btn-crm-primary">Save Outcome</button>
+            </div>
+        </form>
+    </div>
+    
+    <!-- 2. Meetings & SQL Handover -->
+    <div style="display: flex; flex-direction: column; gap: 20px;">
+        
+        <!-- Meeting lifecycle -->
+        <div class="crm-card" style="margin-bottom: 0; flex: 1;">
+            <div class="crm-card-title">2. Client Meeting Lifecycle</div>
+            
+            {% if contact.meeting_status == 'Not Required' or contact.meeting_status == 'To Be Scheduled' or contact.meeting_status == 'Cancelled' %}
+            <form action="{{ url_for('crm.telecrm_schedule_meeting', contact_id=contact.id) }}" method="POST">
+                <div class="form-group">
+                    <label class="form-label">Schedule Client Meeting Date/Time</label>
+                    <input type="datetime-local" name="meeting_scheduled_at" class="form-control" required>
+                </div>
+                <button type="submit" class="btn-crm btn-crm-primary" style="width: 100%;">Schedule Meeting</button>
+            </form>
+            
+            {% elif contact.meeting_status == 'Scheduled' %}
+            <form action="{{ url_for('crm.telecrm_complete_meeting', contact_id=contact.id) }}" method="POST">
+                <div style="font-size: 13px; color: var(--text-crm-secondary); margin-bottom: 12px; background: rgba(16, 185, 129, 0.05); padding: 8px; border-radius: 6px; border: 1px solid rgba(16, 185, 129, 0.15);">
+                    <i class="fas fa-calendar-check" style="color: #10b981; margin-right: 6px;"></i> Meeting booked for: <strong>{{ contact.meeting_scheduled_at }}</strong>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Minutes of Meeting (MOM)</label>
+                    <textarea name="mom" class="form-control" rows="2" placeholder="Record discussion details..." required></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Business Urgencies / Pain Points Mapped</label>
+                    <input type="text" name="notes" class="form-control" placeholder="Target client problems..." required>
+                </div>
+                <button type="submit" class="btn-crm btn-crm-primary" style="width: 100%;">Complete & Save MOM</button>
+            </form>
+            
+            {% else %}
+            <!-- Meeting completed -->
+            <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); padding: 15px; border-radius: 8px; text-align: center;">
+                <h4 style="color: #10b981; margin-bottom: 6px;"><i class="fas fa-check-double"></i> Meeting Completed</h4>
+                <p style="font-size: 12px; color: var(--text-crm-secondary);">MOM: "{{ contact.mom }}"</p>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- SQL Handoff -->
+        <div class="crm-card" style="margin-bottom: 0;">
+            <div class="crm-card-title">3. Handover SQL Opportunity</div>
+            
+            {% if contact.sql_status == 'Not SQL' %}
+            <form action="{{ url_for('crm.telecrm_mark_sql', contact_id=contact.id) }}" method="POST">
+                <div class="form-group">
+                    <label class="form-label">Suggested Sales Rep (Owner)</label>
+                    <select name="sales_manager_id" class="form-control" required>
+                        {% for mgr in managers %}
+                        <option value="{{ mgr.id }}">{{ mgr.name }} ({{ mgr.role }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Handoff summary remarks</label>
+                    <input type="text" name="notes" class="form-control" placeholder="SQL notes for rep...">
+                </div>
+                <button type="submit" class="btn-crm btn-crm-primary" style="width: 100%;" {% if contact.meeting_status != 'Completed' %}disabled title="Meeting must be Completed first" style="opacity: 0.6;"{% endif %}>
+                    Submit SQL Review
+                </button>
+            </form>
+            
+            {% elif contact.sql_status == 'SQL Review' %}
+            <form action="{{ url_for('crm.telecrm_convert_opportunity', contact_id=contact.id) }}" method="POST">
+                <div style="font-size: 13px; color: var(--text-crm-secondary); margin-bottom: 12px; background: rgba(139, 92, 246, 0.05); padding: 8px; border-radius: 6px; border: 1px solid rgba(139, 92, 246, 0.15);">
+                    <i class="fas fa-random" style="color: #8b5cf6; margin-right: 6px;"></i> Handover requested. Notes: "{{ contact.notes }}"
+                </div>
+                {% if current_crm_user['role'] in ('Platform Admin', 'Group Admin', 'Telecaller Manager') %}
+                <div class="form-group">
+                    <label class="form-label">Sales Rep (Owner)</label>
+                    <select name="sales_manager_id" class="form-control">
+                        {% for mgr in managers %}
+                        <option value="{{ mgr.id }}">{{ mgr.name }} ({{ mgr.role }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn-crm btn-crm-primary" style="width: 100%; background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+                    Approve & Convert to Opportunity
+                </button>
+                {% else %}
+                <p style="font-size: 11px; text-align: center; color: var(--text-crm-muted);">Waiting for manager/admin approval and handoff commit.</p>
+                {% endif %}
+            </form>
+            
+            {% else %}
+            <!-- Converted -->
+            <div style="background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.2); padding: 15px; border-radius: 8px; text-align: center; display: flex; flex-direction: column; gap: 10px;">
+                <h4 style="color: #8b5cf6;"><i class="fas fa-handshake"></i> Converted to Opportunity</h4>
+                {% if contact.converted_opportunity_id %}
+                <a href="{{ url_for('crm.crm_opportunity_detail', opp_id=contact.converted_opportunity_id) }}" class="btn-crm btn-crm-secondary" style="padding: 4px 10px; font-size: 11px; align-self: center;">
+                    View CRM Opportunity
+                </a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+        
+    </div>
+
+</div>
+
+<!-- Lower tab lists -->
+<div class="tab-navigation">
+    <button class="tab-btn active" onclick="switchTab(this, 'timeline')">Dialing Timeline ({{ timeline|length }})</button>
+    <button class="tab-btn" onclick="switchTab(this, 'history')">Attempts Log ({{ call_logs|length }})</button>
+    <button class="tab-btn" onclick="switchTab(this, 'emails')">Emails Logs ({{ email_logs|length }})</button>
+    <button class="tab-btn" onclick="switchTab(this, 'email-composer')">Send Email</button>
+    <button class="tab-btn" onclick="switchTab(this, 'profile')">Edit Profile & Custom Fields</button>
+</div>
+
+<!-- TIMELINE -->
+<div id="tab-timeline" class="tab-pane active">
+    <div class="crm-card">
+        <ul class="timeline-list">
+            {% for act in timeline %}
+            <li class="timeline-item">
+                <div class="timeline-marker"></div>
+                <div class="timeline-header">
+                    <span>by <strong>{{ act.user_name or 'System Log' }}</strong></span>
+                    <span>{{ act.created_at }}</span>
+                </div>
+                <div class="timeline-title">{{ act.title }}</div>
+                {% if act.description %}
+                <div class="timeline-body">{{ act.description }}</div>
+                {% endif %}
+            </li>
+            {% else %}
+            <li style="color: var(--text-crm-muted); text-align: center; list-style: none; padding: 20px;">No timeline entries recorded.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<!-- CALL ATTEMPTS HISTORY -->
+<div id="tab-history" class="tab-pane">
+    <div class="crm-card">
+        {% for row in call_logs %}
+        <div class="call-history-log">
+            <div style="display: flex; justify-content: space-between; font-size: 11.5px; color: var(--text-crm-secondary); margin-bottom: 6px;">
+                <span>Attempted: <strong>{{ row.call_datetime }}</strong></span>
+                <span class="dialing-badge dialed" style="font-size: 9px; padding: 1px 4px;">{{ row.disposition }}</span>
+            </div>
+            <p style="font-size: 13px; color: #ffffff;">{{ row.outcome_note or 'No notes logged.' }}</p>
+            {% if row.next_followup_date %}
+            <div style="font-size: 11px; color: var(--text-crm-secondary); margin-top: 4px;">
+                Next follow up: <strong>{{ row.next_followup_date }}</strong>
+            </div>
+            {% endif %}
+        </div>
+        {% else %}
+        <div style="color: var(--text-crm-muted); text-align: center; padding: 20px;">No calls attempted yet.</div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- EMAILS LOGS -->
+<div id="tab-emails" class="tab-pane">
+    <div class="crm-card">
+        {% for mail in email_logs %}
+        <div class="call-history-log">
+            <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-crm-secondary); margin-bottom: 6px;">
+                <span>To: {{ mail.to_email }}</span>
+                <span>{{ mail.sent_at }}</span>
+            </div>
+            <div style="font-weight: 600; font-size: 13px; color: #ffffff; margin-bottom: 4px;">{{ mail.subject }}</div>
+            <p style="font-size: 12px; color: var(--text-crm-secondary); font-family: monospace; background-color: rgba(0,0,0,0.2); padding: 8px; border-radius: 4px; white-space: pre-wrap;">{{ mail.body }}</p>
+        </div>
+        {% else %}
+        <div style="color: var(--text-crm-muted); text-align: center; padding: 20px;">No email communications logged.</div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- SEND EMAIL COMPOSER -->
+<div id="tab-email-composer" class="tab-pane">
+    <div class="crm-card">
+        <form action="{{ url_for('crm.telecrm_send_email', contact_id=contact.id) }}" method="POST">
+            <div class="form-group">
+                <label class="form-label">Recipient Email</label>
+                <input type="email" name="to_email" class="form-control" value="{{ contact.email }}" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Cc (Optional)</label>
+                <input type="text" name="cc" class="form-control">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Subject</label>
+                <input type="text" name="subject" class="form-control" placeholder="Introduction - ThinkArtha Services" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Plain Text Message Body</label>
+                <textarea name="body" class="form-control" rows="6" placeholder="Dear {{ contact.first_name or contact.full_name }},
+
+I'm writing to schedule a brief call..." required></textarea>
+            </div>
+            <button type="submit" class="btn-crm btn-crm-primary">
+                <i class="fas fa-paper-plane"></i> Send plain text email
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- PROFILE EDIT -->
+<div id="tab-profile" class="tab-pane">
+    <div class="crm-card">
+        <div class="crm-card-title">Edit Contact Profile & Custom Properties</div>
+        <form action="{{ url_for('crm.update_telecrm_contact_profile', contact_id=contact.id) }}" method="POST">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px;">
+                <div class="form-group">
+                    <label class="form-label">First Name</label>
+                    <input type="text" name="first_name" class="form-control" value="{{ contact.first_name or '' }}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Last Name</label>
+                    <input type="text" name="last_name" class="form-control" value="{{ contact.last_name or '' }}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Company Name</label>
+                    <input type="text" name="company" class="form-control" value="{{ contact.company or '' }}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" name="email" class="form-control" value="{{ contact.email }}" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Phone Number</label>
+                    <input type="text" name="phone" class="form-control" value="{{ contact.phone or '' }}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Alternate Phone</label>
+                    <input type="text" name="alternate_phone" class="form-control" value="{{ contact.alternate_phone or '' }}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Designation / Job Title</label>
+                    <input type="text" name="job_title" class="form-control" value="{{ contact.job_title or '' }}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">City / Geography</label>
+                    <input type="text" name="geography" class="form-control" value="{{ contact.geography or '' }}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Country</label>
+                    <input type="text" name="country" class="form-control" value="{{ contact.country or '' }}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Industry</label>
+                    <input type="text" name="industry" class="form-control" value="{{ contact.industry or '' }}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Company Website</label>
+                    <input type="text" name="website" class="form-control" value="{{ contact.website or '' }}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">LinkedIn URL</label>
+                    <input type="text" name="linkedin_profile" class="form-control" value="{{ contact.linkedin_profile or '' }}">
+                </div>
+            </div>
+            
+            {% if custom_fields %}
+            <div style="border-top: 1px solid var(--border-crm); margin-top: 24px; padding-top: 20px;">
+                <h3 style="font-size: 14px; color: var(--accent-cyan); margin-bottom: 16px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Custom Fields</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px;">
+                    {% for field in custom_fields %}
+                    <div class="form-group">
+                        <label class="form-label">{{ field.field_label }}</label>
+                        {% if field.field_type == 'select' %}
+                        <select name="cf_{{ field.field_name }}" class="form-control">
+                            <option value="">-- Select --</option>
+                            {% for option in field.options.split(',') %}
+                            <option value="{{ option.strip() }}" {% if custom_values.get(field.id) == option.strip() %}selected{% endif %}>{{ option.strip() }}</option>
+                            {% endfor %}
+                        </select>
+                        {% elif field.field_type == 'number' %}
+                        <input type="number" step="any" name="cf_{{ field.field_name }}" class="form-control" value="{{ custom_values.get(field.id) or '' }}">
+                        {% else %}
+                        <input type="text" name="cf_{{ field.field_name }}" class="form-control" value="{{ custom_values.get(field.id) or '' }}">
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <div style="border-top: 1px solid var(--border-crm); padding-top: 20px; display: flex; gap: 12px; margin-top: 20px; justify-content: flex-end;">
+                <button type="submit" class="btn-crm btn-crm-primary">Save Profile & Custom Fields</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Tab switching engine
+    function switchTab(btn, tabName) {
+        const panes = document.querySelectorAll('.tab-pane');
+        panes.forEach(pane => pane.classList.remove('active'));
+        
+        const buttons = document.querySelectorAll('.tab-btn');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        
+        document.getElementById('tab-' + tabName).classList.add('active');
+        btn.classList.add('active');
+    }
+</script>
+{% endblock %}

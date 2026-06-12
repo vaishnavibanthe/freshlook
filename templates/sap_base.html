@@ -11,25 +11,25 @@
                     <i class="fas fa-gear"></i> Overview
                 </a>
                 <a href="/solutions/sap/sap-data-integration" class="sap-subnav-link {% if slug == 'sap-data-integration' %}active{% endif %}">
-                    Data Integration
+                    <i class="fas fa-circle-nodes"></i> Data Integration
                 </a>
                 <a href="/solutions/sap/sap-data-migration" class="sap-subnav-link {% if slug == 'sap-data-migration' %}active{% endif %}">
-                    Data Migration
+                    <i class="fas fa-truck-fast"></i> Data Migration
                 </a>
                 <a href="/solutions/sap/clean-data-for-sap" class="sap-subnav-link {% if slug == 'clean-data-for-sap' %}active{% endif %}">
-                    Clean Data
+                    <i class="fas fa-broom"></i> Clean Data
                 </a>
                 <a href="/solutions/sap/advanced-data-matching" class="sap-subnav-link {% if slug == 'advanced-data-matching' %}active{% endif %}">
-                    Data Matching
+                    <i class="fas fa-copy"></i> Data Matching
                 </a>
                 <a href="/solutions/sap/data-reconciliation" class="sap-subnav-link {% if slug == 'data-reconciliation' %}active{% endif %}">
-                    Reconciliation
+                    <i class="fas fa-scale-balanced"></i> Reconciliation
                 </a>
                 <a href="/solutions/sap/change-data-capture" class="sap-subnav-link {% if slug == 'change-data-capture' %}active{% endif %}">
-                    Change Data Capture
+                    <i class="fas fa-bolt"></i> Change Data Capture
                 </a>
                 <a href="/solutions/sap/sap-test-data-management" class="sap-subnav-link {% if slug == 'sap-test-data-management' %}active{% endif %}">
-                    Test Data
+                    <i class="fas fa-shield-halved"></i> Test Data
                 </a>
             </div>
         </div>
@@ -51,55 +51,68 @@
 }
 
 .sap-subnav-wrapper {
-    background: rgba(15, 23, 42, 0.85);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background: #07111f;
+    border-bottom: 1px solid rgba(6, 182, 212, 0.18);
     position: sticky;
     top: 0;
     z-index: 100;
     overflow-x: auto;
-    scrollbar-width: none; /* Firefox */
+    scrollbar-width: none;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
 }
 .sap-subnav-wrapper::-webkit-scrollbar {
-    display: none; /* Safari/Chrome */
+    display: none;
 }
 
 .sap-subnav {
     display: flex;
-    gap: 12px;
+    gap: 4px;
     align-items: center;
-    padding: 12px 0;
+    padding: 10px 0;
     white-space: nowrap;
 }
 
 .sap-subnav-link {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--text-secondary);
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #94a3b8;
     text-decoration: none;
-    padding: 8px 16px;
-    border-radius: 20px;
+    padding: 7px 14px;
+    border-radius: 8px;
     border: 1px solid transparent;
-    transition: all 0.3s ease;
+    transition: all 0.25s ease;
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    letter-spacing: 0.01em;
 }
 
 .sap-subnav-link i {
     font-size: 11px;
+    opacity: 0.75;
 }
 
 .sap-subnav-link:hover {
-    color: var(--text-primary);
-    background: rgba(255, 255, 255, 0.04);
+    color: #e2e8f0;
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+.sap-subnav-link:hover i {
+    opacity: 1;
+    color: var(--sap-cyan);
 }
 
 .sap-subnav-link.active {
-    color: #f8fafc;
-    background: linear-gradient(135deg, var(--sap-blue), var(--sap-cyan));
-    border-color: rgba(6, 182, 212, 0.2);
-    box-shadow: 0 4px 12px rgba(6, 182, 212, 0.15);
+    color: #ffffff;
+    background: linear-gradient(135deg, var(--sap-blue), #0891b2);
+    border-color: rgba(6, 182, 212, 0.35);
+    box-shadow: 0 2px 12px rgba(6, 182, 212, 0.2);
+}
+
+.sap-subnav-link.active i {
+    opacity: 1;
+    color: #bae6fd;
 }
 </style>
 {% endblock %}

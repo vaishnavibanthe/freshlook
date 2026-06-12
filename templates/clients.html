@@ -1,0 +1,316 @@
+{% extends "base.html" %}
+
+{% block title %}Our Clients | Enterprise AI & Data Services Provider{% endblock %}
+
+{% block extra_meta %}
+<meta name="description" content="Artha Solutions works with global enterprises across BFSI, Healthcare, Retail, Manufacturing, and other verticals to build AI-ready data foundations and modernization strategy.">
+<meta property="og:title" content="Our Clients - Artha Solutions">
+<meta property="og:description" content="Explore the global clients and industries powered by Artha Solutions' data governance and AI platform engineering.">
+{% endblock %}
+
+{% block content %}
+<style>
+    /* Clients Page Custom Styles using existing theme variables */
+    .clients-hero {
+        position: relative;
+        padding: 90px 0 70px;
+        background: var(--bg-secondary);
+        border-bottom: 1px solid var(--border-color);
+        text-align: center;
+        overflow: hidden;
+    }
+    .clients-hero::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -20%;
+        width: 140%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(124, 58, 237, 0.08) 0%, rgba(217, 70, 239, 0.03) 60%, transparent 100%);
+        pointer-events: none;
+        z-index: 0;
+    }
+    .clients-hero .container {
+        position: relative;
+        z-index: 1;
+        max-width: 900px;
+    }
+    .clients-hero .sub-label {
+        display: inline-block;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        color: var(--accent-blue);
+        text-transform: uppercase;
+        margin-bottom: 16px;
+        background: rgba(124, 58, 237, 0.06);
+        padding: 6px 16px;
+        border-radius: 50px;
+        border: 1px solid rgba(124, 58, 237, 0.1);
+    }
+    .clients-hero h1 {
+        font-family: var(--font-heading);
+        font-size: 44px;
+        font-weight: 800;
+        color: var(--text-primary);
+        line-height: 1.2;
+        margin-bottom: 20px;
+    }
+    .clients-hero p {
+        font-size: 16px;
+        color: var(--text-secondary);
+        line-height: 1.6;
+        margin: 0;
+    }
+    
+    .clients-filter-section {
+        padding: 50px 0 90px;
+        background: var(--bg-primary);
+    }
+    .filter-tab-wrapper {
+        margin-bottom: 45px;
+        position: sticky;
+        top: 80px; /* stick just below standard header */
+        z-index: 10;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        padding: 8px;
+        border-radius: var(--border-radius-md);
+        border: 1px solid var(--border-color);
+        box-shadow: 0 10px 30px -10px rgba(124, 58, 237, 0.03);
+    }
+    .filter-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 6px;
+    }
+    .filter-btn {
+        font-family: var(--font-body);
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        background: transparent;
+        border: 1px solid transparent;
+        padding: 10px 16px;
+        border-radius: var(--border-radius-sm);
+        cursor: pointer;
+        transition: all var(--transition-fast);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .filter-btn:hover {
+        color: var(--accent-blue);
+        background: rgba(124, 58, 237, 0.04);
+    }
+    .filter-btn.active {
+        color: #ffffff;
+        background: var(--accent-blue);
+        border-color: var(--accent-blue);
+        box-shadow: 0 4px 12px rgba(124, 58, 237, 0.2);
+    }
+    .count-badge {
+        font-size: 10px;
+        font-weight: 700;
+        padding: 2px 6px;
+        border-radius: 20px;
+        background: var(--bg-tertiary);
+        color: var(--text-tertiary);
+        transition: all var(--transition-fast);
+    }
+    .filter-btn.active .count-badge {
+        background: rgba(255, 255, 255, 0.2);
+        color: #ffffff;
+    }
+    
+    .category-pane {
+        display: none;
+        opacity: 0;
+        transform: translateY(15px);
+        transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .category-pane.active {
+        display: block;
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    .clients-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 20px;
+    }
+    .client-card {
+        background: var(--glass-bg);
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius-md);
+        padding: 20px;
+        text-align: center;
+        transition: all var(--transition-normal);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        box-shadow: var(--card-shadow);
+    }
+    .client-card:hover {
+        transform: translateY(-5px);
+        border-color: rgba(124, 58, 237, 0.2);
+        box-shadow: var(--hover-shadow);
+        background: #ffffff;
+    }
+    .logo-wrapper {
+        width: 100%;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #ffffff;
+        border-radius: var(--border-radius-sm);
+        padding: 10px;
+        box-shadow: inset 0 2px 8px rgba(0,0,0,0.01);
+        border: 1px solid rgba(0, 0, 0, 0.02);
+    }
+    .logo-wrapper img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        filter: grayscale(100%);
+        opacity: 0.85;
+        transition: all var(--transition-normal);
+    }
+    .client-card:hover .logo-wrapper img {
+        filter: grayscale(0%);
+        opacity: 1;
+    }
+    .client-name {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-primary);
+        word-break: break-word;
+        transition: color var(--transition-fast);
+        min-height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1.3;
+    }
+    .client-card:hover .client-name {
+        color: var(--accent-blue);
+    }
+    
+    @media (max-width: 768px) {
+        .clients-hero {
+            padding: 60px 0 40px;
+        }
+        .clients-hero h1 {
+            font-size: 32px;
+        }
+        .filter-tab-wrapper {
+            overflow-x: auto;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+            padding: 6px;
+            margin-bottom: 30px;
+            top: 70px;
+        }
+        .filter-tabs {
+            flex-wrap: nowrap;
+            justify-content: flex-start;
+        }
+        .filter-btn {
+            flex-shrink: 0;
+            padding: 8px 14px;
+            font-size: 12px;
+        }
+        .clients-grid {
+            grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
+            gap: 12px;
+        }
+        .client-card {
+            padding: 14px;
+            gap: 10px;
+        }
+        .logo-wrapper {
+            height: 60px;
+        }
+        .client-name {
+            font-size: 11px;
+            min-height: 30px;
+        }
+    }
+</style>
+
+<section class="clients-hero">
+    <div class="container">
+        <span class="sub-label">Our Clients & Partners</span>
+        <h1>Trusted by Enterprise Leaders</h1>
+        <p>Deploying governed data strategies, modern master data configurations, and production-ready AI solutions across global verticals.</p>
+    </div>
+</section>
+
+<section class="clients-filter-section">
+    <div class="container">
+        <div class="filter-tab-wrapper">
+            <div class="filter-tabs" id="clients-tabs">
+                {% for category, clients in clients_data.items() %}
+                    <button class="filter-btn {% if loop.first %}active{% endif %}" data-category="{{ category|replace('&', 'and')|replace('/', 'or')|replace(' ', '-')|lower }}">
+                        {{ category }}
+                        <span class="count-badge">{{ clients|length }}</span>
+                    </button>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <div class="clients-grid-container">
+            {% for category, clients in clients_data.items() %}
+                <div class="category-pane {% if loop.first %}active{% endif %}" id="pane-{{ category|replace('&', 'and')|replace('/', 'or')|replace(' ', '-')|lower }}" style="{% if loop.first %}display: block; opacity: 1; transform: translateY(0);{% else %}display: none;{% endif %}">
+                    <div class="clients-grid">
+                        {% for client in clients %}
+                            <div class="client-card">
+                                <div class="logo-wrapper">
+                                    <img src="{{ url_for('static', filename='img/clients/' + client.logo) }}" alt="{{ client.name }} Logo" loading="lazy">
+                                </div>
+                                <span class="client-name">{{ client.name }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const tabs = document.querySelectorAll('#clients-tabs .filter-btn');
+        const panes = document.querySelectorAll('.category-pane');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetCategory = tab.getAttribute('data-category');
+                
+                // Update active tab
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                // Update active pane
+                panes.forEach(pane => {
+                    if (pane.id === `pane-${targetCategory}`) {
+                        pane.style.display = 'block';
+                        // Force layout reflow
+                        pane.offsetHeight;
+                        pane.classList.add('active');
+                    } else {
+                        pane.classList.remove('active');
+                        pane.style.display = 'none';
+                    }
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}

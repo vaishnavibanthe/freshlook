@@ -1,0 +1,614 @@
+{
+    "BFSI": [
+        {
+            "name": "Danamon",
+            "logo": "Danamon.png"
+        },
+        {
+            "name": "Lincolin Finance",
+            "logo": "Lincoln-Financial-Logo.png"
+        },
+        {
+            "name": "Homeserve",
+            "logo": "Homeserve_logo.svg.png"
+        },
+        {
+            "name": "Mandiri",
+            "logo": "Mandiri_logo_2016.svg"
+        },
+        {
+            "name": "Citi",
+            "logo": "Citi.svg.png"
+        },
+        {
+            "name": "Great Eastern",
+            "logo": "Great Eastern.png"
+        },
+        {
+            "name": "Td Bank",
+            "logo": "TD Bank.svg"
+        },
+        {
+            "name": "Mt Bank",
+            "logo": "M&T_Bank_wordmark.svg"
+        },
+        {
+            "name": "Bfm",
+            "logo": "BF&M.png"
+        },
+        {
+            "name": "American Express",
+            "logo": "American Expresss.png"
+        },
+        {
+            "name": "Bfi",
+            "logo": "BFI.png"
+        },
+        {
+            "name": "Bank Of America",
+            "logo": "Bank of America.png"
+        },
+        {
+            "name": "Visa",
+            "logo": "Visa.png"
+        },
+        {
+            "name": "Topa",
+            "logo": "TOPA.png"
+        },
+        {
+            "name": "Piramal",
+            "logo": "Piramal.png"
+        },
+        {
+            "name": "Sbi Card",
+            "logo": "SBICARD.NS_BIG-26943b4e.png"
+        },
+        {
+            "name": "Hero Fincorp",
+            "logo": "Herofincorp.png"
+        },
+        {
+            "name": "Cams",
+            "logo": "CAMS.png"
+        },
+        {
+            "name": "Tata Capital",
+            "logo": "Tata-Capital-Logo.png"
+        },
+        {
+            "name": "Smi",
+            "logo": "SMI.png"
+        },
+        {
+            "name": "Risk Grid",
+            "logo": "Riskgrid_Technologies.png"
+        },
+        {
+            "name": "Financial Engines",
+            "logo": "Financial Engines.png"
+        },
+        {
+            "name": "Pegadaian",
+            "logo": "Pegadaian_new_logo.png"
+        },
+        {
+            "name": "Adira",
+            "logo": "Adira.png"
+        },
+        {
+            "name": "Security Bank",
+            "logo": "Security_Bank_Logo_1.svg.png"
+        },
+        {
+            "name": "Generali",
+            "logo": "Generali Thailand.MI_BIG.svg"
+        },
+        {
+            "name": "Mercury",
+            "logo": "Mercury Insurance.png"
+        },
+        {
+            "name": "Chaitanya",
+            "logo": "Chaitanya.png"
+        },
+        {
+            "name": "Commonwealth",
+            "logo": "commonwealth.png"
+        },
+        {
+            "name": "Fullerton",
+            "logo": "Fullerton.png"
+        },
+        {
+            "name": "Indianexmin Bank",
+            "logo": "India Exim_Bank.png"
+        },
+        {
+            "name": "Karnataka Bank",
+            "logo": "karnataka-bank-logo.png"
+        },
+        {
+            "name": "Bni",
+            "logo": "BNI.png"
+        },
+        {
+            "name": "State Street",
+            "logo": "State street.png"
+        },
+        {
+            "name": "Scotiabank",
+            "logo": "Scotiabank-logo.png"
+        },
+        {
+            "name": "Avalara",
+            "logo": "Avalara-logo.png"
+        },
+        {
+            "name": "Bussan Auto Finance",
+            "logo": "Bussan-Auto-Finance-logo.png"
+        },
+        {
+            "name": "Amp Bank",
+            "logo": "amp bank.png"
+        },
+        {
+            "name": "Mt Bank Seeklogo",
+            "logo": "mt-bank-seeklogo.ai"
+        }
+    ],
+    "Healthcare & Pharma": [
+        {
+            "name": "Fastmed",
+            "logo": "FastMed_logo-TM_RGB_color.svg"
+        },
+        {
+            "name": "Vha",
+            "logo": "VHA Expertise for your every day.jpg"
+        },
+        {
+            "name": "Bluecross",
+            "logo": "blue-cross-blue-shield-1.svg"
+        },
+        {
+            "name": "Drg",
+            "logo": "DRG decision-resources-group-drg-logo-vector.svg"
+        },
+        {
+            "name": "Healthtrust",
+            "logo": "healthtrust-logo-vector.png"
+        },
+        {
+            "name": "Avadynehealth",
+            "logo": "Avadyne_health.png"
+        },
+        {
+            "name": "Healthcare Partner",
+            "logo": "HCPIPA.png"
+        },
+        {
+            "name": "Symphony",
+            "logo": "Symphony.png"
+        },
+        {
+            "name": "St. Jude Childrens Research Hospital",
+            "logo": "St.-Jude-Logo.png"
+        },
+        {
+            "name": "Bioclinica",
+            "logo": "bioclinica-logo-vector.svg"
+        },
+        {
+            "name": "Laheyhealth",
+            "logo": "lahey_health.png"
+        },
+        {
+            "name": "Dmd",
+            "logo": "DMD-logo-blue-and-silver-1024x330.png"
+        },
+        {
+            "name": "Centerlight",
+            "logo": "Centerlight Health care.png"
+        },
+        {
+            "name": "Caritas Nigeria",
+            "logo": "CCFN Caritas Nigeria.png"
+        },
+        {
+            "name": "Prahelathsciences",
+            "logo": "Pra Health Sciences.png"
+        },
+        {
+            "name": "Pieces",
+            "logo": "Pieces_Logo.jpg"
+        },
+        {
+            "name": "Reliant",
+            "logo": "Reliant Rehab 1.png"
+        },
+        {
+            "name": "Nupco",
+            "logo": "NUPCO.png"
+        },
+        {
+            "name": "Dr. Reddys",
+            "logo": "Dr._Reddy's_Laboratories_logo.svg.png"
+        },
+        {
+            "name": "Iqvia",
+            "logo": "Iqvia-logo-color.svg.png"
+        },
+        {
+            "name": "Cca",
+            "logo": "CCA Logo.svg"
+        },
+        {
+            "name": "Bioclinica",
+            "logo": "Bioclinica_Logo.png"
+        }
+    ],
+    "Retail": [
+        {
+            "name": "Carhartt",
+            "logo": "Carhartt-Logo.png"
+        },
+        {
+            "name": "Dominos",
+            "logo": "Dominos.png"
+        },
+        {
+            "name": "Hilmar",
+            "logo": "HilmarCheeseCompany_CMYK_FULL_Large_300dpi.png"
+        },
+        {
+            "name": "Tyson",
+            "logo": "Tyson_Foods_logo.svg"
+        },
+        {
+            "name": "Liberty Hardware",
+            "logo": "Liberty Hardware.svg"
+        },
+        {
+            "name": "Lowes",
+            "logo": "Lowes.png"
+        },
+        {
+            "name": "Cenveo",
+            "logo": "Cenveo.png"
+        },
+        {
+            "name": "True Car",
+            "logo": "Truecar.png"
+        },
+        {
+            "name": "Brown Forman",
+            "logo": "Brown Forman.png"
+        },
+        {
+            "name": "De Beers",
+            "logo": "De_Beers_Logo.svg.png"
+        },
+        {
+            "name": "Vizo",
+            "logo": "VIZIO logo.png"
+        },
+        {
+            "name": "Grecian Delight",
+            "logo": "Grecian Delight.png"
+        },
+        {
+            "name": "Saq New Vertical",
+            "logo": "SAQ New Vertical.svg"
+        },
+        {
+            "name": "Est\u00e9e Lauder Companies Logo.Svg",
+            "logo": "Est\u00e9e_Lauder_Companies_Logo.svg.png"
+        },
+        {
+            "name": "Iff International Flavors & Fragrances New",
+            "logo": "IFF International Flavors & Fragrances New.svg"
+        }
+    ],
+    "Manufacturing": [
+        {
+            "name": "Hanon",
+            "logo": "Hanon_Systems_Logo.jpg"
+        },
+        {
+            "name": "Johnson Controls",
+            "logo": "Johnson_Controls.svg.png"
+        },
+        {
+            "name": "Bayer",
+            "logo": "Bayer.svg.png"
+        },
+        {
+            "name": "Carhartt",
+            "logo": "Carhartt-Logo.png"
+        },
+        {
+            "name": "Texas Instuments",
+            "logo": "TexasInstruments-Logo.svg"
+        },
+        {
+            "name": "Greenheck",
+            "logo": "Greenheck.png"
+        },
+        {
+            "name": "Mitsui",
+            "logo": "Mitsui.png"
+        },
+        {
+            "name": "Saint Gobain",
+            "logo": "saint-gobain.png"
+        },
+        {
+            "name": "Manitoba",
+            "logo": "Manitoba_Liquor_&_Lotteries_Corporation_logo.svg.png"
+        },
+        {
+            "name": "Reckitt",
+            "logo": "Reckitt_Logo_0.svg"
+        },
+        {
+            "name": "Te Connectivity Logo.Svg",
+            "logo": "TE_Connectivity_logo.svg.png"
+        },
+        {
+            "name": "Maruti Suzuki",
+            "logo": "maruti-suzuki-logo.svg"
+        }
+    ],
+    "Utilities": [
+        {
+            "name": "Irving",
+            "logo": "IRVING.png"
+        },
+        {
+            "name": "Sdge",
+            "logo": "SDGE.png"
+        },
+        {
+            "name": "Petronas",
+            "logo": "Petronas-Logo.png"
+        },
+        {
+            "name": "Mitsui",
+            "logo": "Mitsui.png"
+        },
+        {
+            "name": "Clark",
+            "logo": "Clark Construction.png"
+        },
+        {
+            "name": "Match.Com",
+            "logo": "matchcom-logo-vector.svg"
+        },
+        {
+            "name": "American Homes",
+            "logo": "American-homes-4-rent.png"
+        },
+        {
+            "name": "Shippeo",
+            "logo": "SHIPPEO_LOGO.svg"
+        }
+    ],
+    "Telecom": [
+        {
+            "name": "Smart",
+            "logo": "Smart.png"
+        },
+        {
+            "name": "Maxis",
+            "logo": "Maxis_Communications_logo.svg.png"
+        },
+        {
+            "name": "Globe",
+            "logo": "globe-logo-110x41_v7.png"
+        },
+        {
+            "name": "Telkomsel Logo",
+            "logo": "Telkomsel_Logo.png"
+        },
+        {
+            "name": "Indosat",
+            "logo": "Indosat_Ooredoo_Hutchison.svg.png"
+        },
+        {
+            "name": "Verizon",
+            "logo": "Verizon-wireless-brand-font-telecom-tower-text-logo.png"
+        },
+        {
+            "name": "Centurylink",
+            "logo": "CenturyLink_2010_logo.svg.png"
+        },
+        {
+            "name": "Blackberry",
+            "logo": "blackberry-cylance-cylancepersona-biometrics-920x533.jpg"
+        },
+        {
+            "name": "Taulia",
+            "logo": "Taulia-logo.png"
+        },
+        {
+            "name": "Idt911Logo",
+            "logo": "Idt911logo.png"
+        },
+        {
+            "name": "Cycle 30 Logo 4De8Cb7Ee5 Seeklogo.Com",
+            "logo": "cycle-30-logo-4DE8CB7EE5-seeklogo.com.png"
+        }
+    ],
+    "Hospitality & Travel": [
+        {
+            "name": "Hilton",
+            "logo": "Hilton-Logo.png"
+        },
+        {
+            "name": "Iata",
+            "logo": "IATA Logo.png"
+        },
+        {
+            "name": "Penske Logo",
+            "logo": "Penske_Logo.png"
+        },
+        {
+            "name": "Royal Caribbean",
+            "logo": "Royal Caribbean.png"
+        },
+        {
+            "name": "Cota",
+            "logo": "COTA_logo.png"
+        }
+    ],
+    "Education & Public Sector": [
+        {
+            "name": "British Columbia",
+            "logo": "british.png"
+        },
+        {
+            "name": "Uc San Diego",
+            "logo": "UC San Diego.gif"
+        },
+        {
+            "name": "Swinburne",
+            "logo": "Swinburne_University_of_Technology.svg"
+        },
+        {
+            "name": "Vail",
+            "logo": "Vail school disrict.png"
+        },
+        {
+            "name": "Cornell",
+            "logo": "Cornell-university-logo-cornell-university-logo-download-in-svg-or-png-format-.png"
+        },
+        {
+            "name": "Mohre",
+            "logo": "Mohre-01.png"
+        },
+        {
+            "name": "Phillips",
+            "logo": "Phillips Exeter Academy Logo.jpg"
+        },
+        {
+            "name": "Nagara Dana",
+            "logo": "Nagara Dana Rakca.png"
+        },
+        {
+            "name": "Johns Hopkins University",
+            "logo": "Johns Hopkins university_logo_small_vertical_blue.png"
+        }
+    ],
+    "Technology, Services & Others": [
+        {
+            "name": "Neustar",
+            "logo": "Neustar.png"
+        },
+        {
+            "name": "Akkencloud",
+            "logo": "AkkenCloud_Logo.jpg"
+        },
+        {
+            "name": "Iron Mountain",
+            "logo": "Iron Mountain.png"
+        },
+        {
+            "name": "Zafin",
+            "logo": "Zafin_New_Logo.svg"
+        },
+        {
+            "name": "Parkway Corp",
+            "logo": "Parkway Corp.png"
+        },
+        {
+            "name": "Catalist",
+            "logo": "catalist-logo.png"
+        },
+        {
+            "name": "Nivalogo324X180",
+            "logo": "NivaLogo324x180.png"
+        },
+        {
+            "name": "Oracle",
+            "logo": "Oracle-Logo.png"
+        },
+        {
+            "name": "Hindustan Unilever Limited 01",
+            "logo": "Hindustan Unilever Limited-01.svg"
+        },
+        {
+            "name": "Intrado Color",
+            "logo": "Intrado-Color-Logo.svg"
+        },
+        {
+            "name": "Nationstar Interim Logo Standard Cmyk Bw",
+            "logo": "Nationstar_Interim_Logo_Standard_CMYK_BW.jpg"
+        },
+        {
+            "name": "Unifyapps Color",
+            "logo": "Unifyapps Color.png"
+        },
+        {
+            "name": "Snowflake Logo.Svg",
+            "logo": "Snowflake_Logo.svg.png"
+        },
+        {
+            "name": "Unifyapps",
+            "logo": "Unifyapps.webp"
+        },
+        {
+            "name": "Dbs Logo Svg",
+            "logo": "DBS Logo SVG.svg"
+        },
+        {
+            "name": "Uob",
+            "logo": "UOB_Logo.svg"
+        },
+        {
+            "name": "Servicenow",
+            "logo": "Servicenow.png"
+        },
+        {
+            "name": "Snowflake Logo Color",
+            "logo": "Snowflake_Logo Color.svg"
+        },
+        {
+            "name": "Pyramid",
+            "logo": "Pyramid.png"
+        },
+        {
+            "name": "Climb  Big",
+            "logo": "CLIMB _BIG.svg"
+        },
+        {
+            "name": "Tibco Jaspersoft",
+            "logo": "TIBCO-Jaspersoft.webp"
+        },
+        {
+            "name": "Mandiri Logo 2016.Svg",
+            "logo": "Mandiri_logo_2016.svg.png"
+        },
+        {
+            "name": "Visa",
+            "logo": "VISA-logo.png"
+        },
+        {
+            "name": "Redlist",
+            "logo": "REDLIST.png"
+        },
+        {
+            "name": "Mahindra",
+            "logo": "Mahindra-Logo.png"
+        },
+        {
+            "name": "Jaspersoft",
+            "logo": "Jaspersoft-Logo.png"
+        }
+    ],
+    "Media & Entertainment/Theme Parks": [
+        {
+            "name": "Triumphlearning",
+            "logo": "triumph-logo-horizontal-rgb.jpg"
+        }
+    ]
+}

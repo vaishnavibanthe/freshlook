@@ -1,0 +1,201 @@
+{% extends 'crm/base_crm.html' %}
+
+{% block title %}Custom Fields Registry | ThinkArtha CRM{% endblock %}
+
+{% block content %}
+<div class="crm-header-bar">
+    <div class="crm-title-section">
+        <h1>Custom Fields Registry</h1>
+        <p>Define custom metadata properties for Core Leads and TeleCRM Calling Contacts. These act as input fields and filters.</p>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 24px;">
+    
+    <!-- Left Panel: Custom Fields List -->
+    <div class="crm-card">
+        <div class="crm-card-title">Dynamic Custom Fields List</div>
+        <div style="overflow-x: auto;">
+            <table class="leads-table" style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th>Entity</th>
+                        <th>Field Label</th>
+                        <th>DB Field Key</th>
+                        <th>Type</th>
+                        <th>Filterable?</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for field in custom_fields %}
+                    <tr>
+                        <td>
+                            <span class="badge-status {% if field.entity_type == 'lead' %}qualified{% else %}prospecting{% endif %}" style="font-size: 10px;">
+                                {{ 'Core Lead' if field.entity_type == 'lead' else 'TeleCRM Contact' }}
+                            </span>
+                        </td>
+                        <td style="font-weight: 700; color: #ffffff;">{{ field.field_label }}</td>
+                        <td style="font-family: monospace; font-size: 12px; color: var(--text-crm-secondary);">{{ field.field_name }}</td>
+                        <td>
+                            <span style="font-size: 12px; text-transform: uppercase; color: var(--accent-cyan); font-weight: 600;">
+                                {{ field.field_type }}
+                            </span>
+                            {% if field.options %}
+                            <div style="font-size: 10.5px; color: var(--text-crm-muted); max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ field.options }}">
+                                Options: {{ field.options }}
+                            </div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if field.is_filterable == 1 %}
+                            <span style="color: #10b981; font-weight: 600;"><i class="fas fa-check-circle"></i> Yes</span>
+                            {% else %}
+                            <span style="color: var(--text-crm-muted);"><i class="fas fa-minus-circle"></i> No</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div style="display: flex; gap: 8px;">
+                                <button type="button" class="btn-crm btn-crm-secondary" style="padding: 4px 8px; font-size: 11px;" onclick="openEditModal({{ field.id }}, '{{ field.field_label }}', '{{ field.options or '' }}', {{ field.is_filterable }})">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <form action="{{ url_for('crm.admin_custom_fields') }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this custom field? This will delete all saved values for this field across all records.');" style="display: inline;">
+                                    <input type="hidden" name="action" value="delete">
+                                    <input type="hidden" name="field_id" value="{{ field.id }}">
+                                    <button type="submit" class="btn-crm btn-crm-danger" style="padding: 4px 8px; font-size: 11px;">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" style="text-align: center; color: var(--text-crm-muted); padding: 30px;">
+                            No custom fields registered.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Right Panel: Create Custom Field -->
+    <div class="crm-card">
+        <div class="crm-card-title">Create Custom Property</div>
+        <form action="{{ url_for('crm.admin_custom_fields') }}" method="POST">
+            <input type="hidden" name="action" value="create">
+            
+            <div class="form-group">
+                <label class="form-label">Map to Workspace Entity</label>
+                <select name="entity_type" id="entity_type" class="form-control" required>
+                    <option value="lead">Core Lead (CRM Core)</option>
+                    <option value="telecrm_contact">TeleCRM Dialing Contact (BDR Workbench)</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Field Label (Visible to reps)</label>
+                <input type="text" name="field_label" class="form-control" placeholder="e.g. Technology Stack" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">System Name (Database key: lowercase, no spaces)</label>
+                <input type="text" name="field_name" class="form-control" placeholder="e.g. tech_stack" required pattern="[a-z0-9_]+">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Field Type</label>
+                <select name="field_type" id="field_type" class="form-control" onchange="toggleOptionsInput(this.value, 'create-options-group')" required>
+                    <option value="text">Single Line Text</option>
+                    <option value="number">Numeric / Dollar Metric</option>
+                    <option value="select">Dropdown Choice List</option>
+                </select>
+            </div>
+            
+            <div class="form-group" id="create-options-group" style="display: none;">
+                <label class="form-label">Dropdown Values (Comma-separated options)</label>
+                <textarea name="options" class="form-control" rows="2" placeholder="e.g. Snowflake,Databricks,AWS,Azure"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Enable Filterable Check?</label>
+                <select name="is_filterable" class="form-control">
+                    <option value="1">Yes (Display as a query filter in tables)</option>
+                    <option value="0">No (Show in profiles but hide in filters)</option>
+                </select>
+            </div>
+            
+            <button type="submit" class="btn-crm btn-crm-primary" style="width: 100%; margin-top: 10px; justify-content: center;">
+                <i class="fas fa-plus"></i> Register Custom Field
+            </button>
+        </form>
+    </div>
+
+</div>
+
+<!-- Edit Modal Overlay -->
+<div class="modal-overlay" id="edit-field-modal">
+    <div class="modal-card">
+        <h3 style="font-size: 18px; color: #ffffff; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-edit" style="color: var(--accent-cyan);"></i> Edit Custom Field Schema
+        </h3>
+        
+        <form action="{{ url_for('crm.admin_custom_fields') }}" method="POST">
+            <input type="hidden" name="action" value="edit">
+            <input type="hidden" name="field_id" id="edit-field-id">
+            
+            <div class="form-group">
+                <label class="form-label">Field Label</label>
+                <input type="text" name="field_label" id="edit-field-label" class="form-control" required>
+            </div>
+            
+            <div class="form-group" id="edit-options-group">
+                <label class="form-label">Dropdown Values (Comma-separated options)</label>
+                <textarea name="options" id="edit-field-options" class="form-control" rows="2"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Enable Filterable Check?</label>
+                <select name="is_filterable" id="edit-field-filterable" class="form-control">
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                </select>
+            </div>
+            
+            <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
+                <button type="button" class="btn-crm btn-crm-secondary" onclick="closeEditModal()">Cancel</button>
+                <button type="submit" class="btn-crm btn-crm-primary">Save Config</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function toggleOptionsInput(val, targetId) {
+        const group = document.getElementById(targetId);
+        if (val === 'select') {
+            group.style.display = 'flex';
+        } else {
+            group.style.display = 'none';
+        }
+    }
+    
+    // Modal operations
+    const editModal = document.getElementById('edit-field-modal');
+    
+    function openEditModal(id, label, options, filterable) {
+        document.getElementById('edit-field-id').value = id;
+        document.getElementById('edit-field-label').value = label;
+        document.getElementById('edit-field-options').value = options;
+        document.getElementById('edit-field-filterable').value = filterable;
+        
+        editModal.style.display = 'flex';
+    }
+    
+    function closeEditModal() {
+        editModal.style.display = 'none';
+    }
+</script>
+{% endblock %}

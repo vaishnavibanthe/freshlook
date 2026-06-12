@@ -108,6 +108,22 @@
                 } %}
                 {% set sty = status_styles.get(app['status'], ('background:var(--bg-secondary);color:var(--text-secondary)', app['status'])) %}
                 <span style="{{ sty[0] }}; border-radius: 20px; padding: 3px 10px; font-size: 11px; font-weight: 700; white-space: nowrap;">{{ sty[1] }}</span>
+                
+                <div style="margin-top: 6px;">
+                  {% set notif_styles = {
+                    'Sent': ('background:#dcfce7;color:#16a34a', '✉ Sent'),
+                    'Pending': ('background:#f3f4f6;color:#4b5563', '✉ Pending'),
+                    'Retrying': ('background:#fef3c7;color:#d97706', '✉ Retrying'),
+                    'Failed': ('background:#fee2e2;color:#dc2626', '✉ Failed')
+                  } %}
+                  {% set n_sty = notif_styles.get(app['notification_status'], ('background:#f3f4f6;color:#4b5563', '✉ ' ~ (app['notification_status'] or 'Pending'))) %}
+                  <span style="{{ n_sty[0] }}; border-radius: 20px; padding: 2px 8px; font-size: 10px; font-weight: 700; white-space: nowrap; cursor: pointer;" 
+                        title="Recipient: {{ app['notification_recipient'] or 'None' }}"
+                        id="btn-notif-{{ app['id'] }}"
+                        onclick="openNotificationModal({{ app['id'] }}, '{{ app['notification_recipient'] or '' }}', '{{ app['notification_cc'] or '' }}', '{{ app['notification_status'] or 'Pending' }}', '{{ app['notification_sent_at'] or '' }}', {{ app['notification_attempt_count'] or 0 }}, '{{ (app['notification_error'] or '')|replace("'", "\\'") }}')">
+                    {{ n_sty[1] }}
+                  </span>
+                </div>
               </td>
               <td style="padding: 14px 16px; font-size: 12px; color: var(--text-secondary); white-space: nowrap;">{{ app['submitted_at'][:16] if app['submitted_at'] else '—' }}</td>
               <td style="padding: 14px 20px; text-align: right;">
@@ -122,6 +138,12 @@
                   <button onclick="openStatusModal({{ app['id'] }}, '{{ app['status'] }}', '{{ (app['notes'] or '')|replace("'", "\\'") }}')"
                           style="font-size: 12px; color: #6d28d9; background: none; border: 1px solid #ede9fe; padding: 6px 10px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 5px;">
                     <i class="fas fa-pen"></i> Status
+                  </button>
+                  <button id="btn-notif-action-{{ app['id'] }}"
+                          onclick="openNotificationModal({{ app['id'] }}, '{{ app['notification_recipient'] or '' }}', '{{ app['notification_cc'] or '' }}', '{{ app['notification_status'] or 'Pending' }}', '{{ app['notification_sent_at'] or '' }}', {{ app['notification_attempt_count'] or 0 }}, '{{ (app['notification_error'] or '')|replace("'", "\\'") }}')"
+                          style="font-size: 12px; color: #7c3aed; background: none; border: 1px solid #ede9fe; padding: 6px 10px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 5px;"
+                          title="Notification Settings &amp; Logs">
+                    <i class="fas fa-bell"></i> Notif
                   </button>
                 </div>
               </td>
@@ -176,6 +198,89 @@
   </div>
 </div>
 
+<!-- Notification Details & Control Modal -->
+<div id="notif-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center;">
+  <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 18px; padding: 32px; max-width: 650px; width: 95%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-height: 90vh; overflow-y: auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">
+      <h2 style="font-size: 18px; font-weight: 800; color: var(--text-primary); margin: 0;">Notification Control &amp; Logs</h2>
+      <button onclick="closeNotifModal()" style="background: none; border: none; font-size: 20px; color: var(--text-tertiary); cursor: pointer;"><i class="fas fa-times"></i></button>
+    </div>
+
+    <!-- Application ID Header -->
+    <div style="margin-bottom: 20px; font-size: 14px; color: var(--text-secondary);">
+      Application Ref: <strong>#<span id="notif-app-id"></span></strong>
+    </div>
+
+    <!-- Status Info Section -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 12px; padding: 18px; margin-bottom: 24px;">
+      <div>
+        <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 4px;">Recipients</div>
+        <div id="notif-recipient" style="font-weight: 600; font-size: 13px; color: var(--text-primary); word-break: break-all;"></div>
+      </div>
+      <div>
+        <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 4px;">CC Recipients</div>
+        <div id="notif-cc" style="font-weight: 600; font-size: 13px; color: var(--text-primary); word-break: break-all;">—</div>
+      </div>
+      <div>
+        <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 4px;">Status</div>
+        <div id="notif-status" style="font-weight: 700; font-size: 13px; color: var(--accent-blue);"></div>
+      </div>
+      <div>
+        <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 4px;">Sent At</div>
+        <div id="notif-sent-at" style="font-weight: 600; font-size: 13px; color: var(--text-secondary);">—</div>
+      </div>
+      <div>
+        <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 4px;">Delivery Attempts</div>
+        <div id="notif-attempts" style="font-weight: 600; font-size: 13px; color: var(--text-secondary);">0</div>
+      </div>
+      <div id="notif-error-container" style="grid-column: span 2; display: none;">
+        <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #dc2626; margin-bottom: 4px;">Last Error</div>
+        <div id="notif-error" style="font-size: 12px; color: #dc2626; background: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; padding: 8px 12px; font-family: monospace; white-space: pre-wrap; word-break: break-all;"></div>
+      </div>
+    </div>
+
+    <!-- Actions Forms Grid -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 24px; margin-bottom: 24px;">
+      <!-- Resend form -->
+      <div>
+        <h3 style="font-size: 13px; font-weight: 700; color: var(--text-primary); margin-top: 0; margin-bottom: 12px;">Trigger / Retry</h3>
+        <form id="resend-form" method="POST">
+          <button type="submit" class="btn btn-primary" style="padding: 10px; width: 100%; border-radius: 8px; font-size: 13px; font-weight: 700; background: linear-gradient(135deg, #10b981, #059669); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <i class="fas fa-paper-plane"></i> Resend to Poster
+          </button>
+        </form>
+        <p style="font-size: 11px; color: var(--text-tertiary); margin-top: 6px; margin-bottom: 0;">Resends notification using original poster mapping.</p>
+      </div>
+
+      <!-- Forward form -->
+      <div>
+        <h3 style="font-size: 13px; font-weight: 700; color: var(--text-primary); margin-top: 0; margin-bottom: 12px;">Forward to Recruiter</h3>
+        <form id="forward-form" method="POST" style="display: flex; flex-direction: column; gap: 8px;">
+          <select name="recruiter_user_id" id="forward-recruiter-select" class="form-control" style="padding: 8px 12px; border-radius: 8px; font-size: 13px; width: 100%;">
+            <option value="">-- Choose Recruiter User --</option>
+            {% for rec in recruiters %}
+            <option value="{{ rec.id }}">{{ rec.name }} ({{ rec.email }})</option>
+            {% endfor %}
+          </select>
+          <div style="display: flex; gap: 8px; align-items: center; justify-content: center; font-size: 11px; color: var(--text-tertiary);">OR</div>
+          <input type="email" name="forward_email" placeholder="Or enter manual email" class="form-control" style="padding: 8px 12px; border-radius: 8px; font-size: 13px; width: 100%;">
+          <button type="submit" class="btn btn-primary" style="padding: 10px; width: 100%; border-radius: 8px; font-size: 13px; font-weight: 700; background: linear-gradient(135deg, #6d28d9, #7c3aed); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <i class="fas fa-share"></i> Forward Application
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Notification Log List Section -->
+    <div>
+      <h3 style="font-size: 14px; font-weight: 800; color: var(--text-primary); margin-top: 0; margin-bottom: 12px;">Audit Log History</h3>
+      <div id="notif-logs-list" style="background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; overflow-y: auto; max-height: 200px;">
+        <!-- Filled dynamically via JS fetch -->
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 function openStatusModal(appId, currentStatus, currentNotes) {
   const modal = document.getElementById('status-modal');
@@ -190,6 +295,88 @@ function closeStatusModal() {
 }
 document.getElementById('status-modal').addEventListener('click', function(e) {
   if (e.target === this) closeStatusModal();
+});
+
+function openNotificationModal(appId, recipient, cc, status, sentAt, attempts, error) {
+  document.getElementById('notif-app-id').innerText = appId;
+  document.getElementById('notif-recipient').innerText = recipient || 'None';
+  document.getElementById('notif-cc').innerText = cc || 'None';
+  document.getElementById('notif-status').innerText = status;
+  document.getElementById('notif-sent-at').innerText = sentAt || 'Not sent yet';
+  document.getElementById('notif-attempts').innerText = attempts;
+  
+  const errorContainer = document.getElementById('notif-error-container');
+  const errorEl = document.getElementById('notif-error');
+  if (error && error !== 'None') {
+    errorContainer.style.display = 'block';
+    errorEl.innerText = error;
+  } else {
+    errorContainer.style.display = 'none';
+    errorEl.innerText = '';
+  }
+
+  // Set form action URLs
+  document.getElementById('resend-form').action = '/api/admin/careers/applications/' + appId + '/resend-notification';
+  document.getElementById('forward-form').action = '/api/admin/careers/applications/' + appId + '/forward-to-recruiter';
+
+  // Fetch logs
+  const logsList = document.getElementById('notif-logs-list');
+  logsList.innerHTML = '<p style="font-size: 13px; color: var(--text-tertiary); text-align: center; margin: 0;">Loading logs...</p>';
+
+  fetch('/api/admin/careers/applications/' + appId + '/notification-log')
+    .then(response => response.json())
+    .then(data => {
+      if (data && data.status === 'success' && data.logs && data.logs.length > 0) {
+        let logsHtml = '<table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left;">';
+        logsHtml += '<tr style="border-bottom: 2px solid var(--border-color); color: var(--text-tertiary); font-weight: 700;">';
+        logsHtml += '<th style="padding: 8px 6px;">Time</th><th style="padding: 8px 6px;">Recipient</th><th style="padding: 8px 6px;">Status</th><th style="padding: 8px 6px;">Triggered By</th><th style="padding: 8px 6px;">Error</th>';
+        logsHtml += '</tr>';
+        
+        data.logs.forEach(log => {
+          let statusColor = '#4b5563';
+          if (log.status === 'Sent') statusColor = '#16a34a';
+          else if (log.status === 'Failed') statusColor = '#dc2626';
+          else if (log.status === 'Retrying') statusColor = '#d97706';
+
+          logsHtml += `<tr style="border-bottom: 1px solid var(--border-color);">`;
+          logsHtml += `<td style="padding: 8px 6px; color: var(--text-secondary); white-space: nowrap;">${log.attempted_at || log.created_at}</td>`;
+          logsHtml += `<td style="padding: 8px 6px; word-break: break-all;">${log.recipient}</td>`;
+          logsHtml += `<td style="padding: 8px 6px;"><span style="color: ${statusColor}; font-weight: 700;">${log.status}</span></td>`;
+          logsHtml += `<td style="padding: 8px 6px;">${log.triggered_by || 'System'}</td>`;
+          logsHtml += `<td style="padding: 8px 6px; color: #ef4444; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${log.error_message || ''}">${log.error_message || '—'}</td>`;
+          logsHtml += '</tr>';
+        });
+        
+        logsHtml += '</table>';
+        logsList.innerHTML = logsHtml;
+      } else {
+        logsList.innerHTML = '<p style="font-size: 13px; color: var(--text-tertiary); text-align: center; margin: 0;">No logs found for this application.</p>';
+      }
+    })
+    .catch(err => {
+      logsList.innerHTML = '<p style="font-size: 13px; color: #dc2626; text-align: center; margin: 0;">Error loading logs.</p>';
+    });
+
+  document.getElementById('notif-modal').style.display = 'flex';
+}
+
+function closeNotifModal() {
+  document.getElementById('notif-modal').style.display = 'none';
+}
+
+document.getElementById('notif-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeNotifModal();
+});
+
+window.addEventListener('DOMContentLoaded', () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const appIdParam = urlParams.get('open_notif') || urlParams.get('app_id');
+  if (appIdParam) {
+    const btn = document.getElementById('btn-notif-action-' + appIdParam) || document.getElementById('btn-notif-' + appIdParam);
+    if (btn) {
+      btn.click();
+    }
+  }
 });
 </script>
 {% endblock %}

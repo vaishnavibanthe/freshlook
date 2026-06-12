@@ -309,6 +309,7 @@ document.addEventListener('DOMContentLoaded', () => {
         function runSeoCalculations() {
             const title = titleInput.value;
             const content = contentInput.value;
+            const cleanContent = content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
             const keyword = keywordInput.value.trim().toLowerCase();
             const metaTitle = metaTitleInput.value;
             const metaDesc = metaDescInput.value;
@@ -357,7 +358,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (keywordInDesc) score += 20;
 
             // Check 3: Content Word Count (>300 words)
-            const words = content.trim().split(/\s+/).filter(w => w.length > 0);
+            const words = cleanContent.split(/\s+/).filter(w => w.length > 0);
             const wordCount = words.length;
             const optimalLength = wordCount >= 300;
             toggleChecklist(chkLength, optimalLength);
@@ -367,8 +368,9 @@ document.addEventListener('DOMContentLoaded', () => {
             let densityPass = false;
             if (keyword && wordCount > 0) {
                 // Count occurrences
-                const regex = new RegExp('\\b' + keyword + '\\b', 'gi');
-                const matches = content.match(regex);
+                const escapedKeyword = keyword.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+                const regex = new RegExp('\\b' + escapedKeyword + '\\b', 'gi');
+                const matches = cleanContent.match(regex);
                 const count = matches ? matches.length : 0;
                 const density = (count / wordCount) * 100;
                 densityPass = density >= 1.0 && density <= 2.5;
@@ -416,16 +418,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // AI Mock Operations: Meta Description Generator
         document.getElementById('btn-ai-meta').addEventListener('click', () => {
-            const content = contentInput.value.trim();
-            if (content.length === 0) {
+            const rawContent = contentInput.value.trim();
+            const cleanContent = rawContent.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+            if (cleanContent.length === 0) {
                 showToast('Please write some content first.');
                 return;
             }
 
             // Simple AI summarizer: extracts first 150 chars of content text cleanly
-            let clean = content.replace(/\n+/g, ' ');
-            let summary = clean.substring(0, 147);
-            if (content.length > 147) summary += '...';
+            let summary = cleanContent.substring(0, 147);
+            if (cleanContent.length > 147) summary += '...';
             
             metaDescInput.value = summary;
             runSeoCalculations();
@@ -434,14 +436,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // AI Mock Operations: Focus Keyword Extractor
         document.getElementById('btn-ai-keywords').addEventListener('click', () => {
-            const content = contentInput.value.trim();
-            if (content.length === 0) {
+            const rawContent = contentInput.value.trim();
+            const cleanContent = rawContent.replace(/<[^>]*>/g, ' ').toLowerCase();
+            if (cleanContent.trim().length === 0) {
                 showToast('Please write some content first.');
                 return;
             }
 
             // Simple Keyword Extractor: counts noun frequencies excluding common stop words
-            const words = content.toLowerCase()
+            const words = cleanContent
                 .replace(/[^a-z\s]/g, '')
                 .split(/\s+/)
                 .filter(w => w.length > 4); // ignore short words
@@ -749,6 +752,228 @@ document.addEventListener('DOMContentLoaded', () => {
                     rootLink.setAttribute('aria-expanded', 'false');
                 }
             });
+        }
+    });
+
+    // --- Global Public Form Validation System ---
+    const personalDomains = [
+        'gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'rediffmail.com',
+        'protonmail.com', 'icloud.com', 'aol.com', 'mail.com', 'gmx.com',
+        'yandex.com', 'zoho.com', 'proton.me', 'live.com', 'yahoo.co.in', 'hotmail.co.uk',
+        'msn.com', 'comcast.net', 'yahoo.com.br', 'yahoo.co.jp', 'yahoo.fr', 'ymail.com',
+        'mailinator.com', '123mail.org', 'fastmail.fm', 'web.de', 'gmx.net', 'libero.it',
+        'wanadoo.fr', 'orange.fr', 'rambler.ru', 'mail.ru', 'mac.com', 'me.com'
+    ];
+
+    function isSequentialRunJS(digits) {
+        for (let i = 0; i <= digits.length - 6; i++) {
+            const substring = digits.substring(i, i + 6);
+            let diffs = [];
+            for (let j = 0; j < 5; j++) {
+                diffs.push(parseInt(substring[j+1]) - parseInt(substring[j]));
+            }
+            if (diffs.every(d => d === 1) || diffs.every(d => d === -1)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function validatePhoneJS(phone) {
+        phone = phone.trim();
+        if (!phone) return true;
+        
+        const phoneRegex = /^\+?[0-9\s.\-()]+$/;
+        if (!phoneRegex.test(phone)) {
+            return false;
+        }
+        
+        const digits = phone.replace(/\D/g, '');
+        if (digits.length < 7 || digits.length > 15) {
+            return false;
+        }
+        
+        const uniqueDigits = new Set(digits.split(''));
+        if (uniqueDigits.size < 3) {
+            return false;
+        }
+        
+        if (isSequentialRunJS(digits)) {
+            return false;
+        }
+        
+        return true;
+    }
+
+    function showError(input, message) {
+        input.classList.add('is-invalid');
+        input.style.borderColor = '#dc2626';
+        input.style.boxShadow = '0 0 0 2px rgba(220, 38, 38, 0.2)';
+        
+        const parent = input.parentNode;
+        let errorSpan = parent.querySelector('.validation-error-msg');
+        if (!errorSpan) {
+            errorSpan = document.createElement('span');
+            errorSpan.className = 'validation-error-msg';
+            errorSpan.style.color = '#dc2626';
+            errorSpan.style.fontSize = '12px';
+            errorSpan.style.display = 'block';
+            errorSpan.style.marginTop = '4px';
+            parent.appendChild(errorSpan);
+        }
+        errorSpan.innerText = message;
+    }
+
+    function clearError(input) {
+        input.classList.remove('is-invalid');
+        input.style.borderColor = '';
+        input.style.boxShadow = '';
+        
+        const parent = input.parentNode;
+        const errorSpan = parent.querySelector('.validation-error-msg');
+        if (errorSpan) {
+            errorSpan.remove();
+        }
+    }
+
+    function showErrorToast(message) {
+        let toast = document.querySelector('.toast-error-msg');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.className = 'toast-error-msg';
+            toast.style.position = 'fixed';
+            toast.style.bottom = '20px';
+            toast.style.right = '20px';
+            toast.style.backgroundColor = '#dc2626';
+            toast.style.color = '#fff';
+            toast.style.padding = '12px 24px';
+            toast.style.borderRadius = '8px';
+            toast.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            toast.style.zIndex = '9999';
+            toast.style.display = 'flex';
+            toast.style.alignItems = 'center';
+            toast.style.gap = '8px';
+            toast.style.opacity = '0';
+            toast.style.transition = 'opacity 0.3s ease';
+            document.body.appendChild(toast);
+        }
+        toast.innerHTML = `<i class="fas fa-exclamation-circle"></i> <span>${message}</span>`;
+        toast.style.display = 'flex';
+        setTimeout(() => { toast.style.opacity = '1'; }, 10);
+        
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => { toast.style.display = 'none'; }, 300);
+        }, 5000);
+    }
+
+    document.addEventListener('submit', (e) => {
+        const form = e.target;
+        if (!form) return;
+        
+        // Skip validation on admin/backend forms
+        const formAction = form.action || '';
+        if (formAction.includes('/admin/') || formAction.includes('/crm/') || formAction.includes('/telecrm/')) {
+            return;
+        }
+
+        const isCareerForm = form.id === 'career-apply-form' || formAction.includes('/careers/');
+        
+        let isValid = true;
+        let firstInvalidField = null;
+
+        // Email Validation (Only for non-careers forms)
+        const emailInputs = form.querySelectorAll('input[type="email"], input[name="business_email"], input[name="email"]');
+        if (!isCareerForm) {
+            emailInputs.forEach(input => {
+                const val = input.value.trim().toLowerCase();
+                if (!val) return; // Let HTML5 required handle empty cases
+                if (!val.includes('@') || val.split('@').length !== 2) {
+                    showError(input, 'Invalid email format.');
+                    isValid = false;
+                    if (!firstInvalidField) firstInvalidField = input;
+                } else {
+                    const domain = val.split('@')[1].trim();
+                    if (personalDomains.includes(domain)) {
+                        showError(input, 'Please use your official company business email address. Personal domains are not accepted.');
+                        isValid = false;
+                        if (!firstInvalidField) firstInvalidField = input;
+                    } else {
+                        clearError(input);
+                    }
+                }
+            });
+        }
+
+        // Phone Validation (For all forms)
+        const phoneInputs = form.querySelectorAll('input[type="tel"], input[name="phone"]');
+        phoneInputs.forEach(input => {
+            const val = input.value.trim();
+            if (!val) return; // Skip if empty (optional fields)
+            if (!validatePhoneJS(val)) {
+                showError(input, 'Invalid phone number format or test number detected.');
+                isValid = false;
+                if (!firstInvalidField) firstInvalidField = input;
+            } else {
+                clearError(input);
+            }
+        });
+
+        if (!isValid) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+
+            showErrorToast('Please correct the highlighted validation errors on the form.');
+            if (firstInvalidField) {
+                firstInvalidField.focus();
+                firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            // Restore submit button state if disabled by double-submit handlers
+            const submitBtn = form.querySelector('button[type="submit"], input[type="submit"]');
+            if (submitBtn) {
+                setTimeout(() => {
+                    submitBtn.disabled = false;
+                    const origHtml = submitBtn.getAttribute('data-original-html');
+                    if (origHtml) {
+                        submitBtn.innerHTML = origHtml;
+                    } else if (submitBtn.innerText.includes('Submitting')) {
+                        submitBtn.innerText = 'Submit';
+                    }
+                }, 100);
+            }
+        }
+    }, true);
+
+    // Clear errors on input
+    document.addEventListener('input', (e) => {
+        const input = e.target;
+        if (input && input.classList.contains('is-invalid')) {
+            const val = input.value.trim();
+            let currentlyValid = true;
+
+            if (input.type === 'email' || input.name === 'business_email' || input.name === 'email') {
+                const form = input.closest('form');
+                const formAction = form ? (form.action || '') : '';
+                const isCareerForm = form && (form.id === 'career-apply-form' || formAction.includes('/careers/'));
+                if (!isCareerForm && val) {
+                    if (!val.includes('@') || val.split('@').length !== 2) {
+                        currentlyValid = false;
+                    } else {
+                        const domain = val.split('@')[1].trim();
+                        if (personalDomains.includes(domain)) {
+                            currentlyValid = false;
+                        }
+                    }
+                }
+            } else if (input.type === 'tel' || input.name === 'phone') {
+                currentlyValid = validatePhoneJS(val);
+            }
+
+            if (currentlyValid) {
+                clearError(input);
+            }
         }
     });
 });

@@ -1,0 +1,1109 @@
+{% extends "base.html" %}
+
+{% block title %}Token Analytics - Artha Control Center{% endblock %}
+
+{% block content %}
+<!-- Subpage Spacer -->
+<div style="height: var(--nav-height); background-color: var(--bg-secondary);"></div>
+
+<section class="section-alt" style="padding-top: 40px; min-height: 90vh; background: linear-gradient(135deg, rgba(124, 58, 237, 0.03) 0%, rgba(217, 70, 239, 0.01) 100%), var(--bg-secondary);">
+    <div class="container" style="display: grid; grid-template-columns: 280px 1fr; gap: 40px; align-items: start;">
+        
+        <!-- Admin Sidebar Nav -->
+        {% include 'admin_sidebar.html' %}
+        
+        <!-- Main Dashboard Workspace -->
+        <div>
+            <!-- Header Bar -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
+                <div>
+                    <h2 style="font-size: 28px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 4px;">Token Analytics</h2>
+                    <p style="font-size: 13px; color: var(--text-tertiary); margin: 0;">Monitor agent token consumption, reasoning workloads, and task breakdowns.</p>
+                </div>
+                <button onclick="window.location.reload();" class="btn btn-secondary" style="padding: 10px 20px; font-size: 13px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-rotate" style="font-size: 12px;"></i> Refresh Stats
+                </button>
+            </div>
+            
+            <!-- Interactive Analytics Control Bar -->
+            <div style="background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); padding: 16px 24px; margin-bottom: 24px; box-shadow: var(--glass-shadow); text-align: left;">
+                <div style="display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap;">
+                    
+                    <!-- Display Metric Toggle -->
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span style="font-size: 13px; font-weight: 700; color: var(--text-secondary);">Display Metric:</span>
+                        <div class="metric-btn-group" style="display: flex; background-color: var(--bg-secondary); border: 1px solid var(--border-color); padding: 4px; border-radius: 8px;">
+                            <button onclick="setMetric('tokens')" class="chart-filter-btn" id="metric-btn-tokens">Tokens Only</button>
+                            <button onclick="setMetric('cost')" class="chart-filter-btn" id="metric-btn-cost">Cost Only</button>
+                            <button onclick="setMetric('both')" class="chart-filter-btn" id="metric-btn-both">Tokens & Cost</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Custom Rates Toggle Button -->
+                    <div>
+                        <button onclick="toggleCustomPanel()" class="btn btn-secondary" id="btn-toggle-custom" style="padding: 8px 16px; font-size: 13px; display: flex; align-items: center; gap: 8px; border-radius: var(--border-radius-sm);">
+                            <i class="fas fa-sliders-h" style="font-size: 12px;"></i> Custom Rates
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Custom Rates Input Panel -->
+                <div id="customPricingPanel" style="display: none; border-top: 1px solid var(--border-color); padding-top: 16px; margin-top: 16px; align-items: center; gap: 24px; flex-wrap: wrap; animation: fadeIn 0.2s ease;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 12px; font-weight: 700; color: var(--text-secondary);">Input Cost ($/1M tokens):</span>
+                        <input type="number" step="0.001" min="0" id="customInputRate" value="4.05" oninput="updateCustomRates()" style="width: 80px; padding: 6px 10px; border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); background-color: var(--bg-secondary); color: var(--text-primary); outline: none; font-size: 12px; font-weight: 600;">
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 12px; font-weight: 700; color: var(--text-secondary);">Output Cost ($/1M tokens):</span>
+                        <input type="number" step="0.001" min="0" id="customOutputRate" value="20.25" oninput="updateCustomRates()" style="width: 80px; padding: 6px 10px; border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); background-color: var(--bg-secondary); color: var(--text-primary); outline: none; font-size: 12px; font-weight: 600;">
+                    </div>
+                    <button onclick="resetToDefaultRates()" class="btn btn-secondary" style="padding: 6px 12px; font-size: 11px; margin: 0; border-radius: var(--border-radius-sm);">
+                        Reset to Default ($4.05 / $20.25)
+                    </button>
+                    <span style="font-size: 11px; color: var(--text-tertiary); font-style: italic; margin-left: auto;">Rates include Claude 3.5 Sonnet base + 35% markup.</span>
+                </div>
+            </div>
+
+            <!-- Statistics Widgets Row -->
+            <div class="stats-grid" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 32px; text-align: left;">
+                <!-- Grand Total -->
+                <div style="background: var(--grad-primary); color: #ffffff; padding: 20px; border-radius: var(--border-radius-md); box-shadow: 0 10px 20px rgba(124, 58, 237, 0.2); position: relative; overflow: hidden;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; position: relative; z-index: 2;">
+                        <span id="widget-title-grand" style="font-size: 11px; opacity: 0.85; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Total Estimated</span>
+                        <i class="fas fa-coins" style="opacity: 0.9; font-size: 18px;"></i>
+                    </div>
+                    <span id="widget-val-grand" data-tokens="{{ grand_total }}" style="font-size: 26px; font-weight: 800; font-family: var(--font-heading); position: relative; z-index: 2;">{{ "{:,}".format(grand_total) }}</span>
+                    <span id="widget-sub-grand" style="font-size: 10px; display: block; margin-top: 4px; opacity: 0.8; position: relative; z-index: 2;">Tokens Consumed</span>
+                    <div style="position: absolute; bottom: -20px; right: -20px; font-size: 90px; opacity: 0.12; color: #fff; pointer-events: none;"><i class="fas fa-coins"></i></div>
+                </div>
+                
+                <!-- Prompt / User -->
+                <div style="background-color: var(--bg-primary); border: 1px solid var(--border-color); padding: 20px; border-radius: var(--border-radius-md); box-shadow: var(--card-shadow); position: relative; overflow: hidden;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="font-size: 11px; color: var(--text-tertiary); font-weight: 700; text-transform: uppercase;">Prompt (User)</span>
+                        <i class="fas fa-keyboard" style="color: var(--accent-blue); font-size: 16px;"></i>
+                    </div>
+                    <span id="widget-val-user" data-tokens="{{ user_tot }}" style="font-size: 24px; font-weight: 800; font-family: var(--font-heading); color: var(--text-primary);">{{ "{:,}".format(user_tot) }}</span>
+                    <span id="widget-sub-user" style="font-size: 10px; display: block; margin-top: 4px; color: var(--text-tertiary);">{{ "{:.1f}%".format(user_tot / grand_total * 100) if grand_total > 0 else "0%" }} of total</span>
+                </div>
+                
+                <!-- Completion -->
+                <div style="background-color: var(--bg-primary); border: 1px solid var(--border-color); padding: 20px; border-radius: var(--border-radius-md); box-shadow: var(--card-shadow); position: relative; overflow: hidden;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="font-size: 11px; color: var(--text-tertiary); font-weight: 700; text-transform: uppercase;">Completion</span>
+                        <i class="fas fa-code" style="color: var(--accent-magenta); font-size: 16px;"></i>
+                    </div>
+                    <span id="widget-val-comp" data-tokens="{{ comp_tot }}" style="font-size: 24px; font-weight: 800; font-family: var(--font-heading); color: var(--text-primary);">{{ "{:,}".format(comp_tot) }}</span>
+                    <span id="widget-sub-comp" style="font-size: 10px; display: block; margin-top: 4px; color: var(--text-tertiary);">{{ "{:.1f}%".format(comp_tot / grand_total * 100) if grand_total > 0 else "0%" }} of total</span>
+                </div>
+                
+                <!-- Thinking -->
+                <div style="background-color: var(--bg-primary); border: 1px solid var(--border-color); padding: 20px; border-radius: var(--border-radius-md); box-shadow: var(--card-shadow); position: relative; overflow: hidden;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="font-size: 11px; color: var(--text-tertiary); font-weight: 700; text-transform: uppercase;">Reasoning</span>
+                        <i class="fas fa-brain" style="color: var(--accent-cyan); font-size: 16px;"></i>
+                    </div>
+                    <span id="widget-val-think" data-tokens="{{ think_tot }}" style="font-size: 24px; font-weight: 800; font-family: var(--font-heading); color: var(--text-primary);">{{ "{:,}".format(think_tot) }}</span>
+                    <span id="widget-sub-think" style="font-size: 10px; display: block; margin-top: 4px; color: var(--text-tertiary);">{{ "{:.1f}%".format(think_tot / grand_total * 100) if grand_total > 0 else "0%" }} of total</span>
+                </div>
+                
+                <!-- System/Tool -->
+                <div style="background-color: var(--bg-primary); border: 1px solid var(--border-color); padding: 20px; border-radius: var(--border-radius-md); box-shadow: var(--card-shadow); position: relative; overflow: hidden;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="font-size: 11px; color: var(--text-tertiary); font-weight: 700; text-transform: uppercase;">System / Tool</span>
+                        <i class="fas fa-terminal" style="color: var(--text-tertiary); font-size: 16px;"></i>
+                    </div>
+                    <span id="widget-val-sys" data-tokens="{{ sys_tot }}" style="font-size: 24px; font-weight: 800; font-family: var(--font-heading); color: var(--text-primary);">{{ "{:,}".format(sys_tot) }}</span>
+                    <span id="widget-sub-sys" style="font-size: 10px; display: block; margin-top: 4px; color: var(--text-tertiary);">{{ "{:.1f}%".format(sys_tot / grand_total * 100) if grand_total > 0 else "0%" }} of total</span>
+                </div>
+            </div>
+            
+            <!-- Charts Section Layout -->
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 32px;">
+                <!-- Chart Card (Timeseries) -->
+                <div style="background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); padding: 28px; box-shadow: var(--glass-shadow); display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <!-- Chart Control Bar -->
+                        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px;">
+                            <div style="display: flex; flex-direction: column; gap: 2px;">
+                                <h3 style="font-size: 18px; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 8px;">
+                                    Token Consumption Trend
+                                </h3>
+                                <span id="chartSubtitle" style="font-size: 11px; color: var(--text-tertiary); font-weight: 600;">Daily aggregate totals over the active conversation</span>
+                            </div>
+                            
+                            <!-- Filters -->
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div class="filter-btn-group" style="display: flex; background-color: var(--bg-secondary); border: 1px solid var(--border-color); padding: 4px; border-radius: 8px;">
+                                    <button onclick="setFilter('daily')" class="chart-filter-btn active" id="btn-daily">Daily</button>
+                                    <button onclick="setFilter('weekly')" class="chart-filter-btn" id="btn-weekly">Weekly</button>
+                                    <button onclick="setFilter('monthly')" class="chart-filter-btn" id="btn-monthly">Monthly</button>
+                                    <button onclick="setFilter('yearly')" class="chart-filter-btn" id="btn-yearly">Yearly</button>
+                                    <button onclick="setFilter('custom')" class="chart-filter-btn" id="btn-custom">Custom</button>
+                                    <button onclick="setFilter('all')" class="chart-filter-btn" id="btn-all">All Time</button>
+                                </div>
+                                
+                                <div class="toggle-btn-group" style="display: flex; background-color: var(--bg-secondary); border: 1px solid var(--border-color); padding: 4px; border-radius: 8px;">
+                                    <button onclick="setView('category')" class="chart-toggle-btn active" id="btn-cat" title="Breakdown by Category"><i class="fas fa-shapes"></i></button>
+                                    <button onclick="setView('type')" class="chart-toggle-btn" id="btn-type" title="Breakdown by Token Type"><i class="fas fa-list-ol"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Custom Date Picker Panel -->
+                        <div id="customDatePanel" style="display: none; background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; align-items: center; gap: 16px; width: fit-content; animation: fadeIn 0.2s ease;">
+                            <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: var(--text-secondary);">
+                                <span>Start:</span>
+                                <input type="date" id="customStart" style="padding: 6px 10px; border: 1px solid var(--border-color); border-radius: 6px; background-color: var(--bg-primary); color: var(--text-primary); font-family: var(--font-body); font-size: 12px;">
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: var(--text-secondary);">
+                                <span>End:</span>
+                                <input type="date" id="customEnd" style="padding: 6px 10px; border: 1px solid var(--border-color); border-radius: 6px; background-color: var(--bg-primary); color: var(--text-primary); font-family: var(--font-body); font-size: 12px;">
+                            </div>
+                            <button onclick="applyCustomDates()" class="btn btn-primary" style="padding: 6px 14px; font-size: 12px; border-radius: 6px; margin: 0;">Apply</button>
+                        </div>
+                        
+                        <!-- Canvas container -->
+                        <div style="position: relative; height: 320px; width: 100%;">
+                            <canvas id="tokensTimeseriesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Category Summary Breakdown Card -->
+                <div style="background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); padding: 28px; box-shadow: var(--glass-shadow); display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 4px;">Category Breakup</h3>
+                        <p style="font-size: 11px; color: var(--text-tertiary); font-weight: 600; margin-bottom: 24px;">Token distribution relative to project focus areas</p>
+                        
+                        <!-- Doughnut container -->
+                        <div style="position: relative; height: 160px; width: 100%; margin-bottom: 24px; display: flex; justify-content: center;">
+                            <canvas id="categoryDoughnutChart"></canvas>
+                        </div>
+                        
+                        <!-- Progress Bars breakdown list -->
+                        <div style="display: flex; flex-direction: column; gap: 12px; text-align: left;">
+                            {% for cat in categories %}
+                            {% set total_cat_tokens = cat.total or 0 %}
+                            {% set percent = (total_cat_tokens / grand_total * 100) if grand_total > 0 else 0 %}
+                            <div>
+                                <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; margin-bottom: 4px;">
+                                    <span style="color: var(--text-secondary); display: flex; align-items: center; gap: 6px;">
+                                        <span class="category-bullet" data-category="{{ cat.category }}" style="width: 8px; height: 8px; border-radius: 50%; display: inline-block;"></span>
+                                        {{ cat.category }}
+                                    </span>
+                                    <span class="category-val-text" 
+                                          data-category="{{ cat.category }}"
+                                          data-user="{{ cat.user_total or 0 }}"
+                                          data-system="{{ cat.system_total or 0 }}"
+                                          data-completion="{{ cat.completion_total or 0 }}"
+                                          data-thinking="{{ cat.thinking_total or 0 }}"
+                                          style="color: var(--text-primary);">
+                                        {{ "{:,}".format(total_cat_tokens|int) }} ({{ "{:.1f}%".format(percent) }})
+                                    </span>
+                                </div>
+                                <div style="width: 100%; height: 6px; background-color: var(--bg-secondary); border-radius: 3px; overflow: hidden; border: 1px solid var(--border-color);">
+                                    <div class="category-bar" data-category="{{ cat.category }}" style="height: 100%; width: {{ percent }}%; border-radius: 3px;"></div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Table card wrapper -->
+            <div style="background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); padding: 32px; box-shadow: var(--glass-shadow); text-align: left;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                    <div>
+                        <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 4px;">Recent Token Activity Logs</h3>
+                        <p style="font-size: 12px; color: var(--text-tertiary); margin: 0;">Detailed view of the last 15 actions performed by the agent</p>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <input type="text" id="logSearch" placeholder="Search activity..." onkeyup="filterLogsTable()" style="padding: 8px 14px; font-size: 13px; border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); outline: none; background-color: var(--bg-secondary); color: var(--text-primary);">
+                    </div>
+                </div>
+                
+                {% if recent_activity %}
+                <table id="activityTable" style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid var(--border-color); color: var(--text-secondary); font-weight: 600;">
+                            <th style="padding: 12px 16px;">Step Index</th>
+                            <th style="padding: 12px 16px;">Category</th>
+                            <th style="padding: 12px 16px;">Timestamp</th>
+                            <th style="padding: 12px 16px; text-align: right;">Estimated Consumption</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for step in recent_activity %}
+                        <tr style="border-bottom: 1px solid var(--border-color); transition: var(--transition-fast);" onmouseover="this.style.backgroundColor='var(--bg-secondary)'" onmouseout="this.style.backgroundColor='transparent'">
+                            <td style="padding: 16px; font-weight: 700; color: var(--accent-blue);">
+                                #{{ step.step_index }}
+                            </td>
+                            <td style="padding: 16px; font-weight: 600;">
+                                <span class="ai-card-tag" style="margin: 0; font-size: 11px; padding: 3px 10px; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px;
+                                    {% if step.category == 'Design & Aesthetics' %}background-color: rgba(217, 70, 239, 0.08); color: #d946ef; border: 1px solid rgba(217, 70, 239, 0.15);
+                                    {% elif step.category == 'Careers Section' %}background-color: rgba(6, 182, 212, 0.08); color: #06b6d4; border: 1px solid rgba(6, 182, 212, 0.15);
+                                    {% elif step.category == 'Case Studies' %}background-color: rgba(124, 58, 237, 0.08); color: #7c3aed; border: 1px solid rgba(124, 58, 237, 0.15);
+                                    {% elif step.category == 'Admin Features' %}background-color: rgba(99, 102, 241, 0.08); color: #6366f1; border: 1px solid rgba(99, 102, 241, 0.15);
+                                    {% elif step.category == 'Core Backend & Data' %}background-color: rgba(139, 92, 246, 0.08); color: #8b5cf6; border: 1px solid rgba(139, 92, 246, 0.15);
+                                    {% elif step.category == 'About Us Modernization' %}background-color: rgba(217, 119, 6, 0.08); color: #d97706; border: 1px solid rgba(217, 119, 6, 0.15);
+                                    {% else %}background-color: rgba(100, 116, 139, 0.08); color: #64748b; border: 1px solid rgba(100, 116, 139, 0.15);{% endif %}">
+                                    {{ step.category }}
+                                </span>
+                            </td>
+                            <td style="padding: 16px; color: var(--text-tertiary); font-family: monospace; font-size: 12px;">{{ step.timestamp }}</td>
+                            <td style="padding: 16px; text-align: right; font-weight: 700; color: var(--text-primary);">
+                                <span class="activity-val" 
+                                      data-user="{{ step.user_tokens or 0 }}"
+                                      data-system="{{ step.system_tokens or 0 }}"
+                                      data-completion="{{ step.completion_tokens or 0 }}"
+                                      data-thinking="{{ step.thinking_tokens or 0 }}">
+                                    {{ "{:,}".format(step.total_tokens|int) }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div style="text-align: center; padding: 40px 0;">
+                    <i class="fas fa-history" style="font-size: 40px; color: var(--text-tertiary); margin-bottom: 12px;"></i>
+                    <p style="color: var(--text-secondary);">No token records recorded yet. Start interacting with the AI agent to populate records.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+    </div>
+</section>
+
+<!-- Include Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+    /* Styling chart controls */
+    .chart-filter-btn {
+        background: none;
+        border: none;
+        outline: none;
+        padding: 6px 12px;
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--text-secondary);
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .chart-filter-btn:hover {
+        color: var(--text-primary);
+        background-color: rgba(124, 58, 237, 0.05);
+    }
+    .chart-filter-btn.active {
+        color: #ffffff;
+        background: var(--grad-primary);
+        box-shadow: 0 4px 10px rgba(124, 58, 237, 0.15);
+    }
+    
+    .chart-toggle-btn {
+        background: none;
+        border: none;
+        outline: none;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        color: var(--text-secondary);
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .chart-toggle-btn:hover {
+        color: var(--text-primary);
+        background-color: rgba(124, 58, 237, 0.05);
+    }
+    .chart-toggle-btn.active {
+        color: #ffffff;
+        background: var(--accent-blue);
+        box-shadow: 0 4px 10px rgba(124, 58, 237, 0.15);
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-5px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+<script>
+    // Color definitions
+    const colors = {
+        categories: {
+            'Design & Aesthetics': '#d946ef',
+            'Careers Section': '#06b6d4',
+            'Case Studies': '#7c3aed',
+            'Admin Features': '#6366f1',
+            'Core Backend & Data': '#8b5cf6',
+            'About Us Modernization': '#d97706',
+            'General / Infrastructure': '#64748b'
+        },
+        types: {
+            'Prompt (User)': '#7c3aed',
+            'Completion': '#d946ef',
+            'Thinking': '#06b6d4',
+            'System/Tool': '#94a3b8'
+        }
+    };
+
+    // Apply color palettes to static markup elements dynamically
+    document.querySelectorAll('.category-bullet').forEach(bullet => {
+        const cat = bullet.getAttribute('data-category');
+        bullet.style.backgroundColor = colors.categories[cat] || '#ccc';
+    });
+    document.querySelectorAll('.category-bar').forEach(bar => {
+        const cat = bar.getAttribute('data-category');
+        bar.style.backgroundColor = colors.categories[cat] || '#ccc';
+    });
+
+    const pricing = {
+        input: parseFloat(localStorage.getItem('customInputRate')) ?? 4.05,
+        output: parseFloat(localStorage.getItem('customOutputRate')) ?? 20.25
+    };
+    if (isNaN(pricing.input)) pricing.input = 4.05;
+    if (isNaN(pricing.output)) pricing.output = 20.25;
+
+    let rawData = [];
+    let activeFilter = 'daily'; // daily, weekly, monthly, yearly, custom, all
+    let activeView = 'category'; // category, type
+    let activeMetric = localStorage.getItem('activeMetric') || 'tokens'; // tokens, cost, both
+    let showCustomPanel = localStorage.getItem('showCustomPanel') === 'true';
+
+    let timeseriesChartInstance = null;
+    let doughnutChartInstance = null;
+
+    // Initialize UI on page load
+    document.addEventListener("DOMContentLoaded", () => {
+        // Set active class on metric buttons
+        document.querySelectorAll('.metric-btn-group button').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        const activeBtn = document.getElementById(`metric-btn-${activeMetric}`);
+        if (activeBtn) activeBtn.classList.add('active');
+
+        // Set custom rate input values
+        const inRateEl = document.getElementById('customInputRate');
+        const outRateEl = document.getElementById('customOutputRate');
+        if (inRateEl) inRateEl.value = pricing.input;
+        if (outRateEl) outRateEl.value = pricing.output;
+
+        // Manage custom input panel visibility
+        const panel = document.getElementById('customPricingPanel');
+        const btnToggleCustom = document.getElementById('btn-toggle-custom');
+        if (panel && btnToggleCustom) {
+            panel.style.display = showCustomPanel ? 'flex' : 'none';
+            if (showCustomPanel) {
+                btnToggleCustom.classList.add('active');
+                btnToggleCustom.style.backgroundColor = 'var(--accent-blue)';
+                btnToggleCustom.style.color = '#ffffff';
+            } else {
+                btnToggleCustom.classList.remove('active');
+                btnToggleCustom.style.backgroundColor = '';
+                btnToggleCustom.style.color = '';
+            }
+        }
+    });
+
+    // Fetch Token Data on Load
+    fetch('/admin/tokens/data')
+        .then(response => response.json())
+        .then(data => {
+            rawData = data;
+            updateDashboard();
+        })
+        .catch(err => console.error("Error fetching token analytics data:", err));
+
+    function setMetric(metric) {
+        activeMetric = metric;
+        localStorage.setItem('activeMetric', metric);
+        
+        document.querySelectorAll('.metric-btn-group button').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        const activeBtn = document.getElementById(`metric-btn-${metric}`);
+        if (activeBtn) activeBtn.classList.add('active');
+
+        updateDashboard();
+    }
+
+    function toggleCustomPanel() {
+        showCustomPanel = !showCustomPanel;
+        localStorage.setItem('showCustomPanel', showCustomPanel ? 'true' : 'false');
+
+        const panel = document.getElementById('customPricingPanel');
+        const btnToggleCustom = document.getElementById('btn-toggle-custom');
+        if (panel && btnToggleCustom) {
+            panel.style.display = showCustomPanel ? 'flex' : 'none';
+            if (showCustomPanel) {
+                btnToggleCustom.classList.add('active');
+                btnToggleCustom.style.backgroundColor = 'var(--accent-blue)';
+                btnToggleCustom.style.color = '#ffffff';
+            } else {
+                btnToggleCustom.classList.remove('active');
+                btnToggleCustom.style.backgroundColor = '';
+                btnToggleCustom.style.color = '';
+            }
+        }
+    }
+
+    function updateCustomRates() {
+        const inRate = parseFloat(document.getElementById('customInputRate').value) || 0;
+        const outRate = parseFloat(document.getElementById('customOutputRate').value) || 0;
+
+        pricing.input = inRate;
+        pricing.output = outRate;
+
+        localStorage.setItem('customInputRate', inRate);
+        localStorage.setItem('customOutputRate', outRate);
+
+        updateDashboard();
+    }
+
+    function resetToDefaultRates() {
+        const defaultIn = 4.05;
+        const defaultOut = 20.25;
+
+        document.getElementById('customInputRate').value = defaultIn;
+        document.getElementById('customOutputRate').value = defaultOut;
+
+        pricing.input = defaultIn;
+        pricing.output = defaultOut;
+
+        localStorage.setItem('customInputRate', defaultIn);
+        localStorage.setItem('customOutputRate', defaultOut);
+
+        updateDashboard();
+    }
+
+    function calculateCost(user, system, completion, thinking) {
+        const inputTokens = (parseFloat(user) || 0) + (parseFloat(system) || 0);
+        const outputTokens = (parseFloat(completion) || 0) + (parseFloat(thinking) || 0);
+        const inputCost = (inputTokens / 1000000) * pricing.input;
+        const outputCost = (outputTokens / 1000000) * pricing.output;
+        return inputCost + outputCost;
+    }
+
+    function formatCost(val) {
+        if (val === 0) return '$0.00';
+        if (val < 0.01) {
+            return '$' + val.toLocaleString('en-US', { minimumFractionDigits: 4, maximumFractionDigits: 6 });
+        }
+        return '$' + val.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 });
+    }
+
+    function formatMetric(tokens, cost) {
+        if (activeMetric === 'tokens') {
+            return new Intl.NumberFormat().format(Math.round(tokens));
+        } else if (activeMetric === 'cost') {
+            return formatCost(cost);
+        } else { // both
+            return `${new Intl.NumberFormat().format(Math.round(tokens))} (${formatCost(cost)})`;
+        }
+    }
+
+    function updateDashboard() {
+        updateWidgets();
+        updateCategories();
+        updateLogsTable();
+        renderDoughnutChart();
+        renderTimeseriesChart();
+        
+        // Dynamic visibility/opacity of chart view toggle (Category/Type)
+        const viewToggleGroup = document.querySelector('.toggle-btn-group');
+        if (viewToggleGroup) {
+            if (activeMetric === 'both') {
+                viewToggleGroup.style.opacity = '0.4';
+                viewToggleGroup.style.pointerEvents = 'none';
+            } else {
+                viewToggleGroup.style.opacity = '1';
+                viewToggleGroup.style.pointerEvents = 'auto';
+            }
+        }
+    }
+
+    function updateWidgets() {
+        // Grand total widget
+        const widgetGrandVal = document.getElementById('widget-val-grand');
+        const widgetGrandSub = document.getElementById('widget-sub-grand');
+        
+        // Prompt (User) widget
+        const widgetUserVal = document.getElementById('widget-val-user');
+        const widgetUserSub = document.getElementById('widget-sub-user');
+        
+        // Completion widget
+        const widgetCompVal = document.getElementById('widget-val-comp');
+        const widgetCompSub = document.getElementById('widget-sub-comp');
+        
+        // Reasoning widget
+        const widgetThinkVal = document.getElementById('widget-val-think');
+        const widgetThinkSub = document.getElementById('widget-sub-think');
+        
+        // System/Tool widget
+        const widgetSysVal = document.getElementById('widget-val-sys');
+        const widgetSysSub = document.getElementById('widget-sub-sys');
+
+        if (widgetGrandVal && widgetUserVal && widgetCompVal && widgetThinkVal && widgetSysVal) {
+            const user = parseFloat(widgetUserVal.getAttribute('data-tokens')) || 0;
+            const system = parseFloat(widgetSysVal.getAttribute('data-tokens')) || 0;
+            const comp = parseFloat(widgetCompVal.getAttribute('data-tokens')) || 0;
+            const think = parseFloat(widgetThinkVal.getAttribute('data-tokens')) || 0;
+            
+            const grandTokens = user + system + comp + think;
+            const grandCost = calculateCost(user, system, comp, think);
+            
+            widgetGrandVal.innerText = formatMetric(grandTokens, grandCost);
+            widgetGrandSub.innerText = activeMetric === 'tokens' ? 'Tokens Consumed' : (activeMetric === 'cost' ? 'Total Cost (USD)' : 'Tokens & Cost');
+
+            // Update user prompt widget
+            const userCost = calculateCost(user, 0, 0, 0);
+            widgetUserVal.innerText = formatMetric(user, userCost);
+            const userPct = grandTokens > 0 ? ((user / grandTokens) * 100).toFixed(1) : '0.0';
+            widgetUserSub.innerText = `${userPct}% of total`;
+
+            // Update completion widget
+            const compCost = calculateCost(0, 0, comp, 0);
+            widgetCompVal.innerText = formatMetric(comp, compCost);
+            const compPct = grandTokens > 0 ? ((comp / grandTokens) * 100).toFixed(1) : '0.0';
+            widgetCompSub.innerText = `${compPct}% of total`;
+
+            // Update thinking widget
+            const thinkCost = calculateCost(0, 0, 0, think);
+            widgetThinkVal.innerText = formatMetric(think, thinkCost);
+            const thinkPct = grandTokens > 0 ? ((think / grandTokens) * 100).toFixed(1) : '0.0';
+            widgetThinkSub.innerText = `${thinkPct}% of total`;
+
+            // Update system/tool widget
+            const sysCost = calculateCost(0, system, 0, 0);
+            widgetSysVal.innerText = formatMetric(system, sysCost);
+            const sysPct = grandTokens > 0 ? ((system / grandTokens) * 100).toFixed(1) : '0.0';
+            widgetSysSub.innerText = `${sysPct}% of total`;
+        }
+    }
+
+    function updateCategories() {
+        let grandTotalTokens = 0;
+        let grandTotalCost = 0;
+        
+        const elements = document.querySelectorAll('.category-val-text');
+        const data = [];
+        
+        elements.forEach(el => {
+            const user = parseFloat(el.getAttribute('data-user')) || 0;
+            const system = parseFloat(el.getAttribute('data-system')) || 0;
+            const comp = parseFloat(el.getAttribute('data-completion')) || 0;
+            const think = parseFloat(el.getAttribute('data-thinking')) || 0;
+            
+            const totalTokens = user + system + comp + think;
+            const totalCost = calculateCost(user, system, comp, think);
+            
+            grandTotalTokens += totalTokens;
+            grandTotalCost += totalCost;
+            
+            data.push({ el, totalTokens, totalCost });
+        });
+        
+        data.forEach(item => {
+            const { el, totalTokens, totalCost } = item;
+            const cat = el.getAttribute('data-category');
+            
+            let pct = 0;
+            if (activeMetric === 'tokens') {
+                pct = grandTotalTokens > 0 ? (totalTokens / grandTotalTokens * 100) : 0;
+            } else {
+                pct = grandTotalCost > 0 ? (totalCost / grandTotalCost * 100) : 0;
+            }
+            
+            el.innerText = `${formatMetric(totalTokens, totalCost)} (${pct.toFixed(1)}%)`;
+            
+            const bar = document.querySelector(`.category-bar[data-category="${CSS.escape(cat)}"]`);
+            if (bar) {
+                bar.style.width = `${pct}%`;
+            }
+        });
+    }
+
+    function updateLogsTable() {
+        const elements = document.querySelectorAll('.activity-val');
+        elements.forEach(el => {
+            const user = parseFloat(el.getAttribute('data-user')) || 0;
+            const system = parseFloat(el.getAttribute('data-system')) || 0;
+            const comp = parseFloat(el.getAttribute('data-completion')) || 0;
+            const think = parseFloat(el.getAttribute('data-thinking')) || 0;
+            
+            const totalTokens = user + system + comp + think;
+            const totalCost = calculateCost(user, system, comp, think);
+            
+            el.innerText = formatMetric(totalTokens, totalCost);
+        });
+    }
+
+    function setFilter(filter) {
+        activeFilter = filter;
+        document.querySelectorAll('.chart-filter-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(`btn-${filter}`).classList.add('active');
+
+        // Manage custom date picker container visibility
+        const panel = document.getElementById('customDatePanel');
+        if (filter === 'custom') {
+            panel.style.display = 'flex';
+        } else {
+            panel.style.display = 'none';
+            renderTimeseriesChart();
+        }
+    }
+
+    function setView(view) {
+        activeView = view;
+        document.getElementById('btn-cat').classList.toggle('active', view === 'category');
+        document.getElementById('btn-type').classList.toggle('active', view === 'type');
+        renderTimeseriesChart();
+    }
+
+    function applyCustomDates() {
+        renderTimeseriesChart();
+    }
+
+    // Dynamic grouping helper functions
+    function getWeekStartDate(dateStr) {
+        const d = new Date(dateStr);
+        const day = d.getDay();
+        const diff = d.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday
+        const startOfWeek = new Date(d.setDate(diff));
+        return startOfWeek.toISOString().slice(0, 10);
+    }
+
+    function getMonthYearLabel(dateStr) {
+        // Returns "Jan 2026", "Feb 2026", etc.
+        const d = new Date(dateStr);
+        return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+    }
+
+    function getYearLabel(dateStr) {
+        const d = new Date(dateStr);
+        return d.getFullYear().toString();
+    }
+
+    function aggregateData() {
+        let filtered = [...rawData];
+
+        // Apply Custom date filtering if custom filter is active
+        if (activeFilter === 'custom') {
+            const start = document.getElementById('customStart').value;
+            const end = document.getElementById('customEnd').value;
+            if (start) {
+                filtered = filtered.filter(item => item.date >= start);
+            }
+            if (end) {
+                filtered = filtered.filter(item => item.date <= end);
+            }
+        }
+
+        // Apply automatic bounds for cleaner viewing if not custom or all-time
+        if (activeFilter === 'daily') {
+            // Last 30 days
+            const limitDate = new Date();
+            limitDate.setDate(limitDate.getDate() - 30);
+            const limitStr = limitDate.toISOString().slice(0, 10);
+            filtered = filtered.filter(item => item.date >= limitStr);
+        } else if (activeFilter === 'weekly') {
+            // Last 12 weeks
+            const limitDate = new Date();
+            limitDate.setDate(limitDate.getDate() - 84);
+            const limitStr = limitDate.toISOString().slice(0, 10);
+            filtered = filtered.filter(item => item.date >= limitStr);
+        } else if (activeFilter === 'monthly') {
+            // Last 12 months
+            const limitDate = new Date();
+            limitDate.setMonth(limitDate.getMonth() - 12);
+            const limitStr = limitDate.toISOString().slice(0, 10);
+            filtered = filtered.filter(item => item.date >= limitStr);
+        }
+
+        // Object containing { label: { key: sum } }
+        const groups = {};
+
+        filtered.forEach(item => {
+            let label = item.date;
+            if (activeFilter === 'weekly') {
+                label = getWeekStartDate(item.date);
+            } else if (activeFilter === 'monthly') {
+                label = getMonthYearLabel(item.date);
+            } else if (activeFilter === 'yearly') {
+                label = getYearLabel(item.date);
+            }
+
+            if (!groups[label]) {
+                groups[label] = {};
+            }
+
+            if (activeMetric === 'both') {
+                const cost = calculateCost(item.user_tokens, item.system_tokens, item.completion_tokens, item.thinking_tokens);
+                groups[label]['Total Tokens'] = (groups[label]['Total Tokens'] || 0) + item.total_tokens;
+                groups[label]['Total Cost'] = (groups[label]['Total Cost'] || 0) + cost;
+            } else if (activeView === 'category') {
+                const cat = item.category || 'General / Infrastructure';
+                const val = activeMetric === 'tokens' 
+                    ? item.total_tokens 
+                    : calculateCost(item.user_tokens, item.system_tokens, item.completion_tokens, item.thinking_tokens);
+                groups[label][cat] = (groups[label][cat] || 0) + val;
+            } else {
+                const promptVal = activeMetric === 'tokens' ? item.user_tokens : calculateCost(item.user_tokens, 0, 0, 0);
+                const completionVal = activeMetric === 'tokens' ? item.completion_tokens : calculateCost(0, 0, item.completion_tokens, 0);
+                const thinkingVal = activeMetric === 'tokens' ? item.thinking_tokens : calculateCost(0, 0, 0, item.thinking_tokens);
+                const systemVal = activeMetric === 'tokens' ? item.system_tokens : calculateCost(0, item.system_tokens, 0, 0);
+
+                groups[label]['Prompt (User)'] = (groups[label]['Prompt (User)'] || 0) + promptVal;
+                groups[label]['Completion'] = (groups[label]['Completion'] || 0) + completionVal;
+                groups[label]['Thinking'] = (groups[label]['Thinking'] || 0) + thinkingVal;
+                groups[label]['System/Tool'] = (groups[label]['System/Tool'] || 0) + systemVal;
+            }
+        });
+
+        // Sort labels
+        const sortedLabels = Object.keys(groups).sort((a, b) => {
+            // Try sorting as date or string
+            if (activeFilter === 'monthly') {
+                return new Date(a) - new Date(b);
+            }
+            return a.localeCompare(b);
+        });
+
+        return { labels: sortedLabels, groups };
+    }
+
+    function renderTimeseriesChart() {
+        const { labels, groups } = aggregateData();
+        const ctx = document.getElementById('tokensTimeseriesChart').getContext('2d');
+        
+        let datasets = [];
+        let chartOptions = {};
+
+        if (activeMetric === 'both') {
+            datasets = [
+                {
+                    label: 'Total Tokens',
+                    data: labels.map(label => groups[label]['Total Tokens'] || 0),
+                    borderColor: '#7c3aed',
+                    backgroundColor: 'rgba(124, 58, 237, 0.05)',
+                    borderWidth: 2.5,
+                    fill: false,
+                    tension: 0.35,
+                    yAxisID: 'y',
+                    pointRadius: labels.length > 40 ? 0 : 3,
+                    pointHoverRadius: 6
+                },
+                {
+                    label: 'Total Cost (USD)',
+                    data: labels.map(label => groups[label]['Total Cost'] || 0),
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.05)',
+                    borderWidth: 2.5,
+                    fill: false,
+                    tension: 0.35,
+                    yAxisID: 'y1',
+                    pointRadius: labels.length > 40 ? 0 : 3,
+                    pointHoverRadius: 6
+                }
+            ];
+
+            chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            font: { size: 10, weight: '600', family: 'Fira Sans' },
+                            padding: 16,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        padding: 12,
+                        cornerRadius: 8,
+                        titleFont: { size: 12, weight: '700', family: 'Fira Sans' },
+                        bodyFont: { size: 11, family: 'Fira Sans' },
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    if (context.dataset.label.includes('Tokens')) {
+                                        label += new Intl.NumberFormat().format(Math.round(context.parsed.y)) + ' tokens';
+                                    } else {
+                                        label += formatCost(context.parsed.y);
+                                    }
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: {
+                            font: { size: 10, weight: '600', family: 'Fira Sans' },
+                            maxRotation: 45
+                        }
+                    },
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        title: {
+                            display: true,
+                            text: 'Tokens Count',
+                            font: { size: 10, weight: '700', family: 'Fira Sans' }
+                        },
+                        grid: { color: 'rgba(0, 0, 0, 0.04)' },
+                        ticks: {
+                            font: { size: 10, weight: '600', family: 'Fira Sans' },
+                            callback: function(value) {
+                                return new Intl.NumberFormat().format(value);
+                            }
+                        }
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        title: {
+                            display: true,
+                            text: 'Cost (USD)',
+                            font: { size: 10, weight: '700', family: 'Fira Sans' }
+                        },
+                        grid: {
+                            drawOnChartArea: false
+                        },
+                        ticks: {
+                            font: { size: 10, weight: '600', family: 'Fira Sans' },
+                            callback: function(value) {
+                                return formatCost(value);
+                            }
+                        }
+                    }
+                }
+            };
+        } else {
+            let keys = [];
+            let palette = {};
+            if (activeView === 'category') {
+                keys = Object.keys(colors.categories);
+                palette = colors.categories;
+            } else {
+                keys = Object.keys(colors.types);
+                palette = colors.types;
+            }
+
+            datasets = keys.map(key => {
+                const dataPoints = labels.map(label => groups[label][key] || 0);
+                return {
+                    label: key,
+                    data: dataPoints,
+                    borderColor: palette[key],
+                    backgroundColor: palette[key] + '20',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.35,
+                    pointRadius: labels.length > 40 ? 0 : 3,
+                    pointHoverRadius: 6
+                };
+            });
+
+            chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            font: { size: 10, weight: '600', family: 'Fira Sans' },
+                            padding: 16,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        padding: 12,
+                        cornerRadius: 8,
+                        titleFont: { size: 12, weight: '700', family: 'Fira Sans' },
+                        bodyFont: { size: 11, family: 'Fira Sans' },
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    if (activeMetric === 'tokens') {
+                                        label += new Intl.NumberFormat().format(Math.round(context.parsed.y)) + ' tokens';
+                                    } else {
+                                        label += formatCost(context.parsed.y);
+                                    }
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        stacked: true,
+                        grid: { display: false },
+                        ticks: {
+                            font: { size: 10, weight: '600', family: 'Fira Sans' },
+                            maxRotation: 45
+                        }
+                    },
+                    y: {
+                        stacked: true,
+                        grid: { color: 'rgba(0, 0, 0, 0.04)' },
+                        ticks: {
+                            font: { size: 10, weight: '600', family: 'Fira Sans' },
+                            callback: function(value) {
+                                if (activeMetric === 'tokens') {
+                                    return new Intl.NumberFormat().format(value);
+                                } else {
+                                    return formatCost(value);
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+        }
+
+        const subtitleEl = document.getElementById('chartSubtitle');
+        let textVal = '';
+        if (activeFilter === 'daily') textVal = "Daily aggregate totals for the last 30 active days";
+        else if (activeFilter === 'weekly') textVal = "Weekly aggregated workloads (Week Starting Mondays)";
+        else if (activeFilter === 'monthly') textVal = "Monthly totals across the development process";
+        else if (activeFilter === 'yearly') textVal = "Annual consumption totals";
+        else if (activeFilter === 'custom') textVal = "Custom date timeframe filtering";
+        else textVal = "Lifetime token consumption charts";
+
+        if (activeMetric === 'both') {
+            textVal += " (Tokens & Cost Dual Axes)";
+        } else if (activeMetric === 'cost') {
+            textVal += " (Cost USD)";
+        } else {
+            textVal += " (Tokens Count)";
+        }
+        subtitleEl.innerText = textVal;
+
+        if (timeseriesChartInstance) {
+            timeseriesChartInstance.destroy();
+        }
+
+        timeseriesChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: datasets
+            },
+            options: chartOptions
+        });
+    }
+
+    function renderDoughnutChart() {
+        const totals = {};
+        rawData.forEach(item => {
+            const cat = item.category || 'General / Infrastructure';
+            const val = activeMetric === 'tokens' 
+                ? (item.total_tokens || 0)
+                : calculateCost(item.user_tokens, item.system_tokens, item.completion_tokens, item.thinking_tokens);
+            totals[cat] = (totals[cat] || 0) + val;
+        });
+
+        const ctx = document.getElementById('categoryDoughnutChart').getContext('2d');
+        const labels = Object.keys(colors.categories);
+        const data = labels.map(l => totals[l] || 0);
+        const bgColors = labels.map(l => colors.categories[l]);
+
+        if (doughnutChartInstance) {
+            doughnutChartInstance.destroy();
+        }
+
+        doughnutChartInstance = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: bgColors,
+                    borderWidth: 2,
+                    borderColor: '#ffffff',
+                    hoverOffset: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        padding: 12,
+                        cornerRadius: 8,
+                        titleFont: { size: 12, weight: '700', family: 'Fira Sans' },
+                        bodyFont: { size: 11, family: 'Fira Sans' },
+                        callbacks: {
+                            label: function(context) {
+                                const val = context.raw;
+                                const sum = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const pct = sum > 0 ? ((val / sum) * 100).toFixed(1) : 0;
+                                const formattedVal = activeMetric === 'tokens' 
+                                    ? new Intl.NumberFormat().format(Math.round(val)) + ' tokens'
+                                    : formatCost(val);
+                                return ` ${context.label}: ${formattedVal} (${pct}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Search filter function for the activity table logs
+    function filterLogsTable() {
+        const input = document.getElementById("logSearch");
+        const filter = input.value.toLowerCase();
+        const table = document.getElementById("activityTable");
+        if (!table) return;
+        const trs = table.getElementsByTagName("tr");
+
+        for (let i = 1; i < trs.length; i++) {
+            const tdCategory = trs[i].getElementsByTagName("td")[1];
+            const tdTimestamp = trs[i].getElementsByTagName("td")[2];
+            let display = false;
+
+            if (tdCategory && tdCategory.textContent.toLowerCase().indexOf(filter) > -1) {
+                display = true;
+            }
+            if (tdTimestamp && tdTimestamp.textContent.toLowerCase().indexOf(filter) > -1) {
+                display = true;
+            }
+
+            trs[i].style.display = display ? "" : "none";
+        }
+    }
+</script>
+{% endblock %}

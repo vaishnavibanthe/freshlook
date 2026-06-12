@@ -1,0 +1,458 @@
+{% extends "base_crm.html" %}
+
+{% block title %}Manager SQL Review Queue - ThinkArtha{% endblock %}
+
+{% block extra_head %}
+<style>
+    .sql-review-container {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .sql-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13.5px;
+    }
+
+    .sql-table th {
+        background: rgba(22, 45, 80, 0.4);
+        padding: 12px 16px;
+        text-align: left;
+        font-weight: 700;
+        border-bottom: 1px solid var(--border-crm);
+        color: var(--text-crm-primary);
+    }
+
+    .sql-table td {
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--border-crm);
+        color: var(--text-crm-secondary);
+        vertical-align: middle;
+    }
+
+    .sql-table tr:hover td {
+        background: rgba(22, 45, 80, 0.15);
+    }
+
+    /* Modals */
+    .modal-backdrop {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.75);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        backdrop-filter: blur(4px);
+    }
+
+    .modal-card {
+        background: var(--bg-sidebar);
+        border: 1px solid var(--border-crm);
+        border-radius: 12px;
+        width: 100%;
+        max-width: 600px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .modal-header {
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border-crm);
+        background: rgba(22, 45, 80, 0.2);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: 700;
+    }
+
+    .modal-body {
+        padding: 20px;
+        overflow-y: auto;
+        max-height: 80vh;
+    }
+
+    .warning-label {
+        font-size: 11px;
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: 4px;
+        background-color: rgba(245, 158, 11, 0.15);
+        color: #f59e0b;
+        margin-right: 6px;
+        display: inline-block;
+        margin-bottom: 4px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="sql-review-container">
+    <div class="crm-title-section" style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h1>Manager SQL Review Queue</h1>
+            <p>Qualify discovery meetings and hand over high-potential accounts to Sales Managers</p>
+        </div>
+        <button class="btn-crm btn-crm-secondary" onclick="loadSQLQueue()">
+            <i class="fas fa-sync-alt"></i> Refresh Queue
+        </button>
+    </div>
+
+    <!-- SQL list table -->
+    <div class="crm-card" style="padding: 0; overflow-x: auto;">
+        <table class="sql-table">
+            <thead>
+                <tr>
+                    <th>Contact Info</th>
+                    <th>Telecaller / Campaign</th>
+                    <th>Meeting Details</th>
+                    <th>Lead Rating</th>
+                    <th>Product & Partner</th>
+                    <th style="text-align: right;">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="sql-queue-tbody">
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 40px; color: var(--text-crm-muted);">
+                        <i class="fas fa-spinner fa-spin" style="font-size: 24px; margin-bottom: 10px;"></i>
+                        <p>Loading SQL reviews...</p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div id="sql-empty-msg" style="display: none; text-align: center; padding: 60px; color: var(--text-crm-muted);">
+            <i class="fas fa-check-circle" style="font-size: 36px; color: #10b981; margin-bottom: 16px;"></i>
+            <h3 style="color: #fff; font-weight: 700; margin-bottom: 4px;">Queue Clear!</h3>
+            <p>There are no pending SQL submissions to review.</p>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: Inspection & Approval -->
+<div class="modal-backdrop" id="sql-approval-modal">
+    <div class="modal-card">
+        <div class="modal-header">
+            <span><i class="fas fa-check-circle"></i> Approve SQL and Hand Over</span>
+            <button onclick="closeModal('sql-approval-modal')" style="background: none; border: none; color: #fff; cursor: pointer; font-size: 16px;"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <div id="warnings-container" style="margin-bottom: 16px; display: none;">
+                <!-- Match warnings inject here -->
+            </div>
+            
+            <div class="crm-card" style="padding: 16px; margin-bottom: 16px; background: rgba(9, 19, 34, 0.4);">
+                <h4 style="margin-bottom: 8px; color: #fff; font-size: 13.5px;">Meeting Discovery Details</h4>
+                <div style="font-size: 12.5px; display: flex; flex-direction: column; gap: 6px;">
+                    <div><strong>MOM:</strong> <span id="view-mom">-</span></div>
+                    <div><strong>Handover Notes / Pain Points:</strong> <span id="view-pain">-</span></div>
+                </div>
+            </div>
+
+            <form onsubmit="approveSQL(event)">
+                <input type="hidden" id="approve-review-id">
+                
+                <div class="form-group">
+                    <label class="form-label">Assign Sales Manager</label>
+                    <select id="approve-sales-rep" class="form-control" required>
+                        <!-- Sales reps options inject here -->
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Handover Approval Notes (Optional)</label>
+                    <textarea id="approve-notes" class="form-control" placeholder="Add approval remarks for the sales team..."></textarea>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                    <button type="button" class="btn-crm btn-crm-secondary" onclick="closeModal('sql-approval-modal')">Cancel</button>
+                    <button type="submit" class="btn-crm btn-crm-primary">Approve & Convert</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: Rejection -->
+<div class="modal-backdrop" id="sql-rejection-modal">
+    <div class="modal-card" style="max-width: 450px;">
+        <div class="modal-header">
+            <span><i class="fas fa-times-circle"></i> Reject SQL Submission</span>
+            <button onclick="closeModal('sql-rejection-modal')" style="background: none; border: none; color: #fff; cursor: pointer; font-size: 16px;"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <form onsubmit="rejectSQL(event)">
+                <input type="hidden" id="reject-review-id">
+                
+                <div class="form-group">
+                    <label class="form-label">Rejection Reason</label>
+                    <select id="reject-reason" class="form-control" required>
+                        <option value="">Select Reason</option>
+                        <option value="Insufficient qualification">Insufficient qualification</option>
+                        <option value="Meeting did not happen">Meeting did not happen</option>
+                        <option value="No confirmed requirement">No confirmed requirement</option>
+                        <option value="Wrong persona">Wrong persona</option>
+                        <option value="Existing opportunity">Existing opportunity</option>
+                        <option value="Duplicate">Duplicate</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                    <button type="button" class="btn-crm btn-crm-secondary" onclick="closeModal('sql-rejection-modal')">Cancel</button>
+                    <button type="submit" class="btn-crm btn-crm-danger" style="border: none;">Reject Submission</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: Return for information -->
+<div class="modal-backdrop" id="sql-return-modal">
+    <div class="modal-card" style="max-width: 450px;">
+        <div class="modal-header">
+            <span><i class="fas fa-undo"></i> Return for Qualification Details</span>
+            <button onclick="closeModal('sql-return-modal')" style="background: none; border: none; color: #fff; cursor: pointer; font-size: 16px;"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <form onsubmit="returnSQL(event)">
+                <input type="hidden" id="return-review-id">
+                
+                <div class="form-group">
+                    <label class="form-label">Feedback / Instructions for Telecaller</label>
+                    <textarea id="return-feedback" class="form-control" required placeholder="Specify what additional qualification parameters or pain details are missing..."></textarea>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                    <button type="button" class="btn-crm btn-crm-secondary" onclick="closeModal('sql-return-modal')">Cancel</button>
+                    <button type="submit" class="btn-crm btn-crm-primary">Return to Caller</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    let salesRepsList = [];
+
+    document.addEventListener("DOMContentLoaded", () => {
+        loadSQLQueue();
+        loadSalesReps();
+    });
+
+    function openModal(id) {
+        document.getElementById(id).style.display = 'flex';
+    }
+    
+    function closeModal(id) {
+        document.getElementById(id).style.display = 'none';
+    }
+
+    // Load reps
+    function loadSalesReps() {
+        // Query active sales managers
+        fetch('/telecrm/contacts/new') // fetch new contact page to extract managers
+            .then(res => res.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const options = doc.querySelectorAll("select[name='assigned_telecaller_id'] option");
+                
+                const repSelect = document.getElementById("approve-sales-rep");
+                repSelect.innerHTML = '<option value="">Select Sales Manager</option>';
+                
+                options.forEach(opt => {
+                    if (opt.value) {
+                        salesRepsList.push({ id: opt.value, name: opt.textContent });
+                        const o = document.createElement("option");
+                        o.value = opt.value;
+                        o.textContent = opt.textContent;
+                        repSelect.appendChild(o);
+                    }
+                });
+            });
+    }
+
+    // Query pending reviews
+    function loadSQLQueue() {
+        fetch('/api/telecrm/sql-review')
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.getElementById("sql-queue-tbody");
+                tbody.innerHTML = '';
+                
+                if (data.length === 0) {
+                    document.getElementById("sql-empty-msg").style.display = 'block';
+                    return;
+                }
+                document.getElementById("sql-empty-msg").style.display = 'none';
+                
+                data.forEach(r => {
+                    const tr = document.createElement("tr");
+                    
+                    // Warnings builder
+                    let warnHtml = '';
+                    if (r.warnings && r.warnings.length > 0) {
+                        r.warnings.forEach(w => {
+                            warnHtml += `<span class="warning-label"><i class="fas fa-exclamation-triangle"></i> ${w}</span>`;
+                        });
+                    }
+                    
+                    tr.innerHTML = `
+                        <td>
+                            <div style="font-weight: 700; color: #fff;">${r.contact_name}</div>
+                            <div style="font-size: 12px;">${r.company || 'No Company'}</div>
+                            <div style="font-size: 11.5px; color: var(--text-crm-muted); margin-top: 4px;">
+                                ${r.email} | ${r.phone}
+                            </div>
+                        </td>
+                        <td>
+                            <div>${r.telecaller_name}</div>
+                            <div style="font-size: 11.5px; color: var(--text-crm-muted);">${r.campaign_name}</div>
+                        </td>
+                        <td>
+                            <div>${r.discovery_meeting_date || 'Date missing'}</div>
+                            <div style="font-size: 11.5px; color: var(--text-crm-muted); font-style: italic; max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                MOM: ${r.mom || 'No MOM logged.'}
+                            </div>
+                        </td>
+                        <td>
+                            <div style="color: #eab308; font-weight: 700;">${r.lead_quality_rating ? '★ ' + r.lead_quality_rating + '/5' : 'No rating'}</div>
+                        </td>
+                        <td>
+                            <div>${r.product_name || 'No Product'}</div>
+                            <div style="font-size: 11.5px; color: var(--text-crm-muted);">${r.partner_name || 'No Partner'}</div>
+                        </td>
+                        <td style="text-align: right; white-space: nowrap;">
+                            <div style="margin-bottom: 6px;">
+                                ${warnHtml}
+                            </div>
+                            <button class="btn-crm btn-crm-primary" style="padding: 4px 10px; font-size: 11.5px;" onclick="openApprovalModal(${r.id}, '${escapeHtml(r.mom)}', '${escapeHtml(r.notes)}', ${JSON.stringify(r.warnings)})">
+                                <i class="fas fa-check"></i> Approve
+                            </button>
+                            <button class="btn-crm btn-crm-secondary" style="padding: 4px 10px; font-size: 11.5px;" onclick="openReturnModal(${r.id})">
+                                <i class="fas fa-undo"></i> Return
+                            </button>
+                            <button class="btn-crm btn-crm-danger" style="padding: 4px 10px; font-size: 11.5px; border: none;" onclick="openRejectionModal(${r.id})">
+                                <i class="fas fa-times"></i> Reject
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            });
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    // Modal Triggers
+    function openApprovalModal(id, mom, notes, warnings) {
+        document.getElementById("approve-review-id").value = id;
+        document.getElementById("view-mom").textContent = mom || 'None';
+        document.getElementById("view-pain").textContent = notes || 'None';
+        
+        const wContainer = document.getElementById("warnings-container");
+        wContainer.innerHTML = '';
+        if (warnings && warnings.length > 0) {
+            wContainer.style.display = 'block';
+            warnings.forEach(w => {
+                const div = document.createElement("div");
+                div.className = "warning-label";
+                div.style.display = 'block';
+                div.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${w}`;
+                wContainer.appendChild(div);
+            });
+        } else {
+            wContainer.style.display = 'none';
+        }
+        
+        openModal("sql-approval-modal");
+    }
+
+    function openRejectionModal(id) {
+        document.getElementById("reject-review-id").value = id;
+        openModal("sql-rejection-modal");
+    }
+
+    function openReturnModal(id) {
+        document.getElementById("return-review-id").value = id;
+        openModal("sql-return-modal");
+    }
+
+    // API actions
+    function approveSQL(e) {
+        e.preventDefault();
+        const id = document.getElementById("approve-review-id").value;
+        const rep = document.getElementById("approve-sales-rep").value;
+        const notes = document.getElementById("approve-notes").value;
+        
+        fetch(`/api/telecrm/sql-review/${id}/approve`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ assigned_sales_manager_id: rep, notes: notes })
+        })
+        .then(res => res.json())
+        .then(data => {
+            closeModal("sql-approval-modal");
+            document.getElementById("approve-notes").value = '';
+            loadSQLQueue();
+            flashAlert("SQL submission successfully approved and converted into an opportunity.");
+        });
+    }
+
+    function rejectSQL(e) {
+        e.preventDefault();
+        const id = document.getElementById("reject-review-id").value;
+        const reason = document.getElementById("reject-reason").value;
+        
+        fetch(`/api/telecrm/sql-review/${id}/reject`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ rejection_reason: reason })
+        })
+        .then(res => res.json())
+        .then(data => {
+            closeModal("sql-rejection-modal");
+            loadSQLQueue();
+            flashAlert("SQL submission rejected.", "warning");
+        });
+    }
+
+    function returnSQL(e) {
+        e.preventDefault();
+        const id = document.getElementById("return-review-id").value;
+        const notes = document.getElementById("return-feedback").value;
+        
+        fetch(`/api/telecrm/sql-review/${id}/return`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ notes: notes })
+        })
+        .then(res => res.json())
+        .then(data => {
+            closeModal("sql-return-modal");
+            document.getElementById("return-feedback").value = '';
+            loadSQLQueue();
+            flashAlert("SQL submission returned to the telecaller for qualification.");
+        });
+    }
+
+    function flashAlert(msg, type = "success") {
+        const alertsContainer = document.querySelector(".crm-alerts");
+        const alertBox = document.createElement("div");
+        alertBox.className = `alert-box ${type}`;
+        alertBox.innerHTML = `
+            <span>${msg}</span>
+            <button onclick="this.parentElement.remove();" style="background: none; border: none; color: inherit; cursor: pointer;"><i class="fas fa-times"></i></button>
+        `;
+        alertsContainer.appendChild(alertBox);
+        setTimeout(() => alertBox.remove(), 4000);
+    }
+</script>
+{% endblock %}

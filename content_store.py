@@ -466,73 +466,157 @@ SAP_PAGES_DATA = {
         'title': 'SAP Data Integration Services',
         'tagline': 'High-performance connectivity between SAP databases and modern cloud lakes.',
         'icon': 'circle-nodes',
-        'description': 'Break the silos of SAP ECC and S/4HANA. We deploy robust Talend and CDC pipelines to sync material ledgers, customer logs, and sales records with cloud data warehouses.',
+        'description': 'Break down the silos of SAP ECC and S/4HANA. We deploy robust, certified pipelines using Talend and CDC engines to synchronize material ledgers, customer masters, and financial records with cloud data warehouses safely, with zero source system degradation.',
         'features': [
-            {'title': 'RFC and BAPI Connectors', 'desc': 'Direct, certified connections to extract data safely from SAP transactional tables.'},
-            {'title': 'Real-Time Streaming Pipelines', 'desc': 'Sync transaction logs in milliseconds to support instant analytics.'},
-            {'title': 'Security & Role Alignment', 'desc': 'Preserve SAP user permission hierarchies during data warehouse loading.'}
+            {'title': 'Certified RFC and BAPI Connectors', 'desc': 'Eliminate custom ABAP development. Leverage certified SAP interfaces to securely extract data from transparent, cluster, and pooled tables.'},
+            {'title': 'Core Data Services (CDS) Views', 'desc': 'Leverage SAP\'s virtual data model (VDM) layer to perform pushdown logic, extracting pre-aggregated business entities directly.'},
+            {'title': 'Multi-Cloud Lakehouse Targets', 'desc': 'Push clean, schema-mapped SAP records into Databricks Delta Lake, Snowflake, or AWS Redshift with automatic schema evolution.'}
         ],
-        'stats': [{'val': '90%', 'label': 'Extraction Automation'}, {'val': 'Real-Time', 'label': 'Data Freshness'}]
+        'stats': [
+            {'val': '95%', 'label': 'Extraction Automation'},
+            {'val': 'Sub-Minute', 'label': 'Data Latency'},
+            {'val': '4.5x', 'label': 'Faster Reports'}
+        ],
+        'architecture': [
+            {'title': 'Zero-Impact Extraction', 'desc': 'Utilizes SAP\'s native RFC/OData interface layer with throttling controls to safeguard production transactional performance (OLTP).'},
+            {'title': 'Incremental Ingestion', 'desc': 'Applies log-based tracking on SAP application layers to stream changes without repetitive full table scans.'},
+            {'title': 'Metadata Translation', 'desc': 'Automatically maps complex SAP table naming conventions (e.g., KNA1, MARA, ACDOCA) and raw data types to readable, enterprise-ready schemas.'}
+        ],
+        'business_value': [
+            {'title': 'Accelerated Decision Making', 'desc': 'Real-time data availability enables business teams to run daily financial audits and active inventory tracking without lag.'},
+            {'title': 'Infrastructure Cost Optimization', 'desc': 'By moving heavy query workloads to cloud warehouses, you reduce costly MIPS/HANA RAM overhead on the primary ERP.'},
+            {'title': 'Silo Elimination', 'desc': 'Unifies proprietary SAP transaction records with Salesforce CRM, web analytics, and external market logs in a single lakehouse.'}
+        ]
     },
     'sap-data-migration': {
         'title': 'SAP S/4HANA Data Migration',
         'tagline': 'Migrate legacy ERP files to S/4HANA with absolute compliance.',
         'icon': 'truck-fast',
-        'description': 'Transitioning to S/4HANA requires extensive data translation. We automate schema validation, clean duplicate materials codes, and validate balance records before go-live.',
+        'description': 'Transitioning to S/4HANA requires restructuring your entire data model. Artha\'s migration framework automates legacy-to-target mapping, validates balance records, and cleans material files before cutover, ensuring a risk-free go-live.',
         'features': [
-            {'title': 'Automated Code Conversion', 'desc': 'Map legacy customer, vendor, and material codes to new S/4HANA business partner structures.'},
-            {'title': 'Balance Reconciliation Audits', 'desc': 'Compare general ledger balances across sources to prevent financial reporting errors.'},
-            {'title': 'Staged Migration Enclaves', 'desc': 'Execute test migrations in secure environments to resolve issues before cutover.'}
+            {'title': 'Universal Journal Mapping (ACDOCA)', 'desc': 'Seamlessly aggregate and map legacy FI/CO records, general ledgers, and asset databases into S/4HANA\'s single source of truth.'},
+            {'title': 'Business Partner (BP) Consolidation', 'desc': 'Automatically transform and merge legacy vendor and customer files (KNA1/LFA1) into S/4HANA\'s modern Business Partner structure.'},
+            {'title': 'Pre-Migration Readiness Profiling', 'desc': 'Scan, isolate, and archive stale transactional history to minimize HANA in-memory database footprint and licensing costs.'}
         ],
-        'stats': [{'val': '70%', 'label': 'Migration Time Reduction'}, {'val': '100%', 'label': 'Reconciliation Match'}]
+        'stats': [
+            {'val': '65%', 'label': 'Timeline Acceleration'},
+            {'val': '100%', 'label': 'Reconciliation Match'},
+            {'val': '40%', 'label': 'RAM Cost Savings'}
+        ],
+        'architecture': [
+            {'title': 'Staged ETL Pipelines', 'desc': 'Leverages a multi-stage loading architecture (Extract -> Profile -> Cleanse -> Reconcile -> Load) using Talend pipelines.'},
+            {'title': 'Validation Enclaves', 'desc': 'Standardizes target S/4HANA tables in a secure staging zone to validate foreign keys, configuration checks, and schema errors before import.'},
+            {'title': 'Balance Reconciliation', 'desc': 'Run automated checksums on ledger records and inventory quantities during migrations to ensure perfect alignment between old and new systems.'}
+        ],
+        'business_value': [
+            {'title': 'Mitigated Transition Risks', 'desc': 'Ensures zero business disruption during migration cutovers, preserving critical supply-chain schedules and accounting files.'},
+            {'title': 'Reduced Licensing Costs', 'desc': 'Shrinking the migrated dataset size via profiling saves hundreds of thousands in HANA in-memory database RAM licenses.'},
+            {'title': 'Future-Ready Operations', 'desc': 'Establishes clean, high-performance customer and material master databases to power post-upgrade analytics from Day 1.'}
+        ]
     },
     'advanced-data-matching': {
         'title': 'Advanced Data Matching for SAP',
         'tagline': 'Unify customer and material codes using machine learning heuristics.',
         'icon': 'copy',
-        'description': 'Clean database records before S/4HANA migrations. Our matching algorithms automatically group duplicate vendor addresses and consolidate material registries.',
+        'description': 'Clean and consolidate duplicate master records before or after your SAP transition. Our AI-driven matching algorithms group duplicate vendor files, standardize customer registries, and eliminate code redundancy automatically.',
         'features': [
-            {'title': 'Fuzzy Address Matching', 'desc': 'Resolve misspelled addresses and names into a single corporate profile.'},
-            {'title': 'Material Code Deduplication', 'desc': 'Identify duplicate part records by analyzing descriptions, weights, and attributes.'},
-            {'title': 'Active Stewardship Grids', 'desc': 'Provide data owners with manual overrides to confirm or split match groups.'}
+            {'title': 'Semantic Material Master Match', 'desc': 'Deduplicate spare parts and supply materials by analyzing unstructured description fields, technical parameters, and category standards.'},
+            {'title': 'Fuzzy Address & Legal Name Matching', 'desc': 'Resolve multilingual variations in customer names, billing addresses, and tax registry IDs into single profiles.'},
+            {'title': 'Dynamic Stewardship Worklists', 'desc': 'Provide data stewards with an intuitive interface to verify matching suggestions, set thresholds, and execute automated merges.'}
         ],
-        'stats': [{'val': '65%', 'label': 'Reduction in Duplicates'}, {'val': '85%', 'label': 'Automated Match Accuracy'}]
+        'stats': [
+            {'val': '88%', 'label': 'Duplication Clean Rate'},
+            {'val': '99.2%', 'label': 'Match Accuracy Score'},
+            {'val': '45%', 'label': 'Faster Procurement'}
+        ],
+        'architecture': [
+            {'title': 'ML Similarity Pipelines', 'desc': 'Utilizes natural language processing (NLP) and similarity distance algorithms (Levenshtein, Jaro-Winkler, Cosine) on unstructured text columns.'},
+            {'title': 'Blocking & Indexing', 'desc': 'Implements highly optimized blocking keys (e.g., Double Metaphone) to run comparisons over million-row databases efficiently.'},
+            {'title': 'Feedback Stewardship Integration', 'desc': 'Syncs human override decisions directly back to the model to refine weights and confidence scores continuously.'}
+        ],
+        'business_value': [
+            {'title': 'Procurement Savings', 'desc': 'Consolidating duplicate material codes reveals volume purchasing opportunities and prevents duplicate inventory acquisitions.'},
+            {'title': 'Accurate Customer 360', 'desc': 'Unifies duplicate client listings to build single records, improving marketing accuracy and client service logs.'},
+            {'title': 'Clean S/4HANA Upgrade', 'desc': 'Prevents migrating "garbage records" to the new ERP system, lowering indexing time and operational delays.'}
+        ]
     },
     'change-data-capture': {
         'title': 'Change Data Capture (CDC) for SAP',
         'tagline': 'Replicate SAP transactions to Snowflake in real time with zero database stress.',
         'icon': 'bolt',
-        'description': 'Traditional batch extraction can slow down production ERP systems. Our CDC services capture table insertions and edits directly from SAP log files, ensuring data warehouses are always fresh.',
+        'description': 'Traditional batch extraction can slow down production ERP databases and fail to support real-time decisions. Our CDC services capture database table updates directly from SAP log files, keeping data warehouses fresh.',
         'features': [
             {'title': 'Log-Based Capture', 'desc': 'Extract data modifications from transaction logs, bypassing the database execution layer.'},
-            {'title': 'Dynamic Sync Schedulers', 'desc': 'Adjust sync frequencies automatically based on server load and business hours.'},
-            {'title': 'Snowflake Loading Optimization', 'desc': 'Stream updates directly into Snowflake micro-tables to minimize compute expenses.'}
+            {'title': 'Schema Drift Detection & Auto-Mapping', 'desc': 'Detect structural table changes in SAP and automatically sync target tables without breaking pipeline ingestion.'},
+            {'title': 'Snowflake Ingestion Optimization', 'desc': 'Leverage Snowflake Snowpipe or Databricks Autoloader to ingest updates continuously with micro-batch optimization.'}
         ],
-        'stats': [{'val': 'Zero', 'label': 'ERP Performance Impact'}, {'val': 'Sub-Sec', 'label': 'Data Ingestion Latency'}]
+        'stats': [
+            {'val': '<1.5s', 'label': 'Ingestion Latency'},
+            {'val': '0%', 'label': 'Core DB Impact'},
+            {'val': '12M+', 'label': 'Daily Events'}
+        ],
+        'architecture': [
+            {'title': 'Triggerless Replication', 'desc': 'Reads binary database logs (e.g., Oracle REDO, HANA transaction logs) directly to record modifications without query loads.'},
+            {'title': 'Operational Data Provisioning (ODP)', 'desc': 'Utilizes SAP ODP queues to extract delta queues safely at the application layer when direct log access is restricted.'},
+            {'title': 'Micro-Batch Streamers', 'desc': 'Encapsulates delta changes into encrypted JSON/Parquet packets, streaming them into target cloud warehouses.'}
+        ],
+        'business_value': [
+            {'title': 'Real-Time Insights', 'desc': 'Streams sales billing, inventory movements, and shipping updates to dashboards as they occur, enabling dynamic decisions.'},
+            {'title': 'Zero System Interruption', 'desc': 'Prevents reports queries from competing for resources with critical transactional operations, keeping the ERP stable.'},
+            {'title': 'Reduced Compute Overhead', 'desc': 'Replicating only delta changes eliminates massive batch updates, slashing cloud warehouse compute invoices.'}
+        ]
     },
     'clean-data-for-sap': {
         'title': 'Clean Data for SAP',
         'tagline': 'Establish data quality guardrails before upgrading your ERP system.',
         'icon': 'broom',
-        'description': 'Do not migrate legacy garbage to S/4HANA. Our profiling software identifies corrupt postal addresses, duplicate vendor records, and missing fields to ensure your database starts clean.',
+        'description': 'Do not migrate legacy garbage to S/4HANA. Our data profiling and cleansing software identifies corrupt postal addresses, duplicate vendor records, and missing fields to ensure your database starts clean.',
         'features': [
             {'title': 'Postal Validation APIs', 'desc': 'Verify customer and vendor physical addresses against global postal databases in real-time.'},
             {'title': 'Database Purging Programs', 'desc': 'Archive or delete transaction records over 7 years old to save S/4HANA memory costs.'},
             {'title': 'Active Validation Triggers', 'desc': 'Enforce validation standards at the CRM/ERP input screens to keep dirty data out.'}
         ],
-        'stats': [{'val': '45%', 'label': 'Reduction in In-Memory Costs'}, {'val': '95%', 'label': 'Address Accuracy'}]
+        'stats': [
+            {'val': '98%', 'label': 'Master Data Cleanliness'},
+            {'val': '35%', 'label': 'Reduction in RAM Cost'},
+            {'val': '15x', 'label': 'Faster Audit Prep'}
+        ],
+        'architecture': [
+            {'title': 'Continuous Profiling Scans', 'desc': 'Executes background analysis rules across key tables to measure completeness, uniqueness, and consistency.'},
+            {'title': 'API Address Standardization', 'desc': 'Interfaces directly with certified global location services (e.g., USPS, Loqate) to normalize street addresses.'},
+            {'title': 'Archiving Segregation', 'desc': 'Implements data tiering rules (Hot, Warm, Cold) to offload legacy files safely into low-cost cloud storage.'}
+        ],
+        'business_value': [
+            {'title': 'Minimized Logistics Failures', 'desc': 'Normalizing physical addresses avoids shipping delays, delivery returns, and billing disputes.'},
+            {'title': 'Optimized HANA Performance', 'desc': 'Purging cold archive records before migration reduces the required RAM, lowering hardware infrastructure expenses.'},
+            {'title': 'Trustworthy Analytics', 'desc': 'Ensures that corporate dashboards are fed with standardized, complete records, preventing misleading KPI reports.'}
+        ]
     },
     'sap-test-data-management': {
         'title': 'SAP Test Data Management',
         'tagline': 'Provision light, masked developer databases dynamically.',
         'icon': 'shield-halved',
-        'description': 'Developers need realistic datasets for testing without exposing private customer information. We slice and mask production SAP tables to create secure, compact developer databases.',
+        'description': 'Developers need realistic datasets for testing without exposing private customer information. We slice and mask production SAP tables to create secure, compact developer databases while maintaining referential integrity.',
         'features': [
-            {'title': 'Intelligent Data Slicing', 'desc': 'Extract a representative 10% slice of database logs while preserving full referential integrity.'},
-            {'title': 'PII & Financial Masking', 'desc': 'Scramble social security numbers, credit card tokens, and revenue records automatically.'},
-            {'title': 'Automated Sandbox Provisioning', 'desc': 'Reset test environments in minutes using pre-scripted database restore routines.'}
+            {'title': 'Referentially Intact Slicing', 'desc': 'Extract a complete transaction history slice (e.g., specific company codes or time ranges) while maintaining full foreign-key structures.'},
+            {'title': 'Deterministic PII Masking', 'desc': 'Anonymize or scramble credit card records, tax details, employee data, and customer identities deterministically.'},
+            {'title': 'Dynamic Sandbox Refreshing', 'desc': 'Automate sandbox restores from updated production baselines via CLI scripts, slashing server storage costs.'}
         ],
-        'stats': [{'val': '90%', 'label': 'Sandbox Setup Speedup'}, {'val': '100%', 'label': 'PII Privacy Compliance'}]
+        'stats': [
+            {'val': '92%', 'label': 'Sandbox Refresh Speedup'},
+            {'val': '100%', 'label': 'Compliance Guarantee'},
+            {'val': '80%', 'label': 'Lower Storage Costs'}
+        ],
+        'architecture': [
+            {'title': 'Metadata Relationship Mapping', 'desc': 'Maps complex foreign key relationships across hundreds of SAP tables to ensure data consistency during slicing.'},
+            {'title': 'In-Flight Anonymization Engine', 'desc': 'Applies masking rules (scrambling, padding, tokenization) during the extraction process so sensitive data never hits dev disks.'},
+            {'title': 'Automation Orchestration', 'desc': 'Connects with database backup and virtualization utilities to spin up fresh clones on-demand.'}
+        ],
+        'business_value': [
+            {'title': 'Absolute Regulatory Compliance', 'desc': 'Protect customer data privacy and complies with GDPR, HIPAA, and CCPA standards during development.'},
+            {'title': 'Accelerated Development Cycles', 'desc': 'Developers get access to high-fidelity data subsets instantly, eliminating delay tickets for sandbox refreshes.'},
+            {'title': 'Infrastructure Storage Savings', 'desc': 'Slicing production terabytes into 10% clones saves massive hosting costs on non-production servers.'}
+        ]
     },
     'data-reconciliation': {
         'title': 'SAP Data Reconciliation Services',
@@ -540,11 +624,25 @@ SAP_PAGES_DATA = {
         'icon': 'scale-balanced',
         'description': 'Avoid financial discrepancies and ledger imbalances during S/4HANA transitions. We deploy automated validation checks to reconcile every ledger entry, inventory balance, and transaction record in real time.',
         'features': [
-            {'title': 'Real-Time Balance Verification', 'desc': 'Cross-reference and verify general ledger and sub-ledger balances dynamically.'},
-            {'title': 'Discrepancy Alarm Routing', 'desc': 'Instantly flag matching discrepancies to data stewards for rapid exception resolution.'},
-            {'title': 'Auditing Log Persistence', 'desc': 'Maintain immutable audit trails of reconciliation results to support internal and external audits.'}
+            {'title': 'Cross-Database Ledger Balance Matching', 'desc': 'Automatically cross-reference and verify general ledgers against system transactions across systems (e.g., SAP vs. Salesforce billing).'},
+            {'title': 'Real-Time Exception Routing', 'desc': 'Route matching discrepancies and imbalance alerts to finance team dashboards for fast dispute resolution.'},
+            {'title': 'Multi-Currency & Tax Audit Support', 'desc': 'Reconcile intercompany transfers, foreign currency evaluations, and local tax filings to ensure full statutory compliance.'}
         ],
-        'stats': [{'val': '100%', 'label': 'Reconciliation Accuracy'}, {'val': '5X', 'label': 'Faster Auditing Speeds'}]
+        'stats': [
+            {'val': '100%', 'label': 'Reconciliation Accuracy'},
+            {'val': '5x', 'label': 'Faster Auditing Speeds'},
+            {'val': '90%', 'label': 'Fewer Manual Adjustments'}
+        ],
+        'architecture': [
+            {'title': 'Parallel Ledgers Matching Engines', 'desc': 'Compares ledgers across external systems and SAP GL (General Ledger) using high-performance SQL hash queries.'},
+            {'title': 'Steward Audit Trails', 'desc': 'Tracks all reconciling activities, anomaly reports, resolution details, and steward signatures in an immutable database audit log.'},
+            {'title': 'Active Reconciliation Hub', 'desc': 'Intercepts transaction streams to execute checks at ledger interfaces before posting ledger entries.'}
+        ],
+        'business_value': [
+            {'title': 'Fast Ledger Closures', 'desc': 'Accelerates monthly and quarterly financial book closures by eliminating manual excel reconciliation loops.'},
+            {'title': 'Audit-Ready Financials', 'desc': 'Provides clear, automated validation records to external auditors, reducing audit times and preparation workloads.'},
+            {'title': 'Early Fraud Detection', 'desc': 'Catches billing and cash adjustments immediately, minimizing revenue leakage and payment errors.'}
+        ]
     }
 }
 

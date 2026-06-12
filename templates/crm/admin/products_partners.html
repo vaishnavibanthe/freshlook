@@ -1,0 +1,281 @@
+{% extends 'crm/base_crm.html' %}
+
+{% block title %}Products & Partners Administration | ThinkArtha CRM{% endblock %}
+
+{% block content %}
+<style>
+    .admin-splits-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        margin-bottom: 24px;
+    }
+    
+    @media (max-width: 992px) {
+        .admin-splits-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="crm-header-bar">
+    <div class="crm-title-section">
+        <h1>Products & Partners Administration</h1>
+        <p>Configure solutions catalog, manage technology partner mappings, and map co-sell alliances</p>
+    </div>
+</div>
+
+<div class="admin-splits-grid">
+    
+    <!-- Solutions Grid -->
+    <div class="crm-card">
+        <div class="crm-card-title">Products & Solutions Catalog</div>
+        <div style="overflow-x: auto; max-height: 300px; overflow-y: auto;">
+            <table class="crm-table">
+                <thead>
+                    <tr>
+                        <th>Solution Name</th>
+                        <th>Category</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in products %}
+                    <tr>
+                        <td style="font-weight: 600; color: #ffffff;">{{ p.name }}</td>
+                        <td>{{ p.category }}</td>
+                        <td>
+                            <span class="badge-status {% if p.is_active == 1 %}qualified{% else %}disqualified{% endif %}">
+                                {% if p.is_active == 1 %}Active{% else %}Archived{% endif %}
+                            </span>
+                        </td>
+                        <td>
+                            <button onclick="populateProductForm({{ p|tojson|safe }})" class="btn-crm btn-crm-secondary" style="padding: 2px 8px; font-size: 11px;">Edit</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Add/Edit Product Form -->
+        <form action="{{ url_for('crm.admin_products_partners') }}" method="POST" style="margin-top: 20px; border-top: 1px solid var(--border-crm); padding-top: 20px;" id="product-form">
+            <input type="hidden" name="action" value="create_product" id="prod-action">
+            <input type="hidden" name="product_id" id="prod-id">
+            <h4 style="font-size: 13.5px; color: #ffffff; margin-bottom: 12px;" id="prod-title">Add New Product / Solution</h4>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div class="form-group">
+                    <label class="form-label">Solution Name</label>
+                    <input type="text" name="name" id="prod-name" class="form-control" required placeholder="e.g. Master Data Management">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    <input type="text" name="category" id="prod-category" class="form-control" required placeholder="e.g. Governance">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Solution Description</label>
+                <input type="text" name="description" id="prod-desc" class="form-control" placeholder="Describe solution values...">
+            </div>
+            
+            <div id="prod-status-wrapper" style="display: none; align-items: center; gap: 10px; margin-bottom: 12px;">
+                <label class="form-label" style="margin-bottom:0;">Status:</label>
+                <select name="is_active" id="prod-is-active" class="form-control" style="width: 120px;">
+                    <option value="1">Active</option>
+                    <option value="0">Archived</option>
+                </select>
+            </div>
+            
+            <div style="display: flex; gap: 10px;">
+                <button type="button" class="btn-crm btn-crm-secondary" onclick="resetProductForm()" id="btn-prod-cancel" style="display: none;">Cancel</button>
+                <button type="submit" class="btn-crm btn-crm-primary" style="margin-left: auto;" id="btn-prod-submit">Create Product</button>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Partners Grid -->
+    <div class="crm-card">
+        <div class="crm-card-title">Technology Partners Catalog</div>
+        <div style="overflow-x: auto; max-height: 300px; overflow-y: auto;">
+            <table class="crm-table">
+                <thead>
+                    <tr>
+                        <th>Partner Name</th>
+                        <th>Partner Type</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pt in partners %}
+                    <tr>
+                        <td style="font-weight: 600; color: #ffffff;">{{ pt.name }}</td>
+                        <td>{{ pt.partner_type }}</td>
+                        <td>
+                            <span class="badge-status {% if pt.is_active == 1 %}qualified{% else %}disqualified{% endif %}">
+                                {% if pt.is_active == 1 %}Active{% else %}Archived{% endif %}
+                            </span>
+                        </td>
+                        <td>
+                            <button onclick="populatePartnerForm({{ pt|tojson|safe }})" class="btn-crm btn-crm-secondary" style="padding: 2px 8px; font-size: 11px;">Edit</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Add/Edit Partner Form -->
+        <form action="{{ url_for('crm.admin_products_partners') }}" method="POST" style="margin-top: 20px; border-top: 1px solid var(--border-crm); padding-top: 20px;" id="partner-form">
+            <input type="hidden" name="action" value="create_partner" id="part-action">
+            <input type="hidden" name="partner_id" id="part-id">
+            <h4 style="font-size: 13.5px; color: #ffffff; margin-bottom: 12px;" id="part-title">Add New Technology Partner</h4>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div class="form-group">
+                    <label class="form-label">Partner Name</label>
+                    <input type="text" name="name" id="part-name" class="form-control" required placeholder="e.g. Snowflake">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Partner Type</label>
+                    <input type="text" name="partner_type" id="part-type" class="form-control" required placeholder="e.g. Cloud Provider">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Partnership Scope / Details</label>
+                <input type="text" name="description" id="part-desc" class="form-control" placeholder="Describe co-sell alliance...">
+            </div>
+            
+            <div id="part-status-wrapper" style="display: none; align-items: center; gap: 10px; margin-bottom: 12px;">
+                <label class="form-label" style="margin-bottom:0;">Status:</label>
+                <select name="is_active" id="part-is-active" class="form-control" style="width: 120px;">
+                    <option value="1">Active</option>
+                    <option value="0">Archived</option>
+                </select>
+            </div>
+            
+            <div style="display: flex; gap: 10px;">
+                <button type="button" class="btn-crm btn-crm-secondary" onclick="resetPartnerForm()" id="btn-part-cancel" style="display: none;">Cancel</button>
+                <button type="submit" class="btn-crm btn-crm-primary" style="margin-left: auto;" id="btn-part-submit">Create Partner</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Lower Grid: Product Partner Mapping -->
+<div class="crm-card">
+    <div class="crm-card-title">Product & Partner Mappings</div>
+    <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 24px;">
+        <div style="overflow-x: auto; max-height: 260px; overflow-y: auto;">
+            <table class="crm-table">
+                <thead>
+                    <tr>
+                        <th>Product / Solution</th>
+                        <th>Mapped Partner</th>
+                        <th>Mapping Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for map in mappings %}
+                    <tr>
+                        <td style="font-weight: 600; color: #ffffff;">{{ map.product_name }}</td>
+                        <td>{{ map.partner_name }}</td>
+                        <td>
+                            <span class="badge-status {% if map.is_active == 1 %}qualified{% else %}disqualified{% endif %}">
+                                Active
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <div>
+            <h4 style="font-size: 13.5px; color: #ffffff; margin-bottom: 12px;">Map Product to Tech Partner</h4>
+            <form action="{{ url_for('crm.admin_products_partners') }}" method="POST">
+                <input type="hidden" name="action" value="map_partner">
+                <div class="form-group">
+                    <label class="form-label">Select Product / Solution</label>
+                    <select name="product_id" class="form-control" required>
+                        {% for p in products %}
+                        {% if p.is_active == 1 %}
+                        <option value="{{ p.id }}">{{ p.name }}</option>
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Select Partner</label>
+                    <select name="partner_id" class="form-control" required>
+                        {% for pt in partners %}
+                        {% if pt.is_active == 1 %}
+                        <option value="{{ pt.id }}">{{ pt.name }}</option>
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn-crm btn-crm-primary" style="width: 100%; margin-top: 10px;">Link Product & Partner</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Product form populating
+    function populateProductForm(p) {
+        document.getElementById('prod-title').textContent = `Edit Product: ${p.name}`;
+        document.getElementById('prod-action').value = 'edit_product';
+        document.getElementById('prod-id').value = p.id;
+        document.getElementById('prod-name').value = p.name;
+        document.getElementById('prod-category').value = p.category;
+        document.getElementById('prod-desc').value = p.description || '';
+        document.getElementById('prod-is-active').value = p.is_active;
+        
+        document.getElementById('prod-status-wrapper').style.display = 'flex';
+        document.getElementById('btn-prod-cancel').style.display = 'inline-flex';
+        document.getElementById('btn-prod-submit').textContent = 'Commit Changes';
+    }
+    
+    function resetProductForm() {
+        document.getElementById('prod-title').textContent = 'Add New Product / Solution';
+        document.getElementById('prod-action').value = 'create_product';
+        document.getElementById('prod-id').value = '';
+        document.getElementById('product-form').reset();
+        
+        document.getElementById('prod-status-wrapper').style.display = 'none';
+        document.getElementById('btn-prod-cancel').style.display = 'none';
+        document.getElementById('btn-prod-submit').textContent = 'Create Product';
+    }
+
+    // Partner form populating
+    function populatePartnerForm(pt) {
+        document.getElementById('part-title').textContent = `Edit Partner: ${pt.name}`;
+        document.getElementById('part-action').value = 'edit_partner';
+        document.getElementById('part-id').value = pt.id;
+        document.getElementById('part-name').value = pt.name;
+        document.getElementById('part-type').value = pt.partner_type;
+        document.getElementById('part-desc').value = pt.description || '';
+        document.getElementById('part-is-active').value = pt.is_active;
+        
+        document.getElementById('part-status-wrapper').style.display = 'flex';
+        document.getElementById('btn-part-cancel').style.display = 'inline-flex';
+        document.getElementById('btn-part-submit').textContent = 'Commit Changes';
+    }
+    
+    function resetPartnerForm() {
+        document.getElementById('part-title').textContent = 'Add New Technology Partner';
+        document.getElementById('part-action').value = 'create_partner';
+        document.getElementById('part-id').value = '';
+        document.getElementById('partner-form').reset();
+        
+        document.getElementById('part-status-wrapper').style.display = 'none';
+        document.getElementById('btn-part-cancel').style.display = 'none';
+        document.getElementById('btn-part-submit').textContent = 'Create Partner';
+    }
+</script>
+{% endblock %}

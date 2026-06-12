@@ -1,0 +1,295 @@
+{% extends 'crm/base_crm.html' %}
+
+{% block title %}Leads Registry | ThinkArtha CRM{% endblock %}
+
+{% block content %}
+<style>
+    .filter-panel {
+        background-color: var(--bg-card);
+        border: 1px solid var(--border-crm);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 24px;
+    }
+    
+    .filter-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+    
+    .checkbox-filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        padding-top: 10px;
+        border-top: 1px solid var(--border-crm);
+    }
+    
+    .checkbox-label {
+        font-size: 13px;
+        color: var(--text-crm-primary);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+    }
+    
+    .leads-table-container {
+        background-color: var(--bg-card);
+        border: 1px solid var(--border-crm);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+    
+    .leads-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+        text-align: left;
+    }
+    
+    .leads-table th {
+        color: var(--text-crm-secondary);
+        font-weight: 600;
+        padding: 14px 12px;
+        border-bottom: 2px solid var(--border-crm);
+        background-color: rgba(9, 19, 34, 0.4);
+        white-space: nowrap;
+    }
+    
+    .leads-table td {
+        padding: 14px 12px;
+        border-bottom: 1px solid var(--border-crm);
+        color: var(--text-crm-primary);
+        white-space: nowrap;
+    }
+    
+    .leads-table tr:hover td {
+        background-color: rgba(22, 45, 80, 0.25);
+    }
+    
+    .search-input-wrapper {
+        position: relative;
+        max-width: 320px;
+    }
+    
+    .search-input-wrapper i {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-crm-muted);
+    }
+    
+    .search-input-wrapper input {
+        padding-left: 36px;
+    }
+</style>
+
+<div class="crm-header-bar">
+    <div class="crm-title-section">
+        <h1>Leads Registry</h1>
+        <p>Manage, qualify, and track your incoming business prospects</p>
+    </div>
+    <div class="crm-actions-section">
+        <a href="{{ url_for('crm.new_lead') }}" class="btn-crm btn-crm-primary">
+            <i class="fas fa-plus"></i> Add Lead Manually
+        </a>
+    </div>
+</div>
+
+<!-- Dynamic Filters Panel -->
+<div class="filter-panel">
+    <form action="{{ url_for('crm.crm_leads') }}" method="GET" id="filter-form">
+        <div class="filter-grid">
+            <div class="form-group">
+                <label class="form-label">Search Name/Company</label>
+                <div class="search-input-wrapper">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="lead-search" class="form-control" placeholder="Type to filter rows...">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Status</label>
+                <select name="status" class="form-control" onchange="this.form.submit()">
+                    <option value="">All Statuses</option>
+                    <option value="New" {% if request.args.get('status') == 'New' %}selected{% endif %}>New</option>
+                    <option value="Contacted" {% if request.args.get('status') == 'Contacted' %}selected{% endif %}>Contacted</option>
+                    <option value="Qualified" {% if request.args.get('status') == 'Qualified' %}selected{% endif %}>Qualified</option>
+                    <option value="Nurture" {% if request.args.get('status') == 'Nurture' %}selected{% endif %}>Nurture</option>
+                    <option value="Disqualified" {% if request.args.get('status') == 'Disqualified' %}selected{% endif %}>Disqualified</option>
+                    <option value="Converted to Opportunity" {% if request.args.get('status') == 'Converted to Opportunity' %}selected{% endif %}>Converted</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Assigned Owner</label>
+                <select name="owner_id" class="form-control" onchange="this.form.submit()">
+                    <option value="">All Owners</option>
+                    {% for owner in owners %}
+                    <option value="{{ owner.id }}" {% if request.args.get('owner_id')|int == owner.id %}selected{% endif %}>{{ owner.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Product Interest</label>
+                <select name="product_id" class="form-control" onchange="this.form.submit()">
+                    <option value="">All Products</option>
+                    {% for prod in products %}
+                    <option value="{{ prod.id }}" {% if request.args.get('product_id')|int == prod.id %}selected{% endif %}>{{ prod.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Partner</label>
+                <select name="partner_id" class="form-control" onchange="this.form.submit()">
+                    <option value="">All Partners</option>
+                    {% for part in partners %}
+                    <option value="{{ part.id }}" {% if request.args.get('partner_id')|int == part.id %}selected{% endif %}>{{ part.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">MEDDIC Status</label>
+                <select name="meddic_range" class="form-control" onchange="this.form.submit()">
+                    <option value="">All Scores</option>
+                    <option value="Weak" {% if request.args.get('meddic_range') == 'Weak' %}selected{% endif %}>Weak (0-39)</option>
+                    <option value="Developing" {% if request.args.get('meddic_range') == 'Developing' %}selected{% endif %}>Developing (40-69)</option>
+                    <option value="Strong" {% if request.args.get('meddic_range') == 'Strong' %}selected{% endif %}>Strong (70-100)</option>
+                </select>
+            </div>
+            
+            {% for field in custom_filterable_fields %}
+            <div class="form-group">
+                <label class="form-label">{{ field.field_label }}</label>
+                {% if field.field_type == 'select' %}
+                <select name="cf_{{ field.field_name }}" class="form-control" onchange="this.form.submit()">
+                    <option value="">All {{ field.field_label }}</option>
+                    {% for option in field.options.split(',') %}
+                    <option value="{{ option.strip() }}" {% if custom_filter_values.get(field.field_name) == option.strip() %}selected{% endif %}>{{ option.strip() }}</option>
+                    {% endfor %}
+                </select>
+                {% else %}
+                <input type="text" name="cf_{{ field.field_name }}" class="form-control" placeholder="Search..." value="{{ custom_filter_values.get(field.field_name) or '' }}" onchange="this.form.submit()">
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="checkbox-filters">
+            <label class="checkbox-label">
+                <input type="checkbox" name="unassigned" value="1" {% if request.args.get('unassigned') == '1' %}checked{% endif %} onchange="this.form.submit()">
+                Unassigned Leads Only
+            </label>
+            <label class="checkbox-label">
+                <input type="checkbox" name="no_activity" value="1" {% if request.args.get('no_activity') == '1' %}checked{% endif %} onchange="this.form.submit()">
+                No Activity (Last 14 days)
+            </label>
+            <label class="checkbox-label">
+                <input type="checkbox" name="overdue_task" value="1" {% if request.args.get('overdue_task') == '1' %}checked{% endif %} onchange="this.form.submit()">
+                Overdue Tasks Only
+            </label>
+            
+            <a href="{{ url_for('crm.crm_leads') }}" class="btn-crm btn-crm-secondary" style="margin-left: auto; padding: 4px 12px; font-size: 11px;">
+                Reset Filters
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- Leads Data Table Card -->
+<div class="leads-table-container">
+    <div style="overflow-x: auto;">
+        <table class="leads-table" id="leads-data-table">
+            <thead>
+                <tr>
+                    <th>Lead Name</th>
+                    <th>Company</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Geography</th>
+                    <th>Source</th>
+                    <th>Product Solution</th>
+                    <th>Partner</th>
+                    <th>Assigned Owner</th>
+                    <th>Status</th>
+                    <th>MEDDIC Score</th>
+                    <th>Created Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for lead in leads %}
+                <tr>
+                    <td>
+                        <a href="{{ url_for('crm.crm_lead_detail', lead_id=lead.id) }}" style="color: var(--accent-cyan); font-weight: 700; text-decoration: none;">
+                            {{ lead.full_name }}
+                        </a>
+                    </td>
+                    <td>{{ lead.company or '-' }}</td>
+                    <td>{{ lead.email }}</td>
+                    <td>{{ lead.phone or '-' }}</td>
+                    <td>{{ lead.geography or '-' }}</td>
+                    <td>{{ lead.lead_source }}</td>
+                    <td>{{ lead.product_name or '-' }}</td>
+                    <td>{{ lead.partner_name or '-' }}</td>
+                    <td>{{ lead.owner_name or 'Unassigned' }}</td>
+                    <td>
+                        <span class="badge-status {{ lead.status.lower().replace(' ', '_') }}">{{ lead.status }}</span>
+                    </td>
+                    <td style="text-align: center;">
+                        <span style="font-weight: 700; color: {% if lead.meddic_score >= 70 %}#10b981{% elif lead.meddic_score >= 40 %}#f59e0b{% else %}#ef4444{% endif %}">
+                            {{ lead.meddic_score }}
+                        </span>
+                    </td>
+                    <td>{{ lead.created_at[:10] }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="12" style="text-align: center; color: var(--text-crm-muted); padding: 30px;">
+                        No leads match selected filters.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // Live Search Table rows
+    const searchInput = document.getElementById('lead-search');
+    const table = document.getElementById('leads-data-table');
+    
+    if (searchInput && table) {
+        searchInput.addEventListener('keyup', function() {
+            const term = searchInput.value.toLowerCase();
+            const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+            
+            for (let i = 0; i < rows.length; i++) {
+                const nameCell = rows[i].getElementsByTagName('td')[0];
+                const companyCell = rows[i].getElementsByTagName('td')[1];
+                const emailCell = rows[i].getElementsByTagName('td')[2];
+                
+                if (nameCell || companyCell || emailCell) {
+                    const name = nameCell.textContent.toLowerCase();
+                    const company = companyCell.textContent.toLowerCase();
+                    const email = emailCell.textContent.toLowerCase();
+                    
+                    if (name.includes(term) || company.includes(term) || email.includes(term)) {
+                        rows[i].style.display = '';
+                    } else {
+                        rows[i].style.display = 'none';
+                    }
+                }
+            }
+        });
+    }
+</script>
+{% endblock %}

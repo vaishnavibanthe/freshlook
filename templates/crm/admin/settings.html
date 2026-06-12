@@ -1,0 +1,86 @@
+{% extends 'crm/base_crm.html' %}
+
+{% block title %}System Settings | ThinkArtha CRM{% endblock %}
+
+{% block content %}
+<div class="crm-header-bar">
+    <div class="crm-title-section">
+        <h1>System Settings</h1>
+        <p>Configure SMTP outbound mailers, duplicate detection filters, and auto-assignment rules</p>
+    </div>
+</div>
+
+<div class="crm-card" style="max-width: 680px;">
+    <div class="crm-card-title">Outbound SMTP Mailer & Rules Settings</div>
+    
+    <form action="{{ url_for('crm.admin_settings') }}" method="POST">
+        
+        <h4 style="font-size: 14px; font-weight: 700; color: var(--accent-cyan); border-bottom: 1px solid var(--border-crm); padding-bottom: 6px; margin-bottom: 16px;">
+            1. SMTP Server Configurations (Plain text emails)
+        </h4>
+        
+        <div style="display: grid; grid-template-columns: 1.5fr 0.5fr; gap: 12px;">
+            <div class="form-group">
+                <label class="form-label">SMTP Host / Outbound Server</label>
+                <input type="text" name="smtp_host" class="form-control" value="{{ settings.smtp_host or '' }}" placeholder="smtp.gmail.com">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Port</label>
+                <input type="number" name="smtp_port" class="form-control" value="{{ settings.smtp_port or 587 }}">
+            </div>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="form-group">
+                <label class="form-label">SMTP Username</label>
+                <input type="text" name="smtp_username" class="form-control" value="{{ settings.smtp_username or '' }}" placeholder="sales@company.com">
+            </div>
+            <div class="form-group">
+                <label class="form-label">SMTP Password</label>
+                <input type="password" name="smtp_password" class="form-control" placeholder="••••••••" value="{{ smtp_pwd }}">
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">From Address Sender Email</label>
+            <input type="email" name="from_email" class="form-control" value="{{ settings.from_email or '' }}" placeholder="noreply@company.com">
+        </div>
+        
+        <h4 style="font-size: 14px; font-weight: 700; color: var(--accent-cyan); border-bottom: 1px solid var(--border-crm); padding-bottom: 6px; margin-bottom: 16px; margin-top: 24px;">
+            2. System Lead Capture Rules & Auto-assignment
+        </h4>
+        
+        <div class="form-group">
+            <label class="form-label">Default SQL Handover Sales Rep (Manager)</label>
+            <select name="default_sql_owner_id" class="form-control">
+                <option value="">None Selected</option>
+                {% for o in owners %}
+                <option value="{{ o.id }}" {% if settings.default_sql_owner_id == o.id %}selected{% endif %}>{{ o.name }} ({{ o.role }})</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding-top: 10px;">
+            <div class="form-group">
+                <label class="form-label">Duplicate Detection Check</label>
+                <select name="duplicate_detection_enabled" class="form-control">
+                    <option value="1" {% if settings.duplicate_detection_enabled == 1 %}selected{% endif %}>Enabled (Email/Phone checks)</option>
+                    <option value="0" {% if settings.duplicate_detection_enabled == 0 %}selected{% endif %}>Disabled</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Careers Applications Lead Capture</label>
+                <select name="careers_capture_enabled" class="form-control">
+                    <option value="0" {% if settings.careers_capture_enabled == 0 %}selected{% endif %}>Disabled (Ignore Careers leads)</option>
+                    <option value="1" {% if settings.careers_capture_enabled == 1 %}selected{% endif %}>Enabled (Forward careers form to CRM)</option>
+                </select>
+            </div>
+        </div>
+        
+        <div style="border-top: 1px solid var(--border-crm); padding-top: 20px; display: flex; justify-content: flex-end; margin-top: 24px;">
+            <button type="submit" class="btn-crm btn-crm-primary">Save Settings Configuration</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

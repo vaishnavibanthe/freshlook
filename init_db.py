@@ -528,6 +528,20 @@ def init_db():
     )
     ''')
 
+    # Create token_usage table
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS token_usage (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        step_index INTEGER UNIQUE,
+        timestamp TEXT,
+        category TEXT,
+        user_tokens REAL,
+        system_tokens REAL,
+        completion_tokens REAL,
+        thinking_tokens REAL
+    )
+    ''')
+
     # Seed events if empty
     cursor.execute("SELECT COUNT(*) FROM events")
     if cursor.fetchone()[0] == 0:

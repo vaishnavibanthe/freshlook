@@ -1,9 +1,125 @@
 {% extends "base.html" %}
 
-{% block title %}{% if post %}Edit Post: {{ post.title }}{% else %}Write New Post{% endif %} - Artha Control Center{% endblock %}
+{% block title %}{% if post %}Edit Article - {{ post.title }}{% else %}Compose Article{% endif %} - Artha Control Center{% endblock %}
+
+{% block extra_meta %}
+<!-- Summernote CSS CDN -->
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
+<style>
+/* Summernote Dark/Light HSL Theme Integration */
+.note-editor.note-frame {
+    border: 1px solid var(--border-color) !important;
+    background-color: var(--bg-primary) !important;
+    border-radius: var(--border-radius-sm) !important;
+    font-family: var(--font-body) !important;
+    overflow: hidden;
+    box-shadow: var(--card-shadow) !important;
+}
+.note-editor .note-toolbar {
+    background-color: var(--bg-secondary) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    padding: 10px 16px !important;
+}
+.note-editor .note-btn {
+    background-color: var(--bg-primary) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-secondary) !important;
+    border-radius: var(--border-radius-sm) !important;
+    padding: 6px 12px !important;
+    font-size: 13px !important;
+    transition: var(--transition-fast) !important;
+}
+.note-editor .note-btn:hover,
+.note-editor .note-btn.active {
+    background-color: var(--bg-tertiary) !important;
+    color: var(--accent-blue) !important;
+    border-color: var(--accent-blue) !important;
+}
+.note-editor .note-btn-group .note-btn {
+    border-radius: 0 !important;
+}
+.note-editor .note-btn-group .note-btn:first-child {
+    border-top-left-radius: var(--border-radius-sm) !important;
+    border-bottom-left-radius: var(--border-radius-sm) !important;
+}
+.note-editor .note-btn-group .note-btn:last-child {
+    border-top-right-radius: var(--border-radius-sm) !important;
+    border-bottom-right-radius: var(--border-radius-sm) !important;
+}
+.note-editor .note-dropdown-menu {
+    background-color: var(--bg-primary) !important;
+    border: 1px solid var(--border-color) !important;
+    box-shadow: var(--glass-shadow) !important;
+}
+.note-editor .note-dropdown-item {
+    color: var(--text-primary) !important;
+}
+.note-editor .note-dropdown-item:hover {
+    background-color: var(--bg-secondary) !important;
+    color: var(--accent-blue) !important;
+}
+.note-editor .note-editable {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+    padding: 24px !important;
+}
+.note-editor .note-editable h1 {
+    font-size: 28px !important;
+    font-weight: 700 !important;
+    margin-top: 24px !important;
+    margin-bottom: 16px !important;
+    color: var(--text-primary) !important;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 8px;
+}
+.note-editor .note-editable h2 {
+    font-size: 22px !important;
+    font-weight: 700 !important;
+    margin-top: 20px !important;
+    margin-bottom: 12px !important;
+    color: var(--text-primary) !important;
+}
+.note-editor .note-editable a {
+    color: var(--accent-blue) !important;
+    text-decoration: underline !important;
+}
+.note-editor .note-placeholder {
+    padding: 24px !important;
+    font-family: var(--font-body) !important;
+    color: var(--text-tertiary) !important;
+}
+.note-editor .note-statusbar {
+    background-color: var(--bg-secondary) !important;
+    border-top: 1px solid var(--border-color) !important;
+}
+.note-editor .note-statusbar .note-resizebar {
+    border-top: none !important;
+}
+.note-editor .note-modal-content {
+    background-color: var(--bg-primary) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+.note-editor .note-modal-header {
+    border-bottom: 1px solid var(--border-color) !important;
+}
+.note-editor .note-modal-footer {
+    border-top: 1px solid var(--border-color) !important;
+}
+.note-editor .note-form-label {
+    color: var(--text-secondary) !important;
+}
+.note-editor .note-input {
+    background-color: var(--bg-secondary) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+</style>
+{% endblock %}
 
 {% block content %}
-<!-- Subpage Spacer -->
 <div style="height: var(--nav-height); background-color: var(--bg-secondary);"></div>
 
 <section class="section-alt" style="padding-top: 40px; min-height: 90vh;">
@@ -153,4 +269,42 @@
         
     </div>
 </section>
+
+<!-- Load jQuery and Summernote JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#post-content').summernote({
+        placeholder: 'Write your article here... Support for H1, H2, hyperlinks, images, tables, lists, etc.',
+        tabsize: 2,
+        height: 400,
+        toolbar: [
+            ['style', ['style']],
+            ['font', ['bold', 'italic', 'underline', 'clear']],
+            ['color', ['color']],
+            ['para', ['ul', 'ol', 'paragraph']],
+            ['table', ['table']],
+            ['insert', ['link', 'picture', 'hr']],
+            ['view', ['fullscreen', 'codeview', 'help']]
+        ],
+        callbacks: {
+            onChange: function(contents, $editable) {
+                // Update hidden textarea
+                $('#post-content').val(contents);
+                // Dispatch input event to trigger SEO assistant
+                const event = new Event('input', { bubbles: true });
+                document.getElementById('post-content').dispatchEvent(event);
+            }
+        }
+    });
+    
+    // Sync initial content on page load
+    const initialContent = $('#post-content').val();
+    if (initialContent) {
+        const event = new Event('input', { bubbles: true });
+        document.getElementById('post-content').dispatchEvent(event);
+    }
+});
+</script>
 {% endblock %}

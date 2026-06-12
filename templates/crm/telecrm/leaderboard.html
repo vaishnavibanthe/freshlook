@@ -1,0 +1,404 @@
+{% extends "base_crm.html" %}
+
+{% block title %}Telecaller Performance Leaderboard - ThinkArtha{% endblock %}
+
+{% block extra_head %}
+<style>
+    .leaderboard-layout {
+        display: grid;
+        grid-template-columns: 1.5fr 1fr;
+        gap: 20px;
+        min-height: calc(100vh - 120px);
+    }
+
+    .period-tabs {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 16px;
+        border-bottom: 1px solid var(--border-crm);
+        padding-bottom: 8px;
+    }
+
+    .period-tab {
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        background: rgba(22, 45, 80, 0.4);
+        color: var(--text-crm-secondary);
+        border: 1px solid transparent;
+        transition: all 0.2s;
+    }
+
+    .period-tab:hover {
+        background: rgba(22, 45, 80, 0.7);
+        color: #fff;
+    }
+
+    .period-tab.active {
+        background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+        color: #fff;
+        border-color: var(--accent-cyan);
+    }
+
+    /* Standings Card list */
+    .standing-row {
+        display: flex;
+        align-items: center;
+        padding: 14px 18px;
+        background: rgba(9, 19, 34, 0.4);
+        border: 1px solid var(--border-crm);
+        border-radius: 8px;
+        margin-bottom: 10px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .standing-row:hover, .standing-row.selected {
+        border-color: var(--accent-cyan);
+        background: rgba(22, 45, 80, 0.3);
+    }
+
+    .rank-num {
+        width: 32px;
+        font-size: 18px;
+        font-weight: 800;
+        color: var(--text-crm-muted);
+        text-align: center;
+        margin-right: 12px;
+    }
+
+    .standing-row:nth-child(1) .rank-num { color: #f59e0b; font-size: 22px; }
+    .standing-row:nth-child(2) .rank-num { color: #cbd5e1; font-size: 20px; }
+    .standing-row:nth-child(3) .rank-num { color: #b45309; font-size: 19px; }
+
+    .leaderboard-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        color: #fff;
+        font-size: 15px;
+        margin-right: 16px;
+    }
+
+    /* Stats Grid view */
+    .stats-block-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .stat-mini-card {
+        background: rgba(9, 19, 34, 0.6);
+        border: 1px solid var(--border-crm);
+        border-radius: 8px;
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+    
+    .stat-label-sub {
+        font-size: 11px;
+        color: var(--text-crm-muted);
+        text-transform: uppercase;
+        font-weight: 600;
+    }
+
+    .stat-val-sub {
+        font-size: 18px;
+        font-weight: 700;
+        color: #fff;
+    }
+
+    @media (max-width: 900px) {
+        .leaderboard-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="crm-title-section" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <div>
+        <h1>Telecaller Leaderboard & Team Stats</h1>
+        <p>Compare performance rankings, calling activity rates, and qualification output levels</p>
+    </div>
+    
+    <div style="display: flex; gap: 10px;">
+        <button class="btn-crm btn-crm-secondary" onclick="exportLeaderboardData()">
+            <i class="fas fa-download"></i> Export CSV
+        </button>
+        <button class="btn-crm btn-crm-secondary" onclick="loadLeaderboard()">
+            <i class="fas fa-sync-alt"></i> Refresh
+        </button>
+    </div>
+</div>
+
+<div class="leaderboard-layout">
+    
+    <!-- LEFT PANEL: STANDINGS AND FILTERS -->
+    <div class="panel-col" style="background-color: var(--bg-card); border: 1px solid var(--border-crm); border-radius: 12px; backdrop-filter: blur(8px); padding: 20px;">
+        <!-- Period tabs -->
+        <div class="period-tabs" id="period-tabs-list">
+            <span class="period-tab active" data-period="Day" onclick="switchPeriod('Day')">Today</span>
+            <span class="period-tab" data-period="Week" onclick="switchPeriod('Week')">This Week</span>
+            <span class="period-tab" data-period="Month" onclick="switchPeriod('Month')">This Month</span>
+            <span class="period-tab" data-period="Year" onclick="switchPeriod('Year')">This Year</span>
+        </div>
+
+        <!-- Filter widgets -->
+        <div style="display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+            <div>
+                <input type="text" id="leaderboard-search" class="form-control" placeholder="Search team member..." oninput="debounce(filterStandings)()">
+            </div>
+            <div>
+                <select id="leaderboard-metric" class="form-control" onchange="loadLeaderboard()">
+                    <option value="Calls">Rank: Attempted Calls</option>
+                    <option value="Connected">Rank: Connected Calls</option>
+                    <option value="Spoken">Rank: Spoken Conversations</option>
+                    <option value="Talk duration">Rank: Talk Duration</option>
+                    <option value="Meetings scheduled">Rank: Meetings Scheduled</option>
+                    <option value="SQLs">Rank: SQLs Qualified</option>
+                </select>
+            </div>
+            <div>
+                <select id="leaderboard-campaign" class="form-control" onchange="loadLeaderboard()">
+                    <option value="">All Campaigns</option>
+                    {% for c in campaigns %}
+                    <option value="{{ c['id'] }}">{{ c['name'] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <!-- Standings dynamic list -->
+        <div id="standings-list-container" style="max-height: 600px; overflow-y: auto;">
+            <!-- Standings injection -->
+        </div>
+        <div id="standings-empty-msg" style="display: none; text-align: center; padding: 40px; color: var(--text-crm-muted);">
+            No records found.
+        </div>
+    </div>
+
+    <!-- RIGHT PANEL: INDIVIDUAL DETAILED STATS -->
+    <div class="panel-col" style="background-color: var(--bg-card); border: 1px solid var(--border-crm); border-radius: 12px; backdrop-filter: blur(8px); padding: 20px; display: flex; flex-direction: column; gap: 20px;">
+        <div style="border-bottom: 1px solid var(--border-crm); padding-bottom: 12px;">
+            <h3 style="font-weight: 700; color: #fff; font-size: 15px;" id="stat-user-name">Select a telecaller</h3>
+            <span style="font-size: 12px; color: var(--accent-cyan);" id="stat-user-role">to view detailed performance logs</span>
+        </div>
+
+        <!-- Scrollable details stats -->
+        <div style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 20px;">
+            <!-- Calling Stats -->
+            <div>
+                <h4 style="font-size: 12.5px; font-weight: 700; color: var(--accent-cyan); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Calling Activities</h4>
+                <div class="stats-block-grid">
+                    <div class="stat-mini-card">
+                        <span class="stat-label-sub">Attempted</span>
+                        <span class="stat-val-sub" id="stat-attempted">0</span>
+                    </div>
+                    <div class="stat-mini-card">
+                        <span class="stat-label-sub">Connected (≥1s)</span>
+                        <span class="stat-val-sub" id="stat-connected">0</span>
+                    </div>
+                    <div class="stat-mini-card">
+                        <span class="stat-label-sub">Spoken Calls</span>
+                        <span class="stat-val-sub" id="stat-spoken">0</span>
+                    </div>
+                    <div class="stat-mini-card">
+                        <span class="stat-label-sub">Talk Duration</span>
+                        <span class="stat-val-sub" id="stat-duration">0s</span>
+                    </div>
+                </div>
+                <div style="font-size: 11.5px; color: var(--text-crm-muted); margin-top: 10px; display: flex; flex-direction: column; gap: 4px;">
+                    <div>First Call: <span id="stat-first-call" style="color: #fff; font-weight: 500;">-</span></div>
+                    <div>Last Call: <span id="stat-last-call" style="color: #fff; font-weight: 500;">-</span></div>
+                </div>
+            </div>
+
+            <!-- Task Registry Stats -->
+            <div>
+                <h4 style="font-size: 12.5px; font-weight: 700; color: var(--accent-purple); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Tasks Checklist</h4>
+                <div class="stats-block-grid">
+                    <div class="stat-mini-card">
+                        <span class="stat-label-sub">Overdue / Late</span>
+                        <span class="stat-val-sub" style="color: #ef4444;" id="stat-late">0</span>
+                    </div>
+                    <div class="stat-mini-card">
+                        <span class="stat-label-sub">Completed</span>
+                        <span class="stat-val-sub" style="color: #10b981;" id="stat-done">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lead Stage Breakdown -->
+            <div>
+                <h4 style="font-size: 12.5px; font-weight: 700; color: #fff; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Contact Allocations Stages</h4>
+                <div id="stat-stages-list" style="display: flex; flex-direction: column; gap: 8px; font-size: 12px;">
+                    <div style="text-align: center; color: var(--text-crm-muted); padding: 10px 0;">No active allocations.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentPeriod = 'Day';
+    let standingsData = [];
+    let selectedUserId = null;
+
+    document.addEventListener("DOMContentLoaded", () => {
+        loadLeaderboard();
+    });
+
+    function switchPeriod(periodVal) {
+        currentPeriod = periodVal;
+        document.querySelectorAll("#period-tabs-list .period-tab").forEach(tab => {
+            if (tab.getAttribute("data-period") === periodVal) {
+                tab.classList.add("active");
+            } else {
+                tab.classList.remove("active");
+            }
+        });
+        loadLeaderboard();
+    }
+
+    function debounce(func, delay = 300) {
+        let timer;
+        return function(...args) {
+            clearTimeout(timer);
+            timer = setTimeout(() => func.apply(this, args), delay);
+        };
+    }
+
+    // Load listings from API
+    function loadLeaderboard() {
+        const metric = document.getElementById("leaderboard-metric").value;
+        const campaign = document.getElementById("leaderboard-campaign").value;
+        
+        fetch(`/api/telecrm/leaderboard?period=${currentPeriod}&metric=${metric}&campaign=${campaign}`)
+            .then(res => res.json())
+            .then(data => {
+                standingsData = data.standings;
+                filterStandings();
+                
+                // If standings exist and no selected, select first
+                if (data.standings.length > 0 && !selectedUserId) {
+                    selectTelecaller(data.standings[0].id, data.standings[0].name);
+                }
+            });
+    }
+
+    // Filter list locally by search term
+    function filterStandings() {
+        const search = document.getElementById("leaderboard-search").value.toLowerCase();
+        const container = document.getElementById("standings-list-container");
+        container.innerHTML = '';
+        
+        const filtered = standingsData.filter(s => s.name.toLowerCase().includes(search));
+        
+        if (filtered.length === 0) {
+            document.getElementById("standings-empty-msg").style.display = 'block';
+            return;
+        }
+        document.getElementById("standings-empty-msg").style.display = 'none';
+        
+        filtered.forEach(s => {
+            const row = document.createElement("div");
+            row.className = "standing-row";
+            if (selectedUserId === s.id) {
+                row.classList.add("selected");
+            }
+            row.onclick = () => selectTelecaller(s.id, s.name);
+            
+            // Format duration
+            const minutes = Math.floor(s.talk_duration / 60);
+            const seconds = s.talk_duration % 60;
+            const durationStr = minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
+            
+            row.innerHTML = `
+                <div class="rank-num">#${s.rank}</div>
+                <div class="leaderboard-avatar">${s.name[0].toUpperCase()}</div>
+                <div style="flex: 1;">
+                    <div style="font-weight: 700; color: #fff; font-size: 14px;">${s.name}</div>
+                    <div style="font-size: 11.5px; color: var(--text-crm-muted); margin-top: 4px;">
+                        First: ${s.first_call_time ? s.first_call_time.split(' ')[1] : 'NA'} | Last: ${s.last_call_time ? s.last_call_time.split(' ')[1] : 'NA'}
+                    </div>
+                </div>
+                <div style="text-align: right; font-size: 12px; color: var(--text-crm-secondary);">
+                    <div><strong>${s.calls_attempted}</strong> calls</div>
+                    <div style="font-size: 11px; color: var(--accent-cyan); margin-top: 4px;">Dur: ${durationStr}</div>
+                </div>
+                <div style="margin-left: 16px; font-weight: 700; color: #fff; font-size: 14px; min-width: 50px; text-align: right;">
+                    ${s.completion_percentage}%
+                </div>
+            `;
+            container.appendChild(row);
+        });
+    }
+
+    // Select caller to display stats Panel
+    function selectTelecaller(id, name) {
+        selectedUserId = id;
+        document.getElementById("stat-user-name").textContent = name;
+        document.getElementById("stat-user-role").textContent = "Telecaller Agent Portfolio";
+        
+        // Toggle selected class in stands
+        const rows = document.querySelectorAll(".standing-row");
+        rows.forEach(r => r.classList.remove("selected"));
+        // reload list highlighting
+        filterStandings();
+        
+        const campaign = document.getElementById("leaderboard-campaign").value;
+        fetch(`/api/telecrm/users/${id}/statistics?campaign=${campaign}`)
+            .then(res => res.json())
+            .then(data => {
+                // Calling
+                document.getElementById("stat-attempted").textContent = data.calls.attempted || 0;
+                document.getElementById("stat-connected").textContent = data.calls.connected || 0;
+                document.getElementById("stat-spoken").textContent = data.calls.spoken || 0;
+                
+                const min = Math.floor((data.calls.total_duration || 0) / 60);
+                const sec = (data.calls.total_duration || 0) % 60;
+                document.getElementById("stat-duration").textContent = min > 0 ? `${min}m ${sec}s` : `${sec}s`;
+                
+                document.getElementById("stat-first-call").textContent = data.calls.first_call || 'No call log';
+                document.getElementById("stat-last-call").textContent = data.calls.last_call || 'No call log';
+                
+                // Tasks
+                document.getElementById("stat-late").textContent = data.tasks.Late;
+                document.getElementById("stat-done").textContent = data.tasks.Done;
+                
+                // Stage list
+                const stagesList = document.getElementById("stat-stages-list");
+                stagesList.innerHTML = '';
+                const keys = Object.keys(data.stages);
+                if (keys.length === 0) {
+                    stagesList.innerHTML = '<div style="text-align: center; color: var(--text-crm-muted); padding: 10px 0;">No active allocations.</div>';
+                } else {
+                    keys.forEach(k => {
+                        const row = document.createElement("div");
+                        row.style.display = 'flex';
+                        row.style.justifyContent = 'space-between';
+                        row.innerHTML = `<span>${k}:</span><strong>${data.stages[k]}</strong>`;
+                        stagesList.appendChild(row);
+                    });
+                }
+            });
+    }
+
+    // Export leaderboard standing data CSV
+    function exportLeaderboardData() {
+        const metric = document.getElementById("leaderboard-metric").value;
+        window.location.href = `/api/telecrm/leaderboard/export?period=${currentPeriod}&metric=${metric}`;
+    }
+</script>
+{% endblock %}

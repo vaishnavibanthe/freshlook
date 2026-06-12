@@ -1,0 +1,239 @@
+{% extends 'crm/base_crm.html' %}
+
+{% block title %}TeleCRM Dashboard | ThinkArtha CRM{% endblock %}
+
+{% block content %}
+<style>
+    .tele-stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 24px;
+    }
+    
+    .tele-stat-card {
+        background-color: var(--bg-card);
+        border: 1px solid var(--border-crm);
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    
+    .tele-stat-title {
+        font-size: 12.5px;
+        color: var(--text-crm-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+    }
+    
+    .tele-stat-value {
+        font-size: 24px;
+        font-weight: 800;
+        color: #ffffff;
+    }
+
+    .tele-progress-card {
+        background-color: var(--bg-card);
+        border: 1px solid var(--border-crm);
+        border-radius: 12px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        grid-column: span 2;
+    }
+
+    @media (max-width: 768px) {
+        .tele-progress-card {
+            grid-column: span 1;
+            flex-direction: column;
+            gap: 16px;
+        }
+    }
+
+    /* Progress Circle */
+    .progress-circle {
+        position: relative;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: conic-gradient(var(--accent-cyan) calc({{ completion_pct }} * 1%), rgba(22, 45, 80, 0.4) 0);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .progress-circle::after {
+        content: '{{ completion_pct }}%';
+        position: absolute;
+        width: 66px;
+        height: 66px;
+        border-radius: 50%;
+        background-color: var(--bg-sidebar);
+        color: #ffffff;
+        font-size: 14.5px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .dashboard-splits {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 24px;
+        margin-bottom: 24px;
+    }
+    
+    @media (max-width: 992px) {
+        .dashboard-splits {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .performance-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13.5px;
+    }
+
+    .performance-table th {
+        color: var(--text-crm-secondary);
+        font-weight: 600;
+        padding: 12px;
+        border-bottom: 2px solid var(--border-crm);
+        text-align: left;
+    }
+
+    .performance-table td {
+        padding: 12px;
+        border-bottom: 1px solid var(--border-crm);
+        color: var(--text-crm-primary);
+        text-align: left;
+    }
+
+    .performance-table tr:hover td {
+        background-color: rgba(22, 45, 80, 0.2);
+    }
+</style>
+
+<div class="crm-header-bar">
+    <div class="crm-title-section">
+        <h1>TeleCRM Workspace Dashboard</h1>
+        <p>
+            {% if is_caller %}
+            Track your calling targets, follow-ups, booked meetings, and SQL handoffs
+            {% else %}
+            Global view of team dialing queues, conversions, and call statistics
+            {% endif %}
+        </p>
+    </div>
+    
+    <div class="crm-actions-section" style="display: flex; gap: 10px;">
+        <a href="{{ url_for('crm.telecrm_dialing_workbench') }}" class="btn-crm btn-crm-primary">
+            <i class="fas fa-phone-alt"></i> Open workbench
+        </a>
+    </div>
+</div>
+
+<!-- Stats Grid -->
+<div class="tele-stats-grid">
+    <div class="tele-progress-card">
+        <div>
+            <h3 style="font-size: 16px; color: #ffffff; margin-bottom: 4px;">Dialing Progress</h3>
+            <p style="font-size: 12px; color: var(--text-crm-secondary);">
+                Assigned: <strong>{{ assigned }}</strong> &bull; Completed: <strong>{{ completed }}</strong>
+            </p>
+        </div>
+        <div class="progress-circle"></div>
+    </div>
+    
+    <div class="tele-stat-card">
+        <div class="tele-stat-title">Calls Dialed</div>
+        <div class="tele-stat-value" style="color: #ffffff;">{{ dialed }}</div>
+    </div>
+    
+    <div class="tele-stat-card">
+        <div class="tele-stat-title">Spoken Conversations</div>
+        <div class="tele-stat-value" style="color: #3b82f6;">{{ spoken }}</div>
+    </div>
+    
+    <div class="tele-stat-card">
+        <div class="tele-stat-title">Meetings Booked</div>
+        <div class="tele-stat-value" style="color: #f59e0b;">{{ meetings_sched }}</div>
+    </div>
+    
+    <div class="tele-stat-card">
+        <div class="tele-stat-title">SQL Conversions</div>
+        <div class="tele-stat-value" style="color: #10b981;">{{ converted }}</div>
+    </div>
+</div>
+
+<!-- Dashboard Splits -->
+<div class="dashboard-splits">
+    
+    <!-- Left Split: Table listings -->
+    {% if not is_caller %}
+    <div class="crm-card" style="margin-bottom: 0;">
+        <div class="crm-card-title">Telecallers Team Performance</div>
+        <div style="overflow-x: auto;">
+            <table class="performance-table">
+                <thead>
+                    <tr>
+                        <th>Agent Name</th>
+                        <th>Assigned</th>
+                        <th>Dialed Attempts</th>
+                        <th>Spoken Conversations</th>
+                        <th>Meetings Booked</th>
+                        <th>SQL Converted</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for agent in team_performance %}
+                    <tr>
+                        <td style="font-weight: 600;">{{ agent.name }}</td>
+                        <td>{{ agent.assigned }}</td>
+                        <td>{{ agent.dialed }}</td>
+                        <td>{{ agent.spoken }}</td>
+                        <td>{{ agent.scheduled }}</td>
+                        <td style="font-weight: 700; color: #10b981;">{{ agent.converted }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" style="text-align: center; color: var(--text-crm-muted); padding: 20px;">No telecaller agents mapped.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <div class="crm-card" style="margin-bottom: 0;">
+        <div class="crm-card-title">My Call Schedules Today</div>
+        <div style="font-size: 13.5px; color: var(--text-crm-secondary);">
+            <p style="margin-bottom: 12px;">You have <strong>{{ followups_today }}</strong> calls to make today.</p>
+            <a href="{{ url_for('crm.telecrm_dialing_workbench', dialing_status='My pending calls') }}" class="btn-crm btn-crm-primary" style="width: 100%; text-align: center; justify-content: center;">
+                Launch Dialing Workbench
+            </a>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Right Split: Dispositions Breakdown -->
+    <div class="crm-card" style="margin-bottom: 0;">
+        <div class="crm-card-title">Call Outcome Breakdown</div>
+        <div style="display: flex; flex-direction: column; gap: 12px; max-height: 280px; overflow-y: auto;">
+            {% for row in disp_stats %}
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background-color: rgba(22, 45, 80, 0.15); border-radius: 6px; border: 1px solid rgba(22, 45, 80, 0.2);">
+                <span style="font-size: 13px; font-weight: 600; color: #ffffff;">{{ row.label }}</span>
+                <span style="background-color: var(--accent-cyan); color: #000000; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px;">{{ row.value }}</span>
+            </div>
+            {% else %}
+            <div style="color: var(--text-crm-muted); text-align: center; padding: 30px;">No calls logged yet.</div>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

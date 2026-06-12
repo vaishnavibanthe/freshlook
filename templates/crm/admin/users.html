@@ -1,0 +1,212 @@
+{% extends 'crm/base_crm.html' %}
+
+{% block title %}User Registry Administration | ThinkArtha CRM{% endblock %}
+
+{% block content %}
+<style>
+    .admin-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 24px;
+    }
+    
+    @media (max-width: 992px) {
+        .admin-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="crm-header-bar">
+    <div class="crm-title-section">
+        <h1>User Registry Administration</h1>
+        <p>Manage sales reps, telecallers, team structures, and group hierarchies</p>
+    </div>
+</div>
+
+<div class="admin-grid">
+    
+    <!-- Left: Users table list -->
+    <div class="crm-card">
+        <div class="crm-card-title">Registered CRM / TeleCRM Users</div>
+        <div style="overflow-x: auto;">
+            <table class="crm-table">
+                <thead>
+                    <tr>
+                        <th>User Name</th>
+                        <th>Email Address</th>
+                        <th>Role</th>
+                        <th>Business Group</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in users %}
+                    <tr>
+                        <td style="font-weight: 600; color: #ffffff;">{{ u.name }}</td>
+                        <td>{{ u.email }}</td>
+                        <td>
+                            <span style="font-weight: 700; color: {% if u.role == 'Platform Admin' %}#ec4899{% elif u.role == 'Telecaller' %}var(--accent-cyan){% else %}#3b82f6{% endif %};">
+                                {{ u.role }}
+                            </span>
+                        </td>
+                        <td>{{ u.group_name or 'No Group Mapped' }}</td>
+                        <td>
+                            <span class="badge-status {% if u.is_active == 1 %}qualified{% else %}disqualified{% endif %}">
+                                {% if u.is_active == 1 %}Active{% else %}Inactive{% endif %}
+                            </span>
+                        </td>
+                        <td>
+                            <div style="display: flex; gap: 6px;">
+                                <button onclick="populateEditForm({{ u|tojson|safe }})" class="btn-crm btn-crm-secondary" style="padding: 2px 8px; font-size: 11px;">Edit</button>
+                                {% if u.is_active == 1 %}
+                                <form action="{{ url_for('crm.admin_users') }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to deactivate this user?')">
+                                    <input type="hidden" name="action" value="deactivate">
+                                    <input type="hidden" name="user_id" value="{{ u.id }}">
+                                    <button type="submit" class="btn-crm btn-crm-danger" style="padding: 2px 8px; font-size: 11px;">Deactivate</button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Right: Create/Edit form card -->
+    <div class="crm-card" style="align-self: start;">
+        <div class="crm-card-title" id="form-title">Create Workspace Account</div>
+        <form action="{{ url_for('crm.admin_users') }}" method="POST" id="user-form">
+            <input type="hidden" name="action" value="create" id="form-action">
+            <input type="hidden" name="user_id" id="form-user-id">
+            
+            <div class="form-group">
+                <label class="form-label">Full Name</label>
+                <input type="text" name="name" id="form-name" class="form-control" required placeholder="e.g. David Miller">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <input type="email" name="email" id="form-email" class="form-control" required placeholder="name@company.com">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Password <span style="font-size: 10px; color: var(--text-crm-muted);" id="pwd-help">(Mandatory for new accounts)</span></label>
+                <input type="password" name="password" id="form-password" class="form-control" placeholder="••••••••">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Workspace Role</label>
+                <select name="role" id="form-role" class="form-control" required>
+                    <option value="Platform Admin">Platform Admin</option>
+                    <option value="Group Admin">Group Admin</option>
+                    <option value="Sales Head">Sales Head</option>
+                    <option value="Manager / Sales Manager">Sales Manager</option>
+                    <option value="Sales User">Sales User</option>
+                    <option value="Telecaller Manager">Telecaller Manager</option>
+                    <option value="Telecaller">Telecaller</option>
+                    <option value="Read-Only User">Read-Only User</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Business Group Mapping</label>
+                <select name="group_id" id="form-group-id" class="form-control">
+                    <option value="">No Group</option>
+                    {% for g in groups %}
+                    <option value="{{ g.id }}">{{ g.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div class="form-group">
+                    <label class="form-label">Direct Manager</label>
+                    <select name="manager_id" id="form-manager-id" class="form-control">
+                        <option value="">None</option>
+                        {% for mgr in managers %}
+                        <option value="{{ mgr.id }}">{{ mgr.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Sales Head Mapped</label>
+                    <select name="sales_head_id" id="form-sales-head-id" class="form-control">
+                        <option value="">None</option>
+                        {% for sh in heads %}
+                        <option value="{{ sh.id }}">{{ sh.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div class="form-group">
+                    <label class="form-label">Geography</label>
+                    <input type="text" name="geography" id="form-geography" class="form-control" placeholder="e.g. North East">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Department</label>
+                    <input type="text" name="department" id="form-department" class="form-control" placeholder="e.g. Enterprise Sales">
+                </div>
+            </div>
+            
+            <div class="form-group" id="status-toggle-wrapper" style="display: none; flex-direction: row; gap: 10px; align-items: center; padding-top: 8px;">
+                <label class="form-label" style="margin-bottom: 0;">Account active status:</label>
+                <select name="is_active" id="form-is-active" class="form-control" style="width: 120px;">
+                    <option value="1">Active</option>
+                    <option value="0">Deactivated</option>
+                </select>
+            </div>
+            
+            <div style="display: flex; gap: 10px; border-top: 1px solid var(--border-crm); padding-top: 15px; margin-top: 20px;">
+                <button type="button" class="btn-crm btn-crm-secondary" onclick="resetUserForm()" style="display: none;" id="btn-cancel-edit">Cancel Edit</button>
+                <button type="submit" class="btn-crm btn-crm-primary" style="margin-left: auto;" id="btn-submit-action">Create Account</button>
+            </div>
+        </form>
+    </div>
+
+</div>
+
+<script>
+    // Autofills editor form from table item click
+    function populateEditForm(u) {
+        document.getElementById('form-title').textContent = `Edit User: ${u.name}`;
+        document.getElementById('form-action').value = 'edit';
+        document.getElementById('form-user-id').value = u.id;
+        document.getElementById('form-name').value = u.name;
+        document.getElementById('form-email').value = u.email;
+        document.getElementById('form-password').value = ''; // empty by default on edit
+        document.getElementById('pwd-help').textContent = '(Leave blank to retain password)';
+        
+        document.getElementById('form-role').value = u.role;
+        document.getElementById('form-group-id').value = u.group_id || '';
+        document.getElementById('form-manager-id').value = u.manager_id || '';
+        document.getElementById('form-sales-head-id').value = u.sales_head_id || '';
+        
+        document.getElementById('form-geography').value = u.geography || '';
+        document.getElementById('form-department').value = u.department || '';
+        
+        document.getElementById('form-is-active').value = u.is_active;
+        document.getElementById('status-toggle-wrapper').style.display = 'flex';
+        document.getElementById('btn-cancel-edit').style.display = 'inline-flex';
+        document.getElementById('btn-submit-action').textContent = 'Commit Changes';
+    }
+
+    // Reset editor
+    function resetUserForm() {
+        document.getElementById('form-title').textContent = 'Create Workspace Account';
+        document.getElementById('form-action').value = 'create';
+        document.getElementById('form-user-id').value = '';
+        document.getElementById('user-form').reset();
+        
+        document.getElementById('pwd-help').textContent = '(Mandatory for new accounts)';
+        document.getElementById('status-toggle-wrapper').style.display = 'none';
+        document.getElementById('btn-cancel-edit').style.display = 'none';
+        document.getElementById('btn-submit-action').textContent = 'Create Account';
+    }
+</script>
+{% endblock %}

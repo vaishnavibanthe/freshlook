@@ -1,0 +1,764 @@
+{% extends 'crm/base_crm.html' %}
+
+{% block title %}{{ opp.opportunity_name }} | Opportunity Details | ThinkArtha CRM{% endblock %}
+
+{% block content %}
+<style>
+    .detail-summary-bar {
+        background-color: var(--bg-card);
+        border: 1px solid var(--border-crm);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+    
+    .detail-profile {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+    
+    .detail-avatar {
+        width: 54px;
+        height: 54px;
+        background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        font-weight: bold;
+        color: #ffffff;
+    }
+    
+    .detail-names h2 {
+        font-size: 20px;
+        color: #ffffff;
+    }
+    
+    .detail-names span {
+        font-size: 13px;
+        color: var(--text-crm-secondary);
+    }
+    
+    .detail-widgets {
+        display: flex;
+        gap: 24px;
+        flex-wrap: wrap;
+    }
+    
+    .meddic-widget {
+        border-left: 3px solid var(--accent-cyan);
+        padding-left: 14px;
+    }
+    
+    .meddic-widget-score {
+        font-size: 20px;
+        font-weight: 800;
+        color: #ffffff;
+    }
+    
+    .meddic-widget-label {
+        font-size: 11px;
+        color: var(--text-crm-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    /* Tabs Control */
+    .tab-navigation {
+        display: flex;
+        border-bottom: 1px solid var(--border-crm);
+        margin-bottom: 24px;
+        gap: 6px;
+        overflow-x: auto;
+    }
+    
+    .tab-btn {
+        background: none;
+        border: none;
+        padding: 12px 18px;
+        color: var(--text-crm-secondary);
+        font-size: 14.5px;
+        font-weight: 600;
+        cursor: pointer;
+        position: relative;
+        transition: color 0.2s ease;
+        white-space: nowrap;
+    }
+    
+    .tab-btn:hover {
+        color: #ffffff;
+    }
+    
+    .tab-btn.active {
+        color: var(--accent-cyan);
+    }
+    
+    .tab-btn.active::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 2.5px;
+        background-color: var(--accent-cyan);
+        border-radius: 2px;
+    }
+    
+    .tab-pane {
+        display: none;
+    }
+    
+    .tab-pane.active {
+        display: block;
+    }
+    
+    /* Timeline List */
+    .timeline-list {
+        position: relative;
+        padding-left: 24px;
+        list-style: none;
+    }
+    
+    .timeline-list::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 8px;
+        width: 2px;
+        background-color: var(--border-crm);
+    }
+    
+    .timeline-item {
+        position: relative;
+        margin-bottom: 24px;
+    }
+    
+    .timeline-marker {
+        position: absolute;
+        left: -22px;
+        top: 4px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: var(--bg-crm);
+        border: 2.5px solid var(--accent-cyan);
+    }
+    
+    .timeline-header {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        color: var(--text-crm-secondary);
+        margin-bottom: 4px;
+    }
+    
+    .timeline-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: #ffffff;
+    }
+    
+    .timeline-body {
+        font-size: 13px;
+        color: var(--text-crm-secondary);
+        margin-top: 6px;
+        background-color: rgba(22, 45, 80, 0.15);
+        padding: 10px 14px;
+        border-radius: 6px;
+        border: 1px solid rgba(22, 45, 80, 0.2);
+    }
+    
+    .meddic-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+    
+    @media (max-width: 768px) {
+        .meddic-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    .meddic-section-title {
+        grid-column: 1 / -1;
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--accent-cyan);
+        border-bottom: 1px solid var(--border-crm);
+        padding-bottom: 6px;
+        margin-top: 10px;
+    }
+</style>
+
+<!-- Top Deal Information Header -->
+<div class="detail-summary-bar">
+    <div class="detail-profile">
+        <div class="detail-avatar">{{ opp.opportunity_name[0]|upper }}</div>
+        <div class="detail-names">
+            <h2>{{ opp.opportunity_name }}</h2>
+            <span>{{ opp.company_name or opp.company or '-' }} &bull; Est. Value: <strong>${{ "{:,.2f}".format(opp.estimated_value or 0.0) }}</strong></span>
+        </div>
+    </div>
+    
+    <div class="detail-widgets">
+        <div class="meddic-widget">
+            <div class="meddic-widget-score" style="color: {% if opp.meddic_score >= 70 %}#10b981{% elif opp.meddic_score >= 40 %}#f59e0b{% else %}#ef4444{% endif %}">
+                {{ opp.meddic_score }} / 100
+            </div>
+            <div class="meddic-widget-label">MEDDIC Score ({{ meddic_label }})</div>
+        </div>
+        
+        <div class="meddic-widget" style="border-left-color: #3b82f6;">
+            <div class="meddic-widget-score" style="color: #ffffff;">
+                <span class="badge-status {{ opp.stage.lower().replace(' ', '_') }}">{{ opp.stage }}</span>
+            </div>
+            <div class="meddic-widget-label">Deal Stage</div>
+        </div>
+        
+        <div class="meddic-widget" style="border-left-color: #8b5cf6;">
+            <div class="meddic-widget-score" style="color: #ffffff;">
+                {{ opp.probability }}%
+            </div>
+            <div class="meddic-widget-label">Win Probability</div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabs List -->
+<div class="tab-navigation">
+    <button class="tab-btn active" onclick="switchTab('overview')">Deal Profile</button>
+    <button class="tab-btn" onclick="switchTab('account')">Account & Contact</button>
+    <button class="tab-btn" onclick="switchTab('meddic')">MEDDIC Qualification</button>
+    <button class="tab-btn" onclick="switchTab('timeline')">Deal History ({{ timeline|length }})</button>
+    <button class="tab-btn" onclick="switchTab('tasks')">Task Schedule ({{ tasks|length }})</button>
+    <button class="tab-btn" onclick="switchTab('email')">Emails Log</button>
+</div>
+
+<!-- ==================================================== -->
+<!-- TAB: OVERVIEW (Deal Profile) -->
+<!-- ==================================================== -->
+<div id="tab-overview" class="tab-pane active">
+    <div class="crm-card">
+        <div class="crm-card-title">Edit Opportunity Details</div>
+        <form action="{{ url_for('crm.crm_opportunity_detail', opp_id=opp.id) }}" method="POST">
+            <input type="hidden" name="action" value="update_details">
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px;">
+                <div class="form-group">
+                    <label class="form-label">Estimated Deal Value (USD)</label>
+                    <input type="number" step="0.01" name="estimated_value" class="form-control" value="{{ opp.estimated_value or 0.0 }}" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Expected Close Date</label>
+                    <input type="date" name="expected_close_date" class="form-control" value="{{ opp.expected_close_date or '' }}" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Deal Stage</label>
+                    <select name="stage" class="form-control">
+                        <option value="Prospecting" {% if opp.stage == 'Prospecting' %}selected{% endif %}>Prospecting</option>
+                        <option value="Discovery" {% if opp.stage == 'Discovery' %}selected{% endif %}>Discovery</option>
+                        <option value="Solution Fit" {% if opp.stage == 'Solution Fit' %}selected{% endif %}>Solution Fit</option>
+                        <option value="Proposal" {% if opp.stage == 'Proposal' %}selected{% endif %}>Proposal</option>
+                        <option value="Negotiation" {% if opp.stage == 'Negotiation' %}selected{% endif %}>Negotiation</option>
+                        <option value="Closing" {% if opp.stage == 'Closing' %}selected{% endif %}>Closing</option>
+                        <option value="Closed Won" {% if opp.stage == 'Closed Won' %}selected{% endif %}>Closed Won</option>
+                        <option value="Closed Lost" {% if opp.stage == 'Closed Lost' %}selected{% endif %}>Closed Lost</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Win Probability (%)</label>
+                    <input type="number" name="probability" class="form-control" min="0" max="100" value="{{ opp.probability or 10 }}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Sales Rep (Owner)</label>
+                    <select name="owner_id" class="form-control">
+                        {% for owner in owners %}
+                        <option value="{{ owner.id }}" {% if opp.owner_id == owner.id %}selected{% endif %}>{{ owner.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Sales Manager Mapped</label>
+                    <select name="sales_manager_id" class="form-control">
+                        <option value="">None Mapped</option>
+                        {% for mgr in managers %}
+                        <option value="{{ mgr.id }}" {% if opp.sales_manager_id == mgr.id %}selected{% endif %}>{{ mgr.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Primary Product Solution</label>
+                    <select name="primary_product_solution_id" class="form-control">
+                        {% for prod in products %}
+                        <option value="{{ prod.id }}" {% if opp.primary_product_solution_id == prod.id %}selected{% endif %}>{{ prod.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Co-sell Technology Partner</label>
+                    <select name="partner_id" class="form-control">
+                        {% for part in partners %}
+                        <option value="{{ part.id }}" {% if opp.partner_id == part.id %}selected{% endif %}>{{ part.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Partner Influence Type</label>
+                    <select name="partner_influence_type" class="form-control">
+                        <option value="None" {% if opp.partner_influence_type == 'None' %}selected{% endif %}>None</option>
+                        <option value="Referral" {% if opp.partner_influence_type == 'Referral' %}selected{% endif %}>Referral</option>
+                        <option value="Co-sell" {% if opp.partner_influence_type == 'Co-sell' %}selected{% endif %}>Co-sell</option>
+                        <option value="Partner-led" {% if opp.partner_influence_type == 'Partner-led' %}selected{% endif %}>Partner-led</option>
+                        <option value="Technology Partner" {% if opp.partner_influence_type == 'Technology Partner' %}selected{% endif %}>Technology Partner</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Partner Contact Name</label>
+                    <input type="text" name="partner_contact_name" class="form-control" value="{{ opp.partner_contact_name or '' }}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Closed Reason (If Won/Lost)</label>
+                    <input type="text" name="closed_reason" class="form-control" value="{{ opp.closed_reason or '' }}" placeholder="e.g. Budget constraints, Competitor price">
+                </div>
+            </div>
+            
+            <div class="form-group" style="margin-top: 16px;">
+                <label class="form-label">Partner Engagement Notes / Special items</label>
+                <textarea name="partner_notes" class="form-control" rows="2">{{ opp.partner_notes or '' }}</textarea>
+            </div>
+            
+            <div style="border-top: 1px solid var(--border-crm); padding-top: 20px; display: flex; justify-content: space-between; margin-top: 20px;">
+                <span style="font-size: 11.5px; color: var(--text-crm-muted); align-self: center;">
+                    SQL Source: {{ opp.sql_source }} &bull; Closed Date: {{ opp.closed_at or '-' }}
+                </span>
+                <button type="submit" class="btn-crm btn-crm-primary">Save Deal Details</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ==================================================== -->
+<!-- TAB: ACCOUNT & CONTACT -->
+<!-- ==================================================== -->
+<div id="tab-account" class="tab-pane">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+        <!-- Account Info -->
+        <div class="crm-card">
+            <div class="crm-card-title">Mapped Account File</div>
+            <div style="display: flex; flex-direction: column; gap: 14px;">
+                <div class="form-group">
+                    <label class="form-label">Account Name</label>
+                    <input type="text" class="form-control" value="{{ opp.company_name or opp.company or '-' }}" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Website Domain</label>
+                    <input type="text" class="form-control" value="{{ opp.website or '-' }}" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Industry Sector</label>
+                    <input type="text" class="form-control" value="{{ opp.industry or '-' }}" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Geography / Region</label>
+                    <input type="text" class="form-control" value="{{ opp.geography or '-' }}" readonly>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Contact Info -->
+        <div class="crm-card">
+            <div class="crm-card-title">Primary Contact Mapped</div>
+            <div style="display: flex; flex-direction: column; gap: 14px;">
+                <div class="form-group">
+                    <label class="form-label">Contact Name</label>
+                    <input type="text" class="form-control" value="{{ opp.primary_contact_name or opp.contact_name or '-' }}" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="text" class="form-control" value="{{ opp.primary_contact_email or opp.contact_email or '-' }}" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Phone</label>
+                    <input type="text" class="form-control" value="{{ opp.contact_phone or '-' }}" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Job Title / Persona</label>
+                    <input type="text" class="form-control" value="{{ opp.job_title or '-' }}" readonly>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================================================== -->
+<!-- TAB: MEDDIC -->
+<!-- ==================================================== -->
+<div id="tab-meddic" class="tab-pane">
+    <div class="crm-card">
+        <div class="crm-card-title">MEDDIC B2B Qualification Panel</div>
+        <form action="{{ url_for('crm.crm_opportunity_detail', opp_id=opp.id) }}" method="POST">
+            <input type="hidden" name="action" value="update_meddic">
+            
+            <div class="meddic-grid">
+                
+                <!-- Metrics -->
+                <div class="meddic-section-title">M - Metrics (Value Impact & Success criteria) [Weight: 20]</div>
+                <div class="form-group">
+                    <label class="form-label">Business Value Impact Identified?</label>
+                    <select name="metrics_identified" class="form-control">
+                        <option value="no" {% if meddic.metrics_identified == 0 %}selected{% endif %}>No (0 points)</option>
+                        <option value="yes" {% if meddic.metrics_identified == 1 %}selected{% endif %}>Yes (20 points)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Estimated Dollar Value or ROI notes</label>
+                    <input type="text" name="estimated_impact" class="form-control" value="{{ meddic.estimated_impact or '' }}" placeholder="e.g., Save 40% DB load, $120k annually">
+                </div>
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label class="form-label">Value Metric Details / Cost of Pain Note</label>
+                    <textarea name="metrics_note" class="form-control" rows="2">{{ meddic.metrics_note or '' }}</textarea>
+                </div>
+
+                <!-- Economic Buyer -->
+                <div class="meddic-section-title">E - Economic Buyer (Budget Release Authority) [Weight: 15]</div>
+                <div class="form-group">
+                    <label class="form-label">Economic Buyer Mapped?</label>
+                    <select name="economic_buyer_identified" class="form-control">
+                        <option value="no" {% if meddic.economic_buyer_identified == 0 %}selected{% endif %}>No (0 points)</option>
+                        <option value="yes" {% if meddic.economic_buyer_identified == 1 %}selected{% endif %}>Yes (15 points)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Buyer Access Level</label>
+                    <select name="economic_buyer_access_level" class="form-control">
+                        <option value="No Access" {% if meddic.economic_buyer_access_level == 'No Access' %}selected{% endif %}>No Access</option>
+                        <option value="Influenced" {% if meddic.economic_buyer_access_level == 'Influenced' %}selected{% endif %}>Influenced</option>
+                        <option value="Direct Access" {% if meddic.economic_buyer_access_level == 'Direct Access' %}selected{% endif %}>Direct Access</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Economic Buyer Name</label>
+                    <input type="text" name="economic_buyer_name" class="form-control" value="{{ meddic.economic_buyer_name or '' }}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Economic Buyer Title</label>
+                    <input type="text" name="economic_buyer_title" class="form-control" value="{{ meddic.economic_buyer_title or '' }}">
+                </div>
+
+                <!-- Decision Criteria -->
+                <div class="meddic-section-title">D - Decision Criteria (Requirements & Capabilities) [Weight: 15]</div>
+                <div class="form-group">
+                    <label class="form-label">Technical Evaluation Criteria</label>
+                    <input type="text" name="technical_criteria" class="form-control" value="{{ meddic.technical_criteria or '' }}" placeholder="e.g. AWS native, Talend connectors">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Business Evaluation Criteria</label>
+                    <input type="text" name="business_criteria" class="form-control" value="{{ meddic.business_criteria or '' }}" placeholder="e.g. Payback under 9 months, local support">
+                </div>
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label class="form-label">Decision Evaluation Criteria / Security Requirements</label>
+                    <textarea name="decision_criteria" class="form-control" rows="2">{{ meddic.decision_criteria or '' }}</textarea>
+                </div>
+
+                <!-- Decision Process -->
+                <div class="meddic-section-title">D - Decision Process (Steps, Timeline & Approvals) [Weight: 15]</div>
+                <div class="form-group">
+                    <label class="form-label">Buying Process known?</label>
+                    <select name="decision_process_known" class="form-control">
+                        <option value="no" {% if meddic.decision_process_known == 0 %}selected{% endif %}>No (0 points)</option>
+                        <option value="yes" {% if meddic.decision_process_known == 1 %}selected{% endif %}>Yes (15 points)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Target Decision Close Date</label>
+                    <input type="date" name="target_decision_date" class="form-control" value="{{ meddic.target_decision_date or '' }}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Approval Process / Procurement Involved</label>
+                    <select name="procurement_involved" class="form-control">
+                        <option value="no" {% if meddic.procurement_involved == 0 %}selected{% endif %}>Procurement Not Mapped</option>
+                        <option value="yes" {% if meddic.procurement_involved == 1 %}selected{% endif %}>Procurement Mapped</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Process Details / Approval Layers</label>
+                    <input type="text" name="decision_timeline" class="form-control" value="{{ meddic.decision_timeline or '' }}" placeholder="e.g. Tech assessment -> CFO signoff">
+                </div>
+
+                <!-- Identify Pain -->
+                <div class="meddic-section-title">I - Identify Pain (Business urgency & Consequences) [Weight: 20]</div>
+                <div class="form-group">
+                    <label class="form-label">Pain Cost Validated with Prospect?</label>
+                    <select name="pain_validated" class="form-control">
+                        <option value="no" {% if meddic.pain_validated == 0 %}selected{% endif %}>No (0 points)</option>
+                        <option value="yes" {% if meddic.pain_validated == 1 %}selected{% endif %}>Yes (20 points)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Urgency Severity Level</label>
+                    <select name="pain_severity" class="form-control">
+                        <option value="Low" {% if meddic.pain_severity == 'Low' %}selected{% endif %}>Low</option>
+                        <option value="Medium" {% if meddic.pain_severity == 'Medium' %}selected{% endif %}>Medium</option>
+                        <option value="High" {% if meddic.pain_severity == 'High' %}selected{% endif %}>High</option>
+                    </select>
+                </div>
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label class="form-label">Core Urgency Pain / Business Challenge description</label>
+                    <textarea name="primary_pain" class="form-control" rows="2">{{ meddic.primary_pain or '' }}</textarea>
+                </div>
+
+                <!-- Champion -->
+                <div class="meddic-section-title">C - Champion (Internal Coach & Seller Advocate) [Weight: 15]</div>
+                <div class="form-group">
+                    <label class="form-label">Champion Identified?</label>
+                    <select name="champion_identified" class="form-control">
+                        <option value="no" {% if meddic.champion_identified == 0 %}selected{% endif %}>No (0 points)</option>
+                        <option value="yes" {% if meddic.champion_identified == 1 %}selected{% endif %}>Yes (15 points)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Champion Strength</label>
+                    <select name="champion_strength" class="form-control">
+                        <option value="Weak" {% if meddic.champion_strength == 'Weak' %}selected{% endif %}>Weak</option>
+                        <option value="Moderate" {% if meddic.champion_strength == 'Moderate' %}selected{% endif %}>Moderate</option>
+                        <option value="Strong" {% if meddic.champion_strength == 'Strong' %}selected{% endif %}>Strong</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Champion Name</label>
+                    <input type="text" name="champion_name" class="form-control" value="{{ meddic.champion_name or '' }}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Champion Role/Job Title</label>
+                    <input type="text" name="champion_role" class="form-control" value="{{ meddic.champion_role or '' }}">
+                </div>
+
+                <!-- Competition -->
+                <div class="meddic-section-title">Competition & Alternative Options (Optional details)</div>
+                <div class="form-group">
+                    <label class="form-label">Active Competitors or alternatives</label>
+                    <input type="text" name="competitor_or_alternative" class="form-control" value="{{ meddic.competitor_or_alternative or '' }}" placeholder="e.g. MuleSoft, Informatica">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Current client solution in place</label>
+                    <input type="text" name="current_solution" class="form-control" value="{{ meddic.current_solution or '' }}" placeholder="e.g. Legacy manual Python cron jobs">
+                </div>
+            </div>
+            
+            <div style="border-top: 1px solid var(--border-crm); padding-top: 20px; display: flex; justify-content: flex-end; margin-top: 24px;">
+                <button type="submit" class="btn-crm btn-crm-primary">Save MEDDIC Qualifications</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ==================================================== -->
+<!-- TAB: TIMELINE -->
+<!-- ==================================================== -->
+<div id="tab-timeline" class="tab-pane">
+    <div class="crm-card">
+        <div class="crm-card-title">Deal Activity logs</div>
+        <ul class="timeline-list">
+            {% for act in timeline %}
+            <li class="timeline-item">
+                <div class="timeline-marker"></div>
+                <div class="timeline-header">
+                    <span>by <strong>{{ act.user_name or 'System Log' }}</strong></span>
+                    <span>{{ act.created_at }}</span>
+                </div>
+                <div class="timeline-title">{{ act.title }}</div>
+                {% if act.description %}
+                <div class="timeline-body">{{ act.description }}</div>
+                {% endif %}
+            </li>
+            {% else %}
+            <li style="color: var(--text-crm-muted); text-align: center; list-style: none; padding: 20px;">
+                No activities logged on this deal.
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<!-- ==================================================== -->
+<!-- TAB: TASKS -->
+<!-- ==================================================== -->
+<div id="tab-tasks" class="tab-pane">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+        <!-- Tasks list -->
+        <div class="crm-card">
+            <div class="crm-card-title">Deal Checklist Tasks</div>
+            <ul style="list-style: none; display: flex; flex-direction: column; gap: 12px;">
+                {% for t in tasks %}
+                <li style="padding: 12px; background-color: rgba(22, 45, 80, 0.15); border-radius: 8px; display: flex; gap: 12px; align-items: flex-start; border-left: 3px solid {% if t.priority == 'High' %}#ef4444{% elif t.priority == 'Medium' %}#f59e0b{% else %}#3b82f6{% endif %}">
+                    {% if t.status != 'Completed' %}
+                    <input type="checkbox" onchange="completeOppTask({{ t.id }}, this)" style="margin-top: 3px; cursor: pointer;">
+                    {% else %}
+                    <i class="fas fa-check-circle" style="color: #10b981; margin-top: 3px;"></i>
+                    {% endif %}
+                    <div style="flex: 1;">
+                        <span style="font-weight: 600; font-size: 13.5px; {% if t.status == 'Completed' %}text-decoration: line-through; color: var(--text-crm-muted);{% endif %}">{{ t.title }}</span>
+                        <div style="font-size: 11px; color: var(--text-crm-secondary); margin-top: 2px;">
+                            Due: {{ t.due_date }} {% if t.due_time %}{{ t.due_time }}{% endif %} | Priority: {{ t.priority }}
+                        </div>
+                        {% if t.description %}
+                        <p style="font-size: 12px; color: var(--text-crm-secondary); margin-top: 6px; background-color: rgba(0,0,0,0.2); padding: 6px; border-radius: 4px;">{{ t.description }}</p>
+                        {% endif %}
+                    </div>
+                </li>
+                {% else %}
+                <li style="color: var(--text-crm-muted); text-align: center; padding: 20px;">No tasks mapped.</li>
+                {% endfor %}
+            </ul>
+        </div>
+        
+        <!-- Add task form -->
+        <div class="crm-card">
+            <div class="crm-card-title">Schedule New Deal Task</div>
+            <form action="{{ url_for('crm.crm_opportunity_detail', opp_id=opp.id) }}" method="POST">
+                <input type="hidden" name="action" value="add_task">
+                <div class="form-group">
+                    <label class="form-label">Task Title</label>
+                    <input type="text" name="task_title" class="form-control" required placeholder="e.g., Deliver solution architecture draft">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Task Type</label>
+                    <select name="task_type" class="form-control">
+                        <option value="Demo">Demo</option>
+                        <option value="Proposal Submission">Proposal Submission</option>
+                        <option value="Commercial Follow-up">Commercial Follow-up</option>
+                        <option value="Meeting">Meeting</option>
+                        <option value="Call">Call</option>
+                        <option value="Document Review">Document Review</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div class="form-group">
+                        <label class="form-label">Due Date</label>
+                        <input type="date" name="due_date" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Due Time</label>
+                        <input type="time" name="due_time" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Priority</label>
+                    <select name="priority" class="form-control">
+                        <option value="Low">Low</option>
+                        <option value="Medium" selected>Medium</option>
+                        <option value="High">High</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Reminders Notes</label>
+                    <textarea name="task_description" class="form-control" rows="2"></textarea>
+                </div>
+                <button type="submit" class="btn-crm btn-crm-primary" style="width: 100%; margin-top: 10px;">Create Task</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ==================================================== -->
+<!-- TAB: EMAIL -->
+<!-- ==================================================== -->
+<div id="tab-email" class="tab-pane">
+    <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 24px;">
+        <!-- Email composer -->
+        <div class="crm-card">
+            <div class="crm-card-title">Plain Text Email Composer</div>
+            <form action="{{ url_for('crm.crm_opportunity_detail', opp_id=opp.id) }}" method="POST">
+                <input type="hidden" name="action" value="log_email">
+                
+                <div class="form-group">
+                    <label class="form-label">Recipient Email</label>
+                    <input type="email" name="to_email" class="form-control" value="{{ opp.primary_contact_email or opp.contact_email or '' }}" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Cc (Optional)</label>
+                    <input type="text" name="cc" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Subject</label>
+                    <input type="text" name="subject" class="form-control" placeholder="ThinkArtha B2B Proposal Mappings" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email Message Body</label>
+                    <textarea name="body" class="form-control" rows="8" placeholder="Hi {{ opp.primary_contact_name or opp.contact_name or '' }},
+
+Please find attached..." required></textarea>
+                </div>
+                <button type="submit" class="btn-crm btn-crm-primary" style="margin-top: 10px;">
+                    <i class="fas fa-paper-plane"></i> Send & Log Email
+                </button>
+            </form>
+        </div>
+        
+        <!-- Emails list -->
+        <div class="crm-card">
+            <div class="crm-card-title">Email Communications Logs</div>
+            <div style="display: flex; flex-direction: column; gap: 14px; max-height: 400px; overflow-y: auto;">
+                {% for mail in emails %}
+                <div style="padding: 12px; background-color: rgba(22, 45, 80, 0.15); border: 1px solid var(--border-crm); border-radius: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-crm-secondary); margin-bottom: 6px;">
+                        <span>To: {{ mail.to_email }}</span>
+                        <span>{{ mail.sent_at }}</span>
+                    </div>
+                    <div style="font-weight: 600; font-size: 13px; color: #ffffff;">{{ mail.subject }}</div>
+                    <p style="font-size: 12px; color: var(--text-crm-secondary); margin-top: 6px; white-space: pre-wrap; font-family: monospace; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 4px;">{{ mail.body }}</p>
+                </div>
+                {% else %}
+                <div style="color: var(--text-crm-muted); text-align: center; padding: 20px;">No email correspondences recorded.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Tab switching engine
+    function switchTab(tabName) {
+        // Hide all tabs
+        const panes = document.querySelectorAll('.tab-pane');
+        panes.forEach(pane => pane.classList.remove('active'));
+        
+        const buttons = document.querySelectorAll('.tab-btn');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        
+        // Show active tab
+        document.getElementById('tab-' + tabName).classList.add('active');
+        
+        // Mark button active
+        const clickedBtn = Array.from(buttons).find(btn => btn.textContent.toLowerCase().includes(tabName));
+        if (clickedBtn) clickedBtn.classList.add('active');
+    }
+
+    // Task complete toggler
+    function completeOppTask(taskId, checkbox) {
+        if (!checkbox.checked) return;
+        
+        fetch(`/api/crm/tasks/${taskId}/complete`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        }).then(response => {
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                checkbox.checked = false;
+                alert("Failed to complete task.");
+            }
+        });
+    }
+</script>
+{% endblock %}

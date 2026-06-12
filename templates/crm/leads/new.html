@@ -1,0 +1,123 @@
+{% extends 'crm/base_crm.html' %}
+
+{% block title %}Add Lead Manually | ThinkArtha CRM{% endblock %}
+
+{% block content %}
+<div class="crm-header-bar">
+    <div class="crm-title-section">
+        <h1>Add New Lead Manually</h1>
+        <p>Manually create a new business prospect in the Core CRM. Field qualification can be refined post-creation.</p>
+    </div>
+    <div>
+        <a href="{{ url_for('crm.crm_leads') }}" class="btn-crm btn-crm-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Leads
+        </a>
+    </div>
+</div>
+
+<div class="crm-card">
+    <form action="{{ url_for('crm.new_lead') }}" method="POST">
+        <h3 style="font-size: 16px; font-weight: 700; border-bottom: 1px solid var(--border-crm); padding-bottom: 10px; margin-bottom: 20px; color: var(--accent-cyan);">
+            <i class="fas fa-user-plus"></i> Lead Profile Details
+        </h3>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px;">
+            <div class="form-group">
+                <label class="form-label">First Name</label>
+                <input type="text" name="first_name" class="form-control" placeholder="e.g. John">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Last Name</label>
+                <input type="text" name="last_name" class="form-control" placeholder="e.g. Doe">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Company Name</label>
+                <input type="text" name="company" class="form-control" placeholder="e.g. Acme Corp" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Business Email <span style="color: #ef4444;">*</span></label>
+                <input type="email" name="email" class="form-control" placeholder="john.doe@company.com" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Phone Number</label>
+                <input type="text" name="phone" class="form-control" placeholder="e.g. +1 555 1234">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Job Title / Designation</label>
+                <input type="text" name="job_title" class="form-control" placeholder="e.g. SAP Lead Architect">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Geography</label>
+                <input type="text" name="geography" class="form-control" placeholder="e.g. East Coast">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Country</label>
+                <input type="text" name="country" class="form-control" placeholder="e.g. United States">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Industry</label>
+                <input type="text" name="industry" class="form-control" placeholder="e.g. Manufacturing">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Company Website</label>
+                <input type="text" name="website" class="form-control" placeholder="e.g. company.com">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">LinkedIn Profile URL</label>
+                <input type="url" name="linkedin_profile" class="form-control" placeholder="https://linkedin.com/in/username">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Primary Product Solution Interest</label>
+                <select name="primary_product_solution_id" class="form-control">
+                    <option value="">-- Select Product Solution --</option>
+                    {% for prod in products %}
+                    <option value="{{ prod.id }}">{{ prod.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Mapped Technology Partner</label>
+                <select name="partner_id" class="form-control">
+                    <option value="">-- Select Partner --</option>
+                    {% for part in partners %}
+                    <option value="{{ part.id }}">{{ part.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Partner Influence Type</label>
+                <select name="partner_influence_type" class="form-control">
+                    <option value="None">None</option>
+                    <option value="Referral">Referral</option>
+                    <option value="Co-sell">Co-sell</option>
+                    <option value="Partner-led">Partner-led</option>
+                    <option value="Technology Partner">Technology Partner</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="form-group" style="margin-top: 20px;">
+            <label class="form-label">Discussion Notes / Initial Pain Point Summary</label>
+            <textarea name="notes" class="form-control" rows="4" placeholder="Enter conversation details or initial pain points discovered..."></textarea>
+        </div>
+        
+        <div style="border-top: 1px solid var(--border-crm); padding-top: 20px; display: flex; justify-content: flex-end; margin-top: 24px; gap: 12px;">
+            <a href="{{ url_for('crm.crm_leads') }}" class="btn-crm btn-crm-secondary">Cancel</a>
+            <button type="submit" class="btn-crm btn-crm-primary">Create Lead</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

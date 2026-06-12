@@ -138,10 +138,11 @@ def seed_navigation():
     insert_item("Alation", "/alation-2", parent_id=abt_id, group_label="Technology Partners", description="Data Catalog", sort_order=8)
 
     # Company
-    insert_item("About Our Team", "/about-us", parent_id=abt_id, group_label="Company", description="Empower businesses with insightful innovations", sort_order=1)
+    insert_item("About Artha Solutions", "/about-us", parent_id=abt_id, group_label="Company", description="Empower businesses with insightful innovations", sort_order=1)
     insert_item("Partners Ecosystem", "/partners", parent_id=abt_id, group_label="Company", description="Strategic alliances catering to all data requirements", sort_order=2)
-    insert_item("Careers", "/careers", parent_id=abt_id, group_label="Company", description="Be part of our dynamic enterprise consulting team", sort_order=3)
-    insert_item("Request a Demo", "/contact-us", parent_id=abt_id, group_label="Company", description="See our assessment framework in action", sort_order=4)
+    insert_item("Our Clients", "/clients", parent_id=abt_id, group_label="Company", description="Explore client success stories across industries", sort_order=3)
+    insert_item("Careers", "/careers", parent_id=abt_id, group_label="Company", description="Be part of our dynamic enterprise consulting team", sort_order=4)
+    insert_item("Request a Demo", "/contact-us", parent_id=abt_id, group_label="Company", description="See our assessment framework in action", sort_order=5)
 
     # 8. Create CTAs
     cursor.execute("""

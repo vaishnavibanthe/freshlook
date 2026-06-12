@@ -1,0 +1,416 @@
+{% extends 'crm/base_crm.html' %}
+
+{% block title %}Sales CRM Dashboard | ThinkArtha CRM{% endblock %}
+
+{% block content %}
+<div class="crm-header-bar">
+    <div class="crm-title-section">
+        <h1>Sales CRM Dashboard</h1>
+        <p>Real-time deal pipeline, lead activities, and team performance overview</p>
+    </div>
+    <div class="crm-actions-section">
+        <a href="{{ url_for('crm.new_lead') }}" class="btn-crm btn-crm-primary">
+            <i class="fas fa-plus"></i> New CRM Lead
+        </a>
+    </div>
+</div>
+
+<!-- Quick Stats Summary Grid -->
+<style>
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+        margin-bottom: 24px;
+    }
+    
+    .stat-card {
+        background-color: var(--bg-card);
+        border: 1px solid var(--border-crm);
+        border-radius: 12px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        color: #ffffff;
+    }
+    
+    .stat-icon.leads { background-color: rgba(6, 182, 212, 0.15); color: var(--accent-cyan); }
+    .stat-icon.pipeline { background-color: rgba(124, 58, 237, 0.15); color: var(--accent-purple); }
+    .stat-icon.tasks-today { background-color: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+    .stat-icon.tasks-overdue { background-color: rgba(239, 68, 68, 0.15); color: #ef4444; }
+    
+    .stat-details {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .stat-value {
+        font-size: 22px;
+        font-weight: 800;
+        color: #ffffff;
+        line-height: 1.2;
+    }
+    
+    .stat-label {
+        font-size: 12.5px;
+        color: var(--text-crm-secondary);
+        font-weight: 500;
+    }
+    
+    /* Charts Grid Layout */
+    .charts-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        margin-bottom: 24px;
+    }
+    
+    @media (max-width: 992px) {
+        .charts-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    .chart-container {
+        position: relative;
+        height: 260px;
+        width: 100%;
+    }
+    
+    /* Bottom Grid */
+    .dashboard-tables-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 24px;
+    }
+    
+    @media (max-width: 992px) {
+        .dashboard-tables-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    .crm-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13.5px;
+        text-align: left;
+    }
+    
+    .crm-table th {
+        color: var(--text-crm-secondary);
+        font-weight: 600;
+        padding: 12px;
+        border-bottom: 2px solid var(--border-crm);
+    }
+    
+    .crm-table td {
+        padding: 12px;
+        color: var(--text-crm-primary);
+        border-bottom: 1px solid var(--border-crm);
+    }
+    
+    .crm-table tr:hover td {
+        background-color: rgba(22, 45, 80, 0.2);
+    }
+</style>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon leads"><i class="fas fa-user-tag"></i></div>
+        <div class="stat-details">
+            <span class="stat-value">{{ leads_count }}</span>
+            <span class="stat-label">Total Leads ({{ new_leads }} New)</span>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon pipeline"><i class="fas fa-funnel-dollar"></i></div>
+        <div class="stat-details">
+            <span class="stat-value">${{ "{:,.2f}".format(opp_value) }}</span>
+            <span class="stat-label">Pipeline ({{ opp_count }} Opps)</span>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon tasks-today"><i class="fas fa-calendar-day"></i></div>
+        <div class="stat-details">
+            <span class="stat-value">{{ tasks_today }}</span>
+            <span class="stat-label">Tasks Due Today</span>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon tasks-overdue"><i class="fas fa-exclamation-triangle"></i></div>
+        <div class="stat-details">
+            <span class="stat-value">{{ tasks_overdue }}</span>
+            <span class="stat-label">Overdue Tasks</span>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="charts-grid">
+    <div class="crm-card">
+        <div class="crm-card-title">Opportunities by Stage</div>
+        <div class="chart-container">
+            <canvas id="stageChart"></canvas>
+        </div>
+    </div>
+    
+    <div class="crm-card">
+        <div class="crm-card-title">Leads by Capture Source</div>
+        <div class="chart-container">
+            <canvas id="sourceChart"></canvas>
+        </div>
+    </div>
+
+    <div class="crm-card">
+        <div class="crm-card-title">Pipeline by Technology Partner</div>
+        <div class="chart-container">
+            <canvas id="partnerChart"></canvas>
+        </div>
+    </div>
+
+    <div class="crm-card">
+        <div class="crm-card-title">Pipeline by Product / Solution</div>
+        <div class="chart-container">
+            <canvas id="productChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Tables Row -->
+<div class="dashboard-tables-grid">
+    <div class="crm-card" style="margin-bottom: 0;">
+        <div class="crm-card-title">
+            <span>Recently Captured Leads</span>
+            <a href="{{ url_for('crm.crm_leads') }}" class="btn-crm btn-crm-secondary" style="padding: 4px 10px; font-size: 11px;">View All</a>
+        </div>
+        <div style="overflow-x: auto;">
+            <table class="crm-table">
+                <thead>
+                    <tr>
+                        <th>Lead Name</th>
+                        <th>Company</th>
+                        <th>Source</th>
+                        <th>Owner</th>
+                        <th>Status</th>
+                        <th>MEDDIC</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for lead in recent_leads %}
+                    <tr>
+                        <td>
+                            <a href="{{ url_for('crm.crm_lead_detail', lead_id=lead.id) }}" style="color: var(--accent-cyan); font-weight: 600;">
+                                {{ lead.full_name }}
+                            </a>
+                        </td>
+                        <td>{{ lead.company or '-' }}</td>
+                        <td>{{ lead.lead_source }}</td>
+                        <td>{{ lead.owner_name or 'Unassigned' }}</td>
+                        <td>
+                            <span class="badge-status {{ lead.status.lower().replace(' ', '_') }}">{{ lead.status }}</span>
+                        </td>
+                        <td>
+                            <span style="font-weight: 700; color: {% if lead.meddic_score >= 70 %}#10b981{% elif lead.meddic_score >= 40 %}#f59e0b{% else %}#ef4444{% endif %}">
+                                {{ lead.meddic_score }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" style="text-align: center; color: var(--text-crm-muted); padding: 20px;">No leads found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="crm-card" style="margin-bottom: 0;">
+        <div class="crm-card-title">
+            <span>My Tasks Checklist</span>
+            <a href="{{ url_for('crm.crm_tasks') }}" class="btn-crm btn-crm-secondary" style="padding: 4px 10px; font-size: 11px;">View All</a>
+        </div>
+        <div style="overflow-y: auto; max-height: 260px;">
+            <ul style="list-style: none; display: flex; flex-direction: column; gap: 10px;">
+                {% for task in upcoming_tasks %}
+                <li style="display: flex; align-items: flex-start; gap: 12px; padding: 10px; background-color: rgba(22, 45, 80, 0.15); border-radius: 6px; border-left: 3px solid {% if task.priority == 'High' %}#ef4444{% elif task.priority == 'Medium' %}#f59e0b{% else %}#3b82f6{% endif %}">
+                    <form action="{{ url_for('crm.complete_task', task_id=task.id) }}" method="POST" style="margin-top: 2px;">
+                        <input type="checkbox" onchange="completeTask({{ task.id }}, this)" style="cursor: pointer;">
+                    </form>
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="font-size: 13.5px; font-weight: 600; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; color: #ffffff;">
+                            {{ task.title }}
+                        </div>
+                        <div style="font-size: 11px; color: var(--text-crm-secondary); margin-top: 3px;">
+                            Due: {{ task.due_date }} {% if task.due_time %}{{ task.due_time }}{% endif %} | Type: {{ task.task_type }}
+                        </div>
+                    </div>
+                </li>
+                {% else %}
+                <li style="text-align: center; color: var(--text-crm-muted); padding: 20px;">No pending tasks.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Load ChartJS CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Quick async task complete check
+    function completeTask(taskId, checkbox) {
+        if (!checkbox.checked) return;
+        
+        fetch(`/api/crm/tasks/${taskId}/complete`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        }).then(response => {
+            if (response.ok) {
+                // Fade out checklist item
+                const listItem = checkbox.closest('li');
+                listItem.style.transition = 'all 0.4s ease';
+                listItem.style.opacity = '0.3';
+                listItem.style.transform = 'translateX(20px)';
+                setTimeout(() => {
+                    listItem.remove();
+                    // Reload page if zero items to update badges
+                    window.location.reload();
+                }, 400);
+            } else {
+                checkbox.checked = false;
+                alert("Failed to complete task.");
+            }
+        });
+    }
+
+    // Colors mapping
+    const chartColors = [
+        '#06b6d4', // Cyan
+        '#7c3aed', // Purple
+        '#005a9c', // SAP Blue
+        '#10b981', // Green
+        '#f59e0b', // Amber
+        '#ef4444', // Red
+        '#6366f1'  // Indigo
+    ];
+
+    // Stage Chart
+    const stageCtx = document.getElementById('stageChart').getContext('2d');
+    const stageLabels = [{% for item in opps_by_stage %}'{{ item.label }}',{% endfor %}];
+    const stageData = [{% for item in opps_by_stage %}{{ item.value }},{% endfor %}];
+    new Chart(stageCtx, {
+        type: 'bar',
+        data: {
+            labels: stageLabels.length ? stageLabels : ['Prospecting', 'Discovery', 'Solution Fit', 'Proposal', 'Negotiation'],
+            datasets: [{
+                label: 'Pipeline Value ($)',
+                data: stageData.length ? stageData : [50000, 75000, 120000, 90000, 45000],
+                backgroundColor: 'rgba(6, 182, 212, 0.6)',
+                borderColor: '#06b6d4',
+                borderWidth: 1.5,
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { grid: { color: 'rgba(22, 45, 80, 0.2)' }, ticks: { color: '#94a3b8' } },
+                x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+            }
+        }
+    });
+
+    // Source Chart
+    const sourceCtx = document.getElementById('sourceChart').getContext('2d');
+    const sourceLabels = [{% for item in leads_by_source %}'{{ item.label }}',{% endfor %}];
+    const sourceData = [{% for item in leads_by_source %}{{ item.value }},{% endfor %}];
+    new Chart(sourceCtx, {
+        type: 'doughnut',
+        data: {
+            labels: sourceLabels.length ? sourceLabels : ['Contact Form', 'Assessment', 'Healthcare', 'Imported', 'Manual'],
+            datasets: [{
+                data: sourceData.length ? sourceData : [25, 12, 8, 18, 5],
+                backgroundColor: chartColors,
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'right', labels: { color: '#e2e8f0', boxWidth: 12 } }
+            }
+        }
+    });
+
+    // Partner Chart
+    const partnerCtx = document.getElementById('partnerChart').getContext('2d');
+    const partnerLabels = [{% for item in pipeline_by_partner %}'{{ item.label }}',{% endfor %}];
+    const partnerData = [{% for item in pipeline_by_partner %}{{ item.value }},{% endfor %}];
+    new Chart(partnerCtx, {
+        type: 'pie',
+        data: {
+            labels: partnerLabels.length ? partnerLabels : ['Qlik', 'Talend', 'AWS', 'Snowflake', 'No Partner'],
+            datasets: [{
+                data: partnerData.length ? partnerData : [60000, 45000, 95000, 110000, 80000],
+                backgroundColor: chartColors,
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'right', labels: { color: '#e2e8f0', boxWidth: 12 } }
+            }
+        }
+    });
+
+    // Product Chart
+    const productCtx = document.getElementById('productChart').getContext('2d');
+    const productLabels = [{% for item in pipeline_by_product %}'{{ item.label }}',{% endfor %}];
+    const productData = [{% for item in pipeline_by_product %}{{ item.value }},{% endfor %}];
+    new Chart(productCtx, {
+        type: 'bar',
+        data: {
+            labels: productLabels.length ? productLabels : ['AI Readiness', 'MDM', 'SAP Integration', 'CDC Snowflake'],
+            datasets: [{
+                label: 'Pipeline Value ($)',
+                data: productData.length ? productData : [120000, 85000, 110000, 75000],
+                backgroundColor: 'rgba(124, 58, 237, 0.6)',
+                borderColor: '#7c3aed',
+                borderWidth: 1.5,
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y',
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { grid: { display: false }, ticks: { color: '#94a3b8' } },
+                x: { grid: { color: 'rgba(22, 45, 80, 0.2)' }, ticks: { color: '#94a3b8' } }
+            }
+        }
+    });
+</script>
+{% endblock %}

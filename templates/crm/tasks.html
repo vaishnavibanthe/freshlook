@@ -1,0 +1,148 @@
+{% extends 'crm/base_crm.html' %}
+
+{% block title %}Task Management Registry | ThinkArtha CRM{% endblock %}
+
+{% block content %}
+<div class="crm-header-bar">
+    <div class="crm-title-section">
+        <h1>Task Management Registry</h1>
+        <p>Track follow-ups, client demos, document reviews, and schedule calling reminders</p>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 24px;">
+    
+    <!-- Tasks list -->
+    <div class="crm-card" style="margin-bottom: 0;">
+        <div class="crm-card-title">Pending & Completed Tasks</div>
+        
+        <div style="display: flex; flex-direction: column; gap: 14px; max-height: 600px; overflow-y: auto;">
+            {% for t in tasks %}
+            <div style="padding: 14px; background-color: rgba(22, 45, 80, 0.15); border: 1px solid var(--border-crm); border-radius: 8px; display: flex; gap: 14px; align-items: flex-start; border-left: 4px solid {% if t.priority == 'High' %}#ef4444{% elif t.priority == 'Medium' %}#f59e0b{% else %}#3b82f6{% endif %}">
+                {% if t.status != 'Completed' %}
+                <input type="checkbox" onchange="completeRegistryTask({{ t.id }}, this)" style="margin-top: 3px; cursor: pointer;">
+                {% else %}
+                <i class="fas fa-check-circle" style="color: #10b981; margin-top: 3px; font-size: 16px;"></i>
+                {% endif %}
+                <div style="flex: 1;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <span style="font-weight: 600; font-size: 14px; {% if t.status == 'Completed' %}text-decoration: line-through; color: var(--text-crm-muted);{% endif %}">
+                            {{ t.title }}
+                        </span>
+                        <span class="badge-status {{ t.status.lower().replace(' ', '_') }}" style="font-size: 9px; padding: 1px 6px;">{{ t.status }}</span>
+                    </div>
+                    
+                    <div style="font-size: 11px; color: var(--text-crm-secondary); margin-top: 4px;">
+                        Due: <strong>{{ t.due_date }} {% if t.due_time %}{{ t.due_time }}{% endif %}</strong> &bull; Priority: <strong>{{ t.priority }}</strong> &bull; Assigned: <strong>{{ t.assigned_name }}</strong>
+                    </div>
+                    
+                    {% if t.description %}
+                    <p style="font-size: 12.5px; color: var(--text-crm-secondary); margin-top: 8px; background-color: rgba(0,0,0,0.2); padding: 8px; border-radius: 4px;">
+                        {{ t.description }}
+                    </p>
+                    {% endif %}
+                    
+                    {% if t.lead_id or t.opportunity_id %}
+                    <div style="font-size: 11px; color: var(--text-crm-muted); margin-top: 8px;">
+                        Linked: 
+                        {% if t.lead_id %}
+                        Lead: <a href="{{ url_for('crm.crm_lead_detail', lead_id=t.lead_id) }}" style="color: var(--accent-cyan);">{{ t.lead_name }}</a>
+                        {% elif t.opportunity_id %}
+                        Deal: <a href="{{ url_for('crm.crm_opportunity_detail', opp_id=t.opportunity_id) }}" style="color: var(--accent-cyan);">{{ t.opportunity_name }}</a>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% else %}
+            <div style="color: var(--text-crm-muted); text-align: center; padding: 30px;">No tasks logged.</div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Add Task Card -->
+    <div class="crm-card" style="margin-bottom: 0; align-self: start;">
+        <div class="crm-card-title">Schedule New Workspace Task</div>
+        <form action="{{ url_for('crm.crm_tasks') }}" method="POST">
+            <div class="form-group">
+                <label class="form-label">Task Title / Checklist Goal</label>
+                <input type="text" name="title" class="form-control" placeholder="e.g. Follow up on Qlik integration" required>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div class="form-group">
+                    <label class="form-label">Task Action Type</label>
+                    <select name="task_type" class="form-control">
+                        <option value="Call">Call</option>
+                        <option value="Meeting">Meeting</option>
+                        <option value="Follow-up">Follow-up</option>
+                        <option value="Demo">Demo</option>
+                        <option value="Proposal Submission">Proposal Submission</option>
+                        <option value="Email">Email</option>
+                        <option value="Document Review">Document Review</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Assign To</label>
+                    <select name="assigned_to" class="form-control">
+                        {% for owner in owners %}
+                        <option value="{{ owner.id }}" {% if current_crm_user.id == owner.id %}selected{% endif %}>{{ owner.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div class="form-group">
+                    <label class="form-label">Due Date</label>
+                    <input type="date" name="due_date" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Due Time (Optional)</label>
+                    <input type="time" name="due_time" class="form-control">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Priority</label>
+                <select name="priority" class="form-control">
+                    <option value="Low">Low</option>
+                    <option value="Medium" selected>Medium</option>
+                    <option value="High">High</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Task description notes</label>
+                <textarea name="description" class="form-control" rows="4" placeholder="Record checklist comments..."></textarea>
+            </div>
+            
+            <button type="submit" class="btn-crm btn-crm-primary" style="width: 100%; justify-content: center; margin-top: 10px;">
+                <i class="fas fa-plus"></i> Create Workspace Task
+            </button>
+        </form>
+    </div>
+
+</div>
+
+<script>
+    // Complete task quick API trigger
+    function completeRegistryTask(taskId, checkbox) {
+        if (!checkbox.checked) return;
+        
+        fetch(`/api/crm/tasks/${taskId}/complete`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        }).then(response => {
+            if (response.ok) {
+                // Flash success reload
+                window.location.reload();
+            } else {
+                checkbox.checked = false;
+                alert("Failed to complete task.");
+            }
+        });
+    }
+</script>
+{% endblock %}

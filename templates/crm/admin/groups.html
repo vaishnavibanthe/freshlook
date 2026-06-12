@@ -1,0 +1,119 @@
+{% extends 'crm/base_crm.html' %}
+
+{% block title %}Business Groups Management | ThinkArtha CRM{% endblock %}
+
+{% block content %}
+<style>
+    .admin-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 24px;
+    }
+    
+    @media (max-width: 992px) {
+        .admin-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="crm-header-bar">
+    <div class="crm-title-section">
+        <h1>Business Groups Management</h1>
+        <p>Structure and group your sales resources by geography, business units, or divisions</p>
+    </div>
+</div>
+
+<div class="admin-grid">
+    
+    <!-- Left list: Groups table -->
+    <div class="crm-card">
+        <div class="crm-card-title">Business Groups & Territories</div>
+        <div style="overflow-x: auto;">
+            <table class="crm-table">
+                <thead>
+                    <tr>
+                        <th>Group Name</th>
+                        <th>Description / Details</th>
+                        <th>Group Administrator</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for g in groups %}
+                    <tr>
+                        <td style="font-weight: 600; color: #ffffff;">{{ g.name }}</td>
+                        <td>{{ g.description or '-' }}</td>
+                        <td>{{ g.admin_name or 'No Admin Mapped' }}</td>
+                        <td>
+                            <button onclick="populateEditForm({{ g|tojson|safe }})" class="btn-crm btn-crm-secondary" style="padding: 2px 8px; font-size: 11px;">Edit</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Right Form: Create/Edit card -->
+    <div class="crm-card" style="align-self: start;">
+        <div class="crm-card-title" id="form-title">Create Business Group</div>
+        <form action="{{ url_for('crm.admin_groups') }}" method="POST" id="group-form">
+            <input type="hidden" name="action" value="create" id="form-action">
+            <input type="hidden" name="group_id" id="form-group-id">
+            
+            <div class="form-group">
+                <label class="form-label">Business Group Name</label>
+                <input type="text" name="name" id="form-name" class="form-control" required placeholder="e.g. Asia-Pacific Division">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Group Administrator</label>
+                <select name="group_admin_id" id="form-admin-id" class="form-control">
+                    <option value="">None Selected</option>
+                    {% for adm in admins %}
+                    <option value="{{ adm.id }}">{{ adm.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Territory Scope / Details</label>
+                <textarea name="description" id="form-description" class="form-control" rows="4" placeholder="Detail division parameters..."></textarea>
+            </div>
+            
+            <div style="display: flex; gap: 10px; border-top: 1px solid var(--border-crm); padding-top: 15px; margin-top: 20px;">
+                <button type="button" class="btn-crm btn-crm-secondary" onclick="resetGroupForm()" style="display: none;" id="btn-cancel-edit">Cancel Edit</button>
+                <button type="submit" class="btn-crm btn-crm-primary" style="margin-left: auto;" id="btn-submit-action">Create Group</button>
+            </div>
+        </form>
+    </div>
+
+</div>
+
+<script>
+    // Autofills editor form from table item click
+    function populateEditForm(g) {
+        document.getElementById('form-title').textContent = `Edit Group: ${g.name}`;
+        document.getElementById('form-action').value = 'edit';
+        document.getElementById('form-group-id').value = g.id;
+        document.getElementById('form-name').value = g.name;
+        document.getElementById('form-admin-id').value = g.group_admin_id || '';
+        document.getElementById('form-description').value = g.description || '';
+        
+        document.getElementById('btn-cancel-edit').style.display = 'inline-flex';
+        document.getElementById('btn-submit-action').textContent = 'Commit Changes';
+    }
+
+    // Reset editor
+    function resetGroupForm() {
+        document.getElementById('form-title').textContent = 'Create Business Group';
+        document.getElementById('form-action').value = 'create';
+        document.getElementById('form-group-id').value = '';
+        document.getElementById('group-form').reset();
+        
+        document.getElementById('btn-cancel-edit').style.display = 'none';
+        document.getElementById('btn-submit-action').textContent = 'Create Group';
+    }
+</script>
+{% endblock %}

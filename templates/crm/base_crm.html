@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ThinkArtha CRM Workspace{% endblock %}</title>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom styling inside page since we need rich custom aesthetics without modifying main website stylesheet -->
+    <style>
+        :root {
+            --bg-crm: #050b14;
+            --bg-sidebar: #091322;
+            --bg-card: rgba(13, 27, 49, 0.7);
+            --border-crm: rgba(22, 45, 80, 0.6);
+            --accent-cyan: #06b6d4;
+            --accent-blue: #005a9c;
+            --accent-purple: #7c3aed;
+            --text-crm-primary: #e2e8f0;
+            --text-crm-secondary: #94a3b8;
+            --text-crm-muted: #64748b;
+            --glass-bg: rgba(9, 19, 34, 0.4);
+            --glass-border: rgba(22, 45, 80, 0.4);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Fira Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-crm);
+            color: var(--text-crm-primary);
+            overflow-x: hidden;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styling */
+        .crm-sidebar {
+            width: 260px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-crm);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 100;
+            transition: transform 0.3s ease;
+        }
+        
+        .crm-brand {
+            padding: 24px;
+            border-bottom: 1px solid var(--border-crm);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .crm-brand-logo {
+            font-size: 20px;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+        }
+        
+        .crm-brand-logo span {
+            color: var(--accent-cyan);
+        }
+        
+        .crm-brand-sub {
+            font-size: 9px;
+            color: var(--text-crm-muted);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 600;
+        }
+
+        .crm-user-profile {
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--border-crm);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(6, 182, 212, 0.03);
+        }
+
+        .crm-avatar {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #ffffff;
+            font-size: 14px;
+        }
+
+        .crm-user-info {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .crm-user-name {
+            font-size: 13.5px;
+            font-weight: 600;
+            color: #ffffff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .crm-user-role {
+            font-size: 10.5px;
+            color: var(--accent-cyan);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .crm-nav-list {
+            list-style: none;
+            padding: 16px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        
+        .crm-nav-header {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-crm-muted);
+            padding: 8px 12px 4px 12px;
+            font-weight: 700;
+        }
+        
+        .crm-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            color: var(--text-crm-secondary);
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .crm-nav-link i {
+            font-size: 15px;
+            width: 20px;
+            text-align: center;
+            transition: transform 0.2s ease;
+        }
+        
+        .crm-nav-link:hover {
+            color: #ffffff;
+            background-color: rgba(22, 45, 80, 0.4);
+            transform: translateX(4px);
+        }
+        
+        .crm-nav-link:hover i {
+            transform: scale(1.1);
+        }
+        
+        .crm-nav-link.active {
+            color: #ffffff;
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(124, 58, 237, 0.05));
+            border-left: 3px solid var(--accent-cyan);
+            padding-left: 11px;
+        }
+
+        /* Workspace Main Layout */
+        .crm-main {
+            margin-left: 260px;
+            flex: 1;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background: radial-gradient(circle at top right, rgba(6, 182, 212, 0.04), transparent 600px);
+        }
+        
+        .crm-header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        
+        .crm-title-section h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+        
+        .crm-title-section p {
+            font-size: 13px;
+            color: var(--text-crm-secondary);
+            margin-top: 4px;
+        }
+
+        /* Card Container Styles */
+        .crm-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-crm);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            margin-bottom: 24px;
+        }
+
+        .crm-card-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Alert notifications */
+        .crm-alerts {
+            margin-bottom: 20px;
+        }
+
+        .alert-box {
+            padding: 12px 18px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid transparent;
+        }
+
+        .alert-box.success {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            border-color: rgba(16, 185, 129, 0.2);
+        }
+
+        .alert-box.error {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+
+        .alert-box.warning {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+            border-color: rgba(245, 158, 11, 0.2);
+        }
+
+        /* Standard buttons */
+        .btn-crm {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            font-size: 13.5px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            border: none;
+        }
+
+        .btn-crm-primary {
+            background: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-purple) 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(6, 182, 212, 0.25);
+        }
+
+        .btn-crm-primary:hover {
+            transform: translateY(-1.5px);
+            box-shadow: 0 6px 20px rgba(6, 182, 212, 0.4);
+        }
+
+        .btn-crm-secondary {
+            background-color: rgba(22, 45, 80, 0.6);
+            color: var(--text-crm-primary);
+            border: 1px solid var(--border-crm);
+        }
+
+        .btn-crm-secondary:hover {
+            background-color: rgba(22, 45, 80, 0.9);
+            transform: translateY(-1px);
+        }
+
+        .btn-crm-danger {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-crm-danger:hover {
+            background-color: rgba(239, 68, 68, 0.25);
+            transform: translateY(-1px);
+        }
+
+        /* Forms Elements */
+        .form-group {
+            margin-bottom: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-label {
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--text-crm-secondary);
+        }
+
+        .form-control {
+            background-color: rgba(9, 19, 34, 0.6);
+            border: 1px solid var(--border-crm);
+            border-radius: 6px;
+            padding: 10px 14px;
+            color: #ffffff;
+            font-size: 14px;
+            width: 100%;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 8px rgba(6, 182, 212, 0.2);
+        }
+
+        select.form-control {
+            cursor: pointer;
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        /* Badges status labels */
+        .badge-status {
+            display: inline-flex;
+            padding: 3px 8px;
+            font-size: 11px;
+            font-weight: 700;
+            border-radius: 12px;
+            text-transform: uppercase;
+        }
+
+        .badge-status.new, .badge-status.prospecting { background-color: rgba(6, 182, 212, 0.1); color: var(--accent-cyan); }
+        .badge-status.contacted, .badge-status.discovery { background-color: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+        .badge-status.qualified, .badge-status.solution_fit { background-color: rgba(16, 185, 129, 0.1); color: #10b981; }
+        .badge-status.nurture, .badge-status.proposal { background-color: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+        .badge-status.disqualified, .badge-status.closed_lost { background-color: rgba(239, 68, 68, 0.1); color: #ef4444; }
+        .badge-status.converted, .badge-status.closed_won { background-color: rgba(139, 92, 246, 0.1); color: #8b5cf6; }
+
+        /* Responsive Mobile Toggle */
+        .mobile-crm-nav {
+            display: none;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--bg-sidebar);
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-crm);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            z-index: 105;
+        }
+
+
+        /* Light Theme Variable Overrides */
+        body.light-theme {
+            --bg-crm: #f8fafc;
+            --bg-sidebar: #ffffff;
+            --bg-card: #ffffff;
+            --border-crm: #cbd5e1;
+            --accent-cyan: #0891b2;
+            --accent-blue: #1d4ed8;
+            --accent-purple: #6d28d9;
+            --text-crm-primary: #0f172a;
+            --text-crm-secondary: #334155;
+            --text-crm-muted: #64748b;
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(203, 213, 225, 0.5);
+        }
+
+        body.light-theme .crm-brand-logo,
+        body.light-theme .crm-user-name,
+        body.light-theme .crm-title-section h1,
+        body.light-theme .crm-card-title,
+        body.light-theme .crm-nav-link:hover,
+        body.light-theme .crm-nav-link.active,
+        body.light-theme .form-control {
+            color: #0f172a;
+        }
+
+        body.light-theme .form-control {
+            background-color: #ffffff;
+            border-color: #cbd5e1;
+            color: #0f172a;
+        }
+
+        body.light-theme .form-control:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 8px rgba(8, 145, 178, 0.2);
+        }
+        
+        body.light-theme .crm-nav-link {
+            color: #475569;
+        }
+
+        body.light-theme .crm-nav-link:hover {
+            background-color: #f1f5f9;
+        }
+
+        body.light-theme .crm-nav-link.active {
+            background: linear-gradient(135deg, rgba(8, 145, 178, 0.1), rgba(109, 40, 217, 0.05));
+            color: #0891b2;
+        }
+
+        body.light-theme .workbench-table th,
+        body.light-theme .leads-table th {
+            background-color: #f1f5f9;
+            color: #475569;
+        }
+
+        body.light-theme .workbench-table tr:hover td,
+        body.light-theme .leads-table tr:hover td {
+            background-color: #f1f5f9;
+        }
+
+        body.light-theme .modal-card {
+            background-color: #ffffff;
+            border-color: #cbd5e1;
+        }
+        body.light-theme .modal-card h3 {
+            color: #0f172a;
+        }
+
+        body.light-theme .crm-card li,
+        body.light-theme .call-history-log {
+            background-color: #f8fafc !important;
+            border-color: #cbd5e1 !important;
+        }
+        body.light-theme .call-history-log p {
+            color: #0f172a !important;
+        }
+
+        body.light-theme .timeline-body {
+            background-color: #f8fafc !important;
+            border-color: #cbd5e1 !important;
+            color: #334155 !important;
+        }
+        body.light-theme .timeline-title {
+            color: #0f172a !important;
+        }
+
+        .theme-btn:hover {
+            color: var(--accent-cyan) !important;
+        }
+
+        @media (max-width: 992px) {
+            .crm-sidebar {
+                transform: translateX(-260px);
+            }
+            
+            .crm-sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .crm-main {
+                margin-left: 0;
+                padding-top: 80px;
+            }
+            
+            .mobile-crm-nav {
+                display: flex;
+            }
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+    <!-- Mobile Header -->
+    <div class="mobile-crm-nav">
+        <a href="#" style="text-decoration: none;" class="crm-brand-logo">ThinkArtha<span>CRM</span></a>
+        <div style="display: flex; align-items: center; gap: 16px;">
+            <button id="mobile-theme-toggle-btn" style="background: none; border: none; color: #ffffff; cursor: pointer; font-size: 16px;">
+                <i class="fas fa-moon"></i>
+            </button>
+            <button id="sidebar-toggle" style="background: none; border: none; color: #ffffff; font-size: 20px; cursor: pointer;">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <div class="crm-sidebar" id="sidebar">
+        <div class="crm-brand" style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <div class="crm-brand-logo">ThinkArtha<span>CRM</span></div>
+                <div class="crm-brand-sub">workspace</div>
+            </div>
+            <button id="theme-toggle-btn" class="theme-btn" title="Toggle Light/Dark Theme" style="background: none; border: none; color: var(--text-crm-secondary); cursor: pointer; font-size: 16px; padding: 4px; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+        
+        {% if current_crm_user %}
+        <div class="crm-user-profile">
+            <div class="crm-avatar">{{ current_crm_user['name'][0]|upper }}</div>
+            <div class="crm-user-info">
+                <span class="crm-user-name">{{ current_crm_user['name'] }}</span>
+                <span class="crm-user-role">{{ current_crm_user['role'] }}</span>
+            </div>
+        </div>
+        {% endif %}
+        
+        <ul class="crm-nav-list">
+            {% if current_crm_user %}
+                {% set role = current_crm_user['role'] %}
+                
+                {% if role != 'Telecaller' %}
+                <!-- Core CRM Links -->
+                <li class="crm-nav-header">Core CRM</li>
+                <li>
+                    <a href="{{ url_for('crm.crm_dashboard') }}" class="crm-nav-link {% if active_page == 'crm_dashboard' %}active{% endif %}">
+                        <i class="fas fa-chart-line"></i> Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('crm.crm_leads') }}" class="crm-nav-link {% if active_page == 'crm_leads' %}active{% endif %}">
+                        <i class="fas fa-user-tag"></i> Leads
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('crm.crm_opportunities') }}" class="crm-nav-link {% if active_page == 'crm_opportunities' %}active{% endif %}">
+                        <i class="fas fa-handshake"></i> Opportunities
+                    </a>
+                </li>
+                {% endif %}
+                
+                <!-- TeleCRM links -->
+                <li class="crm-nav-header">TeleCRM / Calling</li>
+                {% if role in ('Platform Admin', 'Group Admin', 'Telecaller Manager') %}
+                <li>
+                    <a href="{{ url_for('crm.telecrm_dashboard') }}" class="crm-nav-link {% if active_page == 'telecrm_dashboard' %}active{% endif %}">
+                        <i class="fas fa-headset"></i> TeleCRM Home
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('crm.telecrm_import_page') }}" class="crm-nav-link {% if active_page == 'telecrm_import' %}active{% endif %}">
+                        <i class="fas fa-file-upload"></i> Upload & Allocate
+                    </a>
+                </li>
+                {% endif %}
+                <li>
+                    <a href="{{ url_for('crm.telecrm_dialing_workbench') }}" class="crm-nav-link {% if active_page == 'telecrm_workbench' %}active{% endif %}">
+                        <i class="fas fa-phone-alt"></i> Dialing Workbench
+                    </a>
+                </li>
+                
+                <!-- Shared task logs -->
+                <li class="crm-nav-header">Work Management</li>
+                <li>
+                    <a href="{{ url_for('crm.crm_tasks') }}" class="crm-nav-link {% if active_page == 'crm_tasks' %}active{% endif %}">
+                        <i class="fas fa-tasks"></i> Tasks Registry
+                    </a>
+                </li>
+                
+                <!-- Administrative links -->
+                {% if role in ('Platform Admin', 'Group Admin') %}
+                <li class="crm-nav-header">Administration</li>
+                <li>
+                    <a href="{{ url_for('crm.admin_users') }}" class="crm-nav-link {% if active_page == 'admin_users' %}active{% endif %}">
+                        <i class="fas fa-users-cog"></i> User Registry
+                    </a>
+                </li>
+                {% if role == 'Platform Admin' %}
+                <li>
+                    <a href="{{ url_for('crm.admin_groups') }}" class="crm-nav-link {% if active_page == 'admin_groups' %}active{% endif %}">
+                        <i class="fas fa-sitemap"></i> Business Groups
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('crm.admin_products_partners') }}" class="crm-nav-link {% if active_page == 'admin_products' %}active{% endif %}">
+                        <i class="fas fa-project-diagram"></i> Products & Partners
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('crm.admin_settings') }}" class="crm-nav-link {% if active_page == 'admin_settings' %}active{% endif %}">
+                        <i class="fas fa-cogs"></i> System Settings
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('crm.admin_custom_fields') }}" class="crm-nav-link {% if active_page == 'admin_custom_fields' %}active{% endif %}">
+                        <i class="fas fa-sliders-h"></i> Custom Fields
+                    </a>
+                </li>
+                {% endif %}
+                {% endif %}
+                
+                <li style="margin-top: auto;">
+                    <a href="{{ url_for('crm.crm_logout') }}" class="crm-nav-link" style="color: #ef4444; border-top: 1px solid var(--border-crm); padding-top: 15px;">
+                        <i class="fas fa-sign-out-alt"></i> Sign Out
+                    </a>
+                </li>
+            {% else %}
+                <li>
+                    <a href="{{ url_for('crm.crm_login') }}" class="crm-nav-link active">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+
+    <!-- Main Workspace -->
+    <div class="crm-main">
+        
+        <!-- Alerts flash section -->
+        <div class="crm-alerts">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert-box {% if category == 'error' %}error{% elif category == 'success' %}success{% else %}warning{% endif %}" id="flash-alert">
+                            <span>{{ message }}</span>
+                            <button onclick="this.parentElement.style.display='none';" style="background: none; border: none; color: inherit; cursor: pointer; font-size: 16px;"><i class="fas fa-times"></i></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <script>
+        // Responsive sidebar toggler
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('active');
+            });
+        }
+        
+        // Auto hide flash alerts after 5 seconds
+        setTimeout(() => {
+            const flash = document.getElementById('flash-alert');
+            if (flash) {
+                flash.style.transition = 'opacity 0.5s ease';
+                flash.style.opacity = '0';
+                setTimeout(() => flash.remove(), 500);
+            }
+        }, 5000);
+
+        // Theme Switcher Logic
+        const themeToggleBtn = document.getElementById('theme-toggle-btn');
+        const mobileThemeToggleBtn = document.getElementById('mobile-theme-toggle-btn');
+        const bodyEl = document.body;
+
+        function updateThemeUI(theme) {
+            const deskIcon = themeToggleBtn ? themeToggleBtn.querySelector('i') : null;
+            const mobIcon = mobileThemeToggleBtn ? mobileThemeToggleBtn.querySelector('i') : null;
+
+            if (theme === 'light') {
+                bodyEl.classList.add('light-theme');
+                if (deskIcon) {
+                    deskIcon.classList.remove('fa-moon');
+                    deskIcon.classList.add('fa-sun');
+                }
+                if (mobIcon) {
+                    mobIcon.classList.remove('fa-moon');
+                    mobIcon.classList.add('fa-sun');
+                }
+            } else {
+                bodyEl.classList.remove('light-theme');
+                if (deskIcon) {
+                    deskIcon.classList.remove('fa-sun');
+                    deskIcon.classList.add('fa-moon');
+                }
+                if (mobIcon) {
+                    mobIcon.classList.remove('fa-sun');
+                    mobIcon.classList.add('fa-moon');
+                }
+            }
+        }
+
+        // Initialize theme from storage or system preference
+        const savedTheme = localStorage.getItem('crm-theme') || 'dark';
+        updateThemeUI(savedTheme);
+
+        function toggleTheme() {
+            const nextTheme = bodyEl.classList.contains('light-theme') ? 'dark' : 'light';
+            localStorage.setItem('crm-theme', nextTheme);
+            updateThemeUI(nextTheme);
+        }
+
+        if (themeToggleBtn) {
+            themeToggleBtn.addEventListener('click', toggleTheme);
+        }
+        if (mobileThemeToggleBtn) {
+            mobileThemeToggleBtn.addEventListener('click', toggleTheme);
+        }
+    </script>
+</body>
+</html>

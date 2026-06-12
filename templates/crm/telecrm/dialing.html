@@ -1,0 +1,208 @@
+{% extends 'crm/base_crm.html' %}
+
+{% block title %}Calling Workbench | ThinkArtha CRM{% endblock %}
+
+{% block content %}
+<style>
+    .workbench-filters {
+        background-color: var(--bg-card);
+        border: 1px solid var(--border-crm);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 24px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .workbench-table-card {
+        background-color: var(--bg-card);
+        border: 1px solid var(--border-crm);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+
+    .workbench-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+        text-align: left;
+    }
+
+    .workbench-table th {
+        color: var(--text-crm-secondary);
+        font-weight: 600;
+        padding: 14px 12px;
+        border-bottom: 2px solid var(--border-crm);
+        background-color: rgba(9, 19, 34, 0.4);
+        white-space: nowrap;
+    }
+
+    .workbench-table td {
+        padding: 14px 12px;
+        border-bottom: 1px solid var(--border-crm);
+        color: var(--text-crm-primary);
+        white-space: nowrap;
+    }
+
+    .workbench-table tr:hover td {
+        background-color: rgba(22, 45, 80, 0.25);
+    }
+    
+    .dialing-badge {
+        display: inline-flex;
+        padding: 2px 6px;
+        font-size: 10.5px;
+        font-weight: 700;
+        border-radius: 4px;
+        text-transform: uppercase;
+    }
+    .dialing-badge.not_dialed { background-color: rgba(100, 116, 139, 0.1); color: var(--text-crm-secondary); }
+    .dialing-badge.dialed { background-color: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+    .dialing-badge.connected { background-color: rgba(6, 182, 212, 0.1); color: var(--accent-cyan); }
+    .dialing-badge.spoken { background-color: rgba(139, 92, 246, 0.1); color: #8b5cf6; }
+    .dialing-badge.follow-up_required { background-color: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+    .dialing-badge.meeting_scheduled { background-color: rgba(16, 185, 129, 0.1); color: #10b981; }
+    .dialing-badge.meeting_completed { background-color: rgba(16, 185, 129, 0.2); color: #10b981; }
+    .dialing-badge.sql_marked { background-color: rgba(236, 72, 153, 0.1); color: #ec4899; }
+</style>
+
+<div class="crm-header-bar">
+    <div class="crm-title-section">
+        <h1>Calling Workbench</h1>
+        <p>Telecalling dialing pipeline: select targets, log dispositions, schedule follow-ups</p>
+    </div>
+    <div class="crm-actions-section">
+        <a href="{{ url_for('crm.new_telecrm_contact') }}" class="btn-crm btn-crm-primary">
+            <i class="fas fa-plus"></i> Add Contact Manually
+        </a>
+    </div>
+</div>
+
+<!-- Workbench Filtering Panel -->
+<div class="workbench-filters">
+    <span style="font-size: 13px; font-weight: 700; color: var(--text-crm-secondary);">Filter Workbench:</span>
+    <form action="{{ url_for('crm.telecrm_dialing_workbench') }}" method="GET" style="display: flex; flex-wrap: wrap; gap: 8px; flex: 1;">
+        <select name="dialing_status" class="form-control" style="max-width: 220px; padding: 6px 12px; font-size: 13px;" onchange="this.form.submit()">
+            <option value="">All Dialing Statuses</option>
+            <option value="My pending calls" {% if request.args.get('dialing_status') == 'My pending calls' %}selected{% endif %}>My pending calls</option>
+            <option value="Not Dialed" {% if request.args.get('dialing_status') == 'Not Dialed' %}selected{% endif %}>Not Dialed</option>
+            <option value="Dialed" {% if request.args.get('dialing_status') == 'Dialed' %}selected{% endif %}>Dialed (Unconnected)</option>
+            <option value="Connected" {% if request.args.get('dialing_status') == 'Connected' %}selected{% endif %}>Connected (Gatekeeper)</option>
+            <option value="Spoken" {% if request.args.get('dialing_status') == 'Spoken' %}selected{% endif %}>Spoken (Interested)</option>
+            <option value="Follow-up Required" {% if request.args.get('dialing_status') == 'Follow-up Required' %}selected{% endif %}>Follow-up Required</option>
+            <option value="Meeting Scheduled" {% if request.args.get('dialing_status') == 'Meeting Scheduled' %}selected{% endif %}>Meeting Scheduled</option>
+            <option value="Meeting Completed" {% if request.args.get('dialing_status') == 'Meeting Completed' %}selected{% endif %}>Meeting Completed</option>
+            <option value="SQL Marked" {% if request.args.get('dialing_status') == 'SQL Marked' %}selected{% endif %}>SQL Marked</option>
+        </select>
+        
+        {% for field in custom_filterable_fields %}
+            {% if field.field_type == 'select' %}
+            <select name="cf_{{ field.field_name }}" class="form-control" style="max-width: 200px; padding: 6px 12px; font-size: 13px;" onchange="this.form.submit()">
+                <option value="">All {{ field.field_label }}</option>
+                {% for option in field.options.split(',') %}
+                <option value="{{ option.strip() }}" {% if custom_filter_values.get(field.field_name) == option.strip() %}selected{% endif %}>{{ option.strip() }}</option>
+                {% endfor %}
+            </select>
+            {% else %}
+            <input type="text" name="cf_{{ field.field_name }}" class="form-control" style="max-width: 150px; padding: 6px 12px; font-size: 13px;" placeholder="{{ field.field_label }}..." value="{{ custom_filter_values.get(field.field_name) or '' }}" onchange="this.form.submit()">
+            {% endif %}
+        {% endfor %}
+        
+        <input type="text" id="workbench-search" class="form-control" style="max-width: 260px; padding: 6px 12px; font-size: 13px; margin-left: auto;" placeholder="Search contact or company...">
+        
+        <a href="{{ url_for('crm.telecrm_dialing_workbench') }}" class="btn-crm btn-crm-secondary" style="padding: 6px 12px; font-size: 12px;">Reset</a>
+    </form>
+</div>
+
+<!-- Dialing Workbench Table Card -->
+<div class="workbench-table-card">
+    <div style="overflow-x: auto;">
+        <table class="workbench-table" id="workbench-table">
+            <thead>
+                <tr>
+                    <th>Contact Name</th>
+                    <th>Company</th>
+                    <th>Job Title</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Geography</th>
+                    <th>Target Product</th>
+                    <th>Calling Status</th>
+                    <th>Last Outcome</th>
+                    <th>Meeting Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for contact in contacts %}
+                <tr>
+                    <td>
+                        <a href="{{ url_for('crm.telecrm_contact_detail', contact_id=contact.id) }}" style="color: var(--accent-cyan); font-weight: 700;">
+                            {{ contact.full_name }}
+                        </a>
+                    </td>
+                    <td>{{ contact.company or '-' }}</td>
+                    <td>{{ contact.job_title or '-' }}</td>
+                    <td style="font-weight: 600;">{{ contact.phone or '-' }}</td>
+                    <td>{{ contact.email }}</td>
+                    <td>{{ contact.geography or '-' }}</td>
+                    <td>{{ contact.product_name or '-' }}</td>
+                    <td>
+                        <span class="dialing-badge {{ contact.dialing_status.lower().replace(' ', '_') }}">{{ contact.dialing_status }}</span>
+                    </td>
+                    <td>
+                        <span style="font-size: 11.5px; color: var(--text-crm-secondary);">{{ contact.last_disposition or 'No Attempts' }}</span>
+                    </td>
+                    <td>{{ contact.meeting_status }}</td>
+                    <td>
+                        <a href="{{ url_for('crm.telecrm_contact_detail', contact_id=contact.id) }}" class="btn-crm btn-crm-primary" style="padding: 4px 10px; font-size: 11px;">
+                            <i class="fas fa-phone-alt"></i> Call
+                        </a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="11" style="text-align: center; color: var(--text-crm-muted); padding: 30px;">
+                        No pending calls in this filter workbench view.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // Live Search Workbench Table rows
+    const searchInput = document.getElementById('workbench-search');
+    const table = document.getElementById('workbench-table');
+    
+    if (searchInput && table) {
+        searchInput.addEventListener('keyup', function() {
+            const term = searchInput.value.toLowerCase();
+            const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+            
+            for (let i = 0; i < rows.length; i++) {
+                const nameCell = rows[i].getElementsByTagName('td')[0];
+                const companyCell = rows[i].getElementsByTagName('td')[1];
+                const phoneCell = rows[i].getElementsByTagName('td')[3];
+                
+                if (nameCell || companyCell || phoneCell) {
+                    const name = nameCell.textContent.toLowerCase();
+                    const company = companyCell.textContent.toLowerCase();
+                    const phone = phoneCell.textContent.toLowerCase();
+                    
+                    if (name.includes(term) || company.includes(term) || phone.includes(term)) {
+                        rows[i].style.display = '';
+                    } else {
+                        rows[i].style.display = 'none';
+                    }
+                }
+            }
+        });
+    }
+</script>
+{% endblock %}

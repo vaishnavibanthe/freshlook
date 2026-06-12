@@ -1,0 +1,1721 @@
+{% extends "base_crm.html" %}
+
+{% block title %}TeleCRM Campaign Dialing Workspace - ThinkArtha{% endblock %}
+
+{% block extra_head %}
+<!-- Chart.js for campaign reports rendering -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    .workspace-container {
+        display: grid;
+        grid-template-columns: 320px 1fr 1.25fr;
+        gap: 20px;
+        height: calc(100vh - 100px);
+        min-height: 500px;
+        overflow: hidden;
+        margin-top: 10px;
+    }
+
+    /* Column Panels */
+    .panel-col {
+        display: flex;
+        flex-direction: column;
+        background-color: var(--bg-card);
+        border: 1px solid var(--border-crm);
+        border-radius: 12px;
+        backdrop-filter: blur(8px);
+        overflow: hidden;
+        height: 100%;
+    }
+
+    .panel-header {
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border-crm);
+        background: rgba(22, 45, 80, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-weight: 700;
+        font-size: 14.5px;
+    }
+
+    .panel-body {
+        padding: 20px;
+        overflow-y: auto;
+        flex: 1;
+    }
+
+    /* Queue tab styling */
+    .queue-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        margin-bottom: 12px;
+        border-bottom: 1px solid var(--border-crm);
+        padding-bottom: 8px;
+    }
+    
+    .q-tab {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 11.5px;
+        font-weight: 600;
+        background: rgba(22, 45, 80, 0.4);
+        color: var(--text-crm-secondary);
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .q-tab:hover {
+        background: rgba(22, 45, 80, 0.8);
+        color: #fff;
+    }
+
+    .q-tab.active {
+        background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+        color: #fff;
+        border-color: var(--accent-cyan);
+    }
+
+    /* Contact list cards */
+    .contact-card {
+        padding: 14px 16px;
+        border-radius: 8px;
+        background: rgba(9, 19, 34, 0.4);
+        border: 1px solid var(--border-crm);
+        margin-bottom: 10px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        position: relative;
+    }
+
+    .contact-card:hover, .contact-card.selected {
+        border-color: var(--accent-cyan);
+        background: rgba(22, 45, 80, 0.4);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(6, 182, 212, 0.15);
+    }
+    
+    .contact-card.selected::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3.5px;
+        background: var(--accent-cyan);
+        border-radius: 8px 0 0 8px;
+    }
+
+    .priority-badge {
+        font-size: 9px;
+        font-weight: 700;
+        padding: 2px 6px;
+        border-radius: 4px;
+        text-transform: uppercase;
+        margin-left: 6px;
+    }
+    .priority-badge.urgent { background-color: rgba(239, 68, 68, 0.2); color: #ef4444; }
+    .priority-badge.high { background-color: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+    .priority-badge.normal { background-color: rgba(6, 182, 212, 0.2); color: var(--accent-cyan); }
+    .priority-badge.low { background-color: rgba(100, 116, 139, 0.2); color: var(--text-crm-secondary); }
+
+    /* Sticky Action Bar in Workbench */
+    .sticky-actions-bar {
+        display: flex;
+        gap: 8px;
+        padding: 12px 16px;
+        background: rgba(9, 19, 34, 0.8);
+        border-top: 1px solid var(--border-crm);
+        border-bottom: 1px solid var(--border-crm);
+        margin-bottom: 20px;
+        border-radius: 6px;
+        align-items: center;
+        justify-content: space-around;
+    }
+
+    .act-btn {
+        background: none;
+        border: none;
+        color: var(--text-crm-secondary);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        cursor: pointer;
+        font-size: 11px;
+        font-weight: 600;
+        transition: all 0.2s;
+        padding: 6px 10px;
+        border-radius: 6px;
+    }
+    
+    .act-btn i {
+        font-size: 16px;
+    }
+
+    .act-btn:hover {
+        color: #fff;
+        background: rgba(22, 45, 80, 0.6);
+    }
+    
+    .act-btn.active-action {
+        color: var(--accent-cyan);
+    }
+
+    /* Modal dialog overrides */
+    .modal-backdrop {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.7);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        backdrop-filter: blur(4px);
+    }
+
+    .modal-card {
+        background: var(--bg-sidebar);
+        border: 1px solid var(--border-crm);
+        border-radius: 12px;
+        width: 100%;
+        max-width: 500px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    /* Double tabs navigation */
+    .workbench-tabs {
+        display: flex;
+        border-bottom: 1px solid var(--border-crm);
+        margin-bottom: 16px;
+    }
+
+    .w-tab {
+        flex: 1;
+        padding: 10px;
+        text-align: center;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-crm-secondary);
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        transition: all 0.2s;
+    }
+
+    .w-tab.active {
+        color: #fff;
+        border-bottom-color: var(--accent-cyan);
+        background: rgba(6, 182, 212, 0.05);
+    }
+
+    /* Star rating */
+    .star-rating {
+        display: inline-flex;
+        gap: 4px;
+        cursor: pointer;
+    }
+    .star-rating i {
+        color: var(--text-crm-muted);
+        transition: color 0.15s;
+    }
+    .star-rating i.filled {
+        color: #eab308;
+    }
+
+    /* Alert and Validation warnings */
+    .validation-warning-bar {
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-radius: 6px;
+        padding: 10px 14px;
+        margin-bottom: 16px;
+        display: none;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .validation-warning-item {
+        color: #ef4444;
+        font-size: 12px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    /* Collapsible Reports left-drawer */
+    .campaign-report-section {
+        border-top: 1px solid var(--border-crm);
+        margin-top: 16px;
+        padding-top: 16px;
+    }
+
+    .report-accordion {
+        background: rgba(22, 45, 80, 0.1);
+        border: 1px solid var(--border-crm);
+        border-radius: 8px;
+        margin-bottom: 10px;
+        overflow: hidden;
+    }
+
+    .report-accordion-header {
+        padding: 12px 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 600;
+        user-select: none;
+        transition: background-color 0.2s;
+    }
+
+    .report-accordion-header:hover {
+        background-color: rgba(22, 45, 80, 0.3);
+    }
+
+    .report-accordion-body {
+        padding: 16px;
+        border-top: 1px solid var(--border-crm);
+        display: none;
+        background: rgba(9, 19, 34, 0.2);
+    }
+
+    @media (max-width: 1200px) {
+        .workspace-container {
+            grid-template-columns: 280px 1.2fr 1.5fr;
+        }
+    }
+
+    @media (max-width: 992px) {
+        .workspace-container {
+            grid-template-columns: 1fr 1.2fr;
+        }
+        .panel-campaign-summary {
+            display: none; /* Expandable drawer / modal instead on tablets */
+        }
+    }
+
+    @media (max-width: 600px) {
+        .workspace-container {
+            grid-template-columns: 1fr;
+        }
+        .panel-queue {
+            display: block;
+        }
+        .panel-workbench {
+            display: none;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+    <div class="crm-title-section">
+        <h1>Campaign Execution Panel</h1>
+        <p>Interactive workbench for fast telecalling, disposition logging, and real-time summaries</p>
+    </div>
+    
+    <!-- Action control trigger for campaign -->
+    <div style="display: flex; align-items: center; gap: 10px;">
+        <button id="campaign-status-btn" class="btn-crm btn-crm-secondary" onclick="toggleCampaignStatus()">
+            <i class="fas fa-play"></i> Loading...
+        </button>
+        <div style="position: relative;">
+            <button class="btn-crm btn-crm-secondary" onclick="toggleDropdown('admin-action-dropdown')">
+                <i class="fas fa-ellipsis-v"></i> Action
+            </button>
+            <div id="admin-action-dropdown" class="crm-card" style="display: none; position: absolute; right: 0; top: 40px; z-index: 100; min-width: 180px; padding: 10px 0; margin-bottom: 0;">
+                <a href="#" class="crm-nav-link" onclick="openReallocateModal(); return false;"><i class="fas fa-random"></i> Reallocate Contacts</a>
+                <a href="/api/telecrm/campaigns/{{ campaign['id'] }}/export" class="crm-nav-link"><i class="fas fa-download"></i> Export CSV Report</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="workspace-container">
+    
+    <!-- PANEL 1: CAMPAIGN SUMMARY AND REPORTS -->
+    <div class="panel-col panel-campaign-summary">
+        <div class="panel-header">
+            <span><i class="fas fa-bullhorn"></i> Campaign Info</span>
+            <span class="badge-status new" id="campaign-status-badge">Active</span>
+        </div>
+        <div class="panel-body">
+            <h3 id="campaign-name" style="margin-bottom: 8px; font-weight: 700; font-size: 15px;">Loading...</h3>
+            <p id="campaign-desc" style="font-size: 12px; color: var(--text-crm-secondary); margin-bottom: 16px;">Loading...</p>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+                <div class="crm-card" style="padding: 10px; margin-bottom: 0; text-align: center; background: rgba(6, 182, 212, 0.05);">
+                    <div style="font-size: 11px; color: var(--text-crm-muted);">Assigned</div>
+                    <div id="summary-assigned" style="font-size: 16px; font-weight: 700; color: #fff;">0</div>
+                </div>
+                <div class="crm-card" style="padding: 10px; margin-bottom: 0; text-align: center; background: rgba(16, 185, 129, 0.05);">
+                    <div style="font-size: 11px; color: var(--text-crm-muted);">Completed</div>
+                    <div id="summary-completed" style="font-size: 16px; font-weight: 700; color: #fff;">0</div>
+                </div>
+            </div>
+
+            <!-- List metrics -->
+            <div style="display: flex; flex-direction: column; gap: 8px; font-size: 12px; margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-crm-secondary);">Product/Solution:</span>
+                    <span id="summary-product" style="font-weight: 600;">-</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-crm-secondary);">Partner:</span>
+                    <span id="summary-partner" style="font-weight: 600;">-</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-crm-secondary);">Geography:</span>
+                    <span id="summary-geo" style="font-weight: 600;">-</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-crm-secondary);">Days Remaining:</span>
+                    <span id="summary-days" style="font-weight: 600;">-</span>
+                </div>
+            </div>
+
+            <!-- Funnel progress bars -->
+            <h4 style="font-size: 12px; font-weight: 700; margin-bottom: 10px; color: var(--accent-cyan);">Execution Completion</h4>
+            
+            <div style="margin-bottom: 12px;">
+                <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px;">
+                    <span>Attempted %</span>
+                    <span id="summary-pct-attempt">0%</span>
+                </div>
+                <div style="height: 6px; background: rgba(22, 45, 80, 0.4); border-radius: 4px; overflow: hidden;">
+                    <div id="progress-attempt" style="width: 0%; height: 100%; background: var(--accent-cyan); transition: width 0.3s;"></div>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 12px;">
+                <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px;">
+                    <span>Finalized %</span>
+                    <span id="summary-pct-final">0%</span>
+                </div>
+                <div style="height: 6px; background: rgba(22, 45, 80, 0.4); border-radius: 4px; overflow: hidden;">
+                    <div id="progress-final" style="width: 0%; height: 100%; background: var(--accent-blue); transition: width 0.3s;"></div>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 12px;">
+                <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px;">
+                    <span>Meeting Conv %</span>
+                    <span id="summary-pct-conv">0%</span>
+                </div>
+                <div style="height: 6px; background: rgba(22, 45, 80, 0.4); border-radius: 4px; overflow: hidden;">
+                    <div id="progress-conv" style="width: 0%; height: 100%; background: var(--accent-purple); transition: width 0.3s;"></div>
+                </div>
+            </div>
+
+            <!-- Reports accordion section -->
+            <div class="campaign-report-section">
+                <h4 style="font-size: 12px; font-weight: 700; margin-bottom: 12px;">Campaign Performance Reports</h4>
+                
+                <div class="report-accordion">
+                    <div class="report-accordion-header" onclick="toggleAccordion('calling-report-body')">
+                        <span><i class="fas fa-phone-alt"></i> Calling Summary</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div id="calling-report-body" class="report-accordion-body">
+                        <div style="display: flex; flex-direction: column; gap: 6px; font-size: 11px;">
+                            <div style="display: flex; justify-content: space-between;"><span>Total Calls:</span><strong id="rep-tot-calls">0</strong></div>
+                            <div style="display: flex; justify-content: space-between;"><span>Connected Calls:</span><strong id="rep-conn-calls">0</strong></div>
+                            <div style="display: flex; justify-content: space-between;"><span>Spoken Calls:</span><strong id="rep-spk-calls">0</strong></div>
+                            <div style="display: flex; justify-content: space-between;"><span>Avg Duration:</span><strong id="rep-avg-dur">0s</strong></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="report-accordion">
+                    <div class="report-accordion-header" onclick="toggleAccordion('assignees-report-body')">
+                        <span><i class="fas fa-users"></i> Assignee Rankings</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div id="assignees-report-body" class="report-accordion-body">
+                        <div style="max-height: 200px; overflow-y: auto;">
+                            <table style="width: 100%; font-size: 11px; border-collapse: collapse;">
+                                <thead>
+                                    <tr style="text-align: left; border-bottom: 1px solid var(--border-crm);">
+                                        <th style="padding: 4px 0;">Agent</th>
+                                        <th style="padding: 4px 0;">Assigned</th>
+                                        <th style="padding: 4px 0;">Conv%</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="rep-assignees-tbl"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="report-accordion">
+                    <div class="report-accordion-header" onclick="toggleAccordion('status-report-body')">
+                        <span><i class="fas fa-filter"></i> Leads Status Funnel</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div id="status-report-body" class="report-accordion-body">
+                        <div style="display: flex; flex-direction: column; gap: 6px; font-size: 11px;">
+                            <div style="display: flex; justify-content: space-between;"><span>Fresh/Untouched:</span><strong id="rep-fresh">0</strong></div>
+                            <div style="display: flex; justify-content: space-between;"><span>No Answer/Busy:</span><strong id="rep-noans">0</strong></div>
+                            <div style="display: flex; justify-content: space-between;"><span>Follow-up:</span><strong id="rep-fup">0</strong></div>
+                            <div style="display: flex; justify-content: space-between;"><span>Spoken/Interested:</span><strong id="rep-spoken">0</strong></div>
+                            <div style="display: flex; justify-content: space-between;"><span>Converted/Opportunity:</span><strong id="rep-converted">0</strong></div>
+                            <div style="display: flex; justify-content: space-between;"><span>Lost/Irrelevant:</span><strong id="rep-lost">0</strong></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PANEL 2: CAMPAIGN CONTACT QUEUE -->
+    <div class="panel-col panel-queue">
+        <div class="panel-header" style="display: flex; flex-direction: column; gap: 10px; align-items: stretch;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span><i class="fas fa-list-ol"></i> Contacts Dialing Queue</span>
+                <button class="btn-crm btn-crm-secondary" style="padding: 4px 8px; font-size: 11px;" onclick="loadQueue()">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+            
+            <!-- Tab list -->
+            <div class="queue-tabs" id="queue-tabs-list">
+                <span class="q-tab active" data-tab="Active" onclick="switchQueueTab('Active')">Active (0)</span>
+                <span class="q-tab" data-tab="New" onclick="switchQueueTab('New')">New (0)</span>
+                <span class="q-tab" data-tab="Follow-up" onclick="switchQueueTab('Follow-up')">Follow-up (0)</span>
+                <span class="q-tab" data-tab="Meeting Scheduled" onclick="switchQueueTab('Meeting Scheduled')">Meeting (0)</span>
+                <span class="q-tab" data-tab="Converted" onclick="switchQueueTab('Converted')">Converted (0)</span>
+                <span class="q-tab" data-tab="Completed" onclick="switchQueueTab('Completed')">Completed (0)</span>
+                <span class="q-tab" data-tab="Lost" onclick="switchQueueTab('Lost')">Lost (0)</span>
+            </div>
+
+            <!-- Search and filters -->
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                <div style="position: relative;">
+                    <input type="text" id="queue-search" class="form-control" style="padding-left: 32px;" placeholder="Search contact, company, phone, email..." oninput="debounce(loadQueue)()">
+                    <i class="fas fa-search" style="position: absolute; left: 12px; top: 13px; color: var(--text-crm-muted); font-size: 13px;"></i>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                    <select id="filter-priority" class="form-control" style="padding: 6px 10px; font-size: 11.5px;" onchange="loadQueue()">
+                        <option value="">Sort: Default</option>
+                        <option value="priority">Sort: Priority</option>
+                        <option value="oldest_untouched">Sort: Oldest Untouched</option>
+                        <option value="recent">Sort: Most Recent</option>
+                        <option value="followup">Sort: Follow-up Date</option>
+                    </select>
+                    <select id="filter-interest" class="form-control" style="padding: 6px 10px; font-size: 11.5px;" onchange="loadQueue()">
+                        <option value="">All Interest Levels</option>
+                        <option value="High">High Interest</option>
+                        <option value="Medium">Medium Interest</option>
+                        <option value="Low">Low Interest</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <div class="panel-body" style="padding: 10px;">
+            <div id="queue-contacts-list">
+                <!-- Contact cards inject here -->
+            </div>
+            <div id="queue-empty-msg" style="display: none; text-align: center; padding: 40px 20px; color: var(--text-crm-muted); font-size: 13px;">
+                <i class="fas fa-info-circle" style="font-size: 24px; margin-bottom: 12px;"></i>
+                <p>No contacts found matching the filters.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- PANEL 3: CONTACT WORKBENCH -->
+    <div class="panel-col panel-workbench" id="workbench-container" style="display: flex; flex-direction: column; height: 100%;">
+        <div class="panel-header" style="flex-shrink: 0;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="badge-status new" id="contact-tag">CAMPAIGN</span>
+                <span id="contact-name-header" style="font-size: 15px;">Select a contact</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <!-- Lead Quality Rating 1-5 -->
+                <div class="star-rating" id="contact-rating" title="Lead Quality Rating">
+                    <i class="fas fa-star" data-rating="1" onclick="updateRating(1)"></i>
+                    <i class="fas fa-star" data-rating="2" onclick="updateRating(2)"></i>
+                    <i class="fas fa-star" data-rating="3" onclick="updateRating(3)"></i>
+                    <i class="fas fa-star" data-rating="4" onclick="updateRating(4)"></i>
+                    <i class="fas fa-star" data-rating="5" onclick="updateRating(5)"></i>
+                </div>
+                
+                <button id="favorite-btn" style="background: none; border: none; color: var(--text-crm-muted); cursor: pointer; font-size: 16px;" onclick="toggleFavorite()">
+                    <i class="far fa-star"></i>
+                </button>
+                
+                <button class="btn-crm btn-crm-primary" style="padding: 5px 12px; font-size: 12px;" onclick="goToNextContact()">
+                    Next <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="panel-body" style="flex: 1; overflow-y: auto;">
+            <!-- Warnings notifications -->
+            <div class="validation-warning-bar" id="validation-warnings-banner">
+                <!-- Warnings render dynamically here -->
+            </div>
+
+            <!-- Call/Email quick actions bar -->
+            <div class="sticky-actions-bar">
+                <button class="act-btn" onclick="startCallAttempt()">
+                    <i class="fas fa-phone-alt" style="color: #10b981;"></i>
+                    <span>Call</span>
+                </button>
+                <button class="act-btn" onclick="openCallLaterModal()">
+                    <i class="fas fa-clock" style="color: #f59e0b;"></i>
+                    <span>Call Later</span>
+                </button>
+                <button class="act-btn" onclick="openEmailModal()">
+                    <i class="fas fa-envelope" style="color: var(--accent-cyan);"></i>
+                    <span>Send Email</span>
+                </button>
+                <button class="act-btn" onclick="openMeetingModal()">
+                    <i class="fas fa-calendar-alt" style="color: var(--accent-purple);"></i>
+                    <span>Meeting</span>
+                </button>
+                <button class="act-btn" id="workbench-sql-btn" onclick="submitSQLHandover()">
+                    <i class="fas fa-user-check" style="color: #8b5cf6;"></i>
+                    <span>Mark SQL</span>
+                </button>
+            </div>
+
+            <!-- Editable profile details form -->
+            <form id="contact-profile-form" style="margin-bottom: 24px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                    <div class="form-group">
+                        <label class="form-label">Email address</label>
+                        <input type="email" id="c-email" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Phone number</label>
+                        <input type="text" id="c-phone" class="form-control" required>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                    <div class="form-group">
+                        <label class="form-label">Alternate Phone</label>
+                        <input type="text" id="c-alt-phone" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">LinkedIn Profile URL</label>
+                        <input type="url" id="c-linkedin" class="form-control">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                    <div class="form-group">
+                        <label class="form-label">Company Name</label>
+                        <input type="text" id="c-company" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Job Title</label>
+                        <input type="text" id="c-job-title" class="form-control">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                    <div class="form-group">
+                        <label class="form-label">Product/Solution</label>
+                        <select id="c-product" class="form-control">
+                            <option value="">Select Solution</option>
+                            {% for p in products %}
+                            <option value="{{ p['id'] }}">{{ p['name'] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Partner</label>
+                        <select id="c-partner" class="form-control">
+                            <option value="">Select Partner</option>
+                            {% for part in partners %}
+                            <option value="{{ part['id'] }}">{{ part['name'] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                    <div class="form-group">
+                        <label class="form-label">Geography</label>
+                        <input type="text" id="c-geo" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Country</label>
+                        <input type="text" id="c-country" class="form-control">
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                    <button type="button" class="btn-crm btn-crm-secondary" onclick="updateContactProfile()">
+                        <i class="fas fa-save"></i> Save Details
+                    </button>
+                </div>
+            </form>
+
+            <!-- Bottom tabs: Activity and Tasks -->
+            <div class="workbench-tabs">
+                <span class="w-tab active" id="tab-activity-header" onclick="switchWorkbenchTab('activity')">Activity History</span>
+                <span class="w-tab" id="tab-tasks-header" onclick="switchWorkbenchTab('tasks')">Tasks checklist</span>
+            </div>
+
+            <!-- Activity history list -->
+            <div id="workbench-activity-tab" style="display: block;">
+                <div id="timeline-activities-container">
+                    <!-- Activities inject dynamically here -->
+                </div>
+            </div>
+
+            <!-- Tasks checklist -->
+            <div id="workbench-tasks-tab" style="display: none;">
+                <div id="tasks-checklist-container">
+                    <!-- Tasks list inject here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: Log Call Disposition -->
+<div class="modal-backdrop" id="disposition-modal">
+    <div class="modal-card">
+        <div class="panel-header">
+            <span><i class="fas fa-phone-slash"></i> Log Call Disposition</span>
+        </div>
+        <div class="panel-body">
+            <div style="margin-bottom: 14px; font-size: 13px; color: var(--text-crm-secondary);">
+                Call complete. Talk duration: <strong id="disp-call-duration">0</strong> seconds. Please save call outcome.
+            </div>
+            <form id="disposition-form" onsubmit="saveDisposition(event)">
+                <div class="form-group">
+                    <label class="form-label">Select Disposition Status</label>
+                    <select id="disp-select" class="form-control" required onchange="handleDispositionStatusChange()">
+                        <option value="">Select Disposition</option>
+                        {% for d in dispositions %}
+                        <option value="{{ d['name'] }}" data-lost="{{ d['requires_lost_reason'] }}" data-fup="{{ d['requires_followup'] }}">{{ d['name'] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- If Lost status -->
+                <div class="form-group" id="disp-lost-reason-group" style="display: none;">
+                    <label class="form-label">Lost Reason (Mandatory)</label>
+                    <select id="disp-lost-reason" class="form-control">
+                        <option value="">Select Reason</option>
+                        {% for lr in lost_reasons %}
+                        <option value="{{ lr['id'] }}">{{ lr['name'] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- If Followup status -->
+                <div class="form-group" id="disp-followup-group" style="display: none;">
+                    <label class="form-label">Next Follow-up Date/Time</label>
+                    <input type="datetime-local" id="disp-followup-dt" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Call Notes / Outcome MOM</label>
+                    <textarea id="disp-outcome-note" class="form-control" placeholder="Short description of the calling result..."></textarea>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+                    <input type="checkbox" id="disp-validated" style="cursor: pointer; width: 16px; height: 16px;">
+                    <label for="disp-validated" style="font-size: 12.5px; cursor: pointer; user-select: none;">Mark contact information as Validated</label>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                    <button type="submit" class="btn-crm btn-crm-primary">Save Outcome</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: Call Later (Follow-up) -->
+<div class="modal-backdrop" id="call-later-modal">
+    <div class="modal-card">
+        <div class="panel-header">
+            <span><i class="fas fa-clock"></i> Schedule Follow-up Call</span>
+            <button onclick="closeModal('call-later-modal')" style="background: none; border: none; color: #fff; cursor: pointer;"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="panel-body">
+            <form onsubmit="saveCallLater(event)">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                    <div class="form-group">
+                        <label class="form-label">Date</label>
+                        <input type="date" id="fup-date" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Time</label>
+                        <input type="time" id="fup-time" class="form-control" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Reason</label>
+                    <input type="text" id="fup-reason" class="form-control" placeholder="e.g. Busy now, asked to call back" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Notes</label>
+                    <textarea id="fup-note" class="form-control" placeholder="Add details..."></textarea>
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                    <button type="submit" class="btn-crm btn-crm-primary">Schedule Call</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: Create Meeting -->
+<div class="modal-backdrop" id="meeting-modal">
+    <div class="modal-card">
+        <div class="panel-header">
+            <span><i class="fas fa-calendar-check"></i> Schedule Discovery Meeting</span>
+            <button onclick="closeModal('meeting-modal')" style="background: none; border: none; color: #fff; cursor: pointer;"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="panel-body">
+            <form onsubmit="saveMeeting(event)">
+                <div class="form-group">
+                    <label class="form-label">Meeting Title</label>
+                    <input type="text" id="meet-title" class="form-control" value="ThinkArtha Discovery Call" required>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                    <div class="form-group">
+                        <label class="form-label">Start Time</label>
+                        <input type="datetime-local" id="meet-start" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">End Time</label>
+                        <input type="datetime-local" id="meet-end" class="form-control" required>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                    <div class="form-group">
+                        <label class="form-label">Meeting Mode</label>
+                        <select id="meet-mode" class="form-control" required>
+                            <option value="Online">Online / Teams</option>
+                            <option value="Phone">Phone Call</option>
+                            <option value="In Person">In Person</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Sales Representative</label>
+                        <select id="meet-rep" class="form-control">
+                            <option value="">Assign Sales Manager</option>
+                            {% for sr in sales_reps %}
+                            <option value="{{ sr['id'] }}">{{ sr['name'] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Meeting Link (Teams/Zoom)</label>
+                    <input type="url" id="meet-link" class="form-control" placeholder="https://teams.microsoft.com/...">
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                    <button type="submit" class="btn-crm btn-crm-primary">Schedule Meeting</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: Send Email -->
+<div class="modal-backdrop" id="email-modal">
+    <div class="modal-card">
+        <div class="panel-header">
+            <span><i class="fas fa-envelope"></i> Send Email</span>
+            <button onclick="closeModal('email-modal')" style="background: none; border: none; color: #fff; cursor: pointer;"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="panel-body">
+            <form onsubmit="sendEmail(event)">
+                <div class="form-group">
+                    <label class="form-label">To Email</label>
+                    <input type="email" id="mail-to" class="form-control" required readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">CC Recipient(s) (comma separated)</label>
+                    <input type="text" id="mail-cc" class="form-control" placeholder="marketing@thinkartha.com">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Subject</label>
+                    <input type="text" id="mail-subject" class="form-control" placeholder="ThinkArtha Core Services Follow-up" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Body (Plain Text)</label>
+                    <textarea id="mail-body" class="form-control" style="min-height: 150px;" required placeholder="Dear client..."></textarea>
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                    <button type="submit" class="btn-crm btn-crm-primary">Send Email</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: Campaign Reallocation -->
+<div class="modal-backdrop" id="reallocate-modal">
+    <div class="modal-card">
+        <div class="panel-header">
+            <span><i class="fas fa-random"></i> Reallocate Contacts</span>
+            <button onclick="closeModal('reallocate-modal')" style="background: none; border: none; color: #fff; cursor: pointer;"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="panel-body">
+            <form onsubmit="runReallocation(event)">
+                <div class="form-group">
+                    <label class="form-label">Source Telecaller</label>
+                    <select id="realloc-source" class="form-control">
+                        <option value="">All Telecallers / Unassigned</option>
+                        {% for tc in telecallers %}
+                        <option value="{{ tc['id'] }}">{{ tc['name'] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Target Telecaller</label>
+                    <select id="realloc-target" class="form-control" required>
+                        <option value="">Select Target</option>
+                        {% for tc in telecallers %}
+                        <option value="{{ tc['id'] }}">{{ tc['name'] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Reallocation Scope</label>
+                    <select id="realloc-scope" class="form-control" onchange="toggleReallocScope()">
+                        <option value="all_untouched">All Untouched Leads</option>
+                        <option value="percentage">Percentage Allocation</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="realloc-pct-group" style="display: none;">
+                    <label class="form-label">Percentage to Reallocate (1-100)</label>
+                    <input type="number" id="realloc-pct-val" class="form-control" min="1" max="100" value="30">
+                </div>
+
+                <div id="realloc-force-confirm" style="display: none; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 6px; padding: 12px; margin-bottom: 16px; font-size: 12px;">
+                    <div style="color: #f59e0b; font-weight: 600; display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+                        <i class="fas fa-exclamation-triangle"></i> Reassignment Override Required
+                    </div>
+                    <p style="color: var(--text-crm-secondary); margin-bottom: 8px;" id="realloc-warn-text"></p>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <input type="checkbox" id="realloc-force-cb" style="width: 14px; height: 14px;">
+                        <label for="realloc-force-cb" style="color: #fff; font-weight: 500;">Yes, force reassign scheduled meetings/follow-ups</label>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                    <button type="submit" class="btn-crm btn-crm-primary">Run Reallocation</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // State management variables
+    const campaignId = {{ campaign['id'] }};
+    let currentTab = 'Active';
+    let currentContact = null;
+    let currentCallId = null;
+    let callTimer = null;
+    let callStartDt = null;
+    let workbenchTab = 'activity';
+    
+    // Auto load campaign data on mount
+    document.addEventListener("DOMContentLoaded", () => {
+        loadCampaignSummary();
+        loadQueue();
+        setupKeyboardShortcuts();
+        
+        // Auto-select contact if contact_id is in URL query parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const contactIdParam = urlParams.get('contact_id');
+        if (contactIdParam) {
+            selectContact(parseInt(contactIdParam));
+        }
+    });
+
+    // Helper debounce
+    function debounce(func, delay = 300) {
+        let timer;
+        return function(...args) {
+            clearTimeout(timer);
+            timer = setTimeout(() => func.apply(this, args), delay);
+        };
+    }
+
+    // Modal helpers
+    function openModal(id) {
+        document.getElementById(id).style.display = 'flex';
+    }
+    function closeModal(id) {
+        document.getElementById(id).style.display = 'none';
+    }
+
+    // Toggle Dropdown menu
+    function toggleDropdown(id) {
+        const drop = document.getElementById(id);
+        drop.style.display = drop.style.display === 'none' ? 'block' : 'none';
+    }
+    // Toggle accordion reports
+    function toggleAccordion(id) {
+        const body = document.getElementById(id);
+        body.style.display = body.style.display === 'none' ? 'block' : 'none';
+    }
+
+    // Switch queue tab
+    function switchQueueTab(tabName) {
+        currentTab = tabName;
+        document.querySelectorAll("#queue-tabs-list .q-tab").forEach(tab => {
+            if (tab.getAttribute("data-tab") === tabName) {
+                tab.classList.add("active");
+            } else {
+                tab.classList.remove("active");
+            }
+        });
+        loadQueue();
+    }
+
+    // Load campaign details Panel 1
+    function loadCampaignSummary() {
+        fetch(`/api/telecrm/campaigns/${campaignId}/summary`)
+            . SherryResponse => SherryResponse.json())
+            .then(data => {
+                document.getElementById("campaign-name").textContent = data.campaign_name;
+                document.getElementById("campaign-desc").textContent = data.description || 'No campaign description.';
+                document.getElementById("summary-assigned").textContent = data.assigned_count;
+                document.getElementById("summary-completed").textContent = data.completed_count;
+                document.getElementById("summary-product").textContent = data.product;
+                document.getElementById("summary-partner").textContent = data.partner;
+                document.getElementById("summary-geo").textContent = data.geography;
+                document.getElementById("summary-days").textContent = data.days_remaining !== null ? data.days_remaining + ' days' : 'Continuous';
+                
+                document.getElementById("summary-pct-attempt").textContent = data.attempted_percentage + '%';
+                document.getElementById("progress-attempt").style.width = data.attempted_percentage + '%';
+                
+                document.getElementById("summary-pct-final").textContent = data.finalized_percentage + '%';
+                document.getElementById("progress-final").style.width = data.finalized_percentage + '%';
+                
+                document.getElementById("summary-pct-conv").textContent = data.conversion_percentage + '%';
+                document.getElementById("progress-conv").style.width = data.conversion_percentage + '%';
+                
+                // Toggle status badge
+                const badge = document.getElementById("campaign-status-badge");
+                const btn = document.getElementById("campaign-status-btn");
+                badge.textContent = data.status;
+                if (data.status === 'Active') {
+                    badge.className = "badge-status qualified";
+                    btn.innerHTML = `<i class="fas fa-pause"></i> Pause Campaign`;
+                } else {
+                    badge.className = "badge-status disqualified";
+                    btn.innerHTML = `<i class="fas fa-play"></i> Resume Campaign`;
+                }
+            });
+            
+        // Load report details
+        fetch(`/api/telecrm/campaigns/${campaignId}/reports?period=Month`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.calling) {
+                    document.getElementById("rep-tot-calls").textContent = data.calling.total_calls || 0;
+                    document.getElementById("rep-conn-calls").textContent = data.calling.connected_calls || 0;
+                    document.getElementById("rep-spk-calls").textContent = data.calling.spoken_calls || 0;
+                    const avg = data.calling.avg_duration ? Math.round(data.calling.avg_duration) : 0;
+                    document.getElementById("rep-avg-dur").textContent = avg + 's';
+                }
+                
+                if (data.stages) {
+                    document.getElementById("rep-fresh").textContent = data.stages.fresh;
+                    document.getElementById("rep-noans").textContent = data.stages.call_unanswered;
+                    document.getElementById("rep-fup").textContent = data.stages.followup;
+                    document.getElementById("rep-spoken").textContent = data.stages.spoken;
+                    document.getElementById("rep-converted").textContent = data.stages.converted;
+                    document.getElementById("rep-lost").textContent = data.stages.lost;
+                }
+            });
+
+        // Load performance table
+        fetch(`/api/telecrm/campaigns/${campaignId}/assignee-performance`)
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.getElementById("rep-assignees-tbl");
+                tbody.innerHTML = '';
+                data.forEach(row => {
+                    const tr = document.createElement("tr");
+                    tr.style.borderBottom = "1px solid rgba(22, 45, 80, 0.3)";
+                    tr.innerHTML = `
+                        <td style="padding: 6px 0;">${row.telecaller}</td>
+                        <td style="padding: 6px 0;">${row.assigned}</td>
+                        <td style="padding: 6px 0;">${row.conversion_percentage}%</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            });
+    }
+
+    // Toggle Pause/Resume Campaign status
+    function toggleCampaignStatus() {
+        const btn = document.getElementById("campaign-status-btn");
+        const action = btn.textContent.includes("Pause") ? 'pause' : 'resume';
+        fetch(`/api/telecrm/campaigns/${campaignId}/${action}`, { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                loadCampaignSummary();
+                flashAlert(data.message || "Campaign updated successfully.");
+            });
+    }
+
+    // Load queue list Panel 2
+    function loadQueue() {
+        const search = document.getElementById("queue-search").value;
+        const sort = document.getElementById("filter-priority").value;
+        const interest = document.getElementById("filter-interest").value;
+        
+        fetch(`/api/telecrm/campaigns/${campaignId}/queue?tab=${currentTab}&search=${encodeURIComponent(search)}&sort_by=${sort}&interest=${interest}`)
+            .then(res => res.json())
+            .then(data => {
+                const list = document.getElementById("queue-contacts-list");
+                list.innerHTML = '';
+                
+                // Update counts on tabs
+                const tabs = document.querySelectorAll("#queue-tabs-list .q-tab");
+                tabs.forEach(tab => {
+                    const tabName = tab.getAttribute("data-tab");
+                    const count = data.tab_counts[tabName] || 0;
+                    tab.textContent = `${tabName} (${count})`;
+                });
+                
+                if (data.contacts.length === 0) {
+                    document.getElementById("queue-empty-msg").style.display = 'block';
+                    return;
+                }
+                document.getElementById("queue-empty-msg").style.display = 'none';
+                
+                data.contacts.forEach(c => {
+                    const card = document.createElement("div");
+                    card.className = "contact-card";
+                    if (currentContact && currentContact.id === c.id) {
+                        card.classList.add("selected");
+                    }
+                    card.onclick = () => selectContact(c.id);
+                    
+                    const priBadge = c.priority && c.priority !== 'Normal' 
+                        ? `<span class="priority-badge ${c.priority.toLowerCase()}">${c.priority}</span>` 
+                        : '';
+                    
+                    const favIcon = c.is_favorite ? `<i class="fas fa-star" style="color: #eab308; margin-left: 6px;"></i>` : '';
+                    
+                    card.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                            <strong style="font-size: 13.5px; color: #fff;">${c.full_name}</strong>
+                            <span class="badge-status new" style="font-size: 10px; padding: 2px 6px;">${c.dialing_status}</span>
+                        </div>
+                        <div style="font-size: 11.5px; color: var(--text-crm-secondary); display: flex; justify-content: space-between;">
+                            <span>${c.company || 'No Company'}</span>
+                            <span>${c.phone}</span>
+                        </div>
+                        <div style="display: flex; align-items: center; margin-top: 6px;">
+                            <span style="font-size: 10px; color: var(--text-crm-muted);">Caller: ${c.telecaller_name || 'Unassigned'}</span>
+                            ${priBadge}
+                            ${favIcon}
+                        </div>
+                    `;
+                    list.appendChild(card);
+                });
+            });
+    }
+
+    // Select specific contact Panel 3
+    function selectContact(contactId) {
+        fetch(`/api/telecrm/contacts/${contactId}/calls`) // verifies access implicitly
+            .then(res => {
+                if (res.status === 403) {
+                    flashAlert("Access denied to this contact.", "error");
+                    return;
+                }
+                return fetch(`/api/telecrm/contacts/${contactId}/calls`)
+                    .then(res => res.json())
+                    .then(calls => {
+                        // Load contact details
+                        fetch(`/api/telecrm/contacts/${contactId}/next-contact`) // maps warning
+                            .then(res => res.json())
+                            .then(data => {
+                                currentContact = data.contact;
+                                loadWorkbenchDetails();
+                                loadQueue(); // update active class on queue lists
+                            });
+                    });
+            });
+    }
+
+    // Push details to Panel 3 inputs
+    function loadWorkbenchDetails() {
+        if (!currentContact) return;
+        
+        document.getElementById("contact-name-header").textContent = currentContact.full_name;
+        document.getElementById("contact-tag").textContent = currentContact.dialing_status;
+        
+        // Editable fields
+        document.getElementById("c-email").value = currentContact.email;
+        document.getElementById("c-phone").value = currentContact.phone;
+        document.getElementById("c-alt-phone").value = currentContact.alternate_phone || '';
+        document.getElementById("c-linkedin").value = currentContact.linkedin_profile || '';
+        document.getElementById("c-company").value = currentContact.company || '';
+        document.getElementById("c-job-title").value = currentContact.job_title || '';
+        document.getElementById("c-product").value = currentContact.product_solution_id || '';
+        document.getElementById("c-partner").value = currentContact.partner_id || '';
+        document.getElementById("c-geo").value = currentContact.geography || '';
+        document.getElementById("c-country").value = currentContact.country || '';
+        
+        // Favorite status
+        const favBtn = document.getElementById("favorite-btn");
+        if (currentContact.is_favorite) {
+            favBtn.innerHTML = `<i class="fas fa-star" style="color: #eab308;"></i>`;
+        } else {
+            favBtn.innerHTML = `<i class="far fa-star"></i>`;
+        }
+        
+        // Set lead quality stars
+        setQualityStars(currentContact.lead_quality_rating);
+        
+        // Load validation warnings
+        const banner = document.getElementById("validation-warnings-banner");
+        banner.innerHTML = '';
+        
+        // Query warnings again
+        const warnings = getValidationWarningsLocally(currentContact);
+        if (warnings.length > 0) {
+            banner.style.display = 'flex';
+            warnings.forEach(w => {
+                const item = document.createElement("div");
+                item.className = "validation-warning-item";
+                item.innerHTML = `<i class="fas fa-exclamation-triangle"></i> <span>${w}</span>`;
+                banner.appendChild(item);
+            });
+        } else {
+            banner.style.display = 'none';
+        }
+
+        // Toggle Mark SQL button visibility
+        const sqlBtn = document.getElementById("workbench-sql-btn");
+        if (currentContact.sql_status === 'SQL Review' || currentContact.sql_status === 'Converted to Opportunity') {
+            sqlBtn.classList.add("active-action");
+            sqlBtn.disabled = true;
+        } else {
+            sqlBtn.classList.remove("active-action");
+            sqlBtn.disabled = false;
+        }
+
+        // Load timeline activities & tasks based on active tab
+        loadWorkbenchTabContent();
+    }
+
+    // Local JS validation rules
+    function getValidationWarningsLocally(c) {
+        const warnings = [];
+        if (c.email && (!c.email.includes('@') || !c.email.includes('.'))) {
+            warnings.append('Invalid email format');
+        }
+        if (c.phone && !/[0-9]/.test(c.phone)) {
+            warnings.append('Invalid phone format');
+        }
+        if (c.website && !c.website.includes('.')) {
+            warnings.append('Invalid website format');
+        }
+        if (c.existing_crm_match_status) {
+            warnings.push(c.existing_crm_match_status);
+        }
+        return warnings;
+    }
+
+    // Quality stars updates UI
+    function setQualityStars(rating) {
+        const stars = document.querySelectorAll("#contact-rating i");
+        stars.forEach(star => {
+            const r = parseInt(star.getAttribute("data-rating"));
+            if (rating && r <= rating) {
+                star.className = "fas fa-star filled";
+            } else {
+                star.className = "far fa-star";
+            }
+        });
+    }
+
+    // Update rating via API
+    function updateRating(ratingVal) {
+        if (!currentContact) return;
+        fetch(`/api/telecrm/contacts/${currentContact.id}/rating`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ rating: ratingVal })
+        })
+        .then(res => res.json())
+        .then(data => {
+            currentContact.lead_quality_rating = ratingVal;
+            setQualityStars(ratingVal);
+            flashAlert("Lead quality rating updated.");
+        });
+    }
+
+    // Toggle favorite API
+    function toggleFavorite() {
+        if (!currentContact) return;
+        const nextFav = currentContact.is_favorite ? 0 : 1;
+        fetch(`/api/telecrm/contacts/${currentContact.id}/favorite`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ is_favorite: nextFav })
+        })
+        .then(res => res.json())
+        .then(data => {
+            currentContact.is_favorite = data.is_favorite;
+            loadWorkbenchDetails();
+            flashAlert(data.is_favorite ? "Marked as favorite." : "Removed from favorites.");
+        });
+    }
+
+    // Submit details update form
+    function updateContactProfile() {
+        if (!currentContact) return;
+        
+        const first = currentContact.first_name || '';
+        const last = currentContact.last_name || '';
+        
+        const body = new URLSearchParams();
+        body.append('first_name', first);
+        body.append('last_name', last);
+        body.append('email', document.getElementById("c-email").value);
+        body.append('phone', document.getElementById("c-phone").value);
+        body.append('alternate_phone', document.getElementById("c-alt-phone").value);
+        body.append('linkedin_profile', document.getElementById("c-linkedin").value);
+        body.append('company', document.getElementById("c-company").value);
+        body.append('job_title', document.getElementById("c-job-title").value);
+        body.append('product_solution_id', document.getElementById("c-product").value);
+        body.append('partner_id', document.getElementById("c-partner").value);
+        body.append('geography', document.getElementById("c-geo").value);
+        body.append('country', document.getElementById("c-country").value);
+        
+        fetch(`/telecrm/contacts/${currentContact.id}/update-profile`, {
+            method: 'POST',
+            body: body
+        })
+        .then(() => {
+            flashAlert("Contact profile details updated.");
+            selectContact(currentContact.id);
+        });
+    }
+
+    // Next contact navigation logic
+    function goToNextContact() {
+        // Validation: disposition required if we called
+        if (currentCallId && !document.getElementById("disposition-modal").style.display === 'flex') {
+            flashAlert("A disposition must be logged for the current call before proceeding.", "error");
+            openModal("disposition-modal");
+            return;
+        }
+        
+        fetch(`/api/telecrm/campaigns/${campaignId}/next-contact`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    currentContact = data.contact;
+                    loadWorkbenchDetails();
+                    flashAlert("Navigated to next contact.");
+                } else {
+                    flashAlert(data.message, "warning");
+                }
+            });
+    }
+
+    // Workbench tabs handling
+    function switchWorkbenchTab(tab) {
+        workbenchTab = tab;
+        if (tab === 'activity') {
+            document.getElementById("tab-activity-header").classList.add("active");
+            document.getElementById("tab-tasks-header").classList.remove("active");
+            document.getElementById("workbench-activity-tab").style.display = 'block';
+            document.getElementById("workbench-tasks-tab").style.display = 'none';
+        } else {
+            document.getElementById("tab-activity-header").classList.remove("active");
+            document.getElementById("tab-tasks-header").classList.add("active");
+            document.getElementById("workbench-activity-tab").style.display = 'none';
+            document.getElementById("workbench-tasks-tab").style.display = 'block';
+        }
+        loadWorkbenchTabContent();
+    }
+
+    // Load timeline and task checklist
+    function loadWorkbenchTabContent() {
+        if (!currentContact) return;
+        
+        if (workbenchTab === 'activity') {
+            // Load timeline activities from detailed endpoint
+            fetch(`/telecrm/contacts/${currentContact.id}?ajax=1`)
+                .then(res => res.text())
+                .then(html => {
+                    // Pull timeline from the raw profile details response or use direct query
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const timelineHtml = doc.querySelector("#timeline-activities-container") || doc.querySelector(".timeline-list");
+                    
+                    const container = document.getElementById("timeline-activities-container");
+                    if (timelineHtml) {
+                        container.innerHTML = timelineHtml.innerHTML;
+                    } else {
+                        container.innerHTML = '<div style="font-size: 12px; color: var(--text-crm-muted);">No activity history.</div>';
+                    }
+                });
+        } else {
+            // Tasks
+            fetch(`/telecrm/contacts/${currentContact.id}?ajax=1`)
+                .then(res => res.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const tasksHtml = doc.querySelector("#tasks-checklist-container") || doc.querySelector(".tasks-list");
+                    
+                    const container = document.getElementById("tasks-checklist-container");
+                    if (tasksHtml) {
+                        container.innerHTML = tasksHtml.innerHTML;
+                    } else {
+                        container.innerHTML = '<div style="font-size: 12px; color: var(--text-crm-muted);">No scheduled tasks.</div>';
+                    }
+                });
+        }
+    }
+
+    // Click-to-call implementation
+    function startCallAttempt() {
+        if (!currentContact) return;
+        
+        // Basic calling Mode 1: Device tel: redirect
+        window.location.href = `tel:${currentContact.phone}`;
+        
+        // integrated dialer trigger API
+        fetch(`/api/telecrm/contacts/${currentContact.id}/start-call`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ direction: 'Outgoing' })
+        })
+        .then(res => res.json())
+        .then(data => {
+            currentCallId = data.call_id;
+            callStartDt = new Date();
+            
+            // start timer to count duration
+            if (callTimer) clearInterval(callTimer);
+            callTimer = setInterval(() => {
+                const duration = Math.round((new Date() - callStartDt) / 1000);
+                document.getElementById("disp-call-duration").textContent = duration;
+            }, 1000);
+            
+            // Open modal to log outcome when call completes
+            setTimeout(() => {
+                // Mock telephony provider ending call
+                clearInterval(callTimer);
+                const finalDuration = Math.round((new Date() - callStartDt) / 1000);
+                
+                // complete API call
+                fetch(`/api/telecrm/contacts/${currentContact.id}/complete-call`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        call_id: currentCallId,
+                        ring_duration_seconds: 5,
+                        talk_duration_seconds: finalDuration,
+                        call_status: 'Connected'
+                    })
+                })
+                .then(() => {
+                    openModal("disposition-modal");
+                });
+            }, 6000); // mock 6s call
+        });
+    }
+
+    // Disposition modal toggle lost/fup inputs
+    function handleDispositionStatusChange() {
+        const select = document.getElementById("disp-select");
+        const selectedOpt = select.options[select.selectedIndex];
+        
+        const isLost = selectedOpt.getAttribute("data-lost") === '1';
+        const isFup = selectedOpt.getAttribute("data-fup") === '1';
+        
+        document.getElementById("disp-lost-reason-group").style.display = isLost ? 'block' : 'none';
+        document.getElementById("disp-followup-group").style.display = isFup ? 'block' : 'none';
+        
+        if (isLost) {
+            document.getElementById("disp-lost-reason").required = true;
+        } else {
+            document.getElementById("disp-lost-reason").required = false;
+        }
+    }
+
+    // Save Call Disposition API
+    function saveDisposition(e) {
+        e.preventDefault();
+        if (!currentContact) return;
+        
+        const disp = document.getElementById("disp-select").value;
+        const note = document.getElementById("disp-outcome-note").value;
+        const val = document.getElementById("disp-validated").checked;
+        
+        const payload = {
+            disposition: disp,
+            outcome_note: note,
+            contact_validated: val
+        };
+        
+        // Lost reason
+        const lostSelect = document.getElementById("disp-lost-reason");
+        if (lostSelect.offsetParent !== null && lostSelect.value) {
+            payload.lost_reason_id = parseInt(lostSelect.value);
+        }
+        
+        // Follow-up
+        const fupInput = document.getElementById("disp-followup-dt");
+        if (fupInput.offsetParent !== null && fupInput.value) {
+            payload.next_followup_date = fupInput.value.replace('T', ' ') + ':00';
+        }
+        
+        fetch(`/api/telecrm/contacts/${currentContact.id}/disposition`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(data => {
+            closeModal("disposition-modal");
+            document.getElementById("disposition-form").reset();
+            currentCallId = null;
+            flashAlert("Call disposition outcome saved.");
+            
+            // Reload summaries and queues
+            loadCampaignSummary();
+            selectContact(currentContact.id);
+        });
+    }
+
+    // Call Later Modal scheduling
+    function openCallLaterModal() {
+        if (!currentContact) return;
+        openModal("call-later-modal");
+    }
+    
+    function saveCallLater(e) {
+        e.preventDefault();
+        const date = document.getElementById("fup-date").value;
+        const time = document.getElementById("fup-time").value;
+        const reason = document.getElementById("fup-reason").value;
+        const note = document.getElementById("fup-note").value;
+        
+        fetch(`/api/telecrm/contacts/${currentContact.id}/call-later`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                followup_date: date,
+                followup_time: time,
+                reason: reason,
+                note: note
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            closeModal("call-later-modal");
+            flashAlert("Follow-up task scheduled.");
+            selectContact(currentContact.id);
+        });
+    }
+
+    // Meeting modal scheduling
+    function openMeetingModal() {
+        if (!currentContact) return;
+        openModal("meeting-modal");
+    }
+
+    function saveMeeting(e) {
+        e.preventDefault();
+        const title = document.getElementById("meet-title").value;
+        const start = document.getElementById("meet-start").value.replace('T', ' ') + ':00';
+        const end = document.getElementById("meet-end").value.replace('T', ' ') + ':00';
+        const mode = document.getElementById("meet-mode").value;
+        const link = document.getElementById("meet-link").value;
+        const rep = document.getElementById("meet-rep").value;
+        
+        fetch(`/api/telecrm/contacts/${currentContact.id}/meetings`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                meeting_title: title,
+                start_at: start,
+                end_at: end,
+                meeting_mode: mode,
+                meeting_link: link,
+                assigned_sales_user_id: rep
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            closeModal("meeting-modal");
+            flashAlert("Discovery meeting successfully scheduled.");
+            
+            // Auto trigger completion log dialog or MOM setup (if completing meeting manually later)
+            selectContact(currentContact.id);
+        });
+    }
+
+    // Send email plain text
+    function openEmailModal() {
+        if (!currentContact) return;
+        document.getElementById("mail-to").value = currentContact.email;
+        openModal("email-modal");
+    }
+
+    function sendEmail(e) {
+        e.preventDefault();
+        const body = new URLSearchParams();
+        body.append('to_email', document.getElementById("mail-to").value);
+        body.append('cc', document.getElementById("mail-cc").value);
+        body.append('subject', document.getElementById("mail-subject").value);
+        body.append('body', document.getElementById("mail-body").value);
+        
+        fetch(`/telecrm/contacts/${currentContact.id}/send-email`, {
+            method: 'POST',
+            body: body
+        })
+        .then(() => {
+            closeModal("email-modal");
+            document.getElementById("mail-body").value = '';
+            flashAlert("Plain-text email successfully sent.");
+            selectContact(currentContact.id);
+        });
+    }
+
+    // SQL submit action
+    function submitSQLHandover() {
+        if (!currentContact) return;
+        
+        const note = prompt("Please add brief discovery handover notes for the SQL Review:");
+        if (note === null) return;
+        
+        fetch(`/api/telecrm/contacts/${currentContact.id}/submit-sql`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ notes: note })
+        })
+        .then(res => res.json())
+        .then(data => {
+            flashAlert("Contact submitted for SQL review.");
+            selectContact(currentContact.id);
+        });
+    }
+
+    // Reallocations modal
+    function openReallocateModal() {
+        openModal("reallocate-modal");
+    }
+    
+    function toggleReallocScope() {
+        const scope = document.getElementById("realloc-scope").value;
+        document.getElementById("realloc-pct-group").style.display = scope === 'percentage' ? 'block' : 'none';
+    }
+
+    function runReallocation(e) {
+        e.preventDefault();
+        const source = document.getElementById("realloc-source").value;
+        const target = document.getElementById("realloc-target").value;
+        const scope = document.getElementById("realloc-scope").value;
+        const pct = document.getElementById("realloc-pct-val").value;
+        const force = document.getElementById("realloc-force-cb").checked;
+        
+        const payload = {
+            source_caller_id: source || null,
+            target_caller_id: target,
+            reallocate_type: scope,
+            percentage: pct,
+            force: force
+        };
+        
+        fetch(`/api/telecrm/campaigns/${campaignId}/reallocate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'warning_required') {
+                document.getElementById("realloc-force-confirm").style.display = 'block';
+                document.getElementById("realloc-warn-text").textContent = data.message;
+            } else {
+                closeModal("reallocate-modal");
+                document.getElementById("realloc-force-confirm").style.display = 'none';
+                document.getElementById("realloc-force-cb").checked = false;
+                flashAlert(data.message || "Contacts reallocated.");
+                loadCampaignSummary();
+                loadQueue();
+            }
+        });
+    }
+
+    // Global keyboard shortcuts manager
+    function setupKeyboardShortcuts() {
+        document.addEventListener("keydown", (e) => {
+            // Disable inside input/textarea fields
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) {
+                return;
+            }
+            
+            const key = e.key.toUpperCase();
+            if (key === 'N') {
+                goToNextContact();
+            } else if (key === 'C') {
+                startCallAttempt();
+            } else if (key === 'F') {
+                openCallLaterModal();
+            } else if (key === 'E') {
+                openEmailModal();
+            } else if (key === 'M') {
+                openMeetingModal();
+            } else if (key === 'A') {
+                // Focus note add trigger
+                const note = prompt("Quick Add Contact Note:");
+                if (note) {
+                    // add note logic
+                    fetch(`/api/telecrm/contacts/${currentContact.id}/disposition`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ disposition: currentContact.dialing_status, outcome_note: note })
+                    }).then(() => selectContact(currentContact.id));
+                }
+            }
+        });
+    }
+
+    // Utility notification flash
+    function flashAlert(msg, type = "success") {
+        const alertsContainer = document.querySelector(".crm-alerts");
+        const alertBox = document.createElement("div");
+        alertBox.className = `alert-box ${type}`;
+        alertBox.innerHTML = `
+            <span>${msg}</span>
+            <button onclick="this.parentElement.remove();" style="background: none; border: none; color: inherit; cursor: pointer;"><i class="fas fa-times"></i></button>
+        `;
+        alertsContainer.appendChild(alertBox);
+        setTimeout(() => alertBox.remove(), 4000);
+    }
+</script>
+{% endblock %}
