@@ -92,6 +92,12 @@
             <div class="form-group">
                 <label class="form-label">Upload File (CSV or XLSX only)</label>
                 <input type="file" name="upload_file" id="upload_file" class="form-control" accept=".csv, .xlsx" required>
+                <div style="margin-top: 8px; font-size: 12px; color: var(--text-crm-muted); display: flex; align-items: center; gap: 10px;">
+                    <span>Download format helper:</span>
+                    <a href="{{ url_for('crm.telecrm_sample_csv') }}" style="color: var(--accent-cyan); text-decoration: underline; font-weight: 600;"><i class="fas fa-file-csv"></i> CSV Template</a>
+                    <span>|</span>
+                    <a href="{{ url_for('crm.telecrm_sample_xlsx') }}" style="color: var(--accent-cyan); text-decoration: underline; font-weight: 600;"><i class="fas fa-file-excel"></i> Excel Template</a>
+                </div>
             </div>
             
             <button type="button" class="btn-crm btn-crm-primary" style="width: 100%; justify-content: center;" onclick="runPreviewScan()">

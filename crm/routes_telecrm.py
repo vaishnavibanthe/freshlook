@@ -2791,3 +2791,82 @@ def api_get_settings():
         }
     return jsonify({'status': 'success', 'settings': dict(settings)})
 
+
+# ----------------------------------------------------
+# TeleCRM Sample Templates Download Section
+# ----------------------------------------------------
+
+@crm_bp.route('/telecrm/import/sample-csv')
+@crm_login_required
+@role_required('Platform Admin', 'Group Admin', 'Telecaller Manager')
+def telecrm_sample_csv():
+    headers = [
+        'First Name', 'Last Name', 'Full Name', 'Email', 'Phone',
+        'Company', 'Job Title', 'Geography', 'Country', 'Industry',
+        'Website', 'LinkedIn', 'Alternate Phone', 'Notes'
+    ]
+    sample_data = [
+        ['John', 'Doe', 'John Doe', 'john.doe@examplecorp.com', '+15550199234', 'Example Corp', 'Sales Manager', 'North America', 'United States', 'Technology', 'examplecorp.com', 'linkedin.com/in/johndoe', '+15550199235', 'Interested in AI services.'],
+        ['Jane', 'Smith', 'Jane Smith', 'jane.smith@healthtech.org', '+15550199888', 'HealthTech Org', 'CTO', 'Europe', 'United Kingdom', 'Healthcare', 'healthtech.org', 'linkedin.com/in/janesmith', '', 'Needs backup contact info.']
+    ]
+    
+    dest = io.StringIO()
+    writer = csv.writer(dest)
+    writer.writerow(headers)
+    for row in sample_data:
+        writer.writerow(row)
+        
+    return Response(
+        dest.getvalue(),
+        mimetype="text/csv",
+        headers={"Content-disposition": "attachment; filename=sample_lead_import_template.csv"}
+    )
+
+@crm_bp.route('/telecrm/import/sample-xlsx')
+@crm_login_required
+@role_required('Platform Admin', 'Group Admin', 'Telecaller Manager')
+def telecrm_sample_xlsx():
+    headers = [
+        'First Name', 'Last Name', 'Full Name', 'Email', 'Phone',
+        'Company', 'Job Title', 'Geography', 'Country', 'Industry',
+        'Website', 'LinkedIn', 'Alternate Phone', 'Notes'
+    ]
+    sample_data = [
+        ['John', 'Doe', 'John Doe', 'john.doe@examplecorp.com', '+15550199234', 'Example Corp', 'Sales Manager', 'North America', 'United States', 'Technology', 'examplecorp.com', 'linkedin.com/in/johndoe', '+15550199235', 'Interested in AI services.'],
+        ['Jane', 'Smith', 'Jane Smith', 'jane.smith@healthtech.org', '+15550199888', 'HealthTech Org', 'CTO', 'Europe', 'United Kingdom', 'Healthcare', 'healthtech.org', 'linkedin.com/in/janesmith', '', 'Needs backup contact info.']
+    ]
+    
+    try:
+        import openpyxl
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Sample Template"
+        
+        ws.append(headers)
+        for row in sample_data:
+            ws.append(row)
+            
+        out = io.BytesIO()
+        wb.save(out)
+        out.seek(0)
+        
+        return Response(
+            out.getvalue(),
+            mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={"Content-disposition": "attachment; filename=sample_lead_import_template.xlsx"}
+        )
+    except ImportError:
+        # Fallback to CSV if openpyxl not installed
+        dest = io.StringIO()
+        writer = csv.writer(dest)
+        writer.writerow(headers)
+        for row in sample_data:
+            writer.writerow(row)
+            
+        return Response(
+            dest.getvalue(),
+            mimetype="text/csv",
+            headers={"Content-disposition": "attachment; filename=sample_lead_import_template.csv"}
+        )
+
+
