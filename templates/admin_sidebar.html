@@ -190,6 +190,12 @@
 
     <!-- Bottom Actions -->
     <div style="margin-top: 24px; border-top: 1px solid var(--border-color); padding-top: 16px; display: flex; flex-direction: column; gap: 8px;">
+        <button id="admin-theme-toggle-btn" class="tab-btn" style="display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 13px; padding: 8px 12px; border-radius: 6px; width: 100%; background: none; color: var(--text-secondary); border: none; cursor: pointer; text-align: left; transition: all 0.2s;" onmouseover="this.style.color='var(--accent-blue)';" onmouseout="this.style.color='var(--text-secondary)';" title="Toggle Light/Dark Theme">
+            <span style="display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-moon" id="admin-theme-icon" style="width: 16px;"></i>
+                <span id="admin-theme-text">Dark Theme</span>
+            </span>
+        </button>
         <a href="/" target="_blank" class="tab-btn" style="display: flex; align-items: center; gap: 10px; font-size: 13px; padding: 8px 12px; border-radius: 6px; width: 100%; background: none; color: var(--text-secondary); text-decoration: none;" onmouseover="this.style.color='var(--accent-blue)'" onmouseout="this.style.color='var(--text-secondary)'">
             <i class="fas fa-globe" style="width: 16px;"></i> View Frontend
         </a>
@@ -197,4 +203,46 @@
             <i class="fas fa-right-from-bracket" style="width: 16px;"></i> Sign Out
         </a>
     </div>
+    
+    <script>
+        (function() {
+            const themeBtn = document.getElementById('admin-theme-toggle-btn');
+            const themeIcon = document.getElementById('admin-theme-icon');
+            const themeText = document.getElementById('admin-theme-text');
+            
+            function applyTheme(theme) {
+                if (theme === 'dark') {
+                    document.body.classList.add('dark-theme');
+                    if (themeIcon) {
+                        themeIcon.className = 'fas fa-sun';
+                        themeIcon.style.color = '#f59e0b';
+                    }
+                    if (themeText) {
+                        themeText.innerText = 'Light Theme';
+                    }
+                } else {
+                    document.body.classList.remove('dark-theme');
+                    if (themeIcon) {
+                        themeIcon.className = 'fas fa-moon';
+                        themeIcon.style.color = '';
+                    }
+                    if (themeText) {
+                        themeText.innerText = 'Dark Theme';
+                    }
+                }
+            }
+            
+            // Sync initial state of sidebar button from the body element class
+            const currentTheme = document.body.classList.contains('dark-theme') ? 'dark' : 'light';
+            applyTheme(currentTheme);
+            
+            if (themeBtn) {
+                themeBtn.addEventListener('click', function() {
+                    const nextTheme = document.body.classList.contains('dark-theme') ? 'light' : 'dark';
+                    localStorage.setItem('admin-theme', nextTheme);
+                    applyTheme(nextTheme);
+                });
+            }
+        })();
+    </script>
 </aside>

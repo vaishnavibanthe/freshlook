@@ -10509,3 +10509,173 @@ body.dark-hero-nav .header.scrolled-past-hero .nav-link .fa-chevron-down {
     font-weight: 500 !important;
 }
 
+/* ==========================================
+   ADMIN PANEL DARK THEME OVERRIDES
+   ========================================== */
+
+/* Dark Theme Variables */
+body.dark-theme {
+    --bg-primary: #0b0f19;
+    --bg-secondary: #070a12;
+    --bg-tertiary: #111827;
+    --text-primary: #f9fafb;
+    --text-secondary: #d1d5db;
+    --text-tertiary: #9ca3af;
+    --border-color: rgba(255, 255, 255, 0.08);
+    --glass-bg: rgba(11, 15, 25, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.06);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.35);
+    --card-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.25);
+    --hover-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.4);
+    --accent-glow: rgba(124, 58, 237, 0.3);
+}
+
+/* Header logo adjustments for dark mode */
+body.dark-theme .logo-main {
+    display: none !important;
+}
+body.dark-theme .logo-white {
+    display: inline-block !important;
+}
+
+/* Shrunk header background in dark mode */
+body.dark-theme .header.shrunk {
+    background-color: rgba(11, 15, 25, 0.95) !important;
+}
+
+/* Sidebar button styling overrides in dark mode */
+body.dark-theme .tab-btn:not(.active) {
+    color: var(--text-secondary);
+}
+body.dark-theme .tab-btn:not(.active):hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Form selects dropdown styling in dark mode */
+body.dark-theme select.form-control option {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+/* Table element backgrounds inside workspace */
+body.dark-theme table tr:hover {
+    background-color: var(--bg-secondary) !important;
+}
+
+/* Ensure rich text editor modals and popups look great */
+body.dark-theme .note-editor .note-modal-header,
+body.dark-theme .note-editor .note-modal-footer {
+    border-color: var(--border-color) !important;
+}
+
+/* ==========================================
+   CLAUDE PARTNERSHIP SECTION
+   ========================================== */
+.partner-section {
+    background: linear-gradient(180deg, #faf7f2 0%, #f5efe6 100%);
+    padding: 80px 0;
+    position: relative;
+    border-bottom: 1px solid rgba(197, 160, 89, 0.15);
+    overflow: hidden;
+}
+.partner-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(204, 102, 51, 0.06);
+    border: 1px solid rgba(204, 102, 51, 0.15);
+    padding: 6px 16px;
+    border-radius: 100px;
+    margin-bottom: 28px;
+    box-shadow: 0 2px 8px rgba(204, 102, 51, 0.02);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #cc6633;
+    letter-spacing: 1.5px;
+    font-family: var(--font-heading);
+}
+.partner-title {
+    font-family: var(--font-heading);
+    font-size: 40px;
+    font-weight: 800;
+    color: #191919;
+    line-height: 1.2;
+    margin-bottom: 20px;
+    letter-spacing: -1px;
+}
+.partner-desc {
+    font-family: var(--font-body);
+    font-size: 16px;
+    color: #4b5563;
+    font-weight: 400;
+    line-height: 1.7;
+    max-width: 720px;
+    margin: 0 auto 40px auto;
+    letter-spacing: -0.1px;
+}
+.partner-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-bottom: 48px;
+    text-align: left;
+}
+.partner-card {
+    background: #ffffff;
+    border: 1px solid rgba(197, 160, 89, 0.12);
+    padding: 28px 24px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px -5px rgba(25, 25, 25, 0.03);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+.partner-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 15px 30px -5px rgba(204, 102, 51, 0.08);
+}
+.partner-card-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: rgba(204, 102, 51, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #cc6633;
+    font-size: 16px;
+}
+.partner-card h4 {
+    font-family: var(--font-heading);
+    font-size: 16px;
+    font-weight: 700;
+    color: #191919;
+    margin: 0 0 4px 0;
+}
+.partner-card span {
+    font-size: 13px;
+    color: #6b7280;
+    font-weight: 500;
+}
+.partner-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgba(197, 160, 89, 0.1);
+    padding-top: 24px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+@media (max-width: 768px) {
+    .partner-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    .partner-title {
+        font-size: 32px;
+    }
+}
+

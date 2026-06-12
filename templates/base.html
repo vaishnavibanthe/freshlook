@@ -22,6 +22,16 @@
     {% block extra_meta %}{% endblock %}
 </head>
 <body class="{% block body_class %}{% endblock %}">
+    <script>
+        (function() {
+            if (window.location.pathname.startsWith('/admin')) {
+                const adminTheme = localStorage.getItem('admin-theme') || 'light';
+                if (adminTheme === 'dark') {
+                    document.body.classList.add('dark-theme');
+                }
+            }
+        })();
+    </script>
 
     <!-- Header / Navbar -->
     <header class="header" id="main-header">

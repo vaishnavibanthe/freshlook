@@ -229,6 +229,92 @@
     </div>
 </section>
 
+<!-- Claude Partner Network Section -->
+<section class="partner-section" id="claude-partnership">
+    <!-- Ambient subtle background glows -->
+    <div style="position: absolute; top: -50%; left: -20%; width: 60%; height: 200%; background: radial-gradient(circle, rgba(204, 102, 51, 0.04) 0%, rgba(255, 255, 255, 0) 70%); pointer-events: none;"></div>
+    <div style="position: absolute; bottom: -50%; right: -20%; width: 60%; height: 200%; background: radial-gradient(circle, rgba(217, 119, 6, 0.03) 0%, rgba(255, 255, 255, 0) 70%); pointer-events: none;"></div>
+
+    <div class="container" style="max-width: 1000px; text-align: center; position: relative; z-index: 2;">
+        <!-- Top Badge -->
+        <div class="partner-badge">
+            <i class="fas fa-medal" style="color: #cc6633; font-size: 12px;"></i>
+            <span>Claude Partner Network</span>
+        </div>
+
+        <!-- Partnership Logos -->
+        <div style="display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 24px; flex-wrap: wrap;">
+            <!-- Artha Solutions Logo -->
+            <img src="{{ url_for('static', filename='img/artha-logo-main.png') }}" alt="Artha Solutions" style="height: 32px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.02));">
+            <span style="font-size: 20px; font-weight: 300; color: #94a3b8; font-family: var(--font-heading); line-height: 1;">×</span>
+            <!-- Claude Anthropic style logo -->
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <svg viewBox="0 0 100 100" width="30" height="30" fill="#cc6633" style="display: inline-block; filter: drop-shadow(0 2px 6px rgba(204, 102, 51, 0.15));">
+                    <circle cx="50" cy="50" r="10"/>
+                    <path d="M50 15v15M50 70v15M15 50h15M70 50h15M25 25l11 11M64 64l11 11M25 75l11-11M64 36l11-11" stroke="#cc6633" stroke-width="8" stroke-linecap="round"/>
+                </svg>
+                <span style="font-family: 'Fira Sans', sans-serif; font-weight: 700; font-size: 24px; color: #191919; letter-spacing: -0.5px;">Claude</span>
+            </div>
+        </div>
+
+        <!-- Headline -->
+        <h2 class="partner-title">
+            Now an Authorised <span style="background: linear-gradient(135deg, #cc6633 0%, #e65c00 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Anthropic Partner</span>.
+        </h2>
+
+        <!-- Description -->
+        <p class="partner-desc">
+            Artha Solutions has joined the Claude Partner Network — bringing frontier-grade AI, intelligent agents, and advanced data automation to every enterprise solution we build.
+        </p>
+
+        <!-- Value Cards Grid -->
+        <div class="partner-grid">
+            <!-- Card 1 -->
+            <div class="partner-card">
+                <div class="partner-card-icon">
+                    <i class="fas fa-sparkles"></i>
+                </div>
+                <div>
+                    <h4>Claude AI</h4>
+                    <span>Frontier models integration</span>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="partner-card">
+                <div class="partner-card-icon">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div>
+                    <h4>AI Agents</h4>
+                    <span>Autonomous workflow engines</span>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="partner-card">
+                <div class="partner-card-icon">
+                    <i class="fas fa-network-wired"></i>
+                </div>
+                <div>
+                    <h4>Automation</h4>
+                    <span>End-to-end data pipelines</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer / Signature -->
+        <div class="partner-footer">
+            <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #9ca3af; letter-spacing: 1px; font-family: var(--font-heading);">
+                Anthropic &bull; Claude Partner
+            </div>
+            <div style="font-size: 12px; font-weight: 600; color: #cc6633; font-family: var(--font-heading);">
+                Build with Claude &mdash; <a href="/contact-us" style="text-decoration: underline; color: #cc6633; font-weight: 700;">thinkartha.com</a>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- Client Logos Section -->
 <section class="section" id="client-logos" style="background-color: #fafaf9; padding: 60px 0; border-bottom: 1px solid rgba(15, 23, 42, 0.05); overflow: hidden;">
     <div class="container">
