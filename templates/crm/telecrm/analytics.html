@@ -32,8 +32,26 @@
     .tele-stat-value {
         font-size: 26px;
         font-weight: 800;
-        color: #ffffff;
     }
+    
+    .val-dialed { color: #ffffff; }
+    .val-spoken { color: #3b82f6; }
+    .val-meetings { color: #f59e0b; }
+    .val-sqls { color: #10b981; }
+    
+    .tele-progress-title {
+        font-size: 16px;
+        color: #ffffff;
+        margin-bottom: 4px;
+        font-weight: 700;
+    }
+    
+    .rank-cell {
+        font-weight: 700;
+    }
+    .rank-1 { color: #f59e0b; }
+    .rank-2 { color: #e2e8f0; }
+    .rank-3 { color: var(--text-crm-muted); }
 
     .tele-progress-card {
         background-color: var(--bg-card);
@@ -132,6 +150,95 @@
         flex-wrap: wrap;
         gap: 16px;
     }
+    
+    .filter-bar-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #ffffff;
+    }
+
+    /* Global CRM/TeleCRM Theme Switcher dynamic components */
+    .analytics-disposition-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        background-color: rgba(22, 45, 80, 0.15);
+        border-radius: 6px;
+        border: 1px solid rgba(22, 45, 80, 0.2);
+    }
+    
+    .analytics-disposition-label {
+        font-size: 13.5px;
+        font-weight: 600;
+        color: #ffffff;
+    }
+    
+    .analytics-disposition-value {
+        background-color: var(--accent-cyan);
+        color: #000000;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 10px;
+    }
+    
+    .analytics-funnel-card {
+        background-color: rgba(0,0,0,0.15);
+        border: 1px solid var(--border-crm);
+        border-radius: 10px;
+        padding: 16px;
+    }
+    
+    .analytics-progress-track {
+        height: 6px;
+        background-color: rgba(22, 45, 80, 0.4);
+        border-radius: 3px;
+        overflow: hidden;
+    }
+
+    /* Light Theme Overrides */
+    body.light-theme .val-dialed { color: #0f172a; }
+    body.light-theme .val-spoken { color: #1d4ed8; }
+    body.light-theme .val-meetings { color: #b45309; }
+    body.light-theme .val-sqls { color: #047857; }
+    body.light-theme .tele-progress-title { color: #0f172a; }
+    body.light-theme .rank-2 { color: #475569; }
+    
+    body.light-theme .tele-stat-card,
+    body.light-theme .tele-progress-card,
+    body.light-theme .filter-bar,
+    body.light-theme .dashboard-splits .crm-card {
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+    body.light-theme .progress-circle {
+        background: conic-gradient(var(--accent-cyan) calc({{ completion_pct }} * 1%), #e2e8f0 0);
+    }
+    body.light-theme .progress-circle::after {
+        color: #0f172a;
+        background-color: #ffffff;
+    }
+    body.light-theme .filter-bar-title {
+        color: #0f172a;
+    }
+    body.light-theme .analytics-disposition-row {
+        background-color: #f1f5f9;
+        border-color: #cbd5e1;
+    }
+    body.light-theme .analytics-disposition-label {
+        color: #0f172a;
+    }
+    body.light-theme .analytics-disposition-value {
+        background-color: var(--accent-cyan);
+        color: #ffffff;
+    }
+    body.light-theme .analytics-funnel-card {
+        background-color: #f8fafc;
+        border-color: #cbd5e1;
+    }
+    body.light-theme .analytics-progress-track {
+        background-color: #cbd5e1;
+    }
 </style>
 
 <div class="crm-header-bar">
@@ -143,7 +250,7 @@
 
 <!-- Campaign Filter Bar -->
 <div class="filter-bar">
-    <div style="font-size: 14px; font-weight: 600; color: #ffffff;">
+    <div class="filter-bar-title">
         <i class="fas fa-filter" style="color: var(--accent-cyan); margin-right: 6px;"></i>
         Filter Metrics By Campaign
     </div>
@@ -169,7 +276,7 @@
 <div class="tele-stats-grid">
     <div class="tele-progress-card">
         <div>
-            <h3 style="font-size: 16px; color: #ffffff; margin-bottom: 4px;">Dialing Queue Progress</h3>
+            <h3 class="tele-progress-title">Dialing Queue Progress</h3>
             <p style="font-size: 12px; color: var(--text-crm-secondary);">
                 Allocated Leads: <strong>{{ assigned }}</strong> &bull; Finished calling: <strong>{{ completed }}</strong>
             </p>
@@ -179,22 +286,22 @@
     
     <div class="tele-stat-card">
         <div class="tele-stat-title">Calls Dialed</div>
-        <div class="tele-stat-value" style="color: #ffffff;">{{ dialed }}</div>
+        <div class="tele-stat-value val-dialed">{{ dialed }}</div>
     </div>
     
     <div class="tele-stat-card">
         <div class="tele-stat-title">Spoken Conversations</div>
-        <div class="tele-stat-value" style="color: #3b82f6;">{{ spoken }}</div>
+        <div class="tele-stat-value val-spoken">{{ spoken }}</div>
     </div>
     
     <div class="tele-stat-card">
         <div class="tele-stat-title">Meetings Booked</div>
-        <div class="tele-stat-value" style="color: #f59e0b;">{{ meetings_sched }}</div>
+        <div class="tele-stat-value val-meetings">{{ meetings_sched }}</div>
     </div>
     
     <div class="tele-stat-card">
         <div class="tele-stat-title">SQL Conversions</div>
-        <div class="tele-stat-value" style="color: #10b981;">{{ converted }}</div>
+        <div class="tele-stat-value val-sqls">{{ converted }}</div>
     </div>
 </div>
 
@@ -221,7 +328,7 @@
                 <tbody>
                     {% for agent in team_performance|sort(attribute='converted', reverse=true) %}
                     <tr>
-                        <td style="font-weight: 700; color: {% if loop.index == 1 %}#f59e0b{% elif loop.index == 2 %}#e2e8f0{% else %}var(--text-crm-muted){% endif %};">
+                        <td class="rank-cell rank-{{ loop.index }}">
                             {% if loop.index == 1 %}<i class="fas fa-crown"></i>{% else %}{{ loop.index }}{% endif %}
                         </td>
                         <td style="font-weight: 600;">{{ agent.name }}</td>
@@ -229,7 +336,7 @@
                         <td style="text-align: right;">{{ agent.dialed }}</td>
                         <td style="text-align: right;">{{ agent.spoken }}</td>
                         <td style="text-align: right;">{{ agent.scheduled }}</td>
-                        <td style="text-align: right; font-weight: 700; color: #10b981;">{{ agent.converted }}</td>
+                        <td style="text-align: right; font-weight: 700;" class="val-sqls">{{ agent.converted }}</td>
                     </tr>
                     {% else %}
                     <tr>
@@ -257,9 +364,9 @@
         <div class="crm-card-title">Call Outcomes / Dispositions Breakdown</div>
         <div style="display: flex; flex-direction: column; gap: 12px; max-height: 400px; overflow-y: auto;">
             {% for row in disp_stats %}
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background-color: rgba(22, 45, 80, 0.15); border-radius: 6px; border: 1px solid rgba(22, 45, 80, 0.2);">
-                <span style="font-size: 13.5px; font-weight: 600; color: #ffffff;">{{ row.label }}</span>
-                <span style="background-color: var(--accent-cyan); color: #000000; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px;">{{ row.value }}</span>
+            <div class="analytics-disposition-row">
+                <span class="analytics-disposition-label">{{ row.label }}</span>
+                <span class="analytics-disposition-value">{{ row.value }}</span>
             </div>
             {% else %}
             <div style="color: var(--text-crm-muted); text-align: center; padding: 30px;">No calls logged yet.</div>
@@ -276,7 +383,7 @@
         <div class="crm-card-title">Lead Source Conversion Funnel</div>
         <div style="display: flex; flex-direction: column; gap: 24px;">
             {% for source in funnel_data %}
-            <div style="background-color: rgba(0,0,0,0.15); border: 1px solid var(--border-crm); border-radius: 10px; padding: 16px;">
+            <div class="analytics-funnel-card">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--border-crm); padding-bottom: 6px;">
                     <span style="font-size: 14px; font-weight: 700; color: var(--accent-cyan);"><i class="fas fa-filter"></i> Source: {{ source.label }}</span>
                     <span style="font-size: 12px; color: var(--text-crm-muted);">Total Leads: <strong>{{ source.total }}</strong></span>
@@ -289,7 +396,7 @@
                             <span>Connected Calls</span>
                             <span>{{ source.connected }} / {{ source.total }} ({{ source.connected_pct }}%)</span>
                         </div>
-                        <div style="height: 6px; background-color: rgba(22, 45, 80, 0.4); border-radius: 3px; overflow: hidden;">
+                        <div class="analytics-progress-track">
                             <div style="width: {{ source.connected_pct }}%; height: 100%; background-color: #3b82f6; border-radius: 3px;"></div>
                         </div>
                     </div>
@@ -300,29 +407,29 @@
                             <span>Spoken Conversations</span>
                             <span>{{ source.spoken }} / {{ source.total }} ({{ source.spoken_pct }}%)</span>
                         </div>
-                        <div style="height: 6px; background-color: rgba(22, 45, 80, 0.4); border-radius: 3px; overflow: hidden;">
+                        <div class="analytics-progress-track">
                             <div style="width: {{ source.spoken_pct }}%; height: 100%; background-color: #a855f7; border-radius: 3px;"></div>
                         </div>
                     </div>
-
+ 
                     <!-- Scheduled -->
                     <div>
                         <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 3px;">
                             <span>Meetings Booked</span>
                             <span>{{ source.scheduled }} / {{ source.total }} ({{ source.scheduled_pct }}%)</span>
                         </div>
-                        <div style="height: 6px; background-color: rgba(22, 45, 80, 0.4); border-radius: 3px; overflow: hidden;">
+                        <div class="analytics-progress-track">
                             <div style="width: {{ source.scheduled_pct }}%; height: 100%; background-color: #f59e0b; border-radius: 3px;"></div>
                         </div>
                     </div>
-
+ 
                     <!-- SQLs -->
                     <div>
                         <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 3px;">
                             <span>SQL Conversions</span>
                             <span>{{ source.sql_conversions }} / {{ source.total }} ({{ source.sql_conversions_pct }}%)</span>
                         </div>
-                        <div style="height: 6px; background-color: rgba(22, 45, 80, 0.4); border-radius: 3px; overflow: hidden;">
+                        <div class="analytics-progress-track">
                             <div style="width: {{ source.sql_conversions_pct }}%; height: 100%; background-color: #10b981; border-radius: 3px;"></div>
                         </div>
                     </div>

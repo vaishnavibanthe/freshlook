@@ -190,6 +190,63 @@
     .opps-table tr:hover td {
         background-color: rgba(22, 45, 80, 0.25);
     }
+    
+    .kanban-stage-select {
+        background: rgba(22, 45, 80, 0.8);
+        border: 1px solid var(--border-crm);
+        border-radius: 4px;
+        color: #ffffff;
+        font-size: 10px;
+        padding: 2px;
+        cursor: pointer;
+        outline: none;
+    }
+
+    /* Light Theme Overrides */
+    body.light-theme .kanban-column {
+        background-color: #f1f5f9;
+        border-color: #cbd5e1;
+    }
+    body.light-theme .kanban-column-header {
+        background-color: #e2e8f0;
+        border-bottom-color: #cbd5e1;
+    }
+    body.light-theme .kanban-column-title {
+        color: #0f172a;
+    }
+    body.light-theme .kanban-card-count {
+        background-color: #cbd5e1;
+        color: #475569;
+    }
+    body.light-theme .kanban-card {
+        background-color: #ffffff;
+        border-color: #cbd5e1;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    }
+    body.light-theme .kanban-card:hover {
+        border-color: var(--accent-cyan);
+        box-shadow: 0 8px 18px rgba(8, 145, 178, 0.12);
+    }
+    body.light-theme .kanban-card-title {
+        color: #0f172a;
+    }
+    body.light-theme .kanban-stage-select {
+        background: #ffffff;
+        color: #0f172a;
+        border-color: #cbd5e1;
+    }
+    body.light-theme .opps-table th {
+        background-color: #f1f5f9;
+        border-bottom-color: #cbd5e1;
+        color: #475569;
+    }
+    body.light-theme .opps-table-card {
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        border-color: #cbd5e1;
+    }
+    body.light-theme .opps-table tr:hover td {
+        background-color: #f1f5f9;
+    }
 </style>
 
 <div class="crm-header-bar">
@@ -244,7 +301,7 @@
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <span class="kanban-card-value">${{ "{:,.2f}".format(opp.estimated_value or 0.0) }}</span>
                         <!-- Quick Stage Mappings Selector -->
-                        <select onchange="changeOppStage({{ opp.id }}, this)" style="background: rgba(22, 45, 80, 0.8); border: 1px solid var(--border-crm); border-radius: 4px; color: #ffffff; font-size: 10px; padding: 2px; cursor: pointer;">
+                        <select onchange="changeOppStage({{ opp.id }}, this)" class="kanban-stage-select">
                             {% for st in ['Prospecting', 'Discovery', 'Solution Fit', 'Proposal', 'Negotiation', 'Closing', 'Closed Won', 'Closed Lost'] %}
                             <option value="{{ st }}" {% if opp.stage == st %}selected{% endif %}>{{ st }}</option>
                             {% endfor %}
