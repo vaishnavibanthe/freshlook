@@ -441,15 +441,91 @@
             color: #0891b2;
         }
 
+        /* Light Theme Card, Table, and Dashboard Overrides */
+        body.light-theme .crm-card,
+        body.light-theme .stat-card,
+        body.light-theme .filter-panel,
+        body.light-theme .leads-table-container,
+        body.light-theme .analytics-bar {
+            background-color: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.03) !important;
+            backdrop-filter: none !important;
+        }
+
+        body.light-theme .crm-card-title {
+            color: #0f172a !important;
+            border-bottom: 1px solid #f1f5f9;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+
+        body.light-theme .stat-value {
+            color: #0f172a !important;
+        }
+
+        body.light-theme .stat-label {
+            color: #64748b !important;
+        }
+
+        body.light-theme .kpi-card {
+            background-color: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.01) !important;
+        }
+        
+        body.light-theme .kpi-card:hover {
+            border-color: #cbd5e1 !important;
+            background-color: #f8fafc !important;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05) !important;
+        }
+        
+        body.light-theme .kpi-card.active-filter {
+            border-color: var(--accent-cyan) !important;
+            background-color: rgba(8, 145, 178, 0.01) !important;
+            box-shadow: 0 0 12px rgba(8, 145, 178, 0.15) !important;
+        }
+        
+        body.light-theme .kpi-card-label {
+            color: #475569 !important;
+        }
+        
+        body.light-theme .kpi-card-value {
+            color: #0f172a !important;
+        }
+        
+        body.light-theme .kpi-card-helper {
+            color: #64748b !important;
+        }
+        
+        body.light-theme .kpi-card-icon {
+            color: #cbd5e1 !important;
+        }
+        
+        body.light-theme .analytics-header-row {
+            border-bottom-color: #e2e8f0 !important;
+        }
+        
+        body.light-theme .analytics-title {
+            color: #0f172a !important;
+        }
+
         body.light-theme .workbench-table th,
         body.light-theme .leads-table th {
-            background-color: #f1f5f9;
-            color: #475569;
+            background-color: #f8fafc !important;
+            color: #475569 !important;
+            border-bottom: 2px solid #e2e8f0 !important;
+        }
+
+        body.light-theme .workbench-table td,
+        body.light-theme .leads-table td {
+            border-bottom: 1px solid #e2e8f0 !important;
+            color: #334155 !important;
         }
 
         body.light-theme .workbench-table tr:hover td,
         body.light-theme .leads-table tr:hover td {
-            background-color: #f1f5f9;
+            background-color: #f8fafc !important;
         }
 
         body.light-theme .modal-card {
