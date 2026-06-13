@@ -75,6 +75,9 @@ def role_required(*allowed_roles):
                 g.crm_user = user
                 return f(*args, **kwargs)
                 
+            if request.path.startswith('/api/'):
+                return jsonify({'status': 'error', 'message': 'You do not have permission to access this resource.'}), 403
+                
             flash("You do not have permission to access this resource.", "error")
             # Redirect to dashboards based on role
             if role == 'Telecaller':

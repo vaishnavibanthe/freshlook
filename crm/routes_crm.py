@@ -1169,13 +1169,33 @@ def crm_website_leads():
     rejected = request.args.get('rejected')
     spam = request.args.get('spam')
     
+    # Date filters
+    apply_date_filter = request.args.get('apply_date_filter', '1')
+    date_filter = request.args.get('date_filter', 'This Month')
+    start_date = request.args.get('start_date', '')
+    end_date = request.args.get('end_date', '')
+    
     # Search
     search = request.args.get('search', '').strip()
     
     filters = []
+    
+    # Apply date constraints to leads table if apply_date_filter == '1'
+    if apply_date_filter == '1':
+        from crm.api import get_date_range_bounds
+        start_dt, end_dt = get_date_range_bounds(date_filter, start_date, end_date)
+        if start_dt and end_dt:
+            filters.append("wl.created_at >= ?")
+            params.append(start_dt.strftime('%Y-%m-%d %H:%M:%S'))
+            filters.append("wl.created_at <= ?")
+            params.append(end_dt.strftime('%Y-%m-%d %H:%M:%S'))
+
     if status:
-        filters.append("wl.status = ?")
-        params.append(status)
+        if status == 'Pending':
+            filters.append("wl.status IN ('New', 'Reviewed', 'Assigned')")
+        else:
+            filters.append("wl.status = ?")
+            params.append(status)
     if source_form:
         filters.append("wl.source_form = ?")
         params.append(source_form)
@@ -1244,7 +1264,11 @@ def crm_website_leads():
         geographies=geographies,
         industries=industries,
         owners=owners,
-        active_page='crm_website_leads'
+        active_page='crm_website_leads',
+        date_filter=date_filter,
+        start_date=start_date,
+        end_date=end_date,
+        apply_date_filter=apply_date_filter
     )
 
 @crm_bp.route('/crm/website-leads/<int:lead_id>', methods=['GET', 'POST'])

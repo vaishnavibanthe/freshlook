@@ -109,6 +109,312 @@
     </div>
 </div>
 
+{% if g.crm_user.role in ('Platform Admin', 'Group Admin', 'Sales Head', 'Manager / Sales Manager') %}
+<style>
+    .analytics-bar {
+        background-color: var(--bg-card);
+        border: 1px solid var(--border-crm);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 24px;
+    }
+    
+    .analytics-header-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--border-crm);
+    }
+    
+    .analytics-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--text-crm-primary);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .analytics-controls {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+    
+    .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 16px;
+    }
+    
+    .kpi-card {
+        background: rgba(9, 19, 34, 0.25);
+        border: 1px solid var(--border-crm);
+        border-radius: 10px;
+        padding: 16px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .kpi-card:hover {
+        border-color: var(--accent-cyan);
+        background: rgba(22, 45, 80, 0.2);
+        transform: translateY(-2px);
+    }
+    
+    .kpi-card.active-filter {
+        border-color: var(--accent-cyan);
+        box-shadow: 0 0 10px rgba(5, 206, 250, 0.2);
+    }
+    
+    .kpi-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 8px;
+    }
+    
+    .kpi-card-label {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-crm-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .kpi-card-icon {
+        color: var(--text-crm-muted);
+        font-size: 13px;
+    }
+    
+    .kpi-card-value {
+        font-size: 26px;
+        font-weight: 700;
+        color: var(--text-crm-primary);
+        line-height: 1.1;
+        margin-bottom: 4px;
+    }
+    
+    .kpi-card-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 11px;
+        gap: 4px;
+    }
+    
+    .kpi-card-helper {
+        color: var(--text-crm-muted);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .kpi-trend {
+        display: inline-flex;
+        align-items: center;
+        gap: 2px;
+        font-weight: 600;
+        border-radius: 4px;
+        padding: 1px 4px;
+        white-space: nowrap;
+    }
+    
+    .kpi-trend.up {
+        color: #10b981;
+        background-color: rgba(16, 185, 129, 0.1);
+    }
+    
+    .kpi-trend.down {
+        color: #ef4444;
+        background-color: rgba(239, 68, 68, 0.1);
+    }
+    
+    .kpi-trend.neutral {
+        color: var(--text-crm-muted);
+        background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .custom-date-inputs {
+        display: none;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .custom-date-inputs.visible {
+        display: inline-flex;
+    }
+    
+    .toggle-container {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--text-crm-primary);
+        cursor: pointer;
+    }
+
+    .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 34px;
+        height: 20px;
+    }
+
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #475569;
+        transition: .3s;
+        border-radius: 20px;
+    }
+
+    .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 14px;
+        width: 14px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: .3s;
+        border-radius: 50%;
+    }
+
+    input:checked + .toggle-slider {
+        background-color: var(--accent-cyan);
+    }
+
+    input:checked + .toggle-slider:before {
+        transform: translateX(14px);
+    }
+</style>
+
+<div class="analytics-bar">
+    <div class="analytics-header-row">
+        <div class="analytics-title">
+            <i class="fas fa-chart-line" style="color: var(--accent-cyan);"></i> Website Leads Analytics
+        </div>
+        
+        <div class="analytics-controls">
+            <!-- Toggle: Apply date filter to table -->
+            <div class="toggle-container" title="If enabled, selecting a date filter will also filter the staging leads list table below.">
+                <span>Apply range to table:</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="toggle-apply-date" {% if apply_date_filter == '1' %}checked{% endif %}>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            
+            <!-- Date Filter Dropdown -->
+            <select id="analytics-date-filter" class="form-control" style="width: auto; padding: 4px 12px; font-size: 13px;">
+                <option value="This Week" {% if date_filter == 'This Week' %}selected{% endif %}>This Week</option>
+                <option value="Last Week" {% if date_filter == 'Last Week' %}selected{% endif %}>Last Week</option>
+                <option value="This Month" {% if date_filter == 'This Month' %}selected{% endif %}>This Month</option>
+                <option value="Last Month" {% if date_filter == 'Last Month' %}selected{% endif %}>Last Month</option>
+                <option value="This Year" {% if date_filter == 'This Year' %}selected{% endif %}>This Year</option>
+                <option value="Last Year" {% if date_filter == 'Last Year' %}selected{% endif %}>Last Year</option>
+                <option value="All Time" {% if date_filter == 'All Time' %}selected{% endif %}>All Time</option>
+                <option value="Custom" {% if date_filter == 'Custom' %}selected{% endif %}>Custom</option>
+            </select>
+            
+            <!-- Custom Date Range picker container -->
+            <div id="custom-date-inputs" class="custom-date-inputs {% if date_filter == 'Custom' %}visible{% endif %}">
+                <input type="date" id="start-date-input" class="form-control" style="width: auto; padding: 4px 8px; font-size: 12px;" value="{{ start_date }}">
+                <span style="color: var(--text-crm-secondary); font-size: 12px;">to</span>
+                <input type="date" id="end-date-input" class="form-control" style="width: auto; padding: 4px 8px; font-size: 12px;" value="{{ end_date }}">
+                <button type="button" id="btn-apply-custom-date" class="btn-crm btn-crm-primary" style="padding: 4px 10px; font-size: 11px;">Apply</button>
+                <button type="button" id="btn-reset-custom-date" class="btn-crm btn-crm-secondary" style="padding: 4px 10px; font-size: 11px;">Reset</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="kpi-grid">
+        <!-- 1. Total Website Leads -->
+        <div class="kpi-card {% if request.args.get('status') == '' and request.args.get('converted') != '1' and request.args.get('rejected') != '1' and request.args.get('spam') != '1' and request.args.get('unassigned') != '1' %}active-filter{% endif %}" id="card-total-leads">
+            <div class="kpi-card-header">
+                <span class="kpi-card-label">Total Leads</span>
+                <i class="fas fa-inbox kpi-card-icon"></i>
+            </div>
+            <div class="kpi-card-value" id="val-total-leads">0</div>
+            <div class="kpi-card-footer">
+                <span class="kpi-card-helper">Received in period</span>
+                <span class="kpi-trend neutral" id="trend-total-leads">0%</span>
+            </div>
+        </div>
+        
+        <!-- 2. Pending Review -->
+        <div class="kpi-card {% if request.args.get('status') == 'Pending' %}active-filter{% endif %}" id="card-pending-review">
+            <div class="kpi-card-header">
+                <span class="kpi-card-label">Pending Review</span>
+                <i class="fas fa-clock kpi-card-icon"></i>
+            </div>
+            <div class="kpi-card-value" id="val-pending-review">0</div>
+            <div class="kpi-card-footer">
+                <span class="kpi-card-helper">Needs qualification</span>
+                <span class="kpi-trend neutral" id="trend-pending-review">0%</span>
+            </div>
+        </div>
+        
+        <!-- 3. Converted to Contact -->
+        <div class="kpi-card {% if request.args.get('converted') == '1' or request.args.get('status') == 'Converted to Contact' %}active-filter{% endif %}" id="card-converted-leads">
+            <div class="kpi-card-header">
+                <span class="kpi-card-label">Converted</span>
+                <i class="fas fa-user-check kpi-card-icon"></i>
+            </div>
+            <div class="kpi-card-value" id="val-converted-leads">0</div>
+            <div class="kpi-card-footer">
+                <span class="kpi-card-helper">Moved to Contacts</span>
+                <span class="kpi-trend neutral" id="trend-converted-leads">0%</span>
+            </div>
+        </div>
+        
+        <!-- 4. Spam -->
+        <div class="kpi-card {% if request.args.get('spam') == '1' or request.args.get('status') == 'Spam' %}active-filter{% endif %}" id="card-spam-leads">
+            <div class="kpi-card-header">
+                <span class="kpi-card-label">Spam Captured</span>
+                <i class="fas fa-shield-alt kpi-card-icon"></i>
+            </div>
+            <div class="kpi-card-value" id="val-spam-leads">0</div>
+            <div class="kpi-card-footer">
+                <span class="kpi-card-helper">Filtered automatically</span>
+                <span class="kpi-trend neutral" id="trend-spam-leads">0%</span>
+            </div>
+        </div>
+        
+        <!-- Extra metric: Conversion Rate -->
+        <div class="kpi-card" id="card-conversion-rate">
+            <div class="kpi-card-header">
+                <span class="kpi-card-label">Conversion Rate</span>
+                <i class="fas fa-percentage kpi-card-icon"></i>
+            </div>
+            <div class="kpi-card-value" id="val-conversion-rate">0.0%</div>
+            <div class="kpi-card-footer">
+                <span class="kpi-card-helper">Leads to Contacts rate</span>
+                <span class="kpi-trend neutral" id="trend-conversion-rate">0.0%</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 <!-- Filters Panel -->
 <div class="filter-panel">
     <form action="{{ url_for('crm.crm_website_leads') }}" method="GET" id="filter-form">
@@ -262,4 +568,178 @@
         </table>
     </div>
 </div>
+
+{% if g.crm_user.role in ('Platform Admin', 'Group Admin', 'Sales Head', 'Manager / Sales Manager') %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dateFilterSelect = document.getElementById('analytics-date-filter');
+    const customDateInputs = document.getElementById('custom-date-inputs');
+    const startDateInput = document.getElementById('start-date-input');
+    const endDateInput = document.getElementById('end-date-input');
+    const btnApplyCustom = document.getElementById('btn-apply-custom-date');
+    const btnResetCustom = document.getElementById('btn-reset-custom-date');
+    const toggleApplyDate = document.getElementById('toggle-apply-date');
+    
+    // Select KPI Cards
+    const cardTotal = document.getElementById('card-total-leads');
+    const cardPending = document.getElementById('card-pending-review');
+    const cardConverted = document.getElementById('card-converted-leads');
+    const cardSpam = document.getElementById('card-spam-leads');
+    const cardConvRate = document.getElementById('card-conversion-rate');
+    
+    function getQueryParametersForAPI() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const params = {
+            date_filter: dateFilterSelect.value,
+            apply_date_filter: toggleApplyDate.checked ? '1' : '0'
+        };
+        
+        if (dateFilterSelect.value === 'Custom') {
+            params.start_date = startDateInput.value;
+            params.end_date = endDateInput.value;
+        }
+        
+        const transferFilters = ['group_id', 'owner_id', 'source_form', 'industry', 'geography', 'product_solution_id', 'partner_id'];
+        transferFilters.forEach(f => {
+            if (urlParams.has(f)) params[f] = urlParams.get(f);
+        });
+        
+        return new URLSearchParams(params).toString();
+    }
+    
+    function fetchLeadAnalytics() {
+        const queryStr = getQueryParametersForAPI();
+        const apiURL = `/api/crm/website-leads/analytics?${queryStr}`;
+        
+        fetch(apiURL)
+            .then(res => {
+                if (res.status === 403) {
+                    console.warn("User does not have analytics visibility permissions.");
+                    return null;
+                }
+                return res.json();
+            })
+            .then(data => {
+                if (!data) return;
+                
+                // Update metric values
+                document.getElementById('val-total-leads').textContent = data.total_website_leads;
+                document.getElementById('val-pending-review').textContent = data.pending_for_review;
+                document.getElementById('val-converted-leads').textContent = data.converted_to_contact;
+                document.getElementById('val-spam-leads').textContent = data.spam;
+                document.getElementById('val-conversion-rate').textContent = data.conversion_rate + '%';
+                
+                // Update trends
+                updateTrendUI('trend-total-leads', data.trends?.total_website_leads);
+                updateTrendUI('trend-pending-review', data.trends?.pending_for_review);
+                updateTrendUI('trend-converted-leads', data.trends?.converted_to_contact);
+                updateTrendUI('trend-spam-leads', data.trends?.spam);
+                updateTrendUI('trend-conversion-rate', data.trends?.conversion_rate, true);
+            })
+            .catch(err => console.error("Error loading analytics:", err));
+    }
+    
+    function updateTrendUI(elemId, val, isRateDiff = false) {
+        const elem = document.getElementById(elemId);
+        if (!elem) return;
+        
+        if (val === undefined || val === null) {
+            elem.textContent = '0%';
+            elem.className = 'kpi-trend neutral';
+            return;
+        }
+        
+        const suffix = isRateDiff ? ' pp' : '%';
+        if (val > 0) {
+            elem.innerHTML = `<i class="fas fa-arrow-up"></i> +${val}${suffix}`;
+            elem.className = 'kpi-trend up';
+        } else if (val < 0) {
+            elem.innerHTML = `<i class="fas fa-arrow-down"></i> ${val}${suffix}`;
+            elem.className = 'kpi-trend down';
+        } else {
+            elem.innerHTML = `0${suffix}`;
+            elem.className = 'kpi-trend neutral';
+        }
+    }
+    
+    function onDateFilterChanged() {
+        if (dateFilterSelect.value === 'Custom') {
+            customDateInputs.classList.add('visible');
+            return;
+        } else {
+            customDateInputs.classList.remove('visible');
+        }
+        applyFiltersToPage();
+    }
+    
+    function applyFiltersToPage() {
+        if (toggleApplyDate.checked) {
+            const urlParams = new URLSearchParams(window.location.search);
+            urlParams.set('date_filter', dateFilterSelect.value);
+            urlParams.set('apply_date_filter', '1');
+            
+            if (dateFilterSelect.value === 'Custom') {
+                if (!startDateInput.value || !endDateInput.value) {
+                    alert("Please select both start and end dates.");
+                    return;
+                }
+                urlParams.set('start_date', startDateInput.value);
+                urlParams.set('end_date', endDateInput.value);
+            } else {
+                urlParams.delete('start_date');
+                urlParams.delete('end_date');
+            }
+            
+            window.location.search = urlParams.toString();
+        } else {
+            fetchLeadAnalytics();
+        }
+    }
+    
+    function filterTableByKPI(kpiType) {
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        urlParams.delete('status');
+        urlParams.delete('converted');
+        urlParams.delete('rejected');
+        urlParams.delete('spam');
+        urlParams.delete('unassigned');
+        
+        if (kpiType === 'total') {
+            // Total shows all matching leads
+        } else if (kpiType === 'pending') {
+            urlParams.set('status', 'Pending');
+        } else if (kpiType === 'converted') {
+            urlParams.set('converted', '1');
+        } else if (kpiType === 'spam') {
+            urlParams.set('spam', '1');
+        }
+        
+        window.location.search = urlParams.toString();
+    }
+    
+    dateFilterSelect.addEventListener('change', onDateFilterChanged);
+    toggleApplyDate.addEventListener('change', function() {
+        applyFiltersToPage();
+    });
+    
+    btnApplyCustom.addEventListener('click', applyFiltersToPage);
+    btnResetCustom.addEventListener('click', function() {
+        startDateInput.value = '';
+        endDateInput.value = '';
+        dateFilterSelect.value = 'This Month';
+        customDateInputs.classList.remove('visible');
+        applyFiltersToPage();
+    });
+    
+    cardTotal.addEventListener('click', () => filterTableByKPI('total'));
+    cardPending.addEventListener('click', () => filterTableByKPI('pending'));
+    cardConverted.addEventListener('click', () => filterTableByKPI('converted'));
+    cardSpam.addEventListener('click', () => filterTableByKPI('spam'));
+    cardConvRate.addEventListener('click', () => filterTableByKPI('converted'));
+    
+    fetchLeadAnalytics();
+});
+</script>
+{% endif %}
 {% endblock %}

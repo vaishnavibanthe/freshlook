@@ -524,7 +524,10 @@ def capture_website_lead():
     
     if is_spam and lead_id and not is_career:
         # Update lead status to Spam immediately if honeypot was filled
-        db_execute("UPDATE website_leads SET status = 'Spam', duplicate_status = 'Spam Filtered' WHERE id = ?", (lead_id,))
+        db_execute(
+            "UPDATE website_leads SET status = 'Spam', duplicate_status = 'Spam Filtered', spam_marked_at = ?, spam_marked_by = NULL WHERE id = ?",
+            (now.strftime('%Y-%m-%d %H:%M:%S'), lead_id)
+        )
         log_website_lead_review_log(
             website_lead_id=lead_id,
             action_type='Marked Spam',
@@ -890,7 +893,10 @@ def api_mark_lead_duplicate(lead_id):
     now_str = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
     user_id = g.crm_user['id']
     
-    db_execute("UPDATE website_leads SET status = 'Duplicate', review_notes = ?, updated_at = ? WHERE id = ?", ('Duplicate', notes, now_str, lead_id))
+    db_execute(
+        "UPDATE website_leads SET status = 'Duplicate', review_notes = ?, duplicate_marked_at = ?, duplicate_marked_by = ?, updated_at = ? WHERE id = ?",
+        (notes, now_str, user_id, now_str, lead_id)
+    )
     
     from crm.models import log_website_lead_review_log
     log_website_lead_review_log(
@@ -918,7 +924,10 @@ def api_mark_lead_rejected(lead_id):
     now_str = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
     user_id = g.crm_user['id']
     
-    db_execute("UPDATE website_leads SET status = 'Rejected', review_notes = ?, updated_at = ? WHERE id = ?", (notes, now_str, lead_id))
+    db_execute(
+        "UPDATE website_leads SET status = 'Rejected', review_notes = ?, rejected_at = ?, rejected_by = ?, updated_at = ? WHERE id = ?",
+        (notes, now_str, user_id, now_str, lead_id)
+    )
     
     from crm.models import log_website_lead_review_log
     log_website_lead_review_log(
@@ -946,7 +955,10 @@ def api_mark_lead_spam(lead_id):
     now_str = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
     user_id = g.crm_user['id']
     
-    db_execute("UPDATE website_leads SET status = 'Spam', review_notes = ?, updated_at = ? WHERE id = ?", (notes, now_str, lead_id))
+    db_execute(
+        "UPDATE website_leads SET status = 'Spam', review_notes = ?, spam_marked_at = ?, spam_marked_by = ?, updated_at = ? WHERE id = ?",
+        (notes, now_str, user_id, now_str, lead_id)
+    )
     
     from crm.models import log_website_lead_review_log
     log_website_lead_review_log(
@@ -1087,4 +1099,262 @@ def api_delete_assignment_rule(rule_id):
         
     db_execute("DELETE FROM website_lead_assignment_rules WHERE id = ?", (rule_id,))
     return jsonify({'status': 'success', 'message': 'Rule deleted successfully.'})
+
+
+# ============================================================
+#  WEBSITE LEADS ANALYTICS API
+# ============================================================
+
+def get_date_range_bounds(date_filter, start_date_str=None, end_date_str=None):
+    import datetime
+    now = datetime.datetime.utcnow()
+    today = now.date()
+    
+    start_dt = None
+    end_dt = None
+    
+    if date_filter == 'This Week':
+        monday = today - datetime.timedelta(days=today.weekday())
+        start_dt = datetime.datetime.combine(monday, datetime.time.min)
+        end_dt = now
+    elif date_filter == 'Last Week':
+        monday = today - datetime.timedelta(days=today.weekday())
+        monday_last = monday - datetime.timedelta(days=7)
+        sunday_last = monday - datetime.timedelta(days=1)
+        start_dt = datetime.datetime.combine(monday_last, datetime.time.min)
+        end_dt = datetime.datetime.combine(sunday_last, datetime.time.max)
+    elif date_filter == 'This Month':
+        first_this_month = today.replace(day=1)
+        start_dt = datetime.datetime.combine(first_this_month, datetime.time.min)
+        end_dt = now
+    elif date_filter == 'Last Month':
+        first_this_month = today.replace(day=1)
+        last_prev_month = first_this_month - datetime.timedelta(days=1)
+        first_prev_month = last_prev_month.replace(day=1)
+        start_dt = datetime.datetime.combine(first_prev_month, datetime.time.min)
+        end_dt = datetime.datetime.combine(last_prev_month, datetime.time.max)
+    elif date_filter == 'This Year':
+        first_this_year = today.replace(month=1, day=1)
+        start_dt = datetime.datetime.combine(first_this_year, datetime.time.min)
+        end_dt = now
+    elif date_filter == 'Last Year':
+        first_last_year = today.replace(year=today.year - 1, month=1, day=1)
+        last_last_year = today.replace(year=today.year - 1, month=12, day=31)
+        start_dt = datetime.datetime.combine(first_last_year, datetime.time.min)
+        end_dt = datetime.datetime.combine(last_last_year, datetime.time.max)
+    elif date_filter == 'Custom' and start_date_str and end_date_str:
+        try:
+            start_d = datetime.datetime.strptime(start_date_str, '%Y-%m-%d').date()
+            end_d = datetime.datetime.strptime(end_date_str, '%Y-%m-%d').date()
+            start_dt = datetime.datetime.combine(start_d, datetime.time.min)
+            end_dt = datetime.datetime.combine(end_d, datetime.time.max)
+        except ValueError:
+            pass
+            
+    return start_dt, end_dt
+
+def get_previous_period_bounds(date_filter, start_dt, end_dt):
+    import datetime
+    if not start_dt or not end_dt:
+        return None, None
+        
+    if date_filter == 'This Week' or date_filter == 'Last Week':
+        prev_start = start_dt - datetime.timedelta(days=7)
+        prev_end = end_dt - datetime.timedelta(days=7)
+    elif date_filter == 'This Month':
+        first_this_month = start_dt.date()
+        last_prev_month = first_this_month - datetime.timedelta(days=1)
+        first_prev_month = last_prev_month.replace(day=1)
+        prev_start = datetime.datetime.combine(first_prev_month, datetime.time.min)
+        elapsed_days = (end_dt.date() - first_this_month).days + 1
+        prev_end_date = first_prev_month + datetime.timedelta(days=elapsed_days - 1)
+        if prev_end_date > last_prev_month:
+            prev_end_date = last_prev_month
+        prev_end = datetime.datetime.combine(prev_end_date, end_dt.time())
+    elif date_filter == 'Last Month':
+        first_prev_month = start_dt.date()
+        last_prev_prev_month = first_prev_month - datetime.timedelta(days=1)
+        first_prev_prev_month = last_prev_prev_month.replace(day=1)
+        prev_start = datetime.datetime.combine(first_prev_prev_month, datetime.time.min)
+        prev_end = datetime.datetime.combine(last_prev_prev_month, datetime.time.max)
+    elif date_filter == 'This Year' or date_filter == 'Last Year':
+        try:
+            prev_start = start_dt.replace(year=start_dt.year - 1)
+            prev_end = end_dt.replace(year=end_dt.year - 1)
+        except ValueError:
+            prev_start = start_dt - datetime.timedelta(days=365)
+            prev_end = end_dt - datetime.timedelta(days=365)
+    else:
+        duration = end_dt - start_dt
+        prev_end = start_dt - datetime.timedelta(seconds=1)
+        prev_start = prev_end - duration
+        
+    return prev_start, prev_end
+
+@crm_bp.route('/api/crm/website-leads/analytics', methods=['GET'])
+@crm_login_required
+@role_required('Platform Admin', 'Group Admin', 'Sales Head', 'Manager / Sales Manager')
+def api_website_leads_analytics():
+    role = g.crm_user.get('role')
+    user_id = g.crm_user.get('id')
+    group_id = g.crm_user.get('group_id')
+    
+    date_filter = request.args.get('date_filter', 'This Month')
+    start_date_str = request.args.get('start_date')
+    end_date_str = request.args.get('end_date')
+    
+    product_solution_id = request.args.get('product_solution_id')
+    partner_id = request.args.get('partner_id')
+    
+    product_name = None
+    if product_solution_id:
+        p_row = db_query_one("SELECT name FROM product_solutions WHERE id = ?", (product_solution_id,))
+        if p_row:
+            product_name = p_row['name']
+            
+    partner_name = None
+    if partner_id:
+        part_row = db_query_one("SELECT name FROM partners WHERE id = ?", (partner_id,))
+        if part_row:
+            partner_name = part_row['name']
+            
+    req_group_id = request.args.get('group_id')
+    req_owner_id = request.args.get('owner_id')
+    source_form = request.args.get('source_form')
+    industry = request.args.get('industry')
+    geography = request.args.get('geography')
+    
+    visibility_clause = ""
+    visibility_params = []
+    if role == 'Platform Admin':
+        visibility_clause = "1=1"
+    elif role in ('Group Admin', 'Sales Head'):
+        visibility_clause = "(wl.assigned_owner_id IS NULL OR wl.assigned_owner_id IN (SELECT id FROM crm_users WHERE group_id = ?))"
+        visibility_params.append(group_id)
+    elif role == 'Manager / Sales Manager':
+        visibility_clause = "(wl.assigned_owner_id = ? OR wl.assigned_owner_id IN (SELECT id FROM crm_users WHERE manager_id = ?) OR (wl.assigned_owner_id IS NULL AND wl.geography IN (SELECT geography FROM crm_users WHERE id = ?)))"
+        visibility_params.extend([user_id, user_id, user_id])
+    else:
+        return jsonify({'status': 'error', 'message': 'Forbidden'}), 403
+        
+    filters = []
+    if req_group_id:
+        if role == 'Platform Admin' or (role in ('Group Admin', 'Sales Head') and int(req_group_id) == group_id):
+            filters.append("wl.assigned_owner_id IN (SELECT id FROM crm_users WHERE group_id = ?)")
+            visibility_params.append(int(req_group_id))
+        else:
+            return jsonify({'status': 'error', 'message': 'Permission denied for requested group filter.'}), 403
+            
+    if req_owner_id:
+        owner_val = int(req_owner_id)
+        if role == 'Platform Admin':
+            filters.append("wl.assigned_owner_id = ?")
+            visibility_params.append(owner_val)
+        elif role in ('Group Admin', 'Sales Head'):
+            filters.append("(wl.assigned_owner_id = ? AND wl.assigned_owner_id IN (SELECT id FROM crm_users WHERE group_id = ?))")
+            visibility_params.extend([owner_val, group_id])
+        elif role == 'Manager / Sales Manager':
+            filters.append("(wl.assigned_owner_id = ? AND (wl.assigned_owner_id = ? OR wl.assigned_owner_id IN (SELECT id FROM crm_users WHERE manager_id = ?)))")
+            visibility_params.extend([owner_val, user_id, user_id])
+        else:
+            return jsonify({'status': 'error', 'message': 'Permission denied for requested owner filter.'}), 403
+            
+    if source_form:
+        filters.append("wl.source_form = ?")
+        visibility_params.append(source_form)
+    if industry:
+        filters.append("wl.industry = ?")
+        visibility_params.append(industry)
+    if geography:
+        filters.append("wl.geography = ?")
+        visibility_params.append(geography)
+    if product_name:
+        filters.append("wl.product_solution_interest = ?")
+        visibility_params.append(product_name)
+    if partner_name:
+        filters.append("wl.partner_interest = ?")
+        visibility_params.append(partner_name)
+        
+    if filters:
+        base_clause = visibility_clause + " AND " + " AND ".join(filters)
+    else:
+        base_clause = visibility_clause
+        
+    start_dt, end_dt = get_date_range_bounds(date_filter, start_date_str, end_date_str)
+    
+    def get_counts(s_dt, e_dt, clause, params):
+        t_clause = clause
+        t_params = list(params)
+        if s_dt and e_dt:
+            t_clause += " AND wl.created_at >= ? AND wl.created_at <= ?"
+            t_params.extend([s_dt.strftime('%Y-%m-%d %H:%M:%S'), e_dt.strftime('%Y-%m-%d %H:%M:%S')])
+        total_count = db_query_one(f"SELECT COUNT(*) as cnt FROM website_leads wl WHERE {t_clause}", t_params)['cnt']
+        
+        p_clause = clause + " AND wl.status IN ('New', 'Reviewed', 'Assigned')"
+        p_params = list(params)
+        if s_dt and e_dt:
+            p_clause += " AND wl.created_at >= ? AND wl.created_at <= ?"
+            p_params.extend([s_dt.strftime('%Y-%m-%d %H:%M:%S'), e_dt.strftime('%Y-%m-%d %H:%M:%S')])
+        pending_count = db_query_one(f"SELECT COUNT(*) as cnt FROM website_leads wl WHERE {p_clause}", p_params)['cnt']
+        
+        c_clause = clause + " AND wl.status = 'Converted to Contact'"
+        c_params = list(params)
+        if s_dt and e_dt:
+            c_clause += " AND wl.converted_at >= ? AND wl.converted_at <= ?"
+            c_params.extend([s_dt.strftime('%Y-%m-%d %H:%M:%S'), e_dt.strftime('%Y-%m-%d %H:%M:%S')])
+        converted_count = db_query_one(f"SELECT COUNT(*) as cnt FROM website_leads wl WHERE {c_clause}", c_params)['cnt']
+        
+        s_clause = clause + " AND wl.status = 'Spam'"
+        s_params = list(params)
+        if s_dt and e_dt:
+            s_clause += " AND COALESCE(wl.spam_marked_at, wl.created_at) >= ? AND COALESCE(wl.spam_marked_at, wl.created_at) <= ?"
+            s_params.extend([s_dt.strftime('%Y-%m-%d %H:%M:%S'), e_dt.strftime('%Y-%m-%d %H:%M:%S')])
+        spam_count = db_query_one(f"SELECT COUNT(*) as cnt FROM website_leads wl WHERE {s_clause}", s_params)['cnt']
+        
+        conversion_rate = 0.0
+        if total_count > 0:
+            conversion_rate = round((converted_count / total_count) * 100, 1)
+            
+        return {
+            'total_website_leads': total_count,
+            'pending_for_review': pending_count,
+            'converted_to_contact': converted_count,
+            'spam': spam_count,
+            'conversion_rate': conversion_rate
+        }
+
+    current_res = get_counts(start_dt, end_dt, base_clause, visibility_params)
+    
+    trends = None
+    if start_dt and end_dt:
+        prev_start_dt, prev_end_dt = get_previous_period_bounds(date_filter, start_dt, end_dt)
+        if prev_start_dt and prev_end_dt:
+            prev_res = get_counts(prev_start_dt, prev_end_dt, base_clause, visibility_params)
+            
+            def get_trend_pct(curr, prev):
+                if prev == 0:
+                    return 100 if curr > 0 else 0
+                return round(((curr - prev) / prev) * 100, 1)
+                
+            trends = {
+                'total_website_leads': get_trend_pct(current_res['total_website_leads'], prev_res['total_website_leads']),
+                'pending_for_review': get_trend_pct(current_res['pending_for_review'], prev_res['pending_for_review']),
+                'converted_to_contact': get_trend_pct(current_res['converted_to_contact'], prev_res['converted_to_contact']),
+                'spam': get_trend_pct(current_res['spam'], prev_res['spam']),
+                'conversion_rate': round(current_res['conversion_rate'] - prev_res['conversion_rate'], 1)
+            }
+            
+    res_payload = {
+        'total_website_leads': current_res['total_website_leads'],
+        'pending_for_review': current_res['pending_for_review'],
+        'converted_to_contact': current_res['converted_to_contact'],
+        'spam': current_res['spam'],
+        'conversion_rate': current_res['conversion_rate'],
+        'date_range_start': start_dt.strftime('%Y-%m-%d %H:%M:%S') if start_dt else None,
+        'date_range_end': end_dt.strftime('%Y-%m-%d %H:%M:%S') if end_dt else None,
+        'trends': trends
+    }
+    
+    return jsonify(res_payload)
+
 
