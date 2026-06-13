@@ -1,0 +1,673 @@
+{% extends 'crm/base_crm.html' %}
+
+{% block title %}Staging Lead Review: {{ lead.full_name }} | ThinkArtha CRM{% endblock %}
+
+{% block content %}
+<style>
+    .detail-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 24px;
+        margin-top: 20px;
+    }
+    
+    @media (max-width: 992px) {
+        .detail-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    .detail-card {
+        background-color: var(--bg-card);
+        border: 1px solid var(--border-crm);
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 24px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    
+    .detail-card-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #ffffff;
+        border-bottom: 1px solid var(--border-crm);
+        padding-bottom: 12px;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .data-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(22, 45, 80, 0.4);
+        font-size: 13.5px;
+    }
+    
+    .data-row:last-child {
+        border-bottom: none;
+    }
+    
+    .data-label {
+        color: var(--text-crm-secondary);
+        font-weight: 500;
+    }
+    
+    .data-val {
+        color: #ffffff;
+        font-weight: 600;
+        text-align: right;
+    }
+    
+    body.light-theme .data-val {
+        color: #0f172a;
+    }
+
+    .message-box {
+        background-color: rgba(9, 19, 34, 0.5);
+        border: 1px solid var(--border-crm);
+        border-radius: 8px;
+        padding: 16px;
+        font-size: 13.5px;
+        color: var(--text-crm-primary);
+        line-height: 1.6;
+        white-space: pre-wrap;
+    }
+    
+    /* Log list */
+    .log-list {
+        list-style: none;
+        position: relative;
+        padding-left: 20px;
+    }
+    
+    .log-list::before {
+        content: '';
+        position: absolute;
+        left: 5px;
+        top: 8px;
+        bottom: 8px;
+        width: 2px;
+        background-color: var(--border-crm);
+    }
+    
+    .log-item {
+        position: relative;
+        margin-bottom: 16px;
+        font-size: 13px;
+    }
+    
+    .log-item::before {
+        content: '';
+        position: absolute;
+        left: -20px;
+        top: 4px;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: var(--accent-cyan);
+        border: 2px solid var(--bg-crm);
+    }
+    
+    .log-date {
+        font-size: 11px;
+        color: var(--text-crm-muted);
+        display: block;
+        margin-bottom: 3px;
+    }
+
+    /* Modal dialog */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.7);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(5px);
+    }
+    
+    .modal-content {
+        background-color: var(--bg-sidebar);
+        border: 1px solid var(--border-crm);
+        border-radius: 12px;
+        padding: 24px;
+        width: 100%;
+        max-width: 500px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    }
+
+    .modal-header {
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 16px;
+        color: #ffffff;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal-close {
+        cursor: pointer;
+        color: var(--text-crm-muted);
+        font-size: 18px;
+    }
+
+    .modal-close:hover {
+        color: #ffffff;
+    }
+    
+    .duplicate-alert {
+        background-color: rgba(245, 158, 11, 0.1);
+        border: 1px solid rgba(245, 158, 11, 0.3);
+        color: #f59e0b;
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 16px;
+        font-size: 13px;
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+    }
+</style>
+
+<div class="crm-header-bar">
+    <div class="crm-title-section">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <a href="{{ url_for('crm.crm_website_leads') }}" class="btn-crm btn-crm-secondary" style="padding: 6px 12px; font-size: 12px;">
+                <i class="fas fa-chevron-left"></i> Back to Inbox
+            </a>
+            <h1>Review Website Lead</h1>
+        </div>
+    </div>
+    <div class="crm-actions-section" style="display: flex; gap: 10px;">
+        <span class="badge-status {{ lead.status.lower().replace(' ', '_').replace('converted_to_contact', 'converted') }}" style="padding: 8px 16px; font-size: 12px; display: inline-flex; align-items: center;">
+            {{ lead.status }}
+        </span>
+    </div>
+</div>
+
+<div class="detail-grid">
+    <!-- Left Column: Lead Details -->
+    <div class="left-col">
+        <!-- Contact & Company details -->
+        <div class="detail-card">
+            <div class="detail-card-title">
+                <i class="fas fa-user"></i> Contact & Company Details
+            </div>
+            <div class="data-row">
+                <span class="data-label">Full Name</span>
+                <span class="data-val">{{ lead.full_name }}</span>
+            </div>
+            <div class="data-row">
+                <span class="data-label">Business Email</span>
+                <span class="data-val">
+                    <a href="mailto:{{ lead.business_email }}" style="color: var(--accent-cyan);">{{ lead.business_email }}</a>
+                </span>
+            </div>
+            <div class="data-row">
+                <span class="data-label">Phone</span>
+                <span class="data-val">{{ lead.phone or '-' }}</span>
+            </div>
+            <div class="data-row">
+                <span class="data-label">Company</span>
+                <span class="data-val">{{ lead.company or '-' }}</span>
+            </div>
+            <div class="data-row">
+                <span class="data-label">Job Title</span>
+                <span class="data-val">{{ lead.job_title or '-' }}</span>
+            </div>
+            <div class="data-row">
+                <span class="data-label">Industry</span>
+                <span class="data-val">{{ lead.industry or '-' }}</span>
+            </div>
+            <div class="data-row">
+                <span class="data-label">Geography / Country</span>
+                <span class="data-val">{{ lead.geography or '-' }} / {{ lead.country or '-' }}</span>
+            </div>
+            <div class="data-row">
+                <span class="data-label">Interest Areas</span>
+                <span class="data-val">
+                    {% if lead.product_solution_interest %}Prod: {{ lead.product_solution_interest }}{% endif %}
+                    {% if lead.partner_interest %} | Part: {{ lead.partner_interest }}{% endif %}
+                    {% if not lead.product_solution_interest and not lead.partner_interest %}-{% endif %}
+                </span>
+            </div>
+            <div class="data-row">
+                <span class="data-label">Downloads / Actions</span>
+                <span class="data-val">
+                    {% if lead.case_study_downloaded %}Case: {{ lead.case_study_downloaded }}{% endif %}
+                    {% if lead.resource_downloaded %}Res: {{ lead.resource_downloaded }}{% endif %}
+                    {% if lead.assessment_type %}Assessment: {{ lead.assessment_type }}{% endif %}
+                    {% if not lead.case_study_downloaded and not lead.resource_downloaded and not lead.assessment_type %}-{% endif %}
+                </span>
+            </div>
+            <div class="data-row">
+                <span class="data-label">Consent Status</span>
+                <span class="data-val">
+                    {% if lead.consent_status == 1 %}
+                    <span style="color: #10b981;"><i class="fas fa-check-circle"></i> Agreed</span>
+                    {% else %}
+                    <span style="color: var(--text-crm-muted);"><i class="fas fa-times-circle"></i> Not Agreed</span>
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+
+        <!-- Submission Details -->
+        <div class="detail-card">
+            <div class="detail-card-title">
+                <i class="fas fa-file-alt"></i> Submission Info & Message
+            </div>
+            <div class="data-row">
+                <span class="data-label">Source Form / Page</span>
+                <span class="data-val" title="{{ lead.source_page }}">
+                    {{ lead.source_form }} (<a href="{{ lead.source_page }}" target="_blank" style="color: var(--accent-cyan); font-size: 11px;">View Page</a>)
+                </span>
+            </div>
+            <div class="data-row">
+                <span class="data-label">CTA Clicked</span>
+                <span class="data-val">{{ lead.cta_clicked or '-' }}</span>
+            </div>
+            <div class="data-row">
+                <span class="data-label">Referrer</span>
+                <span class="data-val" style="word-break: break-all; max-width: 300px;">{{ lead.referrer or '-' }}</span>
+            </div>
+            
+            {% if current_crm_user.role == 'Platform Admin' %}
+            <div class="data-row">
+                <span class="data-label">IP Address</span>
+                <span class="data-val">{{ lead.ip_address or '-' }}</span>
+            </div>
+            <div class="data-row">
+                <span class="data-label">User Agent</span>
+                <span class="data-val" style="font-size: 11px; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ lead.user_agent }}">{{ lead.user_agent or '-' }}</span>
+            </div>
+            {% endif %}
+
+            <div style="margin-top: 16px;">
+                <span class="form-label" style="display: block; margin-bottom: 8px;">Submitted Message</span>
+                {% if lead.message %}
+                <div class="message-box">{{ lead.message }}</div>
+                {% else %}
+                <p style="color: var(--text-crm-muted); font-size: 13px; font-style: italic;">No message submitted.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Staging Review Timeline Logs -->
+        <div class="detail-card">
+            <div class="detail-card-title">
+                <i class="fas fa-history"></i> Lead Review Log
+            </div>
+            
+            <ul class="log-list">
+                {% for log in logs %}
+                <li class="log-item">
+                    <span class="log-date">{{ log.created_at }} | Performed by: {{ log.performed_by_name or 'System' }}</span>
+                    <strong>{{ log.action_type }}</strong> - {{ log.description }}
+                    {% if log.new_status %}
+                    <span style="font-size: 11px; color: var(--text-crm-secondary);">[Status: {{ log.new_status }}]</span>
+                    {% endif %}
+                </li>
+                {% else %}
+                <li style="color: var(--text-crm-muted); font-style: italic; font-size: 13px;">No review logs found.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Right Column: Conversion & Review Action Panel -->
+    <div class="right-col">
+        <!-- Lead Status Action Panel -->
+        {% if lead.status != 'Converted to Contact' %}
+        <div class="detail-card">
+            <div class="detail-card-title">
+                <i class="fas fa-cog"></i> Staging Actions
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <!-- Owner Assignment -->
+                <div class="form-group">
+                    <label class="form-label">Assign Staging Owner (Required for Convert)</label>
+                    <select id="assigned-owner-select" class="form-control" onchange="assignOwner({{ lead.id }}, this.value)">
+                        <option value="">-- Select Owner --</option>
+                        {% for owner in owners %}
+                        <option value="{{ owner.id }}" {% if lead.assigned_owner_id|int == owner.id %}selected{% endif %}>{{ owner.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <button class="btn-crm btn-crm-primary" style="justify-content: center; width: 100%; padding: 12px;" onclick="openConvertModal()" {% if not lead.assigned_owner_id %}disabled title="Assign an owner first"{% endif %}>
+                    <i class="fas fa-check-double"></i> Convert to CRM Contact
+                </button>
+                
+                <div style="border-top: 1px solid var(--border-crm); padding-top: 12px; margin-top: 6px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                    <button class="btn-crm btn-crm-secondary" style="justify-content: center; font-size: 12px;" onclick="markStatus('duplicate')">
+                        <i class="fas fa-copy"></i> Duplicate
+                    </button>
+                    <button class="btn-crm btn-crm-secondary" style="justify-content: center; font-size: 12px;" onclick="markStatus('rejected')">
+                        <i class="fas fa-ban"></i> Reject
+                    </button>
+                </div>
+                
+                <button class="btn-crm btn-crm-danger" style="justify-content: center; font-size: 12px;" onclick="markStatus('spam')">
+                    <i class="fas fa-skull-crossbones"></i> Mark as Spam
+                </button>
+            </div>
+        </div>
+        {% else %}
+        <!-- Converted Reference -->
+        <div class="detail-card" style="background: rgba(16, 185, 129, 0.05); border-color: rgba(16, 185, 129, 0.3);">
+            <div class="detail-card-title" style="color: #10b981;">
+                <i class="fas fa-check-circle"></i> Converted Lead Record
+            </div>
+            <p style="font-size: 13.5px; line-height: 1.5; color: var(--text-crm-primary);">
+                This lead has been successfully moved into the CRM Contacts database.
+            </p>
+            <div style="margin-top: 16px; display: flex; flex-direction: column; gap: 10px;">
+                <div class="data-row">
+                    <span class="data-label">CRM Contact Link</span>
+                    <span class="data-val">
+                        <span style="color: #10b981; font-weight: 700;">{{ lead.crm_contact_name }}</span>
+                    </span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Converted By</span>
+                    <span class="data-val">{{ lead.converted_by_name or 'System' }}</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Converted At</span>
+                    <span class="data-val">{{ lead.converted_at }}</span>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Duplicate Warning Card -->
+        {% if duplicates and lead.status != 'Converted to Contact' %}
+        <div class="detail-card" style="border-color: rgba(245, 158, 11, 0.5);">
+            <div class="detail-card-title" style="color: #f59e0b;">
+                <i class="fas fa-exclamation-triangle"></i> Duplicate Warning ({{ duplicates|length }})
+            </div>
+            
+            <p style="font-size: 12px; color: var(--text-crm-secondary); margin-bottom: 12px;">
+                The system detected contacts matching this lead submission.
+            </p>
+            
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                {% for dup in duplicates %}
+                <div style="background-color: rgba(245, 158, 11, 0.05); border: 1px solid rgba(245, 158, 11, 0.2); padding: 10px; border-radius: 6px; font-size: 12.5px;">
+                    <div style="font-weight: 700; color: #ffffff;">{{ dup.full_name }}</div>
+                    <div style="font-size: 11px; color: var(--text-crm-secondary); margin-top: 2px;">
+                        Email: {{ dup.email }} | Co: {{ dup.company or '-' }}
+                    </div>
+                    <div style="font-size: 11px; color: #f59e0b; font-weight: 600; margin-top: 6px;">
+                        Reason: {{ dup.reason }}
+                    </div>
+                    <div style="margin-top: 8px; display: flex; gap: 6px;">
+                        <button class="btn-crm btn-crm-primary" style="padding: 2px 6px; font-size: 10px; gap: 2px;" onclick="linkExistingContact({{ dup.id }}, false)">
+                            Link
+                        </button>
+                        <button class="btn-crm btn-crm-secondary" style="padding: 2px 6px; font-size: 10px; gap: 2px;" onclick="linkExistingContact({{ dup.id }}, true)">
+                            Overwrite Contact Details
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Review Notes / Notes Addition -->
+        <div class="detail-card">
+            <div class="detail-card-title">
+                <i class="fas fa-sticky-note"></i> Reviewer Notes
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 12px;">
+                <textarea id="new-note-text" class="form-control" placeholder="Add a review note..." style="min-height: 80px; font-size: 13px;"></textarea>
+            </div>
+            <button class="btn-crm btn-crm-secondary" style="font-size: 12px; align-self: flex-end;" onclick="addReviewNote()">
+                <i class="fas fa-plus"></i> Add Review Note
+            </button>
+            
+            {% if lead.review_notes %}
+            <div style="margin-top: 16px; border-top: 1px solid var(--border-crm); padding-top: 12px;">
+                <label class="form-label" style="margin-bottom: 6px; display: block;">Notes Log</label>
+                <div style="font-size: 12px; color: var(--text-crm-secondary); white-space: pre-wrap; line-height: 1.5; max-height: 150px; overflow-y: auto;">{{ lead.review_notes }}</div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- UTM & Tracking Data -->
+        <div class="detail-card">
+            <div class="detail-card-title">
+                <i class="fas fa-bullseye"></i> UTM Campaign Tracking
+            </div>
+            <div class="data-row">
+                <span class="data-label">UTM Source</span>
+                <span class="data-val">{{ lead.utm_source or '-' }}</span>
+            </div>
+            <div class="data-row">
+                <span class="data-label">UTM Medium</span>
+                <span class="data-val">{{ lead.utm_medium or '-' }}</span>
+            </div>
+            <div class="data-row">
+                <span class="data-label">UTM Campaign</span>
+                <span class="data-val">{{ lead.utm_campaign or '-' }}</span>
+            </div>
+            <div class="data-row">
+                <span class="data-label">UTM Term</span>
+                <span class="data-val">{{ lead.utm_term or '-' }}</span>
+            </div>
+            <div class="data-row">
+                <span class="data-label">UTM Content</span>
+                <span class="data-val">{{ lead.utm_content or '-' }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Convert Lead Modal -->
+<div class="modal" id="convert-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span>Convert Lead to Contact</span>
+            <i class="fas fa-times modal-close" onclick="closeConvertModal()"></i>
+        </div>
+        
+        <div style="font-size: 13.5px; line-height: 1.5; margin-bottom: 16px;">
+            You are moving <strong style="color: var(--accent-cyan);">{{ lead.full_name }}</strong> into Core CRM. 
+            Select conversion options:
+        </div>
+        
+        <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
+            <label class="checkbox-label">
+                <input type="checkbox" id="create-account-cb" checked>
+                Create Account for company <strong>"{{ lead.company or 'New Account' }}"</strong>
+            </label>
+            
+            {% if current_crm_user.role in ('Platform Admin', 'Group Admin', 'Sales Head', 'Manager / Sales Manager') %}
+            <label class="checkbox-label" onchange="toggleOppFields()">
+                <input type="checkbox" id="create-opp-cb">
+                Create Opportunity Linked to Contact + Account
+            </label>
+            
+            <div id="opp-fields-container" style="display: none; padding-left: 20px; border-left: 2px solid var(--border-crm); margin-top: 6px; flex-direction: column; gap: 10px;">
+                <div class="form-group">
+                    <label class="form-label" style="font-size: 11px;">Opportunity Name</label>
+                    <input type="text" id="opp-name-input" class="form-control" style="padding: 6px 10px; font-size: 12px;" value="{{ lead.company or lead.full_name }} - Partner Opportunity">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" style="font-size: 11px;">Estimated Deal Value (USD)</label>
+                    <input type="number" id="opp-value-input" class="form-control" style="padding: 6px 10px; font-size: 12px;" value="10000">
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div style="display: flex; justify-content: flex-end; gap: 10px;">
+            <button class="btn-crm btn-crm-secondary" onclick="closeConvertModal()">Cancel</button>
+            <button class="btn-crm btn-crm-primary" onclick="submitConvertFlow()">Confirm & Convert</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Toggle opp fields visibility
+    function toggleOppFields() {
+        const cb = document.getElementById('create-opp-cb');
+        const container = document.getElementById('opp-fields-container');
+        if (cb && container) {
+            container.style.display = cb.checked ? 'flex' : 'none';
+        }
+    }
+
+    // Assign owner
+    function assignOwner(leadId, ownerId) {
+        if (!ownerId) return;
+        
+        fetch(`/api/crm/website-leads/${leadId}/assign-owner`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ owner_id: parseInt(ownerId) })
+        }).then(res => res.json())
+          .then(data => {
+              if (data.status === 'success') {
+                  alert(data.message);
+                  location.reload();
+              } else {
+                  alert(data.message);
+              }
+          }).catch(err => {
+              console.error(err);
+              alert("Error assigning owner.");
+          });
+    }
+
+    // Mark status rejected, duplicate, spam
+    function markStatus(action) {
+        const leadId = {{ lead.id }};
+        const note = prompt(`Enter notes for marking this lead as ${action}:`);
+        if (note === null) return; // cancelled
+        
+        fetch(`/api/crm/website-leads/${leadId}/mark-${action}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ review_notes: note })
+        }).then(res => res.json())
+          .then(data => {
+              if (data.status === 'success') {
+                  location.reload();
+              } else {
+                  alert(data.message);
+              }
+          }).catch(err => alert("Error updating status."));
+    }
+
+    // Add review note
+    function addReviewNote() {
+        const leadId = {{ lead.id }};
+        const text = document.getElementById('new-note-text').value.strip();
+        if (!text) return;
+        
+        fetch(`/api/crm/website-leads/${leadId}/review-note`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ note: text })
+        }).then(res => res.json())
+          .then(data => {
+              if (data.status === 'success') {
+                  location.reload();
+              } else {
+                  alert(data.message);
+              }
+          }).catch(err => alert("Error adding review note."));
+    }
+
+    // Link existing contact
+    function linkExistingContact(contactId, overwrite) {
+        const leadId = {{ lead.id }};
+        const ownerId = document.getElementById('assigned-owner-select').value;
+        if (!ownerId) {
+            alert("Please assign an owner first before linking to a contact.");
+            return;
+        }
+        
+        if (!confirm(`Are you sure you want to link this lead to existing contact #${contactId}?${overwrite ? ' Contact details will be overwritten.' : ''}`)) {
+            return;
+        }
+        
+        fetch(`/api/crm/website-leads/${leadId}/link-existing-contact`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contact_id: parseInt(contactId),
+                owner_id: parseInt(ownerId),
+                overwrite: overwrite
+            })
+        }).then(res => res.json())
+          .then(data => {
+              if (data.status === 'success') {
+                  alert(data.message);
+                  location.reload();
+              } else {
+                  alert(data.message);
+              }
+          }).catch(err => alert("Error linking contact."));
+    }
+
+    // Convert Modal Actions
+    function openConvertModal() {
+        document.getElementById('convert-modal').style.display = 'flex';
+    }
+    
+    function closeConvertModal() {
+        document.getElementById('convert-modal').style.display = 'none';
+    }
+    
+    function submitConvertFlow() {
+        const leadId = {{ lead.id }};
+        const ownerId = document.getElementById('assigned-owner-select').value;
+        const createAccount = document.getElementById('create-account-cb').checked;
+        const createOpp = document.getElementById('create-opp-cb') ? document.getElementById('create-opp-cb').checked : false;
+        const oppName = document.getElementById('opp-name-input') ? document.getElementById('opp-name-input').value : '';
+        const oppVal = document.getElementById('opp-value-input') ? parseFloat(document.getElementById('opp-value-input').value) : 0.0;
+        
+        fetch(`/api/crm/website-leads/${leadId}/convert-to-contact`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                owner_id: parseInt(ownerId),
+                ignore_duplicates: true, // User confirmed on detail page
+                create_account: createAccount,
+                create_opportunity: createOpp,
+                opportunity_name: oppName,
+                estimated_value: oppVal
+            })
+        }).then(res => res.json())
+          .then(data => {
+              if (data.status === 'success') {
+                  alert("Successfully converted website lead to Contact!");
+                  location.reload();
+              } else {
+                  alert(data.message);
+              }
+          }).catch(err => alert("Error executing conversion."));
+    }
+    
+    // Add String strip prototype if missing
+    if (!String.prototype.strip) {
+        String.prototype.strip = function () {
+            return this.replace(/^\s+|\s+$/g, '');
+        };
+    }
+</script>
+{% endblock %}

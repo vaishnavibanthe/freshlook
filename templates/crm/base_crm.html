@@ -709,8 +709,7 @@
         <ul class="crm-nav-list">
             {% if current_crm_user %}
                 {% set role = current_crm_user['role'] %}
-                
-                {% if role != 'Telecaller' %}
+                 {% if role != 'Telecaller' %}
                 <!-- Core CRM Links -->
                 <li class="crm-nav-header">Core CRM</li>
                 <li>
@@ -719,13 +718,28 @@
                     </a>
                 </li>
                 <li>
-                    <a href="{{ url_for('crm.crm_leads') }}" class="crm-nav-link {% if active_page == 'crm_leads' %}active{% endif %}">
-                        <i class="fas fa-user-tag"></i> Leads
+                    <a href="{{ url_for('crm.crm_website_leads') }}" class="crm-nav-link {% if active_page == 'crm_website_leads' %}active{% endif %}">
+                        <i class="fas fa-inbox"></i> Website Leads
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('crm.crm_contacts') }}" class="crm-nav-link {% if active_page == 'crm_contacts' %}active{% endif %}">
+                        <i class="fas fa-address-book"></i> Contacts
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('crm.crm_accounts') }}" class="crm-nav-link {% if active_page == 'crm_accounts' %}active{% endif %}">
+                        <i class="fas fa-building"></i> Accounts
                     </a>
                 </li>
                 <li>
                     <a href="{{ url_for('crm.crm_opportunities') }}" class="crm-nav-link {% if active_page == 'crm_opportunities' %}active{% endif %}">
                         <i class="fas fa-handshake"></i> Opportunities
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('crm.crm_tasks') }}" class="crm-nav-link {% if active_page == 'crm_tasks' %}active{% endif %}">
+                        <i class="fas fa-tasks"></i> Tasks
                     </a>
                 </li>
                 {% endif %}
@@ -765,13 +779,15 @@
                     </a>
                 </li>
                 
-                <!-- Shared task logs -->
+                {% if role == 'Telecaller' %}
+                <!-- Shared task logs for Telecaller -->
                 <li class="crm-nav-header">Work Management</li>
                 <li>
                     <a href="{{ url_for('crm.crm_tasks') }}" class="crm-nav-link {% if active_page == 'crm_tasks' %}active{% endif %}">
-                        <i class="fas fa-tasks"></i> Tasks Registry
+                        <i class="fas fa-tasks"></i> Tasks
                     </a>
                 </li>
+                {% endif %}
                 
                 <!-- Administrative links -->
                 {% if role in ('Platform Admin', 'Group Admin') %}

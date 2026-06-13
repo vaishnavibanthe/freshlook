@@ -41,11 +41,44 @@ def crm_dashboard():
     user = g.crm_user
     where_clause, params = get_visibility_where_clause()
     where_clause_o, params_o = get_visibility_where_clause(table_prefix="o")
-    where_clause_l, params_l = get_visibility_where_clause(table_prefix="l")
     
-    # 1. Leads counts
-    leads_count = db_query_one(f"SELECT COUNT(*) as cnt FROM leads WHERE {where_clause}", params)['cnt']
-    new_leads = db_query_one(f"SELECT COUNT(*) as cnt FROM leads WHERE status = 'New' AND {where_clause}", params)['cnt']
+    # Local helper for website leads visibility
+    def get_website_leads_visibility_clause(table_prefix="wl"):
+        role = g.crm_user.get('role')
+        user_id = g.crm_user.get('id')
+        group_id = g.crm_user.get('group_id')
+        p = f"{table_prefix}." if table_prefix else ""
+        if role == 'Platform Admin':
+            return "1=1", []
+        elif role in ('Group Admin', 'Sales Head'):
+            return f"({p}assigned_owner_id IS NULL OR {p}assigned_owner_id IN (SELECT id FROM crm_users WHERE group_id = ?))", [group_id]
+        elif role == 'Manager / Sales Manager':
+            return f"({p}assigned_owner_id = ? OR {p}assigned_owner_id IN (SELECT id FROM crm_users WHERE manager_id = ?) OR ({p}assigned_owner_id IS NULL AND {p}geography IN (SELECT geography FROM crm_users WHERE id = ?)))", [user_id, user_id, user_id]
+        elif role == 'Sales User':
+            return f"{p}assigned_owner_id = ?", [user_id]
+        else:
+            return "1=0", []
+            
+    where_clause_wl, params_wl = get_website_leads_visibility_clause("wl")
+    
+    # 1. Staging leads counts
+    website_leads_count = db_query_one(f"SELECT COUNT(*) as cnt FROM website_leads wl WHERE {where_clause_wl}", params_wl)['cnt']
+    new_website_leads = db_query_one(f"SELECT COUNT(*) as cnt FROM website_leads wl WHERE wl.status = 'New' AND {where_clause_wl}", params_wl)['cnt']
+    unassigned_website_leads = db_query_one(f"SELECT COUNT(*) as cnt FROM website_leads wl WHERE wl.assigned_owner_id IS NULL AND {where_clause_wl}", params_wl)['cnt']
+    pending_review_leads = db_query_one(f"SELECT COUNT(*) as cnt FROM website_leads wl WHERE wl.status IN ('New', 'Reviewed', 'Assigned') AND {where_clause_wl}", params_wl)['cnt']
+    
+    # Converted today / this week
+    today_str = datetime.utcnow().strftime('%Y-%m-%d')
+    week_ago_str = (datetime.utcnow() - timedelta(days=7)).strftime('%Y-%m-%d %H:%M:%S')
+    
+    converted_today = db_query_one(f"SELECT COUNT(*) as cnt FROM website_leads wl WHERE wl.status = 'Converted to Contact' AND DATE(wl.converted_at) = DATE(?) AND {where_clause_wl}", params_wl + [today_str])['cnt']
+    converted_this_week = db_query_one(f"SELECT COUNT(*) as cnt FROM website_leads wl WHERE wl.status = 'Converted to Contact' AND wl.converted_at >= ? AND {where_clause_wl}", params_wl + [week_ago_str])['cnt']
+    rejected_spam_leads = db_query_one(f"SELECT COUNT(*) as cnt FROM website_leads wl WHERE wl.status IN ('Rejected', 'Spam') AND {where_clause_wl}", params_wl)['cnt']
+    
+    # Conversion rate
+    total_captured = db_query_one(f"SELECT COUNT(*) as cnt FROM website_leads wl WHERE {where_clause_wl}", params_wl)['cnt']
+    total_converted = db_query_one(f"SELECT COUNT(*) as cnt FROM website_leads wl WHERE wl.status = 'Converted to Contact' AND {where_clause_wl}", params_wl)['cnt']
+    conversion_rate = round((total_converted / total_captured * 100.0), 1) if total_captured > 0 else 0.0
     
     # 2. Opportunities counts & values
     opp_stats = db_query_one(f'''
@@ -69,14 +102,14 @@ def crm_dashboard():
     tasks_today = task_stats['today_cnt'] or 0
     tasks_overdue = task_stats['overdue_cnt'] or 0
     
-    # 4. Leads by source graph data
+    # 4. Website Leads by source form
     leads_by_source = db_query(f'''
-        SELECT lead_source as label, COUNT(*) as value 
-        FROM leads 
-        WHERE {where_clause} 
-        GROUP BY lead_source 
+        SELECT source_form as label, COUNT(*) as value 
+        FROM website_leads wl
+        WHERE {where_clause_wl} 
+        GROUP BY source_form 
         ORDER BY value DESC LIMIT 5
-    ''', params)
+    ''', params_wl)
     
     # 5. Opportunity value by stage
     opps_by_stage = db_query(f'''
@@ -104,29 +137,43 @@ def crm_dashboard():
         GROUP BY ps.name
     ''', params_o)
 
-    # Recent Leads
-    recent_leads = db_query(f'''
-        SELECT l.*, u.name as owner_name 
-        FROM leads l
-        LEFT JOIN crm_users u ON l.owner_id = u.id
-        WHERE {where_clause_l}
-        ORDER BY l.id DESC LIMIT 5
-    ''', params_l)
+    # 8. Website Leads by Product interest (breakdown)
+    leads_by_product = db_query(f'''
+        SELECT product_solution_interest as label, COUNT(*) as value
+        FROM website_leads wl
+        WHERE product_solution_interest != '' AND {where_clause_wl}
+        GROUP BY product_solution_interest
+        ORDER BY value DESC LIMIT 5
+    ''', params_wl)
+
+    # Recent Website Leads pending review
+    recent_website_leads = db_query(f'''
+        SELECT wl.*, u.name as owner_name 
+        FROM website_leads wl
+        LEFT JOIN crm_users u ON wl.assigned_owner_id = u.id
+        WHERE wl.status IN ('New', 'Reviewed', 'Assigned') AND {where_clause_wl}
+        ORDER BY wl.id DESC LIMIT 5
+    ''', params_wl)
     
     # Upcoming Tasks
     upcoming_tasks = db_query('''
-        SELECT t.*, l.full_name as lead_name, o.opportunity_name 
+        SELECT t.*, o.opportunity_name 
         FROM crm_tasks t
-        LEFT JOIN leads l ON t.lead_id = l.id
         LEFT JOIN opportunities o ON t.opportunity_id = o.id
         WHERE t.assigned_to = ? AND t.status != 'Completed'
         ORDER BY t.due_date ASC, t.due_time ASC LIMIT 5
     ''', (user['id'],))
     
     return render_template(
-        'dashboard.html',
-        leads_count=leads_count,
-        new_leads=new_leads,
+        'crm/dashboard.html',
+        website_leads_count=website_leads_count,
+        new_website_leads=new_website_leads,
+        unassigned_website_leads=unassigned_website_leads,
+        pending_review_leads=pending_review_leads,
+        converted_today=converted_today,
+        converted_this_week=converted_this_week,
+        rejected_spam_leads=rejected_spam_leads,
+        conversion_rate=conversion_rate,
         opp_count=opp_count,
         opp_value=opp_value,
         tasks_today=tasks_today,
@@ -135,7 +182,8 @@ def crm_dashboard():
         opps_by_stage=opps_by_stage,
         pipeline_by_partner=pipeline_by_partner,
         pipeline_by_product=pipeline_by_product,
-        recent_leads=recent_leads,
+        leads_by_product=leads_by_product,
+        recent_leads=recent_website_leads,
         upcoming_tasks=upcoming_tasks,
         active_page='crm_dashboard'
     )
@@ -1077,3 +1125,282 @@ def complete_task(task_id):
         log_timeline_activity('telecrm_contact', task['telecrm_contact_id'], 'Task completed', f"Task completed: {task['title']}", "", user['id'], related_task_id=task_id)
         
     return jsonify({'status': 'success'})
+
+# ============================================================
+#  WEBSITE LEADS ROUTES
+# ============================================================
+
+@crm_bp.route('/crm/website-leads')
+@crm_login_required
+@role_required('Platform Admin', 'Group Admin', 'Sales Head', 'Manager / Sales Manager', 'Sales User', 'Read-Only User')
+def crm_website_leads():
+    # Visibility helper
+    def get_website_leads_visibility_clause(table_prefix="wl"):
+        role = g.crm_user.get('role')
+        user_id = g.crm_user.get('id')
+        group_id = g.crm_user.get('group_id')
+        p = f"{table_prefix}." if table_prefix else ""
+        if role == 'Platform Admin':
+            return "1=1", []
+        elif role in ('Group Admin', 'Sales Head'):
+            return f"({p}assigned_owner_id IS NULL OR {p}assigned_owner_id IN (SELECT id FROM crm_users WHERE group_id = ?))", [group_id]
+        elif role == 'Manager / Sales Manager':
+            return f"({p}assigned_owner_id = ? OR {p}assigned_owner_id IN (SELECT id FROM crm_users WHERE manager_id = ?) OR ({p}assigned_owner_id IS NULL AND {p}geography IN (SELECT geography FROM crm_users WHERE id = ?)))", [user_id, user_id, user_id]
+        elif role == 'Sales User':
+            return f"{p}assigned_owner_id = ?", [user_id]
+        else:
+            return "1=0", []
+
+    where_clause, params = get_website_leads_visibility_clause("wl")
+    
+    # Filters
+    status = request.args.get('status')
+    source_form = request.args.get('source_form')
+    source_page = request.args.get('source_page')
+    industry = request.args.get('industry')
+    geography = request.args.get('geography')
+    product = request.args.get('product')
+    partner = request.args.get('partner')
+    utm_campaign = request.args.get('utm_campaign')
+    duplicate_status = request.args.get('duplicate_status')
+    owner_id = request.args.get('owner_id')
+    unassigned = request.args.get('unassigned')
+    converted = request.args.get('converted')
+    rejected = request.args.get('rejected')
+    spam = request.args.get('spam')
+    
+    # Search
+    search = request.args.get('search', '').strip()
+    
+    filters = []
+    if status:
+        filters.append("wl.status = ?")
+        params.append(status)
+    if source_form:
+        filters.append("wl.source_form = ?")
+        params.append(source_form)
+    if source_page:
+        filters.append("wl.source_page LIKE ?")
+        params.append(f"%{source_page}%")
+    if industry:
+        filters.append("wl.industry = ?")
+        params.append(industry)
+    if geography:
+        filters.append("wl.geography = ?")
+        params.append(geography)
+    if product:
+        filters.append("wl.product_solution_interest LIKE ?")
+        params.append(f"%{product}%")
+    if partner:
+        filters.append("wl.partner_interest LIKE ?")
+        params.append(f"%{partner}%")
+    if utm_campaign:
+        filters.append("wl.utm_campaign = ?")
+        params.append(utm_campaign)
+    if duplicate_status:
+        filters.append("wl.duplicate_status = ?")
+        params.append(duplicate_status)
+    if owner_id:
+        filters.append("wl.assigned_owner_id = ?")
+        params.append(int(owner_id))
+    if unassigned == '1':
+        filters.append("wl.assigned_owner_id IS NULL")
+    if converted == '1':
+        filters.append("wl.status = 'Converted to Contact'")
+    if rejected == '1':
+        filters.append("wl.status = 'Rejected'")
+    if spam == '1':
+        filters.append("wl.status = 'Spam'")
+        
+    if search:
+        filters.append("(wl.full_name LIKE ? OR wl.business_email LIKE ? OR wl.phone LIKE ? OR wl.company LIKE ? OR wl.source_page LIKE ? OR wl.message LIKE ?)")
+        search_param = f"%{search}%"
+        params.extend([search_param, search_param, search_param, search_param, search_param, search_param])
+        
+    if filters:
+        where_clause += " AND " + " AND ".join(filters)
+        
+    query = f'''
+        SELECT wl.*, u.name as owner_name 
+        FROM website_leads wl
+        LEFT JOIN crm_users u ON wl.assigned_owner_id = u.id
+        WHERE {where_clause}
+        ORDER BY wl.id DESC
+    '''
+    leads = db_query(query, params)
+    
+    # Filter dropdown lists
+    statuses = ['New', 'Reviewed', 'Assigned', 'Converted to Contact', 'Rejected', 'Duplicate', 'Spam']
+    source_forms = db_query("SELECT DISTINCT source_form FROM website_leads WHERE source_form != ''")
+    geographies = db_query("SELECT DISTINCT geography FROM website_leads WHERE geography != ''")
+    industries = db_query("SELECT DISTINCT industry FROM website_leads WHERE industry != ''")
+    owners = db_query("SELECT id, name FROM crm_users WHERE is_active = 1 AND role != 'Telecaller'")
+    
+    return render_template(
+        'crm/website_leads/list.html',
+        leads=leads,
+        statuses=statuses,
+        source_forms=source_forms,
+        geographies=geographies,
+        industries=industries,
+        owners=owners,
+        active_page='crm_website_leads'
+    )
+
+@crm_bp.route('/crm/website-leads/<int:lead_id>', methods=['GET', 'POST'])
+@crm_login_required
+@role_required('Platform Admin', 'Group Admin', 'Sales Head', 'Manager / Sales Manager', 'Sales User', 'Read-Only User')
+def crm_website_lead_detail(lead_id):
+    lead = db_query_one('''
+        SELECT wl.*, u.name as owner_name, creator.name as converted_by_name, c.full_name as crm_contact_name
+        FROM website_leads wl
+        LEFT JOIN crm_users u ON wl.assigned_owner_id = u.id
+        LEFT JOIN crm_users creator ON wl.converted_by = creator.id
+        LEFT JOIN contacts c ON wl.crm_contact_id = c.id
+        WHERE wl.id = ?
+    ''', (lead_id,))
+    
+    if not lead:
+        flash("Staging website lead not found.", "error")
+        return redirect(url_for('crm.crm_website_leads'))
+        
+    # Check duplicate suggestions
+    from crm.models import detect_contact_duplicates
+    duplicates = detect_contact_duplicates(
+        email=lead['business_email'],
+        phone=lead['phone'],
+        company=lead['company'],
+        first_name=lead['first_name'],
+        last_name=lead['last_name']
+    )
+    
+    # Fetch review logs
+    logs = db_query('''
+        SELECT rl.*, u.name as performed_by_name
+        FROM website_lead_review_logs rl
+        LEFT JOIN crm_users u ON rl.performed_by = u.id
+        WHERE rl.website_lead_id = ?
+        ORDER BY rl.id ASC
+    ''', (lead_id,))
+    
+    owners = db_query("SELECT id, name FROM crm_users WHERE is_active = 1 AND role != 'Telecaller'")
+    
+    # Check if there are active assignment rules to show
+    rules = db_query("SELECT id, rule_name FROM website_lead_assignment_rules WHERE is_active = 1")
+    
+    return render_template(
+        'crm/website_leads/detail.html',
+        lead=lead,
+        duplicates=duplicates,
+        logs=logs,
+        owners=owners,
+        rules=rules,
+        active_page='crm_website_leads'
+    )
+
+# ============================================================
+#  CONTACTS & ACCOUNTS ROUTES
+# ============================================================
+
+@crm_bp.route('/crm/contacts')
+@crm_login_required
+@role_required('Platform Admin', 'Group Admin', 'Sales Head', 'Manager / Sales Manager', 'Sales User', 'Read-Only User')
+def crm_contacts():
+    where_clause, params = get_visibility_where_clause(table_prefix="c")
+    
+    geography = request.args.get('geography')
+    source = request.args.get('source')
+    owner_id = request.args.get('owner_id')
+    search = request.args.get('search', '').strip()
+    
+    filters = []
+    if geography:
+        filters.append("c.geography = ?")
+        params.append(geography)
+    if source:
+        filters.append("c.source = ?")
+        params.append(source)
+    if owner_id:
+        filters.append("c.owner_id = ?")
+        params.append(int(owner_id))
+    if search:
+        filters.append("(c.full_name LIKE ? OR c.email LIKE ? OR c.phone LIKE ? OR a.account_name LIKE ?)")
+        search_param = f"%{search}%"
+        params.extend([search_param, search_param, search_param, search_param])
+        
+    if filters:
+        where_clause += " AND " + " AND ".join(filters)
+        
+    query = f'''
+        SELECT c.*, a.account_name as company_name, u.name as owner_name
+        FROM contacts c
+        LEFT JOIN accounts a ON c.account_id = a.id
+        LEFT JOIN crm_users u ON c.owner_id = u.id
+        WHERE {where_clause}
+        ORDER BY c.id DESC
+    '''
+    contacts = db_query(query, params)
+    
+    geographies = db_query("SELECT DISTINCT geography FROM contacts WHERE geography != ''")
+    sources = db_query("SELECT DISTINCT source FROM contacts WHERE source != ''")
+    owners = db_query("SELECT id, name FROM crm_users WHERE is_active = 1 AND role != 'Telecaller'")
+    
+    return render_template(
+        'crm/contacts/list.html',
+        contacts=contacts,
+        geographies=geographies,
+        sources=sources,
+        owners=owners,
+        active_page='crm_contacts'
+    )
+
+@crm_bp.route('/crm/accounts')
+@crm_login_required
+@role_required('Platform Admin', 'Group Admin', 'Sales Head', 'Manager / Sales Manager', 'Sales User', 'Read-Only User')
+def crm_accounts():
+    where_clause, params = get_visibility_where_clause(table_prefix="a")
+    
+    industry = request.args.get('industry')
+    geography = request.args.get('geography')
+    owner_id = request.args.get('owner_id')
+    search = request.args.get('search', '').strip()
+    
+    filters = []
+    if industry:
+        filters.append("a.industry = ?")
+        params.append(industry)
+    if geography:
+        filters.append("a.geography = ?")
+        params.append(geography)
+    if owner_id:
+        filters.append("a.owner_id = ?")
+        params.append(int(owner_id))
+    if search:
+        filters.append("(a.account_name LIKE ? OR a.website LIKE ? OR a.domain LIKE ?)")
+        search_param = f"%{search}%"
+        params.extend([search_param, search_param, search_param])
+        
+    if filters:
+        where_clause += " AND " + " AND ".join(filters)
+        
+    query = f'''
+        SELECT a.*, u.name as owner_name, (SELECT COUNT(*) FROM contacts c WHERE c.account_id = a.id) as contact_count
+        FROM accounts a
+        LEFT JOIN crm_users u ON a.owner_id = u.id
+        WHERE {where_clause}
+        ORDER BY a.id DESC
+    '''
+    accounts = db_query(query, params)
+    
+    industries = db_query("SELECT DISTINCT industry FROM accounts WHERE industry != ''")
+    geographies = db_query("SELECT DISTINCT geography FROM accounts WHERE geography != ''")
+    owners = db_query("SELECT id, name FROM crm_users WHERE is_active = 1 AND role != 'Telecaller'")
+    
+    return render_template(
+        'crm/accounts/list.html',
+        accounts=accounts,
+        industries=industries,
+        geographies=geographies,
+        owners=owners,
+        active_page='crm_accounts'
+    )

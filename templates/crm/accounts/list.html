@@ -1,0 +1,184 @@
+{% extends 'crm/base_crm.html' %}
+
+{% block title %}Accounts Registry | ThinkArtha CRM{% endblock %}
+
+{% block content %}
+<style>
+    .filter-panel {
+        background-color: var(--bg-card);
+        border: 1px solid var(--border-crm);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 24px;
+    }
+    
+    .filter-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+    
+    .leads-table-container {
+        background-color: var(--bg-card);
+        border: 1px solid var(--border-crm);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+    
+    .leads-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+        text-align: left;
+    }
+    
+    .leads-table th {
+        color: var(--text-crm-secondary);
+        font-weight: 600;
+        padding: 14px 12px;
+        border-bottom: 2px solid var(--border-crm);
+        background-color: rgba(9, 19, 34, 0.4);
+        white-space: nowrap;
+    }
+    
+    .leads-table td {
+        padding: 14px 12px;
+        border-bottom: 1px solid var(--border-crm);
+        color: var(--text-crm-primary);
+        white-space: nowrap;
+    }
+    
+    .leads-table tr:hover td {
+        background-color: rgba(22, 45, 80, 0.25);
+    }
+    
+    .search-input-wrapper {
+        position: relative;
+        max-width: 320px;
+    }
+    
+    .search-input-wrapper i {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-crm-muted);
+    }
+    
+    .search-input-wrapper input {
+        padding-left: 36px;
+    }
+</style>
+
+<div class="crm-header-bar">
+    <div class="crm-title-section">
+        <h1>Accounts Registry</h1>
+        <p>Manage and view enterprise customer accounts and organizational profiles</p>
+    </div>
+</div>
+
+<!-- Filters Panel -->
+<div class="filter-panel">
+    <form action="{{ url_for('crm.crm_accounts') }}" method="GET" id="filter-form">
+        <div class="filter-grid">
+            <div class="form-group">
+                <label class="form-label">Search Accounts</label>
+                <div class="search-input-wrapper">
+                    <i class="fas fa-search"></i>
+                    <input type="text" name="search" id="account-search" class="form-control" placeholder="Name, website, domain..." value="{{ request.args.get('search') or '' }}">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Industry</label>
+                <select name="industry" class="form-control" onchange="this.form.submit()">
+                    <option value="">All Industries</option>
+                    {% for ind in industries %}
+                    <option value="{{ ind.industry }}" {% if request.args.get('industry') == ind.industry %}selected{% endif %}>{{ ind.industry }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Geography</label>
+                <select name="geography" class="form-control" onchange="this.form.submit()">
+                    <option value="">All Geographies</option>
+                    {% for geo in geographies %}
+                    <option value="{{ geo.geography }}" {% if request.args.get('geography') == geo.geography %}selected{% endif %}>{{ geo.geography }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Assigned Owner</label>
+                <select name="owner_id" class="form-control" onchange="this.form.submit()">
+                    <option value="">All Owners</option>
+                    {% for owner in owners %}
+                    <option value="{{ owner.id }}" {% if request.args.get('owner_id')|int == owner.id %}selected{% endif %}>{{ owner.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="form-group" style="display: flex; align-items: flex-end;">
+                <a href="{{ url_for('crm.crm_accounts') }}" class="btn-crm btn-crm-secondary" style="height: 38px; justify-content: center; width: 100%;">
+                    Reset Filters
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Table Card -->
+<div class="leads-table-container">
+    <div style="overflow-x: auto;">
+        <table class="leads-table">
+            <thead>
+                <tr>
+                    <th>Account Name</th>
+                    <th>Website / Domain</th>
+                    <th>Industry</th>
+                    <th>Geography</th>
+                    <th>Country</th>
+                    <th>Contacts Linked</th>
+                    <th>Owner</th>
+                    <th>Created Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for acct in accounts %}
+                <tr>
+                    <td>
+                        <strong style="color: #ffffff;">{{ acct.account_name }}</strong>
+                    </td>
+                    <td>
+                        {% if acct.website %}
+                        <a href="{{ acct.website }}" target="_blank" style="color: var(--accent-cyan); text-decoration: none;">
+                            {{ acct.domain or acct.website }} <i class="fas fa-external-link-alt" style="font-size: 10px;"></i>
+                        </a>
+                        {% else %}
+                        -
+                        {% endif %}
+                    </td>
+                    <td>{{ acct.industry or '-' }}</td>
+                    <td>{{ acct.geography or '-' }}</td>
+                    <td>{{ acct.country or '-' }}</td>
+                    <td style="text-align: center;">
+                        <span style="font-weight: 700; color: var(--accent-cyan);">{{ acct.contact_count }}</span>
+                    </td>
+                    <td>{{ acct.owner_name or 'Unassigned' }}</td>
+                    <td>{{ acct.created_at[:10] }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="8" style="text-align: center; color: var(--text-crm-muted); padding: 30px;">
+                        No accounts found.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

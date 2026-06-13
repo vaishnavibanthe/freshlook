@@ -6,19 +6,11 @@
 <div class="crm-header-bar">
     <div class="crm-title-section">
         <h1>Sales CRM Dashboard</h1>
-        <p>Real-time deal pipeline, lead activities, and team performance overview</p>
-    </div>
-    <div class="crm-actions-section" style="display:flex; align-items:center; gap:16px;">
-        <a href="{{ url_for('crm.new_lead') }}" class="btn-crm btn-crm-primary">
-            <i class="fas fa-plus"></i> New CRM Lead
-        </a>
+        <p>Real-time staging queue, deal pipeline, and conversion analytics</p>
     </div>
 </div>
 
-<!-- Quick Stats Summary Grid -->
 <style>
-    /* Styles removed (now defined globally in base_crm.html) */
-
     .stats-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -35,6 +27,12 @@
         align-items: center;
         gap: 16px;
         box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        text-decoration: none;
+        transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .stat-card:hover {
+        transform: translateY(-2px);
+        border-color: var(--accent-cyan);
     }
     
     .stat-icon {
@@ -48,10 +46,10 @@
         color: #ffffff;
     }
     
-    .stat-icon.leads { background-color: rgba(6, 182, 212, 0.15); color: var(--accent-cyan); }
+    .stat-icon.new-leads { background-color: rgba(6, 182, 212, 0.15); color: var(--accent-cyan); }
+    .stat-icon.pending { background-color: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+    .stat-icon.conversion { background-color: rgba(16, 185, 129, 0.15); color: #10b981; }
     .stat-icon.pipeline { background-color: rgba(124, 58, 237, 0.15); color: var(--accent-purple); }
-    .stat-icon.tasks-today { background-color: rgba(245, 158, 11, 0.15); color: #f59e0b; }
-    .stat-icon.tasks-overdue { background-color: rgba(239, 68, 68, 0.15); color: #ef4444; }
     
     .stat-details {
         display: flex;
@@ -69,6 +67,10 @@
         font-size: 12.5px;
         color: var(--text-crm-secondary);
         font-weight: 500;
+    }
+    
+    body.light-theme .stat-value {
+        color: #0f172a;
     }
     
     /* Charts Grid Layout */
@@ -130,37 +132,51 @@
 </style>
 
 <div class="stats-grid">
-    <div class="stat-card">
-        <div class="stat-icon leads"><i class="fas fa-user-tag"></i></div>
+    <a href="{{ url_for('crm.crm_website_leads', status='New') }}" class="stat-card">
+        <div class="stat-icon new-leads"><i class="fas fa-inbox"></i></div>
         <div class="stat-details">
-            <span class="stat-value">{{ leads_count }}</span>
-            <span class="stat-label">Total Leads ({{ new_leads }} New)</span>
+            <span class="stat-value">{{ new_website_leads }}</span>
+            <span class="stat-label">New Website Leads (Total: {{ website_leads_count }})</span>
         </div>
-    </div>
+    </a>
     
-    <div class="stat-card">
+    <a href="{{ url_for('crm.crm_website_leads', unassigned='1') }}" class="stat-card">
+        <div class="stat-icon pending"><i class="fas fa-hourglass-half"></i></div>
+        <div class="stat-details">
+            <span class="stat-value">{{ pending_review_leads }}</span>
+            <span class="stat-label">Pending Review (Unassigned: {{ unassigned_website_leads }})</span>
+        </div>
+    </a>
+    
+    <a href="{{ url_for('crm.crm_website_leads') }}" class="stat-card">
+        <div class="stat-icon conversion"><i class="fas fa-percentage"></i></div>
+        <div class="stat-details">
+            <span class="stat-value">{{ conversion_rate }}%</span>
+            <span class="stat-label">Staging Conversion Rate</span>
+        </div>
+    </a>
+    
+    <a href="{{ url_for('crm.crm_opportunities') }}" class="stat-card">
         <div class="stat-icon pipeline"><i class="fas fa-funnel-dollar"></i></div>
         <div class="stat-details">
             <span class="stat-value">${{ "{:,.2f}".format(opp_value) }}</span>
             <span class="stat-label">Pipeline ({{ opp_count }} Opps)</span>
         </div>
-    </div>
-    
-    <div class="stat-card">
-        <div class="stat-icon tasks-today"><i class="fas fa-calendar-day"></i></div>
-        <div class="stat-details">
-            <span class="stat-value">{{ tasks_today }}</span>
-            <span class="stat-label">Tasks Due Today</span>
-        </div>
-    </div>
-    
-    <div class="stat-card">
-        <div class="stat-icon tasks-overdue"><i class="fas fa-exclamation-triangle"></i></div>
-        <div class="stat-details">
-            <span class="stat-value">{{ tasks_overdue }}</span>
-            <span class="stat-label">Overdue Tasks</span>
-        </div>
-    </div>
+    </a>
+</div>
+
+<!-- Extra Mini Metrics Row -->
+<div class="filter-panel" style="padding: 14px 20px; display: flex; flex-wrap: wrap; justify-content: space-between; font-size: 13.5px; margin-bottom: 24px; gap: 12px; align-items: center;">
+    <span>
+        <i class="fas fa-check-circle" style="color: #10b981; margin-right: 4px;"></i> 
+        Converted Today: <strong>{{ converted_today }}</strong> 
+        <span style="color: var(--text-crm-muted); margin: 0 8px;">|</span>
+        Converted This Week: <strong>{{ converted_this_week }}</strong>
+    </span>
+    <span>
+        <i class="fas fa-ban" style="color: #ef4444; margin-right: 4px;"></i> 
+        Staging Rejected / Spam Filtered: <strong>{{ rejected_spam_leads }}</strong>
+    </span>
 </div>
 
 <!-- Charts Row -->
@@ -173,7 +189,7 @@
     </div>
     
     <div class="crm-card">
-        <div class="crm-card-title">Leads by Capture Source</div>
+        <div class="crm-card-title">Staging Leads by Form Source</div>
         <div class="chart-container">
             <canvas id="sourceChart"></canvas>
         </div>
@@ -198,8 +214,8 @@
 <div class="dashboard-tables-grid">
     <div class="crm-card" style="margin-bottom: 0;">
         <div class="crm-card-title">
-            <span>Recently Captured Leads</span>
-            <a href="{{ url_for('crm.crm_leads') }}" class="btn-crm btn-crm-secondary" style="padding: 4px 10px; font-size: 11px;">View All</a>
+            <span>Recently Captured Website Leads (Staging Queue)</span>
+            <a href="{{ url_for('crm.crm_website_leads') }}" class="btn-crm btn-crm-secondary" style="padding: 4px 10px; font-size: 11px;">View Staging Inbox</a>
         </div>
         <div style="overflow-x: auto;">
             <table class="crm-table">
@@ -207,35 +223,37 @@
                     <tr>
                         <th>Lead Name</th>
                         <th>Company</th>
-                        <th>Source</th>
+                        <th>Source Form</th>
                         <th>Owner</th>
+                        <th>Duplicate Status</th>
                         <th>Status</th>
-                        <th>MEDDIC</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for lead in recent_leads %}
                     <tr>
                         <td>
-                            <a href="{{ url_for('crm.crm_lead_detail', lead_id=lead.id) }}" style="color: var(--accent-cyan); font-weight: 600;">
+                            <a href="{{ url_for('crm.crm_website_lead_detail', lead_id=lead.id) }}" style="color: var(--accent-cyan); font-weight: 600;">
                                 {{ lead.full_name }}
                             </a>
                         </td>
                         <td>{{ lead.company or '-' }}</td>
-                        <td>{{ lead.lead_source }}</td>
+                        <td>{{ lead.source_form }}</td>
                         <td>{{ lead.owner_name or 'Unassigned' }}</td>
                         <td>
-                            <span class="badge-status {{ lead.status.lower().replace(' ', '_') }}">{{ lead.status }}</span>
+                            {% if 'Warning' in (lead.duplicate_status or '') %}
+                            <span style="color: #f59e0b; font-weight: bold;"><i class="fas fa-exclamation-triangle"></i> Warning</span>
+                            {% else %}
+                            <span style="color: var(--text-crm-muted);">Clear</span>
+                            {% endif %}
                         </td>
                         <td>
-                            <span style="font-weight: 700; color: {% if lead.meddic_score >= 70 %}#10b981{% elif lead.meddic_score >= 40 %}#f59e0b{% else %}#ef4444{% endif %}">
-                                {{ lead.meddic_score }}
-                            </span>
+                            <span class="badge-status {{ lead.status.lower().replace(' ', '_').replace('converted_to_contact', 'converted') }}">{{ lead.status }}</span>
                         </td>
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="6" style="text-align: center; color: var(--text-crm-muted); padding: 20px;">No leads found.</td>
+                        <td colspan="6" style="text-align: center; color: var(--text-crm-muted); padding: 20px;">No staged leads pending review.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -260,7 +278,7 @@
                             {{ task.title }}
                         </div>
                         <div style="font-size: 11px; color: var(--text-crm-secondary); margin-top: 3px;">
-                            Due: {{ task.due_date }} {% if task.due_time %}{{ task.due_time }}{% endif %} | Type: {{ task.task_type }}
+                            Due: {{ task.due_date }} {% if task.due_time %}{{ task.due_time }}{% endif %}
                         </div>
                     </div>
                 </li>
@@ -275,13 +293,11 @@
 <!-- Load ChartJS CDN -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // ── Listen to Global Theme Changes to Redraw Charts ──
     window.addEventListener('crmThemeChanged', () => {
         updateAllCharts();
     });
 </script>
 <script>
-    // Quick async task complete check
     function completeTask(taskId, checkbox) {
         if (!checkbox.checked) return;
         
@@ -290,14 +306,12 @@
             headers: { 'Content-Type': 'application/json' }
         }).then(response => {
             if (response.ok) {
-                // Fade out checklist item
                 const listItem = checkbox.closest('li');
                 listItem.style.transition = 'all 0.4s ease';
                 listItem.style.opacity = '0.3';
                 listItem.style.transform = 'translateX(20px)';
                 setTimeout(() => {
                     listItem.remove();
-                    // Reload page if zero items to update badges
                     window.location.reload();
                 }, 400);
             } else {
@@ -307,7 +321,6 @@
         });
     }
 
-    // Colors mapping
     const chartColors = [
         '#06b6d4', // Cyan
         '#7c3aed', // Purple
@@ -331,7 +344,7 @@
         };
     }
 
-    // Stage Chart
+    // 1. Stage Chart
     const stageCtx = document.getElementById('stageChart').getContext('2d');
     const stageLabels = [{% for item in opps_by_stage %}'{{ item.label }}',{% endfor %}];
     const stageData = [{% for item in opps_by_stage %}{{ item.value }},{% endfor %}];
@@ -359,16 +372,16 @@
         }
     });
 
-    // Source Chart
+    // 2. Staging Leads Source Chart (Doughnut)
     const sourceCtx = document.getElementById('sourceChart').getContext('2d');
     const sourceLabels = [{% for item in leads_by_source %}'{{ item.label }}',{% endfor %}];
     const sourceData = [{% for item in leads_by_source %}{{ item.value }},{% endfor %}];
     const sourceChart = new Chart(sourceCtx, {
         type: 'doughnut',
         data: {
-            labels: sourceLabels.length ? sourceLabels : ['Contact Form', 'Assessment', 'Healthcare', 'Imported', 'Manual'],
+            labels: sourceLabels.length ? sourceLabels : ['Contact Form', 'Assessment', 'Case Study', 'Microsite', 'Resources'],
             datasets: [{
-                data: sourceData.length ? sourceData : [25, 12, 8, 18, 5],
+                data: sourceData.length ? sourceData : [12, 5, 8, 4, 3],
                 backgroundColor: chartColors,
                 borderWidth: 0
             }]
@@ -382,7 +395,7 @@
         }
     });
 
-    // Partner Chart
+    // 3. Partner Chart
     const partnerCtx = document.getElementById('partnerChart').getContext('2d');
     const partnerLabels = [{% for item in pipeline_by_partner %}'{{ item.label }}',{% endfor %}];
     const partnerData = [{% for item in pipeline_by_partner %}{{ item.value }},{% endfor %}];
@@ -405,7 +418,7 @@
         }
     });
 
-    // Product Chart
+    // 4. Product Chart
     const productCtx = document.getElementById('productChart').getContext('2d');
     const productLabels = [{% for item in pipeline_by_product %}'{{ item.label }}',{% endfor %}];
     const productData = [{% for item in pipeline_by_product %}{{ item.value }},{% endfor %}];
@@ -434,23 +447,21 @@
         }
     });
 
-    // Update all charts when theme changes
     function updateAllCharts() {
         const c = getThemeChartColors();
-        // Stage
         stageChart.data.datasets[0].backgroundColor = c.barCyan;
         stageChart.data.datasets[0].borderColor = c.borderCyan;
         stageChart.options.scales.y.grid.color = c.gridColor;
         stageChart.options.scales.y.ticks.color = c.tickColor;
         stageChart.options.scales.x.ticks.color = c.tickColor;
         stageChart.update();
-        // Source
+        
         sourceChart.options.plugins.legend.labels.color = c.legendColor;
         sourceChart.update();
-        // Partner
+        
         partnerChart.options.plugins.legend.labels.color = c.legendColor;
         partnerChart.update();
-        // Product
+        
         productChart.data.datasets[0].backgroundColor = c.barPurple;
         productChart.data.datasets[0].borderColor = c.borderPurple;
         productChart.options.scales.y.ticks.color = c.tickColor;

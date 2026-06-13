@@ -1,0 +1,180 @@
+{% extends 'crm/base_crm.html' %}
+
+{% block title %}Contacts Registry | ThinkArtha CRM{% endblock %}
+
+{% block content %}
+<style>
+    .filter-panel {
+        background-color: var(--bg-card);
+        border: 1px solid var(--border-crm);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 24px;
+    }
+    
+    .filter-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+    
+    .leads-table-container {
+        background-color: var(--bg-card);
+        border: 1px solid var(--border-crm);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+    
+    .leads-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+        text-align: left;
+    }
+    
+    .leads-table th {
+        color: var(--text-crm-secondary);
+        font-weight: 600;
+        padding: 14px 12px;
+        border-bottom: 2px solid var(--border-crm);
+        background-color: rgba(9, 19, 34, 0.4);
+        white-space: nowrap;
+    }
+    
+    .leads-table td {
+        padding: 14px 12px;
+        border-bottom: 1px solid var(--border-crm);
+        color: var(--text-crm-primary);
+        white-space: nowrap;
+    }
+    
+    .leads-table tr:hover td {
+        background-color: rgba(22, 45, 80, 0.25);
+    }
+    
+    .search-input-wrapper {
+        position: relative;
+        max-width: 320px;
+    }
+    
+    .search-input-wrapper i {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-crm-muted);
+    }
+    
+    .search-input-wrapper input {
+        padding-left: 36px;
+    }
+</style>
+
+<div class="crm-header-bar">
+    <div class="crm-title-section">
+        <h1>Contacts Registry</h1>
+        <p>View and manage qualified CRM contacts and customer references</p>
+    </div>
+</div>
+
+<!-- Filters Panel -->
+<div class="filter-panel">
+    <form action="{{ url_for('crm.crm_contacts') }}" method="GET" id="filter-form">
+        <div class="filter-grid">
+            <div class="form-group">
+                <label class="form-label">Search Contacts</label>
+                <div class="search-input-wrapper">
+                    <i class="fas fa-search"></i>
+                    <input type="text" name="search" id="contact-search" class="form-control" placeholder="Name, email, phone, company..." value="{{ request.args.get('search') or '' }}">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Geography</label>
+                <select name="geography" class="form-control" onchange="this.form.submit()">
+                    <option value="">All Geographies</option>
+                    {% for geo in geographies %}
+                    <option value="{{ geo.geography }}" {% if request.args.get('geography') == geo.geography %}selected{% endif %}>{{ geo.geography }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Source</label>
+                <select name="source" class="form-control" onchange="this.form.submit()">
+                    <option value="">All Sources</option>
+                    {% for src in sources %}
+                    <option value="{{ src.source }}" {% if request.args.get('source') == src.source %}selected{% endif %}>{{ src.source }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Assigned Owner</label>
+                <select name="owner_id" class="form-control" onchange="this.form.submit()">
+                    <option value="">All Owners</option>
+                    {% for owner in owners %}
+                    <option value="{{ owner.id }}" {% if request.args.get('owner_id')|int == owner.id %}selected{% endif %}>{{ owner.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="form-group" style="display: flex; align-items: flex-end;">
+                <a href="{{ url_for('crm.crm_contacts') }}" class="btn-crm btn-crm-secondary" style="height: 38px; justify-content: center; width: 100%;">
+                    Reset Filters
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Table Card -->
+<div class="leads-table-container">
+    <div style="overflow-x: auto;">
+        <table class="leads-table">
+            <thead>
+                <tr>
+                    <th>Full Name</th>
+                    <th>Company</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Geography</th>
+                    <th>Source</th>
+                    <th>Validation</th>
+                    <th>Owner</th>
+                    <th>Created Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for contact in contacts %}
+                <tr>
+                    <td>
+                        <strong style="color: #ffffff;">{{ contact.full_name }}</strong>
+                    </td>
+                    <td>{{ contact.company_name or '-' }}</td>
+                    <td>
+                        <a href="mailto:{{ contact.email }}" style="color: var(--accent-cyan); text-decoration: none;">{{ contact.email }}</a>
+                    </td>
+                    <td>{{ contact.phone or '-' }}</td>
+                    <td>{{ contact.geography or '-' }} ({{ contact.country or '-' }})</td>
+                    <td>{{ contact.source or 'Direct' }}</td>
+                    <td>
+                        <span class="badge-status {{ contact.validation_status.lower().replace(' ', '_') }}">{{ contact.validation_status }}</span>
+                    </td>
+                    <td>{{ contact.owner_name or 'Unassigned' }}</td>
+                    <td>{{ contact.created_at[:10] }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="9" style="text-align: center; color: var(--text-crm-muted); padding: 30px;">
+                        No contacts found.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

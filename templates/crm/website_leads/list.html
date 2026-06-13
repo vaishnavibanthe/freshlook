@@ -1,0 +1,265 @@
+{% extends 'crm/base_crm.html' %}
+
+{% block title %}Website Leads Staging Inbox | ThinkArtha CRM{% endblock %}
+
+{% block content %}
+<style>
+    .filter-panel {
+        background-color: var(--bg-card);
+        border: 1px solid var(--border-crm);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 24px;
+    }
+    
+    .filter-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+    
+    .checkbox-filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        padding-top: 10px;
+        border-top: 1px solid var(--border-crm);
+    }
+    
+    .checkbox-label {
+        font-size: 13px;
+        color: var(--text-crm-primary);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+    }
+    
+    .leads-table-container {
+        background-color: var(--bg-card);
+        border: 1px solid var(--border-crm);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+    
+    .leads-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+        text-align: left;
+    }
+    
+    .leads-table th {
+        color: var(--text-crm-secondary);
+        font-weight: 600;
+        padding: 14px 12px;
+        border-bottom: 2px solid var(--border-crm);
+        background-color: rgba(9, 19, 34, 0.4);
+        white-space: nowrap;
+    }
+    
+    .leads-table td {
+        padding: 14px 12px;
+        border-bottom: 1px solid var(--border-crm);
+        color: var(--text-crm-primary);
+        white-space: nowrap;
+    }
+    
+    .leads-table tr:hover td {
+        background-color: rgba(22, 45, 80, 0.25);
+    }
+    
+    .search-input-wrapper {
+        position: relative;
+        max-width: 320px;
+    }
+    
+    .search-input-wrapper i {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-crm-muted);
+    }
+    
+    .search-input-wrapper input {
+        padding-left: 36px;
+    }
+
+    .badge-duplicate-warning {
+        background-color: rgba(245, 158, 11, 0.15);
+        color: #f59e0b;
+        border: 1px solid rgba(245, 158, 11, 0.3);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+</style>
+
+<div class="crm-header-bar">
+    <div class="crm-title-section">
+        <h1>Website Leads Staging</h1>
+        <p>Review, qualify, and convert leads captured from ThinkArtha.com forms</p>
+    </div>
+</div>
+
+<!-- Filters Panel -->
+<div class="filter-panel">
+    <form action="{{ url_for('crm.crm_website_leads') }}" method="GET" id="filter-form">
+        <div class="filter-grid">
+            <div class="form-group">
+                <label class="form-label">Search Leads</label>
+                <div class="search-input-wrapper">
+                    <i class="fas fa-search"></i>
+                    <input type="text" name="search" id="lead-search" class="form-control" placeholder="Name, company, email..." value="{{ request.args.get('search') or '' }}">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Status</label>
+                <select name="status" class="form-control" onchange="this.form.submit()">
+                    <option value="">All Statuses</option>
+                    {% for st in statuses %}
+                    <option value="{{ st }}" {% if request.args.get('status') == st %}selected{% endif %}>{{ st }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Source Form</label>
+                <select name="source_form" class="form-control" onchange="this.form.submit()">
+                    <option value="">All Forms</option>
+                    {% for form in source_forms %}
+                    <option value="{{ form.source_form }}" {% if request.args.get('source_form') == form.source_form %}selected{% endif %}>{{ form.source_form }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Industry</label>
+                <select name="industry" class="form-control" onchange="this.form.submit()">
+                    <option value="">All Industries</option>
+                    {% for ind in industries %}
+                    <option value="{{ ind.industry }}" {% if request.args.get('industry') == ind.industry %}selected{% endif %}>{{ ind.industry }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Geography</label>
+                <select name="geography" class="form-control" onchange="this.form.submit()">
+                    <option value="">All Geographies</option>
+                    {% for geo in geographies %}
+                    <option value="{{ geo.geography }}" {% if request.args.get('geography') == geo.geography %}selected{% endif %}>{{ geo.geography }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Assigned Owner</label>
+                <select name="owner_id" class="form-control" onchange="this.form.submit()">
+                    <option value="">All Owners</option>
+                    {% for owner in owners %}
+                    <option value="{{ owner.id }}" {% if request.args.get('owner_id')|int == owner.id %}selected{% endif %}>{{ owner.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        
+        <div class="checkbox-filters">
+            <label class="checkbox-label">
+                <input type="checkbox" name="unassigned" value="1" {% if request.args.get('unassigned') == '1' %}checked{% endif %} onchange="this.form.submit()">
+                Unassigned Leads
+            </label>
+            <label class="checkbox-label">
+                <input type="checkbox" name="converted" value="1" {% if request.args.get('converted') == '1' %}checked{% endif %} onchange="this.form.submit()">
+                Converted
+            </label>
+            <label class="checkbox-label">
+                <input type="checkbox" name="rejected" value="1" {% if request.args.get('rejected') == '1' %}checked{% endif %} onchange="this.form.submit()">
+                Rejected
+            </label>
+            <label class="checkbox-label">
+                <input type="checkbox" name="spam" value="1" {% if request.args.get('spam') == '1' %}checked{% endif %} onchange="this.form.submit()">
+                Spam
+            </label>
+            
+            <a href="{{ url_for('crm.crm_website_leads') }}" class="btn-crm btn-crm-secondary" style="margin-left: auto; padding: 4px 12px; font-size: 11px;">
+                Reset Filters
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- Leads Data Table Card -->
+<div class="leads-table-container">
+    <div style="overflow-x: auto;">
+        <table class="leads-table">
+            <thead>
+                <tr>
+                    <th>Lead Name</th>
+                    <th>Company</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Job Title</th>
+                    <th>Source Form</th>
+                    <th>Product/Solution Interest</th>
+                    <th>Owner</th>
+                    <th>Duplicate Warning</th>
+                    <th>Status</th>
+                    <th>Created Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for lead in leads %}
+                <tr>
+                    <td>
+                        <a href="{{ url_for('crm.crm_website_lead_detail', lead_id=lead.id) }}" style="color: var(--accent-cyan); font-weight: 700; text-decoration: none;">
+                            {{ lead.full_name }}
+                        </a>
+                    </td>
+                    <td>{{ lead.company or '-' }}</td>
+                    <td>{{ lead.business_email }}</td>
+                    <td>{{ lead.phone or '-' }}</td>
+                    <td>{{ lead.job_title or '-' }}</td>
+                    <td title="{{ lead.source_page }}">{{ lead.source_form or '-' }}</td>
+                    <td>{{ lead.product_solution_interest or '-' }}</td>
+                    <td>{{ lead.owner_name or 'Unassigned' }}</td>
+                    <td>
+                        {% if 'Warning' in (lead.duplicate_status or '') %}
+                        <span class="badge-duplicate-warning">
+                            <i class="fas fa-exclamation-triangle"></i> Duplicate
+                        </span>
+                        {% else %}
+                        <span style="color: var(--text-crm-muted); font-size: 11px;">Clear</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="badge-status {{ lead.status.lower().replace(' ', '_').replace('converted_to_contact', 'converted') }}">{{ lead.status }}</span>
+                    </td>
+                    <td>{{ lead.created_at[:10] }}</td>
+                    <td>
+                        <a href="{{ url_for('crm.crm_website_lead_detail', lead_id=lead.id) }}" class="btn-crm btn-crm-primary" style="padding: 4px 8px; font-size: 11px; gap: 4px;">
+                            Review <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="12" style="text-align: center; color: var(--text-crm-muted); padding: 30px;">
+                        No website staging leads found.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
