@@ -393,18 +393,18 @@
 
         /* Light Theme Variable Overrides */
         body.light-theme {
-            --bg-crm: #f8fafc;
+            --bg-crm: #f4f5f7;
             --bg-sidebar: #ffffff;
             --bg-card: #ffffff;
-            --border-crm: #cbd5e1;
-            --accent-cyan: #0891b2;
-            --accent-blue: #1d4ed8;
-            --accent-purple: #6d28d9;
-            --text-crm-primary: #0f172a;
-            --text-crm-secondary: #334155;
-            --text-crm-muted: #64748b;
-            --glass-bg: rgba(255, 255, 255, 0.75);
-            --glass-border: rgba(203, 213, 225, 0.5);
+            --border-crm: #dadce0;
+            --accent-cyan: #1a73e8;
+            --accent-blue: #1557b0;
+            --accent-purple: #1a73e8;
+            --text-crm-primary: #202124;
+            --text-crm-secondary: #3c4043;
+            --text-crm-muted: #5f6368;
+            --glass-bg: rgba(255, 255, 255, 0.9);
+            --glass-border: rgba(218, 220, 224, 0.5);
         }
 
         body.light-theme .crm-brand-logo,
@@ -414,18 +414,19 @@
         body.light-theme .crm-nav-link:hover,
         body.light-theme .crm-nav-link.active,
         body.light-theme .form-control {
-            color: #0f172a;
+            color: #202124;
         }
 
         body.light-theme .form-control {
-            background-color: #ffffff;
-            border-color: #cbd5e1;
-            color: #0f172a;
+            background-color: #ffffff !important;
+            border: 1px solid #dadce0 !important;
+            color: #3c4043 !important;
+            border-radius: 4px !important;
         }
 
         body.light-theme .form-control:focus {
-            border-color: var(--accent-cyan);
-            box-shadow: 0 0 8px rgba(8, 145, 178, 0.2);
+            border-color: #1a73e8 !important;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.05), 0 0 0 2px rgba(26,115,232,0.2) !important;
         }
         
         body.light-theme .crm-nav-link {
@@ -437,95 +438,218 @@
         }
 
         body.light-theme .crm-nav-link.active {
-            background: linear-gradient(135deg, rgba(8, 145, 178, 0.1), rgba(109, 40, 217, 0.05));
-            color: #0891b2;
+            background: linear-gradient(135deg, rgba(26, 115, 232, 0.1), rgba(26, 115, 232, 0.02));
+            color: #1a73e8;
         }
 
-        /* Light Theme Card, Table, and Dashboard Overrides */
+        /* Light Theme Card, Table, and Dashboard Overrides - Google Analytics style */
         body.light-theme .crm-card,
         body.light-theme .stat-card,
         body.light-theme .filter-panel,
         body.light-theme .leads-table-container,
         body.light-theme .analytics-bar {
             background-color: #ffffff !important;
-            border: 1px solid #e2e8f0 !important;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.03) !important;
+            border: 1px solid #dadce0 !important;
+            box-shadow: 0 1px 3px rgba(60,64,67,0.1), 0 1px 2px rgba(60,64,67,0.05) !important;
             backdrop-filter: none !important;
+            border-radius: 8px !important;
         }
 
         body.light-theme .crm-card-title {
-            color: #0f172a !important;
-            border-bottom: 1px solid #f1f5f9;
+            color: #202124 !important;
+            border-bottom: 1px solid #f1f3f4;
             padding-bottom: 12px;
             margin-bottom: 20px;
         }
 
         body.light-theme .stat-value {
-            color: #0f172a !important;
+            color: #202124 !important;
         }
 
         body.light-theme .stat-label {
-            color: #64748b !important;
+            color: #5f6368 !important;
         }
 
         body.light-theme .kpi-card {
             background-color: #ffffff !important;
-            border: 1px solid #e2e8f0 !important;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.01) !important;
+            border: 1px solid #dadce0 !important;
+            box-shadow: 0 1px 2px rgba(60,64,67,0.05) !important;
         }
         
         body.light-theme .kpi-card:hover {
             border-color: #cbd5e1 !important;
-            background-color: #f8fafc !important;
-            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05) !important;
+            background-color: #f8f9fa !important;
+            box-shadow: 0 4px 12px rgba(60, 64, 67, 0.08) !important;
         }
         
         body.light-theme .kpi-card.active-filter {
-            border-color: var(--accent-cyan) !important;
-            background-color: rgba(8, 145, 178, 0.01) !important;
-            box-shadow: 0 0 12px rgba(8, 145, 178, 0.15) !important;
+            border-color: #1a73e8 !important;
+            background-color: rgba(26, 115, 232, 0.01) !important;
+            box-shadow: 0 0 12px rgba(26, 115, 232, 0.1) !important;
         }
         
         body.light-theme .kpi-card-label {
-            color: #475569 !important;
+            color: #5f6368 !important;
         }
         
         body.light-theme .kpi-card-value {
-            color: #0f172a !important;
+            color: #202124 !important;
         }
         
         body.light-theme .kpi-card-helper {
-            color: #64748b !important;
+            color: #5f6368 !important;
         }
         
         body.light-theme .kpi-card-icon {
-            color: #cbd5e1 !important;
+            color: #dadce0 !important;
         }
         
         body.light-theme .analytics-header-row {
-            border-bottom-color: #e2e8f0 !important;
+            border-bottom-color: #dadce0 !important;
         }
         
         body.light-theme .analytics-title {
-            color: #0f172a !important;
+            color: #202124 !important;
         }
 
+        /* Google Analytics Style Tables for Light Theme */
+        body.light-theme table,
+        body.light-theme .leads-table,
+        body.light-theme .workbench-table,
+        body.light-theme .crm-table,
+        body.light-theme .sql-table,
+        body.light-theme .opps-table,
+        body.light-theme .performance-table,
+        body.light-theme .campaign-table,
+        body.light-theme .preview-table,
+        body.light-theme .contact-table {
+            background-color: #ffffff !important;
+            border-collapse: collapse !important;
+            width: 100% !important;
+        }
+
+        body.light-theme th,
+        body.light-theme table th,
+        body.light-theme .leads-table th,
         body.light-theme .workbench-table th,
-        body.light-theme .leads-table th {
-            background-color: #f8fafc !important;
-            color: #475569 !important;
-            border-bottom: 2px solid #e2e8f0 !important;
+        body.light-theme .crm-table th,
+        body.light-theme .sql-table th,
+        body.light-theme .opps-table th,
+        body.light-theme .performance-table th,
+        body.light-theme .campaign-table th,
+        body.light-theme .preview-table th,
+        body.light-theme .contact-table th {
+            background-color: #f1f3f4 !important;
+            color: #5f6368 !important;
+            font-size: 11px !important;
+            font-weight: 600 !important;
+            letter-spacing: 0.8px !important;
+            text-transform: uppercase !important;
+            padding: 12px 16px !important;
+            border-bottom: 2px solid #dadce0 !important;
+            border-top: none !important;
+            border-left: none !important;
+            border-right: none !important;
+            text-align: left !important;
         }
 
+        body.light-theme td,
+        body.light-theme table td,
+        body.light-theme .leads-table td,
         body.light-theme .workbench-table td,
-        body.light-theme .leads-table td {
-            border-bottom: 1px solid #e2e8f0 !important;
-            color: #334155 !important;
+        body.light-theme .crm-table td,
+        body.light-theme .sql-table td,
+        body.light-theme .opps-table td,
+        body.light-theme .performance-table td,
+        body.light-theme .campaign-table td,
+        body.light-theme .preview-table td,
+        body.light-theme .contact-table td {
+            background-color: #ffffff !important;
+            color: #3c4043 !important;
+            border-bottom: 1px solid #e8eaed !important;
+            border-top: none !important;
+            border-left: none !important;
+            border-right: none !important;
+            padding: 12px 16px !important;
+            font-size: 13.5px !important;
         }
 
+        body.light-theme tr:hover td,
+        body.light-theme table tr:hover td,
+        body.light-theme .leads-table tr:hover td,
         body.light-theme .workbench-table tr:hover td,
-        body.light-theme .leads-table tr:hover td {
-            background-color: #f8fafc !important;
+        body.light-theme .crm-table tr:hover td,
+        body.light-theme .sql-table tr:hover td,
+        body.light-theme .opps-table tr:hover td,
+        body.light-theme .performance-table tr:hover td,
+        body.light-theme .campaign-table tr:hover td,
+        body.light-theme .preview-table tr:hover td,
+        body.light-theme .contact-table tr:hover td {
+            background-color: #f8f9fa !important;
+        }
+
+        /* Google Analytics Style Buttons for Light Theme */
+        body.light-theme .btn-crm-primary {
+            background: #1a73e8 !important;
+            color: #ffffff !important;
+            border: 1px solid #1a73e8 !important;
+            box-shadow: none !important;
+            border-radius: 4px !important;
+        }
+
+        body.light-theme .btn-crm-primary:hover {
+            background: #1557b0 !important;
+            border-color: #1557b0 !important;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        body.light-theme .btn-crm-secondary {
+            background-color: #ffffff !important;
+            color: #3c4043 !important;
+            border: 1px solid #dadce0 !important;
+            box-shadow: none !important;
+            border-radius: 4px !important;
+        }
+
+        body.light-theme .btn-crm-secondary:hover {
+            background-color: #f8f9fa !important;
+            color: #1a73e8 !important;
+            border-color: #cbd5e1 !important;
+            transform: none !important;
+        }
+
+        body.light-theme .btn-crm-danger {
+            background-color: #fce8e6 !important;
+            color: #c5221f !important;
+            border: 1px solid #fad2cf !important;
+            border-radius: 4px !important;
+        }
+
+        body.light-theme .btn-crm-danger:hover {
+            background-color: #fbcbcb !important;
+            transform: none !important;
+        }
+
+        /* Override inline style white colors to dark colors for light theme */
+        body.light-theme [style*="color: #ffffff"],
+        body.light-theme [style*="color: #fff"],
+        body.light-theme [style*="color:#ffffff"],
+        body.light-theme [style*="color:#fff"],
+        body.light-theme [style*="color: rgb(255, 255, 255)"],
+        body.light-theme [style*="color: rgb(255,255,255)"] {
+            color: var(--text-crm-primary) !important;
+        }
+
+        body.light-theme strong,
+        body.light-theme b,
+        body.light-theme h1,
+        body.light-theme h2,
+        body.light-theme h3,
+        body.light-theme h4,
+        body.light-theme h5,
+        body.light-theme h6 {
+            color: var(--text-crm-primary) !important;
         }
 
         body.light-theme .modal-card {
@@ -533,25 +657,25 @@
             border-color: #cbd5e1;
         }
         body.light-theme .modal-card h3 {
-            color: #0f172a;
+            color: #202124;
         }
 
         body.light-theme .crm-card li,
         body.light-theme .call-history-log {
-            background-color: #f8fafc !important;
-            border-color: #cbd5e1 !important;
+            background-color: #f8f9fa !important;
+            border-color: #dadce0 !important;
         }
         body.light-theme .call-history-log p {
-            color: #0f172a !important;
+            color: #202124 !important;
         }
 
         body.light-theme .timeline-body {
-            background-color: #f8fafc !important;
-            border-color: #cbd5e1 !important;
-            color: #334155 !important;
+            background-color: #f8f9fa !important;
+            border-color: #dadce0 !important;
+            color: #3c4043 !important;
         }
         body.light-theme .timeline-title {
-            color: #0f172a !important;
+            color: #202124 !important;
         }
 
         .theme-btn:hover {
