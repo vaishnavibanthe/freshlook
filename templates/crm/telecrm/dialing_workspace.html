@@ -312,6 +312,197 @@
             display: none;
         }
     }
+
+    /* Light Theme Workspace Overrides */
+    body.light-theme .panel-col {
+        background-color: #ffffff;
+        border-color: #dadce0;
+        box-shadow: 0 1px 3px rgba(60,64,67,0.1);
+    }
+
+    body.light-theme .panel-header {
+        background-color: #f1f3f4;
+        color: #202124;
+        border-bottom-color: #dadce0;
+        background: #f1f3f4 !important;
+    }
+
+    body.light-theme .q-tab {
+        background: #f1f3f4;
+        color: #5f6368;
+    }
+
+    body.light-theme .q-tab:hover {
+        background: #e8eaed;
+        color: #202124;
+    }
+
+    body.light-theme .q-tab.active {
+        background: #1a73e8;
+        color: #ffffff;
+        border-color: #1a73e8;
+    }
+
+    body.light-theme .contact-card {
+        background: #ffffff;
+        border-color: #dadce0;
+    }
+
+    body.light-theme .contact-card:hover,
+    body.light-theme .contact-card.selected {
+        background: #f4f8fe;
+        border-color: #1a73e8;
+        box-shadow: 0 4px 12px rgba(26, 115, 232, 0.12);
+    }
+
+    body.light-theme .contact-card.selected::before {
+        background: #1a73e8;
+    }
+
+    body.light-theme .priority-badge.urgent { background-color: #fce8e6; color: #c5221f; }
+    body.light-theme .priority-badge.high { background-color: #fef7e0; color: #b06000; }
+    body.light-theme .priority-badge.normal { background-color: #e8f0fe; color: #1a73e8; }
+    body.light-theme .priority-badge.low { background-color: #f1f3f4; color: #5f6368; }
+
+    body.light-theme .sticky-actions-bar {
+        background: #ffffff;
+        border-color: #dadce0;
+    }
+
+    body.light-theme .act-btn {
+        color: #5f6368;
+    }
+
+    body.light-theme .act-btn:hover {
+        background-color: #f1f3f4;
+        color: #202124;
+    }
+
+    body.light-theme .act-btn.active-action {
+        color: #1a73e8;
+    }
+
+    body.light-theme .w-tab {
+        color: #5f6368;
+        border-bottom-color: transparent;
+    }
+
+    body.light-theme .w-tab.active {
+        color: #1a73e8;
+        border-bottom-color: #1a73e8;
+        background: rgba(26, 115, 232, 0.04);
+    }
+
+    body.light-theme .report-accordion {
+        background: #ffffff;
+        border-color: #dadce0;
+    }
+
+    body.light-theme .report-accordion-header {
+        background-color: #f8f9fa;
+        color: #3c4043;
+    }
+
+    body.light-theme .report-accordion-header:hover {
+        background-color: #f1f3f4;
+    }
+
+    body.light-theme .report-accordion-body {
+        background-color: #ffffff;
+        border-top-color: #dadce0;
+    }
+
+    body.light-theme .report-accordion table th {
+        background-color: #ffffff !important;
+        color: #5f6368 !important;
+        border-bottom-color: #dadce0 !important;
+    }
+
+    body.light-theme .report-accordion table td {
+        background-color: #ffffff !important;
+        color: #3c4043 !important;
+        border-bottom-color: #e8eaed !important;
+    }
+
+    body.light-theme #campaign-name {
+        color: #202124;
+    }
+
+    body.light-theme #campaign-desc {
+        color: #5f6368;
+    }
+
+    body.light-theme #contact-name-header {
+        color: #202124;
+    }
+
+    body.light-theme .form-label {
+        color: #3c4043;
+    }
+
+    body.light-theme .star-rating i {
+        color: #dadce0;
+    }
+
+    body.light-theme .star-rating i.filled {
+        color: #f4b400;
+    }
+
+    body.light-theme .workspace-container select.form-control,
+    body.light-theme .workspace-container input.form-control {
+        background-color: #ffffff !important;
+        border: 1px solid #dadce0 !important;
+        color: #3c4043 !important;
+    }
+
+    body.light-theme .validation-warning-bar {
+        background: #fce8e6;
+        border-color: #fad2cf;
+    }
+
+    body.light-theme .validation-warning-item {
+        color: #c5221f;
+    }
+
+    body.light-theme #summary-assigned,
+    body.light-theme #summary-completed {
+        color: #202124 !important;
+    }
+
+    /* Compact Report Table Overrides in Light Theme */
+    body.light-theme .report-accordion table th {
+        background-color: #ffffff !important;
+        color: #5f6368 !important;
+        border-bottom: 1px solid #dadce0 !important;
+        padding: 6px 4px !important;
+        font-size: 11px !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.5px !important;
+    }
+
+    body.light-theme .report-accordion table td {
+        background-color: #ffffff !important;
+        color: #3c4043 !important;
+        border-bottom: 1px solid #e8eaed !important;
+        padding: 6px 4px !important;
+        font-size: 11px !important;
+    }
+
+    body.light-theme #rep-assignees-tbl tr {
+        border-bottom: 1px solid #e8eaed !important;
+    }
+
+    /* Modal close button styling in Light Theme */
+    body.light-theme .panel-header button {
+        color: #5f6368 !important;
+        opacity: 0.8;
+        transition: opacity 0.2s, color 0.2s;
+    }
+    
+    body.light-theme .panel-header button:hover {
+        color: #202124 !important;
+        opacity: 1;
+    }
 </style>
 {% endblock %}
 
