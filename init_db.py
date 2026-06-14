@@ -511,7 +511,8 @@ def init_db():
         date TEXT NOT NULL,
         location TEXT NOT NULL,
         summary TEXT,
-        description TEXT
+        description TEXT,
+        card_image TEXT
     )
     ''')
 
@@ -524,7 +525,8 @@ def init_db():
         host TEXT NOT NULL,
         duration TEXT NOT NULL,
         summary TEXT,
-        description TEXT
+        description TEXT,
+        card_image TEXT
     )
     ''')
 

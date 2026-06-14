@@ -714,7 +714,8 @@ def home():
             'time': '10:00 AM EST' if 'north america' in item.get('title', '').lower() else '2:30 PM IST',
             'delivery_type': del_type,
             'location': item.get('location'),
-            'url': f'/event-view/{slug}'
+            'url': f'/event-view/{slug}',
+            'card_image': item.get('card_image')
         })
         
     for slug, item in get_db_webinars().items():
@@ -728,7 +729,8 @@ def home():
             'time': item.get('duration', '45 min'),
             'delivery_type': 'Online',
             'location': item.get('host', 'Artha Solutions'),
-            'url': f'/webinar-view/{slug}'
+            'url': f'/webinar-view/{slug}',
+            'card_image': item.get('card_image')
         })
         
     # Sort chronologically: upcoming events first, then webinars alphabetically
@@ -3407,19 +3409,20 @@ def admin_resource_new():
         loc_or_host = request.form.get('location')
         summary = request.form.get('summary')
         description = request.form.get('description')
+        card_image = request.form.get('card_image')
         
         conn = get_db_connection()
         try:
             if res_type == 'Webinar':
                 conn.execute('''
-                INSERT INTO webinars (slug, title, host, duration, summary, description)
-                VALUES (?, ?, ?, ?, ?, ?)
-                ''', (slug, title, loc_or_host, date_or_duration, summary, description))
+                INSERT INTO webinars (slug, title, host, duration, summary, description, card_image)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                ''', (slug, title, loc_or_host, date_or_duration, summary, description, card_image))
             else:
                 conn.execute('''
-                INSERT INTO events (slug, title, date, location, summary, description)
-                VALUES (?, ?, ?, ?, ?, ?)
-                ''', (slug, title, date_or_duration, loc_or_host, summary, description))
+                INSERT INTO events (slug, title, date, location, summary, description, card_image)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                ''', (slug, title, date_or_duration, loc_or_host, summary, description, card_image))
             conn.commit()
             conn.close()
             return redirect('/admin/resources')
@@ -3451,13 +3454,14 @@ def admin_event_edit(event_id):
         location_val = request.form.get('location')
         summary = request.form.get('summary')
         description = request.form.get('description')
+        card_image = request.form.get('card_image')
         
         try:
             conn.execute('''
             UPDATE events 
-            SET title = ?, slug = ?, date = ?, location = ?, summary = ?, description = ?
+            SET title = ?, slug = ?, date = ?, location = ?, summary = ?, description = ?, card_image = ?
             WHERE id = ?
-            ''', (title, slug, date_val, location_val, summary, description, event_id))
+            ''', (title, slug, date_val, location_val, summary, description, card_image, event_id))
             conn.commit()
             conn.close()
             return redirect('/admin/resources')
@@ -3501,13 +3505,14 @@ def admin_webinar_edit(webinar_id):
         host_val = request.form.get('location')
         summary = request.form.get('summary')
         description = request.form.get('description')
+        card_image = request.form.get('card_image')
         
         try:
             conn.execute('''
             UPDATE webinars 
-            SET title = ?, slug = ?, duration = ?, host = ?, summary = ?, description = ?
+            SET title = ?, slug = ?, duration = ?, host = ?, summary = ?, description = ?, card_image = ?
             WHERE id = ?
-            ''', (title, slug, duration_val, host_val, summary, description, webinar_id))
+            ''', (title, slug, duration_val, host_val, summary, description, card_image, webinar_id))
             conn.commit()
             conn.close()
             return redirect('/admin/resources')

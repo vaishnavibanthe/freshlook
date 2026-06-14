@@ -3,774 +3,401 @@
 ============================================================
 
 PROMPT #1
-Timestamp: 2026-06-12T21:09:41Z
-----------------------------------------
-start the server
-
-============================================================
-
-PROMPT #2
 Timestamp: 2026-06-12T21:12:00Z
 ----------------------------------------
 in crm/dashboard put dark and light theme switcher are right hand with prominent visualization
 
 ============================================================
 
+PROMPT #2
+Timestamp: 2026-06-12T21:21:41Z
+----------------------------------------
+Use this as a single audit-and-implementation prompt in Antigravity. It instructs Antigravity to inspect the website first, fix issues safely, and add ongoing SEO/AEO controls rather than merely generating recommendations.
+
+Official guidance currently emphasizes crawlable, people-first content, valid structured data that matches visible page content, strong page experience, canonical and indexing controls, and clear access for relevant search crawlers. OpenAI also advises allowing OAI-SearchBot for inclusion in ChatGPT search, while GPTBot can be controlled separately for training preferences. Bing recommends IndexNow for notifying participating search engines about content changes.  
+
+You are a senior Technical SEO architect, Answer Engine Optimization specialist, Generative Engine Optimization strategist, Python full-stack developer, structured-data expert, content strategist, accessibility specialist, and web-performance engineer.
+
+Project: ThinkArtha.com Freshlook
+
+Objective:
+Audit and improve the complete ThinkArtha.com website for:
+
+1. Traditional SEO
+2. Technical SEO
+3. On-page SEO
+4. Content quality and topical authority
+5. Local and international discoverability where relevant
+6. Answer Engine Optimization, or AEO
+7. Generative Engine Optimization, or GEO
+8. AI search and chatbot citation readiness
+9. Google AI search visibility
+10. Bing and Copilot discoverability
+11. ChatGPT search discoverability
+12. Conversion-focused organic landing pages
+13. Accessibility and page experience
+14. Ongoing SEO governance through the admin panel
+
+Important:
+Do not redesign or rewrite the entire website blindly.
+
+First inspect the current application, route structure, templates, database, content, metadata, robots rules, sitemap, internal links, structured data, page speed, and admin capabilities.
+
+Then:
+
+* Produce an audit report.
+* Categorize issues by Critical, High, Medium, and Low priority.
+* Automatically fix safe technical issues.
+* Create an implementation plan for changes requiring content or bus
+<truncated 30891 bytes>
+ustry pages contain genuinely distinct content.
+10. Case studies provide citation-ready public evidence.
+11. Job pages use valid, current JobPosting data.
+12. Expired jobs are handled correctly.
+13. Orphan pages and broken internal links are resolved.
+14. Core Web Vitals have been audited and materially improved where required.
+15. Important content is available in crawlable HTML.
+16. Organization, service, solution, partner, and industry entities are consistent.
+17. Admin can manage SEO and AEO fields without code changes.
+18. Content publishing includes quality checks and review workflow.
+19. IndexNow submits approved public URL changes.
+20. Organic and AI referral traffic can be measured.
+21. No private CRM, TeleCRM, applicant, recruiter, or customer information is exposed.
+22. Audit, deployment, testing, and rollback documentation are complete.
+
+Final Instruction:
+Begin with a complete read-only audit of the current ThinkArtha.com application. Present the findings and proposed change list before making destructive or large-scale content changes. Then implement safe technical fixes, database migrations, admin SEO controls, structured data, sitemap management, robots and crawler controls, content-quality gates, AEO components, analytics hooks, tests, and deployment documentation.
+
+The goal is not to manipulate rankings. The goal is to make ThinkArtha.com technically excellent, genuinely useful, authoritative, easy to crawl, easy to understand, easy to cite, and highly relevant to enterprise buyers searching for data, AI, governance, MDM, integration, analytics, and modernization solutions.
+
+============================================================
+
 PROMPT #3
-Timestamp: 2026-06-12T21:21:41Z
-----------------------------------------
-Use this as a single audit-and-implementation prompt in Antigravity. It instructs Antigravity to inspect the website first, fix issues safely, and add ongoing SEO/AEO controls rather than merely generating recommendations.
-
-Official guidance currently emphasizes crawlable, people-first content, valid structured data that matches visible page content, strong page experience, canonical and indexing controls, and clear access for relevant search crawlers. OpenAI also advises allowing OAI-SearchBot for inclusion in ChatGPT search, while GPTBot can be controlled separately for training preferences. Bing recommends IndexNow for notifying participating search engines about content changes.  
-
-You are a senior Technical SEO architect, Answer Engine Optimization specialist, Generative Engine Optimization strategist, Python full-stack developer, structured-data expert, content strategist, accessibility specialist, and web-performance engineer.
-
-Project: ThinkArtha.com Freshlook
-
-Objective:
-Audit and improve the complete ThinkArtha.com website for:
-
-1. Traditional SEO
-2. Technical SEO
-3. On-page SEO
-4. Content quality and topical authority
-5. Local and international discoverability where relevant
-6. Answer Engine Optimization, or AEO
-7. Generative Engine Optimization, or GEO
-8. AI search and chatbot citation readiness
-9. Google AI search visibility
-10. Bing and Copilot discoverability
-11. ChatGPT search discoverability
-12. Conversion-focused organic landing pages
-13. Accessibility and page experience
-14. Ongoing SEO governance through the admin panel
-
-Important:
-Do not redesign or rewrite the entire website blindly.
-
-First inspect the current application, route structure, templates, database, content, metadata, robots rules, sitemap, internal links, structured data, page speed, and admin capabilities.
-
-Then:
-
-* Produce an audit report.
-* Categorize issues by Critical, High, Medium, and Low priority.
-* Automatically fix safe technical issues.
-* Create an implementation plan for changes requiring content or bus
-<truncated 30891 bytes>
-ustry pages contain genuinely distinct content.
-10. Case studies provide citation-ready public evidence.
-11. Job pages use valid, current JobPosting data.
-12. Expired jobs are handled correctly.
-13. Orphan pages and broken internal links are resolved.
-14. Core Web Vitals have been audited and materially improved where required.
-15. Important content is available in crawlable HTML.
-16. Organization, service, solution, partner, and industry entities are consistent.
-17. Admin can manage SEO and AEO fields without code changes.
-18. Content publishing includes quality checks and review workflow.
-19. IndexNow submits approved public URL changes.
-20. Organic and AI referral traffic can be measured.
-21. No private CRM, TeleCRM, applicant, recruiter, or customer information is exposed.
-22. Audit, deployment, testing, and rollback documentation are complete.
-
-Final Instruction:
-Begin with a complete read-only audit of the current ThinkArtha.com application. Present the findings and proposed change list before making destructive or large-scale content changes. Then implement safe technical fixes, database migrations, admin SEO controls, structured data, sitemap management, robots and crawler controls, content-quality gates, AEO components, analytics hooks, tests, and deployment documentation.
-
-The goal is not to manipulate rankings. The goal is to make ThinkArtha.com technically excellent, genuinely useful, authoritative, easy to crawl, easy to understand, easy to cite, and highly relevant to enterprise buyers searching for data, AI, governance, MDM, integration, analytics, and modernization solutions.
-
-============================================================
-
-PROMPT #4
-Timestamp: 2026-06-12T21:21:41Z
-----------------------------------------
-Use this as a single audit-and-implementation prompt in Antigravity. It instructs Antigravity to inspect the website first, fix issues safely, and add ongoing SEO/AEO controls rather than merely generating recommendations.
-
-Official guidance currently emphasizes crawlable, people-first content, valid structured data that matches visible page content, strong page experience, canonical and indexing controls, and clear access for relevant search crawlers. OpenAI also advises allowing OAI-SearchBot for inclusion in ChatGPT search, while GPTBot can be controlled separately for training preferences. Bing recommends IndexNow for notifying participating search engines about content changes.  
-
-You are a senior Technical SEO architect, Answer Engine Optimization specialist, Generative Engine Optimization strategist, Python full-stack developer, structured-data expert, content strategist, accessibility specialist, and web-performance engineer.
-
-Project: ThinkArtha.com Freshlook
-
-Objective:
-Audit and improve the complete ThinkArtha.com website for:
-
-1. Traditional SEO
-2. Technical SEO
-3. On-page SEO
-4. Content quality and topical authority
-5. Local and international discoverability where relevant
-6. Answer Engine Optimization, or AEO
-7. Generative Engine Optimization, or GEO
-8. AI search and chatbot citation readiness
-9. Google AI search visibility
-10. Bing and Copilot discoverability
-11. ChatGPT search discoverability
-12. Conversion-focused organic landing pages
-13. Accessibility and page experience
-14. Ongoing SEO governance through the admin panel
-
-Important:
-Do not redesign or rewrite the entire website blindly.
-
-First inspect the current application, route structure, templates, database, content, metadata, robots rules, sitemap, internal links, structured data, page speed, and admin capabilities.
-
-Then:
-
-* Produce an audit report.
-* Categorize issues by Critical, High, Medium, and Low priority.
-* Automatically fix safe technical issues.
-* Create an implementation plan for changes requiring content or bus
-<truncated 30891 bytes>
-ustry pages contain genuinely distinct content.
-10. Case studies provide citation-ready public evidence.
-11. Job pages use valid, current JobPosting data.
-12. Expired jobs are handled correctly.
-13. Orphan pages and broken internal links are resolved.
-14. Core Web Vitals have been audited and materially improved where required.
-15. Important content is available in crawlable HTML.
-16. Organization, service, solution, partner, and industry entities are consistent.
-17. Admin can manage SEO and AEO fields without code changes.
-18. Content publishing includes quality checks and review workflow.
-19. IndexNow submits approved public URL changes.
-20. Organic and AI referral traffic can be measured.
-21. No private CRM, TeleCRM, applicant, recruiter, or customer information is exposed.
-22. Audit, deployment, testing, and rollback documentation are complete.
-
-Final Instruction:
-Begin with a complete read-only audit of the current ThinkArtha.com application. Present the findings and proposed change list before making destructive or large-scale content changes. Then implement safe technical fixes, database migrations, admin SEO controls, structured data, sitemap management, robots and crawler controls, content-quality gates, AEO components, analytics hooks, tests, and deployment documentation.
-
-The goal is not to manipulate rankings. The goal is to make ThinkArtha.com technically excellent, genuinely useful, authoritative, easy to crawl, easy to understand, easy to cite, and highly relevant to enterprise buyers searching for data, AI, governance, MDM, integration, analytics, and modernization solutions.
-
-============================================================
-
-PROMPT #5
 Timestamp: 2026-06-12T21:33:20Z
 ----------------------------------------
 You added quick answer on home page on top which is incorrect, it should be last section and it creates visibility issues for the menu, please refer attached image and fix
 
 ============================================================
 
-PROMPT #6
+PROMPT #4
 Timestamp: 2026-06-12T21:36:57Z
 ----------------------------------------
 In CRM give dark abd light theme converter in same style as done on /crm/dashboard right hand side. Keep it across CRM and telecrm. Remove the theme switcher toggle from left sidebar.
 
 ============================================================
 
-PROMPT #7
+PROMPT #5
 Timestamp: 2026-06-12T21:47:45Z
 ----------------------------------------
 commit everything to github
 
 ============================================================
 
-PROMPT #8
-Timestamp: 2026-06-13T04:56:58Z
+PROMPT #6
+Timestamp: 2026-06-13T04:58:10Z
 ----------------------------------------
-Start the server
+in CRM light mode there are visibility and color combination issues. Check the attached image and fix.
+
+============================================================
+
+PROMPT #7
+Timestamp: 2026-06-13T05:41:45Z
+----------------------------------------
+Use this correction prompt in Antigravity to update the CRM design:
+
+Update the existing Lean Core CRM specification with one important change:
+
+Website form submissions should not directly create CRM Contacts.
+
+Instead, all website-generated submissions must first enter a separate staging section called:
+
+Website Leads
+
+URL:
+/crm/website-leads
+
+This section is separate from the main CRM sections.
+
+Final Core CRM navigation should be:
+
+1. Dashboard
+    URL: /crm/dashboard
+2. Website Leads
+    URL: /crm/website-leads
+3. Contacts
+    URL: /crm/contacts
+4. Accounts
+    URL: /crm/accounts
+5. Opportunities
+    URL: /crm/opportunities
+6. Tasks
+    URL: /crm/tasks
+
+Purpose of Website Leads:
+Website Leads is a lightweight review and qualification inbox for all leads captured from ThinkArtha.com forms before they become CRM Contacts.
+
+Website Leads should capture submissions from:
+
+* Contact forms
+* Talk to Expert forms
+* Data Readiness Assessment forms
+* Case study download forms
+* Healthcare microsite forms
+* Manufacturing microsite forms
+* BFSI microsite forms
+* Retail microsite forms
+* Resource download forms
+* Webinar forms
+* Any future website lead form
+
+Career applications should not enter Website Leads.
+
+Website Lead Fields:
+
+* id
+* first_name
+* last_name
+* full_name
+* business_email
+* phone
+* company
+* job_title
+* country
+* geography
+* industry
+* message
+* source_form
+* source_page
+* cta_clicked
+* form_name
+* product_solution_interest
+* partner_interest
+* case_study_downloaded, if applicable
+* resource_downloaded, if applicable
+* assessment_type, if applicable
+* consent_status
+* utm_source
+* utm_medium
+* utm_campaign
+* utm_term
+* utm_content
+* referrer
+* ip_address
+* user_agent
+* duplicate_status
+* crm_contact_id, nullable
+* assigned_owner_id, nullable
+* status
+* review_notes
+* created_at
+* updated_at
+* converted_at
+* converted_by
+
+Website Lead Status:
+Use a simple status flow:
+
+1. New
+2. Reviewed
+3. Assigned
+4. Converted to Contact
+5. Rejected
+6. Duplicate
+7. Spam
+
+Website Lead List View:
+Create p
+<truncated 7040 bytes>
+e endpoint must be rate-limited.
+* Validate and sanitize all inputs.
+* Spam protection should include honeypot and optional CAPTCHA.
+* Website Leads must never be public.
+* Website Leads must not be indexed.
+* Website Leads must not appear in sitemap.
+* Only authorized CRM users can view Website Leads.
+* Do not expose IP/user-agent except to authorized admins.
+* Maintain audit logs for conversion and rejection.
+
+UX Requirement:
+The Website Leads section should feel like a simple review inbox.
+
+It should not look like a full CRM pipeline.
+
+Each row should make it easy to:
+
+* See who submitted the form.
+* See why they submitted.
+* See source page and campaign.
+* Check duplicate warning.
+* Assign owner.
+* Convert to Contact with one click.
+* Reject spam/irrelevant submissions quickly.
+
+Acceptance Criteria:
+
+1. Website form submissions go to Website Leads, not directly to Contacts.
+2. Website Leads has its own CRM section.
+3. Website Leads can be reviewed before entering CRM.
+4. Website Leads can be converted to Contacts with one click after assigning owner.
+5. Duplicate detection runs before conversion.
+6. Converted Website Leads create or link to Contact.
+7. Website Lead source data is copied into Contact.
+8. Website Lead remains as historical record after conversion.
+9. Website Leads can be marked Duplicate, Rejected, or Spam.
+10. Dashboard shows pending and converted Website Leads.
+11. Core CRM dependency rules remain unchanged:
+    * Contact is independent.
+    * Account requires Contact.
+    * Opportunity requires Account and Contact.
+    * Task requires Contact, Account, or Opportunity.
+12. Website Leads are private, secure, and never indexed.
+13. The CRM remains lean and minimal.
+
+============================================================
+
+PROMPT #8
+Timestamp: 2026-06-13T06:09:27Z
+----------------------------------------
+Use this as an add-on prompt for Antigravity:
+
+Update the existing Website Leads section in the Lean CRM.
+Add a top analytics bar to the Website Leads page.
+Page:
+ /crm/website-leads
+The analytics bar should appear above the Website Leads table/list.
+Purpose:
+Give managers and admins a quick view of website lead inflow and conversion status before leads are moved into CRM Contacts.
+Analytics Bar Metrics:
+Show four compact KPI cards:
+1. Total Website Leads
+- Count of all website leads received within the selected date range.
+2. Pending for Review
+- Count of website leads with status:
+  New
+  Reviewed
+  Assigned
+but not yet converted, rejected, duplicate, or spam.
+3. Converted to Contact
+- Count of website leads converted into CRM Contacts within the selected date range.
+4. Spam
+- Count of website leads marked as Spam within the selected date range.
+Optional additional small metric, only if space allows:
+- Conversion Rate
+  Formula:
+  Converted to Contact / Total Website Leads × 100
+Date Filter:
+Add a date filter control on the analytics bar.
+Predefined date filters:
+- This Week
+- Last Week
+- This Month
+- Last Month
+- This Year
+- Last Year
+- All Time
+- Custom
+Custom Date Filter:
+When Custom is selected, show:
+- Start date
+- End date
+- Apply button
+- Reset button
+Date Filter Behavior:
+- Default filter should be This Month.
+- Changing the date filter should update all KPI cards.
+- The selected date filter should also update the Website Leads table below, unless the user disables “Apply to list”.
+- Add a toggle:
+  Apply date filter to table: Yes/No
+- If Yes, table records should match the same date range.
+- If No, only KPI cards update while the table keeps its own filters.
+Date Field Logic:
+Use created_at for:
+- Total Website Leads
+- Pending for Review
+- Spam, unless spam_marked_at exists
+Use converted_at for:
+- Converted to Contact
+If spam_marked_at is created later, use spam_marked_at for Spam count.
+KPI Card Design:
+Each KPI card should show:
+- Metric label
+- Count
+- Small helper text
+- Trend c
+<truncated 979 bytes>
+less specifically permitted.
+API Requirement:
+Create or update API:
+GET /api/crm/website-leads/analytics
+Query parameters:
+- date_filter
+- start_date
+- end_date
+- group_id, permission-controlled
+- owner_id, permission-controlled
+- source_form
+- industry
+- geography
+- product_solution_id
+- partner_id
+API response should return:
+- total_website_leads
+- pending_for_review
+- converted_to_contact
+- spam
+- conversion_rate
+- date_range_start
+- date_range_end
+- previous_period_comparison, optional
+Date Filter Definitions:
+- This Week: Monday to current date
+- Last Week: previous Monday to previous Sunday
+- This Month: first day of current month to current date
+- Last Month: first day to last day of previous month
+- This Year: January 1 to current date
+- Last Year: January 1 to December 31 of previous year
+- All Time: no date restriction
+- Custom: user-selected start and end date
+Database Suggestions:
+If not already present, add:
+WebsiteLead:
+- spam_marked_at
+- spam_marked_by
+- rejected_at
+- rejected_by
+- duplicate_marked_at
+- duplicate_marked_by
+Acceptance Criteria:
+1. Website Leads page has a top analytics bar.
+2. Analytics bar shows Total Website Leads, Pending for Review, Converted to Contact, and Spam.
+3. Date filter supports This Week, Last Week, This Month, Last Month, This Year, Last Year, All Time, and Custom.
+4. Custom filter supports start date and end date.
+5. KPI cards update based on selected date range.
+6. KPI card clicks filter the Website Leads table.
+7. Default date filter is This Month.
+8. Role-based visibility is respected.
+9. Analytics API supports date range and CRM hierarchy filtering.
+10. The Website Leads section remains lean, simple, and review-focused.
 
 ============================================================
 
 PROMPT #9
-Timestamp: 2026-06-13T04:58:10Z
-----------------------------------------
-in CRM light mode there are visibility and color combination issues. Check the attached image and fix.
-
-============================================================
-
-PROMPT #10
-Timestamp: 2026-06-13T04:58:10Z
-----------------------------------------
-in CRM light mode there are visibility and color combination issues. Check the attached image and fix.
-
-============================================================
-
-PROMPT #11
-Timestamp: 2026-06-13T05:41:45Z
-----------------------------------------
-Use this correction prompt in Antigravity to update the CRM design:
-
-Update the existing Lean Core CRM specification with one important change:
-
-Website form submissions should not directly create CRM Contacts.
-
-Instead, all website-generated submissions must first enter a separate staging section called:
-
-Website Leads
-
-URL:
-/crm/website-leads
-
-This section is separate from the main CRM sections.
-
-Final Core CRM navigation should be:
-
-1. Dashboard
-    URL: /crm/dashboard
-2. Website Leads
-    URL: /crm/website-leads
-3. Contacts
-    URL: /crm/contacts
-4. Accounts
-    URL: /crm/accounts
-5. Opportunities
-    URL: /crm/opportunities
-6. Tasks
-    URL: /crm/tasks
-
-Purpose of Website Leads:
-Website Leads is a lightweight review and qualification inbox for all leads captured from ThinkArtha.com forms before they become CRM Contacts.
-
-Website Leads should capture submissions from:
-
-* Contact forms
-* Talk to Expert forms
-* Data Readiness Assessment forms
-* Case study download forms
-* Healthcare microsite forms
-* Manufacturing microsite forms
-* BFSI microsite forms
-* Retail microsite forms
-* Resource download forms
-* Webinar forms
-* Any future website lead form
-
-Career applications should not enter Website Leads.
-
-Website Lead Fields:
-
-* id
-* first_name
-* last_name
-* full_name
-* business_email
-* phone
-* company
-* job_title
-* country
-* geography
-* industry
-* message
-* source_form
-* source_page
-* cta_clicked
-* form_name
-* product_solution_interest
-* partner_interest
-* case_study_downloaded, if applicable
-* resource_downloaded, if applicable
-* assessment_type, if applicable
-* consent_status
-* utm_source
-* utm_medium
-* utm_campaign
-* utm_term
-* utm_content
-* referrer
-* ip_address
-* user_agent
-* duplicate_status
-* crm_contact_id, nullable
-* assigned_owner_id, nullable
-* status
-* review_notes
-* created_at
-* updated_at
-* converted_at
-* converted_by
-
-Website Lead Status:
-Use a simple status flow:
-
-1. New
-2. Reviewed
-3. Assigned
-4. Converted to Contact
-5. Rejected
-6. Duplicate
-7. Spam
-
-Website Lead List View:
-Create p
-<truncated 7040 bytes>
-e endpoint must be rate-limited.
-* Validate and sanitize all inputs.
-* Spam protection should include honeypot and optional CAPTCHA.
-* Website Leads must never be public.
-* Website Leads must not be indexed.
-* Website Leads must not appear in sitemap.
-* Only authorized CRM users can view Website Leads.
-* Do not expose IP/user-agent except to authorized admins.
-* Maintain audit logs for conversion and rejection.
-
-UX Requirement:
-The Website Leads section should feel like a simple review inbox.
-
-It should not look like a full CRM pipeline.
-
-Each row should make it easy to:
-
-* See who submitted the form.
-* See why they submitted.
-* See source page and campaign.
-* Check duplicate warning.
-* Assign owner.
-* Convert to Contact with one click.
-* Reject spam/irrelevant submissions quickly.
-
-Acceptance Criteria:
-
-1. Website form submissions go to Website Leads, not directly to Contacts.
-2. Website Leads has its own CRM section.
-3. Website Leads can be reviewed before entering CRM.
-4. Website Leads can be converted to Contacts with one click after assigning owner.
-5. Duplicate detection runs before conversion.
-6. Converted Website Leads create or link to Contact.
-7. Website Lead source data is copied into Contact.
-8. Website Lead remains as historical record after conversion.
-9. Website Leads can be marked Duplicate, Rejected, or Spam.
-10. Dashboard shows pending and converted Website Leads.
-11. Core CRM dependency rules remain unchanged:
-    * Contact is independent.
-    * Account requires Contact.
-    * Opportunity requires Account and Contact.
-    * Task requires Contact, Account, or Opportunity.
-12. Website Leads are private, secure, and never indexed.
-13. The CRM remains lean and minimal.
-
-============================================================
-
-PROMPT #12
-Timestamp: 2026-06-13T05:41:45Z
-----------------------------------------
-Use this correction prompt in Antigravity to update the CRM design:
-
-Update the existing Lean Core CRM specification with one important change:
-
-Website form submissions should not directly create CRM Contacts.
-
-Instead, all website-generated submissions must first enter a separate staging section called:
-
-Website Leads
-
-URL:
-/crm/website-leads
-
-This section is separate from the main CRM sections.
-
-Final Core CRM navigation should be:
-
-1. Dashboard
-    URL: /crm/dashboard
-2. Website Leads
-    URL: /crm/website-leads
-3. Contacts
-    URL: /crm/contacts
-4. Accounts
-    URL: /crm/accounts
-5. Opportunities
-    URL: /crm/opportunities
-6. Tasks
-    URL: /crm/tasks
-
-Purpose of Website Leads:
-Website Leads is a lightweight review and qualification inbox for all leads captured from ThinkArtha.com forms before they become CRM Contacts.
-
-Website Leads should capture submissions from:
-
-* Contact forms
-* Talk to Expert forms
-* Data Readiness Assessment forms
-* Case study download forms
-* Healthcare microsite forms
-* Manufacturing microsite forms
-* BFSI microsite forms
-* Retail microsite forms
-* Resource download forms
-* Webinar forms
-* Any future website lead form
-
-Career applications should not enter Website Leads.
-
-Website Lead Fields:
-
-* id
-* first_name
-* last_name
-* full_name
-* business_email
-* phone
-* company
-* job_title
-* country
-* geography
-* industry
-* message
-* source_form
-* source_page
-* cta_clicked
-* form_name
-* product_solution_interest
-* partner_interest
-* case_study_downloaded, if applicable
-* resource_downloaded, if applicable
-* assessment_type, if applicable
-* consent_status
-* utm_source
-* utm_medium
-* utm_campaign
-* utm_term
-* utm_content
-* referrer
-* ip_address
-* user_agent
-* duplicate_status
-* crm_contact_id, nullable
-* assigned_owner_id, nullable
-* status
-* review_notes
-* created_at
-* updated_at
-* converted_at
-* converted_by
-
-Website Lead Status:
-Use a simple status flow:
-
-1. New
-2. Reviewed
-3. Assigned
-4. Converted to Contact
-5. Rejected
-6. Duplicate
-7. Spam
-
-Website Lead List View:
-Create p
-<truncated 7040 bytes>
-e endpoint must be rate-limited.
-* Validate and sanitize all inputs.
-* Spam protection should include honeypot and optional CAPTCHA.
-* Website Leads must never be public.
-* Website Leads must not be indexed.
-* Website Leads must not appear in sitemap.
-* Only authorized CRM users can view Website Leads.
-* Do not expose IP/user-agent except to authorized admins.
-* Maintain audit logs for conversion and rejection.
-
-UX Requirement:
-The Website Leads section should feel like a simple review inbox.
-
-It should not look like a full CRM pipeline.
-
-Each row should make it easy to:
-
-* See who submitted the form.
-* See why they submitted.
-* See source page and campaign.
-* Check duplicate warning.
-* Assign owner.
-* Convert to Contact with one click.
-* Reject spam/irrelevant submissions quickly.
-
-Acceptance Criteria:
-
-1. Website form submissions go to Website Leads, not directly to Contacts.
-2. Website Leads has its own CRM section.
-3. Website Leads can be reviewed before entering CRM.
-4. Website Leads can be converted to Contacts with one click after assigning owner.
-5. Duplicate detection runs before conversion.
-6. Converted Website Leads create or link to Contact.
-7. Website Lead source data is copied into Contact.
-8. Website Lead remains as historical record after conversion.
-9. Website Leads can be marked Duplicate, Rejected, or Spam.
-10. Dashboard shows pending and converted Website Leads.
-11. Core CRM dependency rules remain unchanged:
-    * Contact is independent.
-    * Account requires Contact.
-    * Opportunity requires Account and Contact.
-    * Task requires Contact, Account, or Opportunity.
-12. Website Leads are private, secure, and never indexed.
-13. The CRM remains lean and minimal.
-
-============================================================
-
-PROMPT #13
-Timestamp: 2026-06-13T06:09:27Z
-----------------------------------------
-Use this as an add-on prompt for Antigravity:
-
-Update the existing Website Leads section in the Lean CRM.
-Add a top analytics bar to the Website Leads page.
-Page:
- /crm/website-leads
-The analytics bar should appear above the Website Leads table/list.
-Purpose:
-Give managers and admins a quick view of website lead inflow and conversion status before leads are moved into CRM Contacts.
-Analytics Bar Metrics:
-Show four compact KPI cards:
-1. Total Website Leads
-- Count of all website leads received within the selected date range.
-2. Pending for Review
-- Count of website leads with status:
-  New
-  Reviewed
-  Assigned
-but not yet converted, rejected, duplicate, or spam.
-3. Converted to Contact
-- Count of website leads converted into CRM Contacts within the selected date range.
-4. Spam
-- Count of website leads marked as Spam within the selected date range.
-Optional additional small metric, only if space allows:
-- Conversion Rate
-  Formula:
-  Converted to Contact / Total Website Leads × 100
-Date Filter:
-Add a date filter control on the analytics bar.
-Predefined date filters:
-- This Week
-- Last Week
-- This Month
-- Last Month
-- This Year
-- Last Year
-- All Time
-- Custom
-Custom Date Filter:
-When Custom is selected, show:
-- Start date
-- End date
-- Apply button
-- Reset button
-Date Filter Behavior:
-- Default filter should be This Month.
-- Changing the date filter should update all KPI cards.
-- The selected date filter should also update the Website Leads table below, unless the user disables “Apply to list”.
-- Add a toggle:
-  Apply date filter to table: Yes/No
-- If Yes, table records should match the same date range.
-- If No, only KPI cards update while the table keeps its own filters.
-Date Field Logic:
-Use created_at for:
-- Total Website Leads
-- Pending for Review
-- Spam, unless spam_marked_at exists
-Use converted_at for:
-- Converted to Contact
-If spam_marked_at is created later, use spam_marked_at for Spam count.
-KPI Card Design:
-Each KPI card should show:
-- Metric label
-- Count
-- Small helper text
-- Trend c
-<truncated 979 bytes>
-less specifically permitted.
-API Requirement:
-Create or update API:
-GET /api/crm/website-leads/analytics
-Query parameters:
-- date_filter
-- start_date
-- end_date
-- group_id, permission-controlled
-- owner_id, permission-controlled
-- source_form
-- industry
-- geography
-- product_solution_id
-- partner_id
-API response should return:
-- total_website_leads
-- pending_for_review
-- converted_to_contact
-- spam
-- conversion_rate
-- date_range_start
-- date_range_end
-- previous_period_comparison, optional
-Date Filter Definitions:
-- This Week: Monday to current date
-- Last Week: previous Monday to previous Sunday
-- This Month: first day of current month to current date
-- Last Month: first day to last day of previous month
-- This Year: January 1 to current date
-- Last Year: January 1 to December 31 of previous year
-- All Time: no date restriction
-- Custom: user-selected start and end date
-Database Suggestions:
-If not already present, add:
-WebsiteLead:
-- spam_marked_at
-- spam_marked_by
-- rejected_at
-- rejected_by
-- duplicate_marked_at
-- duplicate_marked_by
-Acceptance Criteria:
-1. Website Leads page has a top analytics bar.
-2. Analytics bar shows Total Website Leads, Pending for Review, Converted to Contact, and Spam.
-3. Date filter supports This Week, Last Week, This Month, Last Month, This Year, Last Year, All Time, and Custom.
-4. Custom filter supports start date and end date.
-5. KPI cards update based on selected date range.
-6. KPI card clicks filter the Website Leads table.
-7. Default date filter is This Month.
-8. Role-based visibility is respected.
-9. Analytics API supports date range and CRM hierarchy filtering.
-10. The Website Leads section remains lean, simple, and review-focused.
-
-============================================================
-
-PROMPT #14
-Timestamp: 2026-06-13T06:09:27Z
-----------------------------------------
-Use this as an add-on prompt for Antigravity:
-
-Update the existing Website Leads section in the Lean CRM.
-Add a top analytics bar to the Website Leads page.
-Page:
- /crm/website-leads
-The analytics bar should appear above the Website Leads table/list.
-Purpose:
-Give managers and admins a quick view of website lead inflow and conversion status before leads are moved into CRM Contacts.
-Analytics Bar Metrics:
-Show four compact KPI cards:
-1. Total Website Leads
-- Count of all website leads received within the selected date range.
-2. Pending for Review
-- Count of website leads with status:
-  New
-  Reviewed
-  Assigned
-but not yet converted, rejected, duplicate, or spam.
-3. Converted to Contact
-- Count of website leads converted into CRM Contacts within the selected date range.
-4. Spam
-- Count of website leads marked as Spam within the selected date range.
-Optional additional small metric, only if space allows:
-- Conversion Rate
-  Formula:
-  Converted to Contact / Total Website Leads × 100
-Date Filter:
-Add a date filter control on the analytics bar.
-Predefined date filters:
-- This Week
-- Last Week
-- This Month
-- Last Month
-- This Year
-- Last Year
-- All Time
-- Custom
-Custom Date Filter:
-When Custom is selected, show:
-- Start date
-- End date
-- Apply button
-- Reset button
-Date Filter Behavior:
-- Default filter should be This Month.
-- Changing the date filter should update all KPI cards.
-- The selected date filter should also update the Website Leads table below, unless the user disables “Apply to list”.
-- Add a toggle:
-  Apply date filter to table: Yes/No
-- If Yes, table records should match the same date range.
-- If No, only KPI cards update while the table keeps its own filters.
-Date Field Logic:
-Use created_at for:
-- Total Website Leads
-- Pending for Review
-- Spam, unless spam_marked_at exists
-Use converted_at for:
-- Converted to Contact
-If spam_marked_at is created later, use spam_marked_at for Spam count.
-KPI Card Design:
-Each KPI card should show:
-- Metric label
-- Count
-- Small helper text
-- Trend c
-<truncated 979 bytes>
-less specifically permitted.
-API Requirement:
-Create or update API:
-GET /api/crm/website-leads/analytics
-Query parameters:
-- date_filter
-- start_date
-- end_date
-- group_id, permission-controlled
-- owner_id, permission-controlled
-- source_form
-- industry
-- geography
-- product_solution_id
-- partner_id
-API response should return:
-- total_website_leads
-- pending_for_review
-- converted_to_contact
-- spam
-- conversion_rate
-- date_range_start
-- date_range_end
-- previous_period_comparison, optional
-Date Filter Definitions:
-- This Week: Monday to current date
-- Last Week: previous Monday to previous Sunday
-- This Month: first day of current month to current date
-- Last Month: first day to last day of previous month
-- This Year: January 1 to current date
-- Last Year: January 1 to December 31 of previous year
-- All Time: no date restriction
-- Custom: user-selected start and end date
-Database Suggestions:
-If not already present, add:
-WebsiteLead:
-- spam_marked_at
-- spam_marked_by
-- rejected_at
-- rejected_by
-- duplicate_marked_at
-- duplicate_marked_by
-Acceptance Criteria:
-1. Website Leads page has a top analytics bar.
-2. Analytics bar shows Total Website Leads, Pending for Review, Converted to Contact, and Spam.
-3. Date filter supports This Week, Last Week, This Month, Last Month, This Year, Last Year, All Time, and Custom.
-4. Custom filter supports start date and end date.
-5. KPI cards update based on selected date range.
-6. KPI card clicks filter the Website Leads table.
-7. Default date filter is This Month.
-8. Role-based visibility is respected.
-9. Analytics API supports date range and CRM hierarchy filtering.
-10. The Website Leads section remains lean, simple, and review-focused.
-
-============================================================
-
-PROMPT #15
 Timestamp: 2026-06-13T06:20:52Z
 ----------------------------------------
 for light theme in crm, analytics boxes are not appearing right. please refer attached image for inspiration and modify the light color crm admin theme
 
 ============================================================
 
-PROMPT #16
+PROMPT #10
 Timestamp: 2026-06-13T06:28:32Z
 ----------------------------------------
 compile all the exatc prompts given in this project so far and create a file prompts library in txt format and save in root folder
 
 ============================================================
 
-PROMPT #17
-Timestamp: 2026-06-13T06:29:49Z
-----------------------------------------
-continue with Claude Sonnet model
-
-============================================================
-
-PROMPT #18
+PROMPT #11
 Timestamp: 2026-06-13T07:24:28Z
 ----------------------------------------
 enforce a system that every prmopt get recorded in prompts_library.txt going forward.
 
 ============================================================
-

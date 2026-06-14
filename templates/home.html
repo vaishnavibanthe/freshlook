@@ -957,13 +957,13 @@
 
 
 
-<!-- 8.5. Events & Webinars Hub Section (Interactive Mini Cards) -->
+<!-- 8.5. Events & Webinars Hub Section (Redesigned Premium Layout) -->
 <section class="section" id="home-events-webinars" style="background-color: var(--bg-primary); padding: 80px 0; position: relative; overflow: hidden;">
     <div class="hero-bg-glow hero-glow-2" style="opacity: 0.15; top: 10%; right: -10%;"></div>
     <div class="container">
         
         <!-- Section Header -->
-        <div class="section-header" style="text-align: center; margin-bottom: 45px;">
+        <div class="section-header" style="text-align: center; margin-bottom: 55px;">
             <span class="section-subtitle-badge" style="background-color: rgba(59, 130, 246, 0.08); border-color: rgba(59, 130, 246, 0.15); color: var(--accent-blue);">Learning Hub</span>
             <h2 class="section-title">Knowledge & <span>Industry Events</span></h2>
             <p class="section-desc" style="max-width: 680px; margin: 20px auto 0;">
@@ -971,67 +971,65 @@
             </p>
         </div>
 
-        <!-- Cards Grid -->
-        <div class="events-cards-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 24px;">
-            {% for item in events_list[:6] %}
-            <div class="event-mini-card synapse-glass-card neon-border-glow" data-type="{{ item.type|lower }}" style="display: flex; flex-direction: column; justify-content: space-between; border-radius: 16px; padding: 28px; background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(255, 255, 255, 0.02) 100%); border: 1px solid var(--border-color); box-shadow: var(--card-shadow); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);">
-                <div>
-                    <!-- Badges Row -->
-                    <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 18px; flex-wrap: wrap;">
-                        <!-- Type Badge -->
-                        {% if item.type == 'Event' %}
-                        <span class="ai-card-tag" style="margin: 0; background: rgba(59, 130, 246, 0.08); color: #3b82f6; border-color: rgba(59, 130, 246, 0.15); font-size: 10px; padding: 4px 10px; font-weight: 700;"><i class="fas fa-calendar-days" style="margin-right: 4px;"></i> Live Event</span>
-                        {% else %}
-                        <span class="ai-card-tag" style="margin: 0; background: rgba(168, 85, 247, 0.08); color: #a855f7; border-color: rgba(168, 85, 247, 0.15); font-size: 10px; padding: 4px 10px; font-weight: 700;"><i class="fas fa-circle-play" style="margin-right: 4px;"></i> Webinar</span>
-                        {% endif %}
+        {% set event_images = [
+            '/static/img/event_1.png',
+            '/static/img/event_2.png',
+            '/static/img/event_3.png',
+            '/static/img/event_4.png',
+            '/static/img/event_5.png',
+            '/static/img/event_6.png'
+        ] %}
 
-                        <!-- Delivery Mode Badge -->
-                        {% if item.delivery_type == 'Online' %}
-                        <span class="ai-card-tag" style="margin: 0; background: rgba(16, 185, 129, 0.08); color: #10b981; border-color: rgba(16, 185, 129, 0.15); font-size: 10px; padding: 4px 10px; font-weight: 700;">Online</span>
-                        {% elif item.delivery_type == 'Hybrid' %}
-                        <span class="ai-card-tag" style="margin: 0; background: rgba(245, 158, 11, 0.08); color: #f59e0b; border-color: rgba(245, 158, 11, 0.15); font-size: 10px; padding: 4px 10px; font-weight: 700;">Hybrid</span>
+        <!-- Cards Grid -->
+        <div class="events-redesigned-grid">
+            {% for item in events_list[:6] %}
+            {% set img_url = item.card_image if item.card_image else event_images[loop.index0 % event_images|length] %}
+            <div class="event-premium-card" data-type="{{ item.type|lower }}">
+                <!-- Image Container -->
+                <div class="event-card-img-wrapper">
+                    <img src="{{ img_url }}" alt="{{ item.title }}" class="event-card-img">
+                    <!-- Dynamic badges overlay -->
+                    <div class="event-card-badges">
+                        {% if item.type == 'Event' %}
+                        <span class="badge-type live"><i class="fas fa-calendar-days"></i> Event</span>
                         {% else %}
-                        <span class="ai-card-tag" style="margin: 0; background: rgba(239, 68, 68, 0.08); color: #ef4444; border-color: rgba(239, 68, 68, 0.15); font-size: 10px; padding: 4px 10px; font-weight: 700;">In-Person</span>
+                        <span class="badge-type webinar"><i class="fas fa-circle-play"></i> Webinar</span>
                         {% endif %}
                     </div>
-
-                    <!-- Title & description -->
-                    <h3 style="font-size: 18.5px; font-weight: 800; line-height: 1.35; margin: 0 0 12px 0; color: var(--text-primary);">
-                        {{ item.title }}
-                    </h3>
-                    <p style="font-size: 13.5px; line-height: 1.55; color: var(--text-secondary); margin: 0 0 20px 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; height: 63px;">
-                        {{ item.summary }}
-                    </p>
                 </div>
 
-                <!-- Footer details & button -->
-                <div>
-                    <!-- Date & time section -->
-                    <div style="border-top: 1px solid var(--border-color); padding-top: 16px; margin-bottom: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                        <div style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--text-tertiary);">
-                            <i class="far fa-calendar" style="color: var(--accent-blue); font-size: 14px;"></i>
-                            <span>{{ item.date_str }}</span>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--text-tertiary);">
-                            <i class="far fa-clock" style="color: var(--accent-blue); font-size: 14px;"></i>
-                            <span>{{ item.time }}</span>
-                        </div>
-                        <div style="grid-column: span 2; display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--text-tertiary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                            {% if item.type == 'Event' %}
-                            <i class="fas fa-location-dot" style="color: var(--accent-blue); font-size: 14px;"></i>
-                            {% else %}
-                            <i class="fas fa-user-tie" style="color: var(--accent-blue); font-size: 14px;"></i>
-                            {% endif %}
-                            <span title="{{ item.location }}">{{ item.location }}</span>
+                <!-- Content Area -->
+                <div class="event-card-body">
+                    <h3 class="event-card-title">{{ item.title }}</h3>
+                    <p class="event-card-desc">{{ item.summary }}</p>
+                    
+                    <hr class="event-card-divider">
+                    
+                    <!-- Meta Details -->
+                    <div class="event-card-meta">
+                        <span class="meta-label">TIME</span>
+                        <div class="meta-details">
+                            <span class="meta-detail-item"><i class="far fa-calendar"></i> {{ item.date_str }}</span>
+                            <span class="meta-detail-item"><i class="far fa-clock"></i> {{ item.time }}</span>
+                            <span class="meta-detail-item" title="{{ item.location }}">
+                                {% if item.type == 'Event' %}
+                                <i class="fas fa-location-dot"></i>
+                                {% else %}
+                                <i class="fas fa-user-tie"></i>
+                                {% endif %}
+                                {{ item.location }}
+                            </span>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Action Button -->
-                    <a href="{{ item.url }}" class="btn {% if item.type == 'Event' %}btn-primary{% else %}btn-secondary{% endif %}" style="display: block; text-align: center; font-size: 13px; font-weight: 700; padding: 11px 0; border-radius: 8px; text-decoration: none; transition: all 0.3s ease;">
+                <!-- Action CTA styled like inspiration image link -->
+                <div class="event-card-footer">
+                    <a href="{{ item.url }}" class="event-card-cta">
                         {% if item.type == 'Event' %}
-                        Register for Event <i class="fas fa-arrow-right" style="margin-left: 6px; font-size: 10px;"></i>
+                        REGISTER FOR EVENT <span class="cta-arrow">&rarr;</span>
                         {% else %}
-                        Watch Webinar <i class="fas fa-circle-play" style="margin-left: 6px; font-size: 11px;"></i>
+                        WATCH WEBINAR <span class="cta-arrow">+</span>
                         {% endif %}
                     </a>
                 </div>
@@ -1040,20 +1038,11 @@
         </div>
 
         <!-- View All Button -->
-        <div style="text-align: center; margin-top: 45px;">
+        <div style="text-align: center; margin-top: 55px;">
             <a href="/resources/events" class="btn btn-secondary btn-glow" style="padding: 12px 32px; border-radius: 30px; font-weight: 700; font-size: 14.5px;">View All Events & Webinars <i class="fas fa-calendar-alt" style="margin-left: 8px;"></i></a>
         </div>
     </div>
 </section>
-
-<!-- Inline styles & scripts for tabs & micro-animations -->
-<style>
-    .event-mini-card:hover {
-        transform: translateY(-6px);
-        border-color: rgba(37, 99, 235, 0.3) !important;
-        box-shadow: 0 12px 30px rgba(37, 99, 235, 0.05) !important;
-    }
-</style>
 
 <!-- 9. Final CTA Section -->
 <section class="section-alt cta-banner-cosmic tech-dot-grid" style="text-align: center; padding: 100px 0;" id="cta-hub">

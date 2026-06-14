@@ -247,6 +247,36 @@
     body.light-theme .opps-table tr:hover td {
         background-color: #f1f5f9;
     }
+    .filter-panel {
+        background-color: var(--bg-card);
+        border: 1px solid var(--border-crm);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 24px;
+    }
+    
+    .filter-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+    
+    .search-input-wrapper {
+        position: relative;
+    }
+    
+    .search-input-wrapper i {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-crm-muted);
+    }
+    
+    .search-input-wrapper input {
+        padding-left: 36px;
+    }
 </style>
 
 <div class="crm-header-bar">
@@ -264,6 +294,120 @@
             </button>
         </div>
     </div>
+</div>
+
+<!-- Filters Panel -->
+<div class="filter-panel">
+    <form action="{{ url_for('crm.crm_opportunities') }}" method="GET" id="filter-form">
+        <div class="filter-grid">
+            <div class="form-group">
+                <label class="form-label">Search Accounts</label>
+                <div class="search-input-wrapper">
+                    <i class="fas fa-search"></i>
+                    <input type="text" name="search_account" class="form-control" placeholder="Company / Account name..." value="{{ search_account or '' }}">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Industry</label>
+                <select name="industry" class="form-control" onchange="this.form.submit()">
+                    <option value="">All Industries</option>
+                    {% for ind in industries %}
+                    <option value="{{ ind.industry }}" {% if selected_industry == ind.industry %}selected{% endif %}>{{ ind.industry }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Geography</label>
+                <select name="geography" class="form-control" onchange="this.form.submit()">
+                    <option value="">All Geographies</option>
+                    {% for geo in geographies %}
+                    <option value="{{ geo.geography }}" {% if selected_geography == geo.geography %}selected{% endif %}>{{ geo.geography }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Assigned Owner</label>
+                <select name="owner_id" class="form-control" onchange="this.form.submit()">
+                    <option value="">All Owners</option>
+                    {% for owner in owners %}
+                    <option value="{{ owner.id }}" {% if selected_owner_id|int == owner.id %}selected{% endif %}>{{ owner.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Deal Stage</label>
+                <select name="stage" class="form-control" onchange="this.form.submit()">
+                    <option value="">All Stages</option>
+                    {% for st in stages %}
+                    <option value="{{ st }}" {% if selected_stage == st %}selected{% endif %}>{{ st }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Expected Value</label>
+                <select name="value_range" class="form-control" onchange="this.form.submit()">
+                    <option value="">All Values</option>
+                    {% for val in value_ranges %}
+                    <option value="{{ val }}" {% if selected_value_range == val %}selected{% endif %}>{{ val }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 16px; align-items: center; border-top: 1px solid var(--border-crm); padding-top: 15px; flex-wrap: wrap;">
+            <!-- Date Added Filter -->
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 13px; color: var(--text-crm-secondary);">Date Added:</span>
+                <select name="date_filter" id="date-filter" class="form-control" style="width: auto; padding: 4px 12px; font-size: 13px;">
+                    <option value="All Time" {% if date_filter == 'All Time' %}selected{% endif %}>All Time</option>
+                    <option value="This Week" {% if date_filter == 'This Week' %}selected{% endif %}>This Week</option>
+                    <option value="Last Week" {% if date_filter == 'Last Week' %}selected{% endif %}>Last Week</option>
+                    <option value="This Month" {% if date_filter == 'This Month' %}selected{% endif %}>This Month</option>
+                    <option value="Last Month" {% if date_filter == 'Last Month' %}selected{% endif %}>Last Month</option>
+                    <option value="This Year" {% if date_filter == 'This Year' %}selected{% endif %}>This Year</option>
+                    <option value="Last Year" {% if date_filter == 'Last Year' %}selected{% endif %}>Last Year</option>
+                    <option value="Custom" {% if date_filter == 'Custom' %}selected{% endif %}>Custom</option>
+                </select>
+                <div id="custom-date-inputs" style="display: {% if date_filter == 'Custom' %}flex{% else %}none{% endif %}; align-items: center; gap: 6px;">
+                    <input type="date" name="start_date" class="form-control" style="width: auto; padding: 4px; font-size: 12px;" value="{{ start_date }}">
+                    <span style="color: var(--text-crm-muted); font-size: 12px;">to</span>
+                    <input type="date" name="end_date" class="form-control" style="width: auto; padding: 4px; font-size: 12px;" value="{{ end_date }}">
+                </div>
+            </div>
+
+            <!-- Expected Closure Filter -->
+            <div style="display: flex; align-items: center; gap: 8px; margin-left: 16px;">
+                <span style="font-size: 13px; color: var(--text-crm-secondary);">Expected Closure:</span>
+                <select name="close_date_filter" id="close-date-filter" class="form-control" style="width: auto; padding: 4px 12px; font-size: 13px;">
+                    <option value="All Time" {% if close_date_filter == 'All Time' %}selected{% endif %}>All Time</option>
+                    <option value="This Week" {% if close_date_filter == 'This Week' %}selected{% endif %}>This Week</option>
+                    <option value="Last Week" {% if close_date_filter == 'Last Week' %}selected{% endif %}>Last Week</option>
+                    <option value="This Month" {% if close_date_filter == 'This Month' %}selected{% endif %}>This Month</option>
+                    <option value="Last Month" {% if close_date_filter == 'Last Month' %}selected{% endif %}>Last Month</option>
+                    <option value="This Year" {% if close_date_filter == 'This Year' %}selected{% endif %}>This Year</option>
+                    <option value="Last Year" {% if close_date_filter == 'Last Year' %}selected{% endif %}>Last Year</option>
+                    <option value="Custom" {% if close_date_filter == 'Custom' %}selected{% endif %}>Custom</option>
+                </select>
+                <div id="custom-close-date-inputs" style="display: {% if close_date_filter == 'Custom' %}flex{% else %}none{% endif %}; align-items: center; gap: 6px;">
+                    <input type="date" name="close_start_date" class="form-control" style="width: auto; padding: 4px; font-size: 12px;" value="{{ close_start_date }}">
+                    <span style="color: var(--text-crm-muted); font-size: 12px;">to</span>
+                    <input type="date" name="close_end_date" class="form-control" style="width: auto; padding: 4px; font-size: 12px;" value="{{ close_end_date }}">
+                </div>
+            </div>
+
+            <button type="submit" class="btn-crm btn-crm-primary" style="margin-left: auto; padding: 6px 16px; font-size: 12.5px;">
+                <i class="fas fa-filter"></i> Apply Filters
+            </button>
+            <a href="{{ url_for('crm.crm_opportunities') }}" class="btn-crm btn-crm-secondary" style="padding: 6px 16px; font-size: 12.5px;">
+                Reset
+            </a>
+        </div>
+    </form>
 </div>
 
 <!-- ==================================================== -->
@@ -411,5 +555,23 @@
             }
         });
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const dateFilter = document.getElementById('date-filter');
+        const customDateInputs = document.getElementById('custom-date-inputs');
+        if (dateFilter && customDateInputs) {
+            dateFilter.addEventListener('change', function() {
+                customDateInputs.style.display = dateFilter.value === 'Custom' ? 'flex' : 'none';
+            });
+        }
+
+        const closeDateFilter = document.getElementById('close-date-filter');
+        const customCloseDateInputs = document.getElementById('custom-close-date-inputs');
+        if (closeDateFilter && customCloseDateInputs) {
+            closeDateFilter.addEventListener('change', function() {
+                customCloseDateInputs.style.display = closeDateFilter.value === 'Custom' ? 'flex' : 'none';
+            });
+        }
+    });
 </script>
 {% endblock %}

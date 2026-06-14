@@ -1,0 +1,807 @@
+{% extends "base_crm.html" %}
+
+{% block title %}Review TeleCRM SQL - ThinkArtha{% endblock %}
+
+{% block extra_head %}
+<style>
+    .review-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 20px;
+    }
+
+    .detail-section {
+        background: rgba(9, 19, 34, 0.45);
+        border: 1px solid var(--border-crm);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+        backdrop-filter: blur(10px);
+    }
+
+    .section-title {
+        font-size: 14px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #fff;
+        border-bottom: 1px solid var(--border-crm);
+        padding-bottom: 8px;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .info-label {
+        font-size: 11px;
+        color: var(--text-crm-muted);
+        text-transform: uppercase;
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+
+    .info-val {
+        font-size: 13.5px;
+        color: #fff;
+        font-weight: 500;
+    }
+
+    .duplicate-card {
+        background: rgba(245, 158, 11, 0.05);
+        border: 1px solid rgba(245, 158, 11, 0.25);
+        border-radius: 8px;
+        padding: 12px;
+        margin-bottom: 12px;
+    }
+
+    .review-log-item {
+        font-size: 12px;
+        border-left: 2px solid var(--accent-blue);
+        padding-left: 10px;
+        margin-bottom: 12px;
+    }
+
+    .badge-sql {
+        display: inline-block;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .badge-sql.new { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+    .badge-sql.pending { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+    .badge-sql.approved { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+    .badge-sql.converted { background: rgba(16, 185, 129, 0.25); color: #10b981; border: 1px solid #10b981; }
+    .badge-sql.rejected { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+    .badge-sql.duplicate { background: rgba(139, 92, 246, 0.15); color: #8b5cf6; }
+
+    /* Modals styling */
+    .modal-backdrop {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.8);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        backdrop-filter: blur(4px);
+    }
+
+    .modal-card {
+        background: var(--bg-sidebar);
+        border: 1px solid var(--border-crm);
+        border-radius: 12px;
+        width: 100%;
+        max-width: 550px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .modal-header {
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border-crm);
+        background: rgba(22, 45, 80, 0.2);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: 700;
+    }
+
+    .modal-body {
+        padding: 20px;
+        overflow-y: auto;
+        max-height: 80vh;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="sql-container" id="detail-app">
+    <!-- Header -->
+    <div class="crm-title-section" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <div>
+            <a href="/telecrm/sql" style="color: var(--accent-blue); text-decoration: none; font-size: 13px; font-weight: 600;">
+                <i class="fas fa-arrow-left"></i> Back to Staging Inbox
+            </a>
+            <h1 style="margin-top: 6px;" id="header-title">Review SQL Staging Record</h1>
+            <p>Qualified on <span id="header-created-at">-</span> by Telecaller <span id="header-telecaller">-</span></p>
+        </div>
+        <div>
+            <span class="badge-sql" id="header-status">-</span>
+        </div>
+    </div>
+
+    <!-- Review Content -->
+    <div class="review-grid">
+        <!-- LEFT COLUMN: SQL Information -->
+        <div>
+            <!-- Section A: SQL Summary -->
+            <div class="detail-section">
+                <div class="section-title"><i class="fas fa-info-circle"></i> A. SQL Summary</div>
+                <div class="info-grid">
+                    <div>
+                        <div class="info-label">Contact Name</div>
+                        <div class="info-val" id="view-name">-</div>
+                    </div>
+                    <div>
+                        <div class="info-label">Company</div>
+                        <div class="info-val" id="view-company">-</div>
+                    </div>
+                    <div>
+                        <div class="info-label">Job Title</div>
+                        <div class="info-val" id="view-job-title">-</div>
+                    </div>
+                    <div>
+                        <div class="info-label">Email Address</div>
+                        <div class="info-val" id="view-email">-</div>
+                    </div>
+                    <div>
+                        <div class="info-label">Phone Number</div>
+                        <div class="info-val" id="view-phone">-</div>
+                    </div>
+                    <div>
+                        <div class="info-label">Geography / Country</div>
+                        <div class="info-val" id="view-geography">-</div>
+                    </div>
+                    <div>
+                        <div class="info-label">Product / Solution</div>
+                        <div class="info-val" id="view-product">-</div>
+                    </div>
+                    <div>
+                        <div class="info-label">Partner Mapping</div>
+                        <div class="info-val" id="view-partner">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section B: Meeting & MOM -->
+            <div class="detail-section">
+                <div class="section-title"><i class="fas fa-calendar-alt"></i> B. Meeting & MOM</div>
+                <div class="info-grid" style="margin-bottom: 16px;">
+                    <div>
+                        <div class="info-label">Meeting Scheduled</div>
+                        <div class="info-val" id="view-meet-sched">-</div>
+                    </div>
+                    <div>
+                        <div class="info-label">Meeting Completed</div>
+                        <div class="info-val" id="view-meet-comp">-</div>
+                    </div>
+                    <div>
+                        <div class="info-label">Meeting Mode</div>
+                        <div class="info-val" id="view-meet-mode">-</div>
+                    </div>
+                    <div>
+                        <div class="info-label">Meeting Link</div>
+                        <div class="info-val"><a href="#" id="view-meet-link" target="_blank">-</a></div>
+                    </div>
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <div class="info-label">Meeting Minutes / MOM</div>
+                    <div class="info-val" style="background: rgba(22, 45, 80, 0.15); padding: 12px; border-radius: 6px; border: 1px solid var(--border-crm);" id="view-mom">-</div>
+                </div>
+                <div>
+                    <div class="info-label">Next Action</div>
+                    <div class="info-val" id="view-next-action">-</div>
+                </div>
+            </div>
+
+            <!-- Section C: Qualification Snapshot -->
+            <div class="detail-section">
+                <div class="section-title"><i class="fas fa-check-double"></i> C. Qualification Snapshot (MEDDIC prefill)</div>
+                <div style="margin-bottom: 16px;">
+                    <div class="info-label">Identify Pain (Business Pain / problem)</div>
+                    <div class="info-val" id="view-pain">-</div>
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <div class="info-label">Problem Statement</div>
+                    <div class="info-val" id="view-problem">-</div>
+                </div>
+                <div class="info-grid" style="margin-bottom: 16px;">
+                    <div>
+                        <div class="info-label">Urgency Level</div>
+                        <div class="info-val" id="view-urgency">-</div>
+                    </div>
+                    <div>
+                        <div class="info-label">Interest Level</div>
+                        <div class="info-val" id="view-interest">-</div>
+                    </div>
+                    <div>
+                        <div class="info-label">Lead Quality Rating</div>
+                        <div class="info-val" style="color: #eab308; font-weight: 700;" id="view-rating">-</div>
+                    </div>
+                    <div>
+                        <div class="info-label">Decision Maker Involved</div>
+                        <div class="info-val" id="view-decision-maker">-</div>
+                    </div>
+                </div>
+                <div class="info-grid">
+                    <div>
+                        <div class="info-label">Budget Indication</div>
+                        <div class="info-val" id="view-budget">-</div>
+                    </div>
+                    <div>
+                        <div class="info-label">Timeline Indication</div>
+                        <div class="info-val" id="view-timeline">-</div>
+                    </div>
+                    <div style="grid-column: span 2;">
+                        <div class="info-label">Economic Buyer Hint</div>
+                        <div class="info-val" id="view-buyer-hint">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section D: Source & Timeline -->
+            <div class="detail-section">
+                <div class="section-title"><i class="fas fa-history"></i> D. Source & Calling Activity Timeline</div>
+                <div class="info-grid" style="margin-bottom: 16px;">
+                    <div>
+                        <div class="info-label">Source Campaign</div>
+                        <div class="info-val" id="view-campaign">-</div>
+                    </div>
+                    <div>
+                        <div class="info-label">Telecaller</div>
+                        <div class="info-val" id="view-caller">-</div>
+                    </div>
+                </div>
+                <h4 style="margin-bottom: 12px; font-size: 13px; color: #fff;">Dialer Timeline logs</h4>
+                <div id="timeline-container" style="display: flex; flex-direction: column; gap: 10px;">
+                    <!-- Activity logs go here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Duplicate Checks & Review Control Actions -->
+        <div>
+            <!-- Section E: Duplicate check alerts -->
+            <div class="detail-section" style="border-color: rgba(245, 158, 11, 0.3);">
+                <div class="section-title" style="color: #f59e0b;"><i class="fas fa-exclamation-triangle"></i> E. Duplicate Check</div>
+                <div id="duplicate-warning-body">
+                    <!-- Duplicate warnings inject dynamically -->
+                </div>
+            </div>
+
+            <!-- Section F: Review Action controls -->
+            <div class="detail-section" style="border-color: var(--accent-blue);">
+                <div class="section-title" style="color: var(--accent-blue);"><i class="fas fa-gavel"></i> F. Review Actions</div>
+                <div style="display: flex; flex-direction: column; gap: 10px;" id="action-buttons-container">
+                    <button class="btn-crm btn-crm-primary" onclick="openMoveModal()"><i class="fas fa-exchange-alt"></i> Move to Core CRM</button>
+                    <button class="btn-crm btn-crm-secondary" onclick="approveSQLStaging()"><i class="fas fa-check"></i> Approve SQL (Keep Staging)</button>
+                    <button class="btn-crm btn-crm-secondary" onclick="openReturnModal()"><i class="fas fa-undo"></i> Return for Details</button>
+                    <button class="btn-crm btn-crm-danger" style="border: none;" onclick="openRejectModal()"><i class="fas fa-times"></i> Reject SQL</button>
+                    <button class="btn-crm btn-crm-secondary" onclick="openDuplicateModal()"><i class="fas fa-clone"></i> Mark Duplicate</button>
+                </div>
+                
+                <div class="form-group" style="margin-top: 20px;">
+                    <label class="form-label">Review Note History</label>
+                    <textarea id="review-note-input" class="form-control" rows="2" placeholder="Append a note to the review logs..."></textarea>
+                    <button class="btn-crm btn-crm-secondary" style="margin-top: 8px; width: 100%;" onclick="saveReviewNote()">Save Note</button>
+                </div>
+            </div>
+
+            <!-- Staging Logs -->
+            <div class="detail-section">
+                <div class="section-title"><i class="fas fa-align-left"></i> Review Log History</div>
+                <div id="review-logs-list" style="display: flex; flex-direction: column; gap: 8px;">
+                    <!-- Review logs entries -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: Move to CRM -->
+<div class="modal-backdrop" id="move-crm-modal">
+    <div class="modal-card">
+        <div class="modal-header">
+            <span><i class="fas fa-exchange-alt"></i> Move SQL to Core CRM</span>
+            <button onclick="closeModal('move-crm-modal')" style="background: none; border: none; color: #fff; cursor: pointer;"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <form onsubmit="submitMoveToCRM(event)">
+                <div class="form-group">
+                    <label class="form-label">Assign CRM Owner <span style="color: #ef4444;">*</span></label>
+                    <select id="move-owner" class="form-control" required>
+                        <option value="">Select Owner</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Contact Mapping Choice</label>
+                    <select id="move-contact-map" class="form-control">
+                        <option value="new">Create New Contact</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Account Mapping Choice</label>
+                    <select id="move-account-map" class="form-control">
+                        <option value="new">Create New Account</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Opportunity Mapping Choice</label>
+                    <select id="move-opp-map" class="form-control">
+                        <option value="new">Create New Opportunity</option>
+                    </select>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px;">
+                    <button type="button" class="btn-crm btn-crm-secondary" onclick="closeModal('move-crm-modal')">Cancel</button>
+                    <button type="submit" class="btn-crm btn-crm-primary">Convert & Handover</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: Return for info -->
+<div class="modal-backdrop" id="return-info-modal">
+    <div class="modal-card" style="max-width: 450px;">
+        <div class="modal-header">
+            <span><i class="fas fa-undo"></i> Return to Telecaller</span>
+            <button onclick="closeModal('return-info-modal')" style="background: none; border: none; color: #fff; cursor: pointer;"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <form onsubmit="submitReturnSQL(event)">
+                <div class="form-group">
+                    <label class="form-label">Feedback / What details are missing? <span style="color: #ef4444;">*</span></label>
+                    <textarea id="return-reason" class="form-control" rows="3" required placeholder="Describe details telecaller needs to capture..."></textarea>
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                    <button type="button" class="btn-crm btn-crm-secondary" onclick="closeModal('return-info-modal')">Cancel</button>
+                    <button type="submit" class="btn-crm btn-crm-primary">Return</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: Reject -->
+<div class="modal-backdrop" id="reject-modal">
+    <div class="modal-card" style="max-width: 450px;">
+        <div class="modal-header">
+            <span><i class="fas fa-times-circle"></i> Reject SQL</span>
+            <button onclick="closeModal('reject-modal')" style="background: none; border: none; color: #fff; cursor: pointer;"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <form onsubmit="submitRejectSQL(event)">
+                <div class="form-group">
+                    <label class="form-label">Rejection Reason <span style="color: #ef4444;">*</span></label>
+                    <select id="reject-reason-select" class="form-control" required>
+                        <option value="">Select Reason</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Additional Comments</label>
+                    <textarea id="reject-comments" class="form-control" rows="2" placeholder="Rejection notes..."></textarea>
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                    <button type="button" class="btn-crm btn-crm-secondary" onclick="closeModal('reject-modal')">Cancel</button>
+                    <button type="submit" class="btn-crm btn-crm-danger" style="border: none;">Reject SQL</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: Duplicate -->
+<div class="modal-backdrop" id="duplicate-modal">
+    <div class="modal-card" style="max-width: 450px;">
+        <div class="modal-header">
+            <span><i class="fas fa-clone"></i> Mark as Duplicate</span>
+            <button onclick="closeModal('duplicate-modal')" style="background: none; border: none; color: #fff; cursor: pointer;"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <form onsubmit="submitMarkDuplicate(event)">
+                <div class="form-group">
+                    <label class="form-label">Notes / Duplicate Record Reference</label>
+                    <textarea id="duplicate-reason" class="form-control" rows="3" required placeholder="Specify duplicate matching reference..."></textarea>
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                    <button type="button" class="btn-crm btn-crm-secondary" onclick="closeModal('duplicate-modal')">Cancel</button>
+                    <button type="submit" class="btn-crm btn-crm-primary">Mark Duplicate</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    const sqlId = {{ sql_id }};
+    let sqlData = null;
+
+    document.addEventListener("DOMContentLoaded", () => {
+        loadDetail();
+    });
+
+    function openModal(id) {
+        document.getElementById(id).style.display = 'flex';
+    }
+
+    function closeModal(id) {
+        document.getElementById(id).style.display = 'none';
+    }
+
+    function loadDetail() {
+        fetch(`/api/telecrm/sql/${sqlId}`)
+            .then(res => res.json())
+            .then(data => {
+                sqlData = data;
+                renderDetails();
+            });
+    }
+
+    function renderDetails() {
+        const sql = sqlData.sql;
+        
+        // Header
+        document.getElementById("header-title").textContent = `Review SQL: ${sql.contact_name} (${sql.company})`;
+        document.getElementById("header-created-at").textContent = sql.created_at ? sql.created_at.split(' ')[0] : '-';
+        document.getElementById("header-telecaller").textContent = sql.telecaller_name || 'Unassigned';
+        
+        const statusEl = document.getElementById("header-status");
+        statusEl.textContent = sql.status;
+        statusEl.className = `badge-sql ${sql.status.toLowerCase().replace(/\s+/g, '-')}`;
+        
+        // Section A
+        document.getElementById("view-name").textContent = sql.contact_name;
+        document.getElementById("view-company").textContent = sql.company;
+        document.getElementById("view-job-title").textContent = sql.job_title || '-';
+        document.getElementById("view-email").textContent = sql.email || '-';
+        document.getElementById("view-phone").textContent = sql.phone || '-';
+        document.getElementById("view-geography").textContent = `${sql.geography || ''} / ${sql.country || ''}`.trim() || '-';
+        document.getElementById("view-product").textContent = sql.product_name || 'No Solution';
+        document.getElementById("view-partner").textContent = sql.partner_name || 'No Partner';
+
+        // Section B
+        document.getElementById("view-meet-sched").textContent = sql.meeting_scheduled_at || '-';
+        document.getElementById("view-meet-comp").textContent = sql.meeting_completed_at || '-';
+        document.getElementById("view-meet-mode").textContent = sql.meeting_mode || '-';
+        
+        const linkEl = document.getElementById("view-meet-link");
+        if (sql.meeting_link) {
+            linkEl.href = sql.meeting_link;
+            linkEl.textContent = sql.meeting_link;
+        } else {
+            linkEl.removeAttribute('href');
+            linkEl.textContent = '-';
+        }
+        document.getElementById("view-mom").textContent = sql.mom || '-';
+        document.getElementById("view-next-action").textContent = sql.next_action || '-';
+
+        // Section C
+        document.getElementById("view-pain").textContent = sql.business_pain || '-';
+        document.getElementById("view-problem").textContent = sql.problem_statement || '-';
+        document.getElementById("view-urgency").textContent = sql.urgency_level || 'Medium';
+        document.getElementById("view-interest").textContent = sql.interest_level || 'Medium';
+        document.getElementById("view-rating").textContent = sql.lead_quality_rating ? `★ ${sql.lead_quality_rating}/5` : '-';
+        document.getElementById("view-decision-maker").textContent = sql.decision_maker_involved === 1 ? 'Yes' : 'No';
+        document.getElementById("view-budget").textContent = sql.budget_indication || 'No Budget indication';
+        document.getElementById("view-timeline").textContent = sql.timeline_indication || 'No Timeline indication';
+        document.getElementById("view-buyer-hint").textContent = sql.economic_buyer_hint || '-';
+
+        // Section D
+        document.getElementById("view-campaign").textContent = sql.campaign_name || '-';
+        document.getElementById("view-caller").textContent = sql.telecaller_name || '-';
+        
+        // Render Timeline logs
+        const timelineBox = document.getElementById("timeline-container");
+        timelineBox.innerHTML = '';
+        
+        // Generate mock timeline entries from MOM and calls
+        const timelineItem = document.createElement("div");
+        timelineItem.style.background = 'rgba(22, 45, 80, 0.15)';
+        timelineItem.style.padding = '10px';
+        timelineItem.style.borderRadius = '6px';
+        timelineItem.style.fontSize = '12px';
+        timelineItem.innerHTML = `
+            <div style="display: flex; justify-content: space-between; font-weight: 600; color: #fff;">
+                <span>Call Spoken Outcome</span>
+                <span style="color: var(--text-crm-muted);">${sql.meeting_completed_at || ''}</span>
+            </div>
+            <p style="margin: 4px 0 0 0; color: var(--text-crm-secondary);">MOM: ${sql.mom || ''}</p>
+        `;
+        timelineBox.appendChild(timelineItem);
+
+        // Section E: Duplicates
+        const dupWarningBody = document.getElementById("duplicate-warning-body");
+        dupWarningBody.innerHTML = '';
+        
+        const contacts = sqlData.duplicates.contacts;
+        const accounts = sqlData.duplicates.accounts;
+        const opportunities = sqlData.duplicates.opportunities;
+        
+        let dupCount = 0;
+        
+        if (contacts.length > 0) {
+            contacts.forEach(c => {
+                dupCount++;
+                const div = document.createElement("div");
+                div.className = "duplicate-card";
+                div.innerHTML = `
+                    <div style="font-weight: 700; color: #fff; font-size: 12.5px;">Contact match: ${c.full_name}</div>
+                    <div style="font-size: 11.5px; color: var(--text-crm-secondary); margin-top: 2px;">Email: ${c.email} | Phone: ${c.phone || '-'}</div>
+                    <div style="font-size: 10.5px; color: #f59e0b; margin-top: 4px; font-weight: 600;">Match Type: Email | Confidence: High</div>
+                `;
+                dupWarningBody.appendChild(div);
+            });
+        }
+        
+        if (accounts.length > 0) {
+            accounts.forEach(a => {
+                dupCount++;
+                const div = document.createElement("div");
+                div.className = "duplicate-card";
+                div.innerHTML = `
+                    <div style="font-weight: 700; color: #fff; font-size: 12.5px;">Account match: ${a.account_name}</div>
+                    <div style="font-size: 11.5px; color: var(--text-crm-secondary); margin-top: 2px;">Industry: ${a.industry || '-'} | Geography: ${a.geography || '-'}</div>
+                    <div style="font-size: 10.5px; color: #f59e0b; margin-top: 4px; font-weight: 600;">Match Type: Company Name | Confidence: High</div>
+                `;
+                dupWarningBody.appendChild(div);
+            });
+        }
+
+        if (opportunities.length > 0) {
+            opportunities.forEach(o => {
+                dupCount++;
+                const div = document.createElement("div");
+                div.className = "duplicate-card";
+                div.innerHTML = `
+                    <div style="font-weight: 700; color: #fff; font-size: 12.5px;">Opportunity match: ${o.opportunity_name}</div>
+                    <div style="font-size: 11.5px; color: var(--text-crm-secondary); margin-top: 2px;">Stage: ${o.stage} | Owner: ${o.owner_name || 'Unassigned'}</div>
+                    <div style="font-size: 10.5px; color: #f59e0b; margin-top: 4px; font-weight: 600;">Match Type: Open Opportunity | Status: ${o.status}</div>
+                `;
+                dupWarningBody.appendChild(div);
+            });
+        }
+        
+        if (dupCount === 0) {
+            dupWarningBody.innerHTML = `
+                <div style="text-align: center; padding: 20px; color: var(--text-crm-muted); font-size: 12.5px;">
+                    <i class="fas fa-check-circle" style="color: #10b981; font-size: 18px; margin-bottom: 6px;"></i>
+                    <p style="margin: 0;">No duplicates found in CRM database.</p>
+                </div>
+            `;
+        }
+
+        // Section F: Rejection reasons list
+        const rejectSelect = document.getElementById("reject-reason-select");
+        rejectSelect.innerHTML = '<option value="">Select Rejection Reason</option>';
+        sqlData.rejection_reasons.forEach(r => {
+            const opt = document.createElement("option");
+            opt.value = r.reason;
+            opt.textContent = r.reason;
+            rejectSelect.appendChild(opt);
+        });
+
+        // Populate Active Users in Move to CRM modal
+        const ownerSelect = document.getElementById("move-owner");
+        ownerSelect.innerHTML = '<option value="">Select CRM Owner</option>';
+        sqlData.active_users.forEach(u => {
+            const opt = document.createElement("option");
+            opt.value = u.id;
+            opt.textContent = `${u.name} (${u.role})`;
+            if (u.id === sql.recommended_owner_id || u.id === sql.assigned_owner_id) {
+                opt.selected = true;
+            }
+            ownerSelect.appendChild(opt);
+        });
+
+        // Set mapping choices
+        const contactMap = document.getElementById("move-contact-map");
+        contactMap.innerHTML = '<option value="new">Create New Contact</option>';
+        contacts.forEach(c => {
+            const opt = document.createElement("option");
+            opt.value = c.id;
+            opt.textContent = `Link to existing Contact: ${c.full_name} (${c.email})`;
+            opt.selected = true; // default select match
+            contactMap.appendChild(opt);
+        });
+
+        const accountMap = document.getElementById("move-account-map");
+        accountMap.innerHTML = '<option value="new">Create New Account</option>';
+        accounts.forEach(a => {
+            const opt = document.createElement("option");
+            opt.value = a.id;
+            opt.textContent = `Link to existing Account: ${a.account_name}`;
+            opt.selected = true; // default select match
+            accountMap.appendChild(opt);
+        });
+
+        const oppMap = document.getElementById("move-opp-map");
+        oppMap.innerHTML = '<option value="new">Create New Opportunity</option>';
+        opportunities.forEach(o => {
+            const opt = document.createElement("option");
+            opt.value = o.id;
+            opt.textContent = `Link to existing Opportunity: ${o.opportunity_name}`;
+            oppMap.appendChild(opt);
+        });
+
+        // Render logs list
+        const logsList = document.getElementById("review-logs-list");
+        logsList.innerHTML = '';
+        if (sqlData.logs.length === 0) {
+            logsList.innerHTML = '<div style="font-size: 12px; color: var(--text-crm-muted);">No logs recorded.</div>';
+        } else {
+            sqlData.logs.forEach(l => {
+                const div = document.createElement("div");
+                div.className = "review-log-item";
+                div.innerHTML = `
+                    <div style="font-weight: 600; color: #fff;">${l.action_type}</div>
+                    <div style="color: var(--text-crm-secondary); font-size: 11.5px; margin-top: 2px;">${l.description}</div>
+                    <div style="font-size: 10.5px; color: var(--text-crm-muted); margin-top: 4px;">
+                        By ${l.performed_by_name || 'System'} | ${l.created_at}
+                    </div>
+                `;
+                logsList.appendChild(div);
+            });
+        }
+
+        // Disable buttons if already converted
+        const btns = document.querySelectorAll("#action-buttons-container button");
+        if (sql.status === 'Converted to CRM' || sql.status === 'Rejected' || sql.status === 'Duplicate') {
+            btns.forEach(b => b.disabled = true);
+        } else {
+            btns.forEach(b => b.disabled = false);
+        }
+    }
+
+    function approveSQLStaging() {
+        const note = document.getElementById("review-note-input").value.trim();
+        fetch(`/api/telecrm/sql/${sqlId}/approve`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ notes: note })
+        })
+        .then(res => res.json())
+        .then(data => {
+            alert("SQL approved for CRM handoff queue.");
+            loadDetail();
+        });
+    }
+
+    function openMoveModal() {
+        openModal("move-crm-modal");
+    }
+
+    function submitMoveToCRM(e) {
+        e.preventDefault();
+        const owner = document.getElementById("move-owner").value;
+        const contactMap = document.getElementById("move-contact-map").value;
+        const accountMap = document.getElementById("move-account-map").value;
+        const oppMap = document.getElementById("move-opp-map").value;
+        
+        fetch(`/api/telecrm/sql/${sqlId}/move-to-crm`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                assigned_owner_id: parseInt(owner),
+                contact_mapping: contactMap,
+                account_mapping: accountMap,
+                opportunity_mapping: oppMap
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success') {
+                closeModal("move-crm-modal");
+                alert("SQL staging record successfully converted and moved to CRM.");
+                loadDetail();
+            } else {
+                alert("Move failed: " + data.message);
+            }
+        });
+    }
+
+    function openReturnModal() {
+        openModal("return-info-modal");
+    }
+
+    function submitReturnSQL(e) {
+        e.preventDefault();
+        const reason = document.getElementById("return-reason").value.trim();
+        fetch(`/api/telecrm/sql/${sqlId}/return-for-more-info`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reason: reason })
+        })
+        .then(res => res.json())
+        .then(data => {
+            closeModal("return-info-modal");
+            document.getElementById("return-reason").value = '';
+            alert("SQL returned to Telecaller workbench.");
+            loadDetail();
+        });
+    }
+
+    function openRejectModal() {
+        openModal("reject-modal");
+    }
+
+    function submitRejectSQL(e) {
+        e.preventDefault();
+        const reason = document.getElementById("reject-reason-select").value;
+        const comments = document.getElementById("reject-comments").value.trim();
+        
+        fetch(`/api/telecrm/sql/${sqlId}/reject`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reason: `${reason}. Comments: ${comments}` })
+        })
+        .then(res => res.json())
+        .then(data => {
+            closeModal("reject-modal");
+            alert("SQL handoff rejected.");
+            loadDetail();
+        });
+    }
+
+    function openDuplicateModal() {
+        openModal("duplicate-modal");
+    }
+
+    function submitMarkDuplicate(e) {
+        e.preventDefault();
+        const reason = document.getElementById("duplicate-reason").value.trim();
+        fetch(`/api/telecrm/sql/${sqlId}/mark-duplicate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reason: reason })
+        })
+        .then(res => res.json())
+        .then(data => {
+            closeModal("duplicate-modal");
+            document.getElementById("duplicate-reason").value = '';
+            alert("SQL marked as duplicate staging record.");
+            loadDetail();
+        });
+    }
+
+    function saveReviewNote() {
+        const note = document.getElementById("review-note-input").value.trim();
+        if (!note) return;
+        
+        fetch(`/api/telecrm/sql/${sqlId}/review-note`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ note: note })
+        })
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("review-note-input").value = '';
+            loadDetail();
+        });
+    }
+</script>
+{% endblock %}

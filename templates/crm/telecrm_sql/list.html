@@ -1,0 +1,551 @@
+{% extends "base_crm.html" %}
+
+{% block title %}TeleCRM SQL Staging Inbox - ThinkArtha{% endblock %}
+
+{% block extra_head %}
+<style>
+    .sql-container {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    /* KPI Cards Analytics Bar */
+    .kpi-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 16px;
+    }
+
+    .kpi-card {
+        background: rgba(22, 45, 80, 0.2);
+        border: 1px solid var(--border-crm);
+        border-radius: 10px;
+        padding: 16px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .kpi-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; width: 4px; height: 100%;
+        background: var(--text-crm-muted);
+    }
+
+    .kpi-card.active {
+        background: rgba(22, 45, 80, 0.4);
+        border-color: var(--accent-blue);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+    }
+
+    .kpi-card.active::before {
+        background: var(--accent-blue);
+    }
+
+    .kpi-card:hover {
+        transform: translateY(-2px);
+        background: rgba(22, 45, 80, 0.35);
+    }
+
+    .kpi-card.pending::before { background: #f59e0b; }
+    .kpi-card.approved::before { background: #10b981; }
+    .kpi-card.converted::before { background: #3b82f6; }
+    .kpi-card.rejected::before { background: #ef4444; }
+    .kpi-card.duplicate::before { background: #8b5cf6; }
+
+    .kpi-val {
+        font-size: 24px;
+        font-weight: 800;
+        color: #fff;
+        margin-top: 6px;
+    }
+
+    .kpi-title {
+        font-size: 11.5px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-crm-secondary);
+        font-weight: 700;
+    }
+
+    /* Filters Section */
+    .filter-panel {
+        background: rgba(9, 19, 34, 0.45);
+        border: 1px solid var(--border-crm);
+        border-radius: 12px;
+        padding: 20px;
+        backdrop-filter: blur(10px);
+    }
+
+    .filter-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+
+    .table-responsive {
+        background: rgba(9, 19, 34, 0.3);
+        border: 1px solid var(--border-crm);
+        border-radius: 12px;
+        overflow-x: auto;
+    }
+
+    .sql-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+
+    .sql-table th {
+        background: rgba(22, 45, 80, 0.35);
+        padding: 12px 14px;
+        text-align: left;
+        font-weight: 700;
+        border-bottom: 1px solid var(--border-crm);
+        color: var(--text-crm-primary);
+        white-space: nowrap;
+    }
+
+    .sql-table td {
+        padding: 14px 14px;
+        border-bottom: 1px solid var(--border-crm);
+        color: var(--text-crm-secondary);
+        vertical-align: middle;
+    }
+
+    .sql-table tr:hover td {
+        background: rgba(22, 45, 80, 0.15);
+    }
+
+    .badge-sql {
+        display: inline-block;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .badge-sql.new { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+    .badge-sql.pending { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+    .badge-sql.approved { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+    .badge-sql.converted { background: rgba(16, 185, 129, 0.25); color: #10b981; border: 1px solid #10b981; }
+    .badge-sql.rejected { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+    .badge-sql.duplicate { background: rgba(139, 92, 246, 0.15); color: #8b5cf6; }
+
+    .warning-lbl {
+        font-size: 10px;
+        padding: 2px 6px;
+        background: rgba(245, 158, 11, 0.15);
+        color: #f59e0b;
+        border-radius: 4px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="sql-container">
+    <!-- Header -->
+    <div class="crm-title-section" style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h1>TeleCRM SQL Staging Inbox</h1>
+            <p>Staging area to review, qualify, and convert Telecaller SQL handoffs into Core CRM opportunities.</p>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <select id="date-presets" class="form-control" style="width: 140px; padding: 6px 10px;" onchange="handleDatePresetChange()">
+                <option value="This Week">This Week</option>
+                <option value="Last Week">Last Week</option>
+                <option value="This Month" selected>This Month</option>
+                <option value="Last Month">Last Month</option>
+                <option value="This Year">This Year</option>
+                <option value="Last Year">Last Year</option>
+                <option value="All Time">All Time</option>
+                <option value="Custom">Custom Range</option>
+            </select>
+            <div id="custom-date-grp" style="display: none; align-items: center; gap: 6px;">
+                <input type="date" id="start-date" class="form-control" style="width: 130px; padding: 4px 8px;">
+                <span style="color: var(--text-crm-muted);">to</span>
+                <input type="date" id="end-date" class="form-control" style="width: 130px; padding: 4px 8px;">
+                <button class="btn-crm btn-crm-primary" style="padding: 6px 12px;" onclick="fetchAnalyticsAndList()">Apply</button>
+            </div>
+            <button class="btn-crm btn-crm-secondary" onclick="fetchAnalyticsAndList()">
+                <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+        </div>
+    </div>
+
+    <!-- KPI Analytics Cards -->
+    <div class="kpi-row">
+        <div class="kpi-card active" id="kpi-all" onclick="filterByStatus('')">
+            <span class="kpi-title">Total SQLs</span>
+            <div class="kpi-val" id="val-total">0</div>
+        </div>
+        <div class="kpi-card pending" id="kpi-pending" onclick="filterByStatus('New SQL')">
+            <span class="kpi-title">Pending Review</span>
+            <div class="kpi-val" id="val-pending">0</div>
+        </div>
+        <div class="kpi-card approved" id="kpi-approved" onclick="filterByStatus('Approved for CRM')">
+            <span class="kpi-title">Approved for CRM</span>
+            <div class="kpi-val" id="val-approved">0</div>
+        </div>
+        <div class="kpi-card converted" id="kpi-converted" onclick="filterByStatus('Converted to CRM')">
+            <span class="kpi-title">Converted to CRM</span>
+            <div class="kpi-val" id="val-converted">0</div>
+        </div>
+        <div class="kpi-card rejected" id="kpi-rejected" onclick="filterByStatus('Rejected')">
+            <span class="kpi-title">Rejected</span>
+            <div class="kpi-val" id="val-rejected">0</div>
+        </div>
+        <div class="kpi-card duplicate" id="kpi-duplicate" onclick="filterByStatus('Duplicate')">
+            <span class="kpi-title">Duplicate</span>
+            <div class="kpi-val" id="val-duplicate">0</div>
+        </div>
+    </div>
+
+    <!-- Advanced Filters -->
+    <div class="filter-panel">
+        <div style="display: flex; gap: 12px; margin-bottom: 16px; align-items: center;">
+            <div style="flex-grow: 1; position: relative;">
+                <input type="text" id="search-input" class="form-control" placeholder="Search SQLs by Name, Email, Phone, Company, Domain, Telecaller..." style="padding-left: 36px;" oninput="debouncedSearch()">
+                <i class="fas fa-search" style="position: absolute; left: 12px; top: 12px; color: var(--text-crm-muted);"></i>
+            </div>
+            <button class="btn-crm btn-crm-secondary" onclick="toggleAdvancedFilters()">
+                <i class="fas fa-filter"></i> Filters
+            </button>
+            <button class="btn-crm btn-crm-secondary" onclick="resetFilters()">Reset</button>
+        </div>
+
+        <div id="adv-filter-grid" class="filter-grid" style="display: none;">
+            <div class="form-group">
+                <label class="form-label" style="font-size: 11px;">Status</label>
+                <select id="filter-status" class="form-control" onchange="fetchList()">
+                    <option value="">All Statuses</option>
+                    <option value="New SQL">New SQL</option>
+                    <option value="Approved for CRM">Approved for CRM</option>
+                    <option value="Converted to CRM">Converted to CRM</option>
+                    <option value="More Info Required">More Info Required</option>
+                    <option value="Rejected">Rejected</option>
+                    <option value="Duplicate">Duplicate</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" style="font-size: 11px;">Campaign</label>
+                <select id="filter-campaign" class="form-control" onchange="fetchList()">
+                    <option value="">All Campaigns</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" style="font-size: 11px;">Telecaller</label>
+                <select id="filter-telecaller" class="form-control" onchange="fetchList()">
+                    <option value="">All Telecallers</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" style="font-size: 11px;">Product/Solution</label>
+                <select id="filter-product" class="form-control" onchange="fetchList()">
+                    <option value="">All Solutions</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" style="font-size: 11px;">Interest Level</label>
+                <select id="filter-interest" class="form-control" onchange="fetchList()">
+                    <option value="">All Levels</option>
+                    <option value="High">High</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Low">Low</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" style="font-size: 11px;">Duplicate Warn</label>
+                <select id="filter-duplicate" class="form-control" onchange="fetchList()">
+                    <option value="">All Matches</option>
+                    <option value="Duplicate">Has Warning</option>
+                    <option value="None">No Warning</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" style="font-size: 11px;">Owner Assigned</label>
+                <select id="filter-owner" class="form-control" onchange="fetchList()">
+                    <option value="">All Owners</option>
+                    <option value="unassigned">Unassigned</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- SQL Staging Registry Table -->
+    <div class="table-responsive">
+        <table class="sql-table">
+            <thead>
+                <tr>
+                    <th>Contact Info</th>
+                    <th>Job Title</th>
+                    <th>Campaign</th>
+                    <th>Telecaller</th>
+                    <th>Solution / Partner</th>
+                    <th>Meeting completed</th>
+                    <th>Duplicates</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th style="text-align: right; padding-right: 20px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="sql-tbody">
+                <tr>
+                    <td colspan="10" style="text-align: center; padding: 40px; color: var(--text-crm-muted);">
+                        <i class="fas fa-spinner fa-spin" style="font-size: 24px; margin-bottom: 10px;"></i>
+                        <p>Loading staging inbox...</p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    let activeStatusFilter = '';
+    const debounce = (func, delay = 300) => {
+        let timer;
+        return function(...args) {
+            clearTimeout(timer);
+            timer = setTimeout(() => func.apply(this, args), delay);
+        };
+    };
+
+    const debouncedSearch = debounce(() => fetchList());
+
+    document.addEventListener("DOMContentLoaded", () => {
+        loadFilterDropdowns();
+        fetchAnalyticsAndList();
+    });
+
+    function toggleAdvancedFilters() {
+        const grid = document.getElementById("adv-filter-grid");
+        grid.style.display = grid.style.display === 'none' ? 'grid' : 'none';
+    }
+
+    function handleDatePresetChange() {
+        const preset = document.getElementById("date-presets").value;
+        const customGrp = document.getElementById("custom-date-grp");
+        if (preset === 'Custom') {
+            customGrp.style.display = 'flex';
+        } else {
+            customGrp.style.display = 'none';
+            fetchAnalyticsAndList();
+        }
+    }
+
+    function resetFilters() {
+        document.getElementById("search-input").value = '';
+        document.getElementById("filter-status").value = '';
+        document.getElementById("filter-campaign").value = '';
+        document.getElementById("filter-telecaller").value = '';
+        document.getElementById("filter-product").value = '';
+        document.getElementById("filter-interest").value = '';
+        document.getElementById("filter-duplicate").value = '';
+        document.getElementById("filter-owner").value = '';
+        activeStatusFilter = '';
+        
+        const cards = document.querySelectorAll(".kpi-card");
+        cards.forEach(c => c.classList.remove("active"));
+        document.getElementById("kpi-all").classList.add("active");
+        
+        fetchList();
+    }
+
+    function filterByStatus(status) {
+        activeStatusFilter = status;
+        document.getElementById("filter-status").value = status;
+        
+        const cards = document.querySelectorAll(".kpi-card");
+        cards.forEach(c => c.classList.remove("active"));
+        
+        if (status === '') {
+            document.getElementById("kpi-all").classList.add("active");
+        } else if (status === 'New SQL') {
+            document.getElementById("kpi-pending").classList.add("active");
+        } else if (status === 'Approved for CRM') {
+            document.getElementById("kpi-approved").classList.add("active");
+        } else if (status === 'Converted to CRM') {
+            document.getElementById("kpi-converted").classList.add("active");
+        } else if (status === 'Rejected') {
+            document.getElementById("kpi-rejected").classList.add("active");
+        } else if (status === 'Duplicate') {
+            document.getElementById("kpi-duplicate").classList.add("active");
+        }
+        
+        fetchList();
+    }
+
+    function loadFilterDropdowns() {
+        // Query campaigns list dynamically from crm campaigns list page
+        fetch('/api/telecrm/sql')
+            .then(res => res.json())
+            .then(sqls => {
+                const campaigns = new Set();
+                const telecallers = new Set();
+                const products = new Set();
+                
+                sqls.forEach(s => {
+                    if (s.telecrm_campaign_id) campaigns.add(JSON.stringify({ id: s.telecrm_campaign_id, name: s.campaign_name }));
+                    if (s.telecaller_id) telecallers.add(JSON.stringify({ id: s.telecaller_id, name: s.telecaller_name }));
+                    if (s.product_solution_id) products.add(JSON.stringify({ id: s.product_solution_id, name: s.product_name }));
+                });
+                
+                const campSel = document.getElementById("filter-campaign");
+                campaigns.forEach(c => {
+                    const parsed = JSON.parse(c);
+                    const opt = document.createElement("option");
+                    opt.value = parsed.id;
+                    opt.textContent = parsed.name;
+                    campSel.appendChild(opt);
+                });
+
+                const callerSel = document.getElementById("filter-telecaller");
+                telecallers.forEach(t => {
+                    const parsed = JSON.parse(t);
+                    const opt = document.createElement("option");
+                    opt.value = parsed.id;
+                    opt.textContent = parsed.name;
+                    callerSel.appendChild(opt);
+                });
+
+                const prodSel = document.getElementById("filter-product");
+                products.forEach(p => {
+                    const parsed = JSON.parse(p);
+                    const opt = document.createElement("option");
+                    opt.value = parsed.id;
+                    opt.textContent = parsed.name;
+                    prodSel.appendChild(opt);
+                });
+            });
+    }
+
+    function fetchAnalyticsAndList() {
+        const dateFilter = document.getElementById("date-presets").value;
+        const start = document.getElementById("start-date").value;
+        const end = document.getElementById("end-date").value;
+        
+        let url = `/api/telecrm/sql/analytics?date_filter=${encodeURIComponent(dateFilter)}`;
+        if (dateFilter === 'Custom' && start && end) {
+            url += `&start_date=${start}&end_date=${end}`;
+        }
+        
+        fetch(url)
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById("val-total").textContent = data.total_sqls;
+                document.getElementById("val-pending").textContent = data.pending_review;
+                document.getElementById("val-approved").textContent = data.approved_for_crm;
+                document.getElementById("val-converted").textContent = data.converted_to_crm;
+                document.getElementById("val-rejected").textContent = data.rejected;
+                document.getElementById("val-duplicate").textContent = data.duplicate;
+            });
+            
+        fetchList();
+    }
+
+    function fetchList() {
+        const search = document.getElementById("search-input").value;
+        const status = document.getElementById("filter-status").value;
+        const campaign = document.getElementById("filter-campaign").value;
+        const telecaller = document.getElementById("filter-telecaller").value;
+        const product = document.getElementById("filter-product").value;
+        const interest = document.getElementById("filter-interest").value;
+        const duplicate = document.getElementById("filter-duplicate").value;
+        const owner = document.getElementById("filter-owner").value;
+        
+        let url = `/api/telecrm/sql?search=${encodeURIComponent(search)}`;
+        if (status) url += `&status=${status}`;
+        if (campaign) url += `&campaign_id=${campaign}`;
+        if (telecaller) url += `&telecaller_id=${telecaller}`;
+        if (product) url += `&product_solution_id=${product}`;
+        if (interest) url += `&interest_level=${interest}`;
+        if (duplicate) url += `&duplicate_status=${duplicate}`;
+        if (owner === 'unassigned') url += `&unassigned=true`;
+        
+        const tbody = document.getElementById("sql-tbody");
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="10" style="text-align: center; padding: 40px; color: var(--text-crm-muted);">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 24px; margin-bottom: 10px;"></i>
+                    <p>Fetching staging rows...</p>
+                </td>
+            </tr>
+        `;
+        
+        fetch(url)
+            .then(res => res.json())
+            .then(rows => {
+                tbody.innerHTML = '';
+                if (rows.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="10" style="text-align: center; padding: 40px; color: var(--text-crm-muted);">
+                                No SQL records found matching current criteria.
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                rows.forEach(r => {
+                    const tr = document.createElement("tr");
+                    
+                    let dupWarn = '';
+                    if (r.duplicate_status === 'Duplicate') {
+                        dupWarn = `<span class="warning-lbl"><i class="fas fa-exclamation-triangle"></i> Dup</span>`;
+                    } else {
+                        dupWarn = `<span style="color: var(--text-crm-muted); font-size: 11px;">None</span>`;
+                    }
+                    
+                    const statusClass = r.status.toLowerCase().replace(/\s+/g, '-');
+                    
+                    const pName = r.product_name || 'No Solution';
+                    const partner = r.partner_name ? ` / ${r.partner_name}` : '';
+                    
+                    tr.innerHTML = `
+                        <td>
+                            <div style="font-weight: 700; color: #fff;">${r.contact_name}</div>
+                            <div style="font-size: 11.5px; color: var(--text-crm-secondary);">${r.company}</div>
+                            <div style="font-size: 11px; color: var(--text-crm-muted); margin-top: 4px;">
+                                ${r.email || 'No email'} | ${r.phone || 'No phone'}
+                            </div>
+                        </td>
+                        <td>${r.job_title || '-'}</td>
+                        <td>${r.campaign_name || '-'}</td>
+                        <td>${r.telecaller_name || '-'}</td>
+                        <td>
+                            <div>${pName}</div>
+                            <div style="font-size: 11px; color: var(--text-crm-muted);">${partner}</div>
+                        </td>
+                        <td>${r.meeting_completed_at ? r.meeting_completed_at.split(' ')[0] : '-'}</td>
+                        <td>${dupWarn}</td>
+                        <td><span class="badge-sql ${statusClass}">${r.status}</span></td>
+                        <td>${r.created_at ? r.created_at.split(' ')[0] : '-'}</td>
+                        <td style="text-align: right; white-space: nowrap; padding-right: 20px;">
+                            <a href="/telecrm/sql/${r.id}" class="btn-crm btn-crm-primary" style="padding: 4px 10px; font-size: 11.5px; text-decoration: none;">
+                                <i class="fas fa-search"></i> Review
+                            </a>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            });
+    }
+</script>
+{% endblock %}

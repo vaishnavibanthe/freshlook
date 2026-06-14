@@ -67,6 +67,21 @@
                     <label for="resource-summary" class="form-label">Short Summary *</label>
                     <input type="text" id="resource-summary" name="summary" class="form-control" placeholder="Brief one-line summary..." value="{{ resource.summary if resource else '' }}" required style="font-size: 14px;">
                 </div>
+                
+                <!-- Card Image Option -->
+                <div class="form-group">
+                    <label for="resource-card-image" class="form-label">Event Card Image Option</label>
+                    <select id="resource-card-image" name="card_image" class="form-control">
+                        <option value="" {% if not resource or not resource.card_image %}selected{% endif %}>-- Use Dynamic Default Image --</option>
+                        <option value="/static/img/event_1.png" {% if resource and resource.card_image == '/static/img/event_1.png' %}selected{% endif %}>Theme 1: Tech Conference Room</option>
+                        <option value="/static/img/event_2.png" {% if resource and resource.card_image == '/static/img/event_2.png' %}selected{% endif %}>Theme 2: Professional Collaboration</option>
+                        <option value="/static/img/event_3.png" {% if resource and resource.card_image == '/static/img/event_3.png' %}selected{% endif %}>Theme 3: Cloud Data Network</option>
+                        <option value="/static/img/event_4.png" {% if resource and resource.card_image == '/static/img/event_4.png' %}selected{% endif %}>Theme 4: Presenter on Stage</option>
+                        <option value="/static/img/event_5.png" {% if resource and resource.card_image == '/static/img/event_5.png' %}selected{% endif %}>Theme 5: Laptop Analytics Dashboard</option>
+                        <option value="/static/img/event_6.png" {% if resource and resource.card_image == '/static/img/event_6.png' %}selected{% endif %}>Theme 6: Abstract Digital Connections</option>
+                    </select>
+                    <small style="display:block; margin-top: 6px; color: var(--text-tertiary);">Choose a premium image for the background card. Replaces index-based fallbacks.</small>
+                </div>
 
                 <!-- Description -->
                 <div class="form-group">

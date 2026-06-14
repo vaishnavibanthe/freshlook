@@ -729,6 +729,93 @@ def crm_opportunities():
         'Closing': ['Closing', 'Closed Won', 'Closed Lost']
     }
     
+    # Extract query params for filters
+    search_account = request.args.get('search_account', '').strip()
+    industry = request.args.get('industry', '').strip()
+    geography = request.args.get('geography', '').strip()
+    owner_id = request.args.get('owner_id', '').strip()
+    stage = request.args.get('stage', '').strip()
+    value_range = request.args.get('value_range', '').strip()
+    
+    # Date filters
+    date_filter = request.args.get('date_filter', 'All Time')
+    start_date = request.args.get('start_date', '')
+    end_date = request.args.get('end_date', '')
+    
+    close_date_filter = request.args.get('close_date_filter', 'All Time')
+    close_start_date = request.args.get('close_start_date', '')
+    close_end_date = request.args.get('close_end_date', '')
+    
+    filters = []
+    
+    if search_account:
+        filters.append("(o.company LIKE ? OR a.account_name LIKE ?)")
+        search_param = f"%{search_account}%"
+        params.extend([search_param, search_param])
+        
+    if industry:
+        filters.append("o.industry = ?")
+        params.append(industry)
+        
+    if geography:
+        filters.append("o.geography = ?")
+        params.append(geography)
+        
+    if owner_id:
+        filters.append("o.owner_id = ?")
+        params.append(int(owner_id))
+        
+    if stage:
+        filters.append("o.stage = ?")
+        params.append(stage)
+        
+    if value_range:
+        if value_range == 'Under 50k':
+            filters.append("o.estimated_value < 50000")
+        elif value_range == '50k-100k':
+            filters.append("o.estimated_value >= 50000 AND o.estimated_value < 100000")
+        elif value_range == '100k-250k':
+            filters.append("o.estimated_value >= 100000 AND o.estimated_value < 250000")
+        elif value_range == '250k-500k':
+            filters.append("o.estimated_value >= 250000 AND o.estimated_value < 500000")
+        elif value_range == '500k-1M':
+            filters.append("o.estimated_value >= 500000 AND o.estimated_value < 1000000")
+        elif value_range == '1M-5M':
+            filters.append("o.estimated_value >= 1000000 AND o.estimated_value < 5000000")
+        elif value_range == '5M-10M':
+            filters.append("o.estimated_value >= 5000000 AND o.estimated_value < 10000000")
+        elif value_range == '10M-50M':
+            filters.append("o.estimated_value >= 10000000 AND o.estimated_value < 50000000")
+        elif value_range == '50M-100M':
+            filters.append("o.estimated_value >= 50000000 AND o.estimated_value < 100000000")
+        elif value_range == '100M-500M':
+            filters.append("o.estimated_value >= 100000000 AND o.estimated_value < 500000000")
+        elif value_range == '500M-1B':
+            filters.append("o.estimated_value >= 500000000 AND o.estimated_value < 1000000000")
+        elif value_range == '1B and above':
+            filters.append("o.estimated_value >= 1000000000")
+
+    if date_filter != 'All Time':
+        from crm.api import get_date_range_bounds
+        start_dt, end_dt = get_date_range_bounds(date_filter, start_date, end_date)
+        if start_dt and end_dt:
+            filters.append("o.created_at >= ?")
+            params.append(start_dt.strftime('%Y-%m-%d %H:%M:%S'))
+            filters.append("o.created_at <= ?")
+            params.append(end_dt.strftime('%Y-%m-%d %H:%M:%S'))
+            
+    if close_date_filter != 'All Time':
+        from crm.api import get_date_range_bounds
+        c_start_dt, c_end_dt = get_date_range_bounds(close_date_filter, close_start_date, close_end_date)
+        if c_start_dt and c_end_dt:
+            filters.append("o.expected_close_date >= ?")
+            params.append(c_start_dt.strftime('%Y-%m-%d'))
+            filters.append("o.expected_close_date <= ?")
+            params.append(c_end_dt.strftime('%Y-%m-%d'))
+            
+    if filters:
+        where_clause += " AND " + " AND ".join(filters)
+    
     # Fetch list of opportunities
     query = f'''
         SELECT o.*, u.name as owner_name, a.account_name as company_name, p.name as partner_name, ps.name as product_name
@@ -750,11 +837,42 @@ def crm_opportunities():
         if opp_bucket in kanban_opps:
             kanban_opps[opp_bucket].append(opp)
             
+    # Fetch options dynamically
+    industries = db_query("SELECT DISTINCT industry FROM opportunities WHERE industry IS NOT NULL AND industry != ''")
+    geographies = db_query("SELECT DISTINCT geography FROM opportunities WHERE geography IS NOT NULL AND geography != ''")
+    owners = db_query("SELECT id, name FROM crm_users WHERE is_active = 1 AND role != 'Telecaller'")
+    stages = ['Prospecting', 'Discovery', 'Solution Fit', 'Proposal', 'Negotiation', 'Closing', 'Closed Won', 'Closed Lost']
+    value_ranges = [
+        'Under 50k', '50k-100k', '100k-250k', '250k-500k', '500k-1M', '1M-5M', 
+        '5M-10M', '10M-50M', '50M-100M', '100M-500M', '500M-1B', '1B and above'
+    ]
+    
     return render_template(
-        'opportunities/list.html',
+        'crm/opportunities/list.html',
         opportunities=opps,
         kanban_opportunities=kanban_opps,
-        active_page='crm_opportunities'
+        active_page='crm_opportunities',
+        
+        # dropdowns
+        industries=industries,
+        geographies=geographies,
+        owners=owners,
+        stages=stages,
+        value_ranges=value_ranges,
+        
+        # selected values
+        search_account=search_account,
+        selected_industry=industry,
+        selected_geography=geography,
+        selected_owner_id=owner_id,
+        selected_stage=stage,
+        selected_value_range=value_range,
+        date_filter=date_filter,
+        start_date=start_date,
+        end_date=end_date,
+        close_date_filter=close_date_filter,
+        close_start_date=close_start_date,
+        close_end_date=close_end_date
     )
 
 # ----------------------------------------------------
@@ -1027,10 +1145,13 @@ def update_opportunity_stage(opp_id):
 # CRM Tasks Listing
 # ----------------------------------------------------
 @crm_bp.route('/crm/tasks', methods=['GET', 'POST'])
+@crm_bp.route('/telecrm/tasks', methods=['GET', 'POST'])
 @crm_login_required
 def crm_tasks():
     user = g.crm_user
     now_str = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+    is_telecrm = request.path.startswith('/telecrm')
+    active_page = 'telecrm_tasks' if is_telecrm else 'crm_tasks'
     
     if request.method == 'POST':
         title = request.form.get('title')
@@ -1047,56 +1168,168 @@ def crm_tasks():
         ''', (title, desc, task_type, assigned_to, user['id'], due_date, due_time, priority, now_str, now_str))
         
         flash("Task created successfully.", "success")
-        return redirect(url_for('crm.crm_tasks'))
+        return redirect(request.path)
+
         
-    # Read tasks visible to user
+    # Read tasks visible to user, and filter
     role = user['role']
+    params = []
+    
     if role == 'Platform Admin':
-        tasks = db_query('''
-            SELECT t.*, u.name as assigned_name, creator.name as creator_name, l.full_name as lead_name, o.opportunity_name 
-            FROM crm_tasks t 
-            LEFT JOIN crm_users u ON t.assigned_to = u.id 
-            LEFT JOIN crm_users creator ON t.created_by = creator.id 
-            LEFT JOIN leads l ON t.lead_id = l.id 
-            LEFT JOIN opportunities o ON t.opportunity_id = o.id 
-            ORDER BY t.due_date ASC, t.id DESC
-        ''')
+        where_clause = "1=1"
     elif role in ('Group Admin', 'Sales Head'):
-        tasks = db_query('''
-            SELECT t.*, u.name as assigned_name, creator.name as creator_name, l.full_name as lead_name, o.opportunity_name 
-            FROM crm_tasks t 
-            LEFT JOIN crm_users u ON t.assigned_to = u.id 
-            LEFT JOIN crm_users creator ON t.created_by = creator.id 
-            LEFT JOIN leads l ON t.lead_id = l.id 
-            LEFT JOIN opportunities o ON t.opportunity_id = o.id 
-            WHERE u.group_id = ?
-            ORDER BY t.due_date ASC, t.id DESC
-        ''', (user['group_id'],))
+        where_clause = "u.group_id = ?"
+        params.append(user['group_id'])
     elif role == 'Manager / Sales Manager':
-        tasks = db_query('''
-            SELECT t.*, u.name as assigned_name, creator.name as creator_name, l.full_name as lead_name, o.opportunity_name 
-            FROM crm_tasks t 
-            LEFT JOIN crm_users u ON t.assigned_to = u.id 
-            LEFT JOIN crm_users creator ON t.created_by = creator.id 
-            LEFT JOIN leads l ON t.lead_id = l.id 
-            LEFT JOIN opportunities o ON t.opportunity_id = o.id 
-            WHERE t.assigned_to = ? OR t.assigned_to IN (SELECT id FROM crm_users WHERE manager_id = ?)
-            ORDER BY t.due_date ASC, t.id DESC
-        ''', (user['id'], user['id']))
+        where_clause = "(t.assigned_to = ? OR t.assigned_to IN (SELECT id FROM crm_users WHERE manager_id = ?))"
+        params.extend([user['id'], user['id']])
     else:
-        tasks = db_query('''
-            SELECT t.*, u.name as assigned_name, creator.name as creator_name, l.full_name as lead_name, o.opportunity_name 
-            FROM crm_tasks t 
-            LEFT JOIN crm_users u ON t.assigned_to = u.id 
-            LEFT JOIN crm_users creator ON t.created_by = creator.id 
-            LEFT JOIN leads l ON t.lead_id = l.id 
-            LEFT JOIN opportunities o ON t.opportunity_id = o.id 
-            WHERE t.assigned_to = ? 
-            ORDER BY t.due_date ASC, t.id DESC
-        ''', (user['id'],))
+        where_clause = "t.assigned_to = ?"
+        params.append(user['id'])
         
+    # Extract query parameters for filters
+    search_account = request.args.get('search_account', '').strip()
+    industry = request.args.get('industry', '').strip()
+    geography = request.args.get('geography', '').strip()
+    owner_id = request.args.get('owner_id', '').strip()
+    stage = request.args.get('stage', '').strip()
+    value_range = request.args.get('value_range', '').strip()
+    
+    # Date filters
+    date_filter = request.args.get('date_filter', 'All Time')
+    start_date = request.args.get('start_date', '')
+    end_date = request.args.get('end_date', '')
+    
+    close_date_filter = request.args.get('close_date_filter', 'All Time')
+    close_start_date = request.args.get('close_start_date', '')
+    close_end_date = request.args.get('close_end_date', '')
+    
+    filters = []
+    
+    if is_telecrm:
+        filters.append("(t.telecrm_contact_id IS NOT NULL OR t.task_type = 'SQL Follow-up')")
+
+    
+    if search_account:
+        filters.append("(l.company LIKE ? OR o.company LIKE ? OR tc.company LIKE ? OR a.account_name LIKE ?)")
+        search_param = f"%{search_account}%"
+        params.extend([search_param, search_param, search_param, search_param])
+        
+    if industry:
+        filters.append("(l.industry = ? OR o.industry = ? OR tc.industry = ? OR a.industry = ?)")
+        params.extend([industry, industry, industry, industry])
+        
+    if geography:
+        filters.append("(l.geography = ? OR o.geography = ? OR tc.geography = ? OR a.geography = ?)")
+        params.extend([geography, geography, geography, geography])
+        
+    if owner_id:
+        filters.append("t.assigned_to = ?")
+        params.append(int(owner_id))
+        
+    if stage:
+        filters.append("o.stage = ?")
+        params.append(stage)
+        
+    if value_range:
+        if value_range == 'Under 50k':
+            filters.append("o.estimated_value < 50000")
+        elif value_range == '50k-100k':
+            filters.append("o.estimated_value >= 50000 AND o.estimated_value < 100000")
+        elif value_range == '100k-250k':
+            filters.append("o.estimated_value >= 100000 AND o.estimated_value < 250000")
+        elif value_range == '250k-500k':
+            filters.append("o.estimated_value >= 250000 AND o.estimated_value < 500000")
+        elif value_range == '500k-1M':
+            filters.append("o.estimated_value >= 500000 AND o.estimated_value < 1000000")
+        elif value_range == '1M-5M':
+            filters.append("o.estimated_value >= 1000000 AND o.estimated_value < 5000000")
+        elif value_range == '5M-10M':
+            filters.append("o.estimated_value >= 5000000 AND o.estimated_value < 10000000")
+        elif value_range == '10M-50M':
+            filters.append("o.estimated_value >= 10000000 AND o.estimated_value < 50000000")
+        elif value_range == '50M-100M':
+            filters.append("o.estimated_value >= 50000000 AND o.estimated_value < 100000000")
+        elif value_range == '100M-500M':
+            filters.append("o.estimated_value >= 100000000 AND o.estimated_value < 500000000")
+        elif value_range == '500M-1B':
+            filters.append("o.estimated_value >= 500000000 AND o.estimated_value < 1000000000")
+        elif value_range == '1B and above':
+            filters.append("o.estimated_value >= 1000000000")
+
+    if date_filter != 'All Time':
+        from crm.api import get_date_range_bounds
+        start_dt, end_dt = get_date_range_bounds(date_filter, start_date, end_date)
+        if start_dt and end_dt:
+            filters.append("t.created_at >= ?")
+            params.append(start_dt.strftime('%Y-%m-%d %H:%M:%S'))
+            filters.append("t.created_at <= ?")
+            params.append(end_dt.strftime('%Y-%m-%d %H:%M:%S'))
+            
+    if close_date_filter != 'All Time':
+        from crm.api import get_date_range_bounds
+        c_start_dt, c_end_dt = get_date_range_bounds(close_date_filter, close_start_date, close_end_date)
+        if c_start_dt and c_end_dt:
+            filters.append("t.due_date >= ?")
+            params.append(c_start_dt.strftime('%Y-%m-%d'))
+            filters.append("t.due_date <= ?")
+            params.append(c_end_dt.strftime('%Y-%m-%d'))
+            
+    if filters:
+        where_clause += " AND " + " AND ".join(filters)
+        
+    query = f'''
+        SELECT DISTINCT t.*, u.name as assigned_name, creator.name as creator_name, 
+               l.full_name as lead_name, o.opportunity_name 
+        FROM crm_tasks t 
+        LEFT JOIN crm_users u ON t.assigned_to = u.id 
+        LEFT JOIN crm_users creator ON t.created_by = creator.id 
+        LEFT JOIN leads l ON t.lead_id = l.id 
+        LEFT JOIN opportunities o ON t.opportunity_id = o.id 
+        LEFT JOIN contacts c ON t.telecrm_contact_id = c.id
+        LEFT JOIN accounts a ON o.account_id = a.id OR c.account_id = a.id
+        LEFT JOIN telecrm_contacts tc ON t.telecrm_contact_id = tc.id
+        WHERE {where_clause}
+        ORDER BY t.due_date ASC, t.id DESC
+    '''
+    tasks = db_query(query, params)
+        
+    # Fetch options dynamically
+    industries = db_query("SELECT DISTINCT industry FROM opportunities WHERE industry IS NOT NULL AND industry != '' UNION SELECT DISTINCT industry FROM leads WHERE industry IS NOT NULL AND industry != ''")
+    geographies = db_query("SELECT DISTINCT geography FROM opportunities WHERE geography IS NOT NULL AND geography != '' UNION SELECT DISTINCT geography FROM leads WHERE geography IS NOT NULL AND geography != ''")
     owners = db_query("SELECT id, name FROM crm_users WHERE is_active = 1 AND role != 'Telecaller'")
-    return render_template('tasks.html', tasks=tasks, owners=owners, active_page='crm_tasks')
+    stages = ['Prospecting', 'Discovery', 'Solution Fit', 'Proposal', 'Negotiation', 'Closing', 'Closed Won', 'Closed Lost']
+    value_ranges = [
+        'Under 50k', '50k-100k', '100k-250k', '250k-500k', '500k-1M', '1M-5M', 
+        '5M-10M', '10M-50M', '50M-100M', '100M-500M', '500M-1B', '1B and above'
+    ]
+    
+    return render_template(
+        'crm/tasks.html',
+        tasks=tasks,
+        owners=owners,
+        active_page=active_page,
+        
+        # dropdowns
+        industries=industries,
+        geographies=geographies,
+        stages=stages,
+        value_ranges=value_ranges,
+        
+        # selected values
+        search_account=search_account,
+        selected_industry=industry,
+        selected_geography=geography,
+        selected_owner_id=owner_id,
+        selected_stage=stage,
+        selected_value_range=value_range,
+        date_filter=date_filter,
+        start_date=start_date,
+        end_date=end_date,
+        close_date_filter=close_date_filter,
+        close_start_date=close_start_date,
+        close_end_date=close_end_date
+    )
 
 @crm_bp.route('/api/crm/tasks/<int:task_id>/complete', methods=['POST'])
 @crm_login_required

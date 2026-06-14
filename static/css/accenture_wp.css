@@ -1,0 +1,259 @@
+/* ============================================================
+   ACCENTURE-STYLE HOVER-REVEAL WHITEPAPER CARDS
+   ============================================================ */
+
+/* Grid: 3 equal columns */
+.acc-wp-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+    align-items: start;
+    margin-top: 30px;
+}
+
+@media (max-width: 1024px) {
+    .acc-wp-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+    }
+}
+
+@media (max-width: 640px) {
+    .acc-wp-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+}
+
+/* The card container */
+.acc-wp-card {
+    position: relative;
+    display: block;
+    height: 460px;
+    border-radius: 4px;
+    overflow: hidden;
+    text-decoration: none;
+    color: #ffffff;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    cursor: pointer;
+}
+
+.acc-wp-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 24px 48px -12px rgba(124, 58, 237, 0.3);
+}
+
+/* Background image & gradient overlay */
+.acc-wp-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.acc-wp-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.acc-wp-card:hover .acc-wp-img {
+    transform: scale(1.05);
+}
+
+/* Always-on bottom dark gradient for default title contrast */
+.acc-wp-img-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, 
+        rgba(15, 23, 42, 0.95) 0%, 
+        rgba(15, 23, 42, 0.4) 40%, 
+        transparent 100%);
+    z-index: 2;
+}
+
+/* Default visible content (tag + title at bottom) */
+.acc-wp-default {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 28px;
+    z-index: 3;
+    transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.acc-wp-card:hover .acc-wp-default {
+    opacity: 0;
+    transform: translateY(-15px);
+}
+
+/* Small category tag */
+.acc-wp-tag, .acc-wp-hover-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: monospace;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    color: #a78bfa; /* Light violet for dark background readability */
+    margin-bottom: 12px;
+}
+
+.acc-wp-tag i, .acc-wp-hover-tag i {
+    font-size: 11px;
+}
+
+/* Default Title */
+.acc-wp-title {
+    font-family: var(--font-heading);
+    font-size: 20px;
+    font-weight: 800;
+    line-height: 1.3;
+    color: #ffffff;
+    letter-spacing: -0.3px;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Hover reveal panel - slides up from bottom */
+.acc-wp-hover-panel {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, 
+        rgba(76, 29, 149, 0.96) 0%, 
+        rgba(15, 23, 42, 0.98) 100%);
+    z-index: 4;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    transform: translateY(101%);
+    transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.acc-wp-card:hover .acc-wp-hover-panel {
+    transform: translateY(0);
+}
+
+.acc-wp-hover-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: flex-end;
+}
+
+/* Hover panel category tag */
+.acc-wp-hover-tag {
+    color: #c084fc; /* Brighten slightly on hover color overlay */
+}
+
+/* Hover panel Title */
+.acc-wp-hover-title {
+    font-family: var(--font-heading);
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.35;
+    color: #ffffff;
+    margin: 0 0 12px 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Hover summary/description text */
+.acc-wp-summary {
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: rgba(255, 255, 255, 0.85);
+    font-weight: 300;
+    margin-bottom: 24px;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Footer structure inside hover panel */
+.acc-wp-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    padding-top: 16px;
+    margin-top: auto;
+}
+
+.acc-wp-publisher {
+    font-size: 11px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.7);
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 140px;
+}
+
+.acc-wp-publisher i {
+    color: #c084fc;
+    font-size: 10px;
+}
+
+/* Red PDF badge */
+.acc-wp-pdf-badge {
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: #ef4444;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(239, 68, 68, 0.15);
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+/* CTA "READ WHITEPAPER" style */
+.acc-wp-cta {
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: color 0.3s ease;
+}
+
+.acc-wp-cta:hover {
+    color: #c084fc;
+}
+
+.acc-wp-arrow {
+    font-size: 14px;
+    display: inline-block;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.acc-wp-card:hover .acc-wp-arrow {
+    transform: translateX(4px);
+}

@@ -799,6 +799,11 @@
                     </a>
                 </li>
                 <li>
+                    <a href="/crm/telecrm-sql" class="crm-nav-link {% if active_page == 'telecrm_sql' %}active{% endif %}">
+                        <i class="fas fa-check-circle"></i> TeleCRM SQL
+                    </a>
+                </li>
+                <li>
                     <a href="{{ url_for('crm.crm_contacts') }}" class="crm-nav-link {% if active_page == 'crm_contacts' %}active{% endif %}">
                         <i class="fas fa-address-book"></i> Contacts
                     </a>
@@ -822,15 +827,15 @@
                 
                 <!-- TeleCRM links -->
                 <li class="crm-nav-header">TeleCRM / Calling</li>
-                {% if role in ('Platform Admin', 'Group Admin', 'Telecaller Manager') %}
                 <li>
-                    <a href="{{ url_for('crm.telecrm_campaigns') }}" class="crm-nav-link {% if active_page == 'telecrm_campaigns' %}active{% endif %}">
-                        <i class="fas fa-bullhorn"></i> Campaigns
+                    <a href="/telecrm/dashboard" class="crm-nav-link {% if active_page == 'telecrm_dashboard' %}active{% endif %}">
+                        <i class="fas fa-chart-pie"></i> Dashboard
                     </a>
                 </li>
+                {% if role in ('Platform Admin', 'Group Admin', 'Telecaller Manager') %}
                 <li>
-                    <a href="{{ url_for('crm.telecrm_analytics') }}" class="crm-nav-link {% if active_page == 'telecrm_analytics' %}active{% endif %}">
-                        <i class="fas fa-chart-bar"></i> Analytics
+                    <a href="/telecrm/campaigns" class="crm-nav-link {% if active_page == 'telecrm_campaigns' %}active{% endif %}">
+                        <i class="fas fa-bullhorn"></i> Campaigns
                     </a>
                 </li>
                 <li>
@@ -850,8 +855,23 @@
                 </li>
                 {% endif %}
                 <li>
-                    <a href="{{ url_for('crm.telecrm_dialing_workbench') }}" class="crm-nav-link {% if active_page == 'telecrm_workbench' %}active{% endif %}">
+                    <a href="/telecrm/dialing" class="crm-nav-link {% if active_page == 'telecrm_workbench' %}active{% endif %}">
                         <i class="fas fa-phone-alt"></i> Dialing Workbench
+                    </a>
+                </li>
+                <li>
+                    <a href="/telecrm/sql" class="crm-nav-link {% if active_page == 'telecrm_sql' %}active{% endif %}">
+                        <i class="fas fa-check-circle"></i> TeleCRM SQL
+                    </a>
+                </li>
+                <li>
+                    <a href="/telecrm/tasks" class="crm-nav-link {% if active_page == 'telecrm_tasks' %}active{% endif %}">
+                        <i class="fas fa-tasks"></i> Tasks
+                    </a>
+                </li>
+                <li>
+                    <a href="/telecrm/reports" class="crm-nav-link {% if active_page == 'telecrm_analytics' %}active{% endif %}">
+                        <i class="fas fa-chart-bar"></i> Reports
                     </a>
                 </li>
                 

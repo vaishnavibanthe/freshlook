@@ -24,7 +24,42 @@ def check_telecrm_contact_access(contact_id):
     else:
         return False
 
+# Helper to check SQL duplicates
+
+def check_sql_duplicates(email, phone, company, product_solution_id):
+    dup_contacts = []
+    dup_accounts = []
+    dup_opportunities = []
+    
+    if email:
+        rows = db_query("SELECT id FROM contacts WHERE email = ?", (email,))
+        dup_contacts.extend([r['id'] for r in rows])
+    if phone:
+        rows = db_query("SELECT id FROM contacts WHERE phone = ?", (phone,))
+        dup_contacts.extend([r['id'] for r in rows if r['id'] not in dup_contacts])
+        
+    if company:
+        rows = db_query("SELECT id FROM accounts WHERE LOWER(account_name) = ?", (company.lower().strip(),))
+        dup_accounts.extend([r['id'] for r in rows])
+        
+    if dup_accounts:
+        placeholder = ','.join(['?'] * len(dup_accounts))
+        rows = db_query(f"SELECT id FROM opportunities WHERE account_id IN ({placeholder}) AND status = 'Open'", dup_accounts)
+        dup_opportunities.extend([r['id'] for r in rows])
+    elif dup_contacts:
+        placeholder = ','.join(['?'] * len(dup_contacts))
+        rows = db_query(f"SELECT id FROM opportunities WHERE contact_id IN ({placeholder}) AND status = 'Open'", dup_contacts)
+        dup_opportunities.extend([r['id'] for r in rows if r['id'] not in dup_opportunities])
+        
+    return {
+        'contact_ids': dup_contacts,
+        'account_ids': dup_accounts,
+        'opportunity_ids': dup_opportunities,
+        'status': 'Duplicate' if (dup_contacts or dup_accounts or dup_opportunities) else 'None'
+    }
+
 # Helper to check if user has access to a specific campaign / list
+
 def check_campaign_access(campaign_id):
     user = g.crm_user
     role = user['role']
@@ -1699,221 +1734,669 @@ def api_complete_meeting(meeting_id):
     date_str = datetime.utcnow().strftime('%Y-%m-%d')
     update_user_daily_stat(user_id, meeting['campaign_id'], date_str, {'meetings_completed': 1})
     
-    if sql_recommendation == 1:
-        # Submit automatically for SQL review
-        # Check if already submitted
-        exist = db_query_one("SELECT id FROM telecrm_sql_reviews WHERE telecrm_contact_id = ? AND campaign_id = ?", (contact_id, meeting['campaign_id']))
-        if not exist:
-            db_execute('''
-                INSERT INTO telecrm_sql_reviews (
-                    telecrm_contact_id, campaign_id, submitted_by, submitted_at, review_status, notes
-                ) VALUES (?, ?, ?, ?, 'Pending', ?)
-            ''', (contact_id, meeting['campaign_id'], user_id, now_str, f"MOM: {mom}. Pain: {pain}"))
-            
-            db_execute("UPDATE telecrm_contacts SET sql_status = 'SQL Review', dialing_status = 'SQL Marked' WHERE id = ?", (contact_id,))
-            log_timeline_activity('telecrm_contact', contact_id, 'SQL requested', "Submitted for Manager SQL review", "", user_id)
-            
     update_campaign_completion_stats(meeting['campaign_id'])
     
     return jsonify({'status': 'success'})
 
+
 # ----------------------------------------------------
-# SQL Submit & Review Queues
+# TeleCRM SQL Staging & Review Section
 # ----------------------------------------------------
-@crm_bp.route('/telecrm/sql-review')
+@crm_bp.route('/telecrm/sql')
+@crm_bp.route('/crm/telecrm-sql')
 @crm_login_required
-@role_required('Platform Admin', 'Group Admin', 'Telecaller Manager', 'Manager / Sales Manager')
-def telecrm_sql_review_page():
-    return render_template('telecrm/sql_review.html', active_page='telecrm_sql_review')
+@role_required('Platform Admin', 'Group Admin', 'Telecaller Manager', 'Manager / Sales Manager', 'Sales Head', 'Telecaller')
+def telecrm_sql_staging_list_page():
+    return render_template('crm/telecrm_sql/list.html', active_page='telecrm_sql')
 
 
-@crm_bp.route('/api/telecrm/contacts/<int:contact_id>/submit-sql', methods=['POST'])
+@crm_bp.route('/telecrm/sql/<int:sql_id>')
+@crm_login_required
+@role_required('Platform Admin', 'Group Admin', 'Telecaller Manager', 'Manager / Sales Manager', 'Sales Head', 'Telecaller')
+def telecrm_sql_detail_page(sql_id):
+    return render_template('crm/telecrm_sql/detail.html', active_page='telecrm_sql', sql_id=sql_id)
+
+
+@crm_bp.route('/api/telecrm/contacts/<int:contact_id>/mark-sql', methods=['POST'])
 @crm_login_required
 @role_required('Platform Admin', 'Group Admin', 'Telecaller Manager', 'Telecaller')
-def api_submit_sql(contact_id):
+def api_mark_sql(contact_id):
     if not check_telecrm_contact_access(contact_id):
         return jsonify({'status': 'error', 'message': 'Access denied.'}), 403
         
     data = request.json or {}
-    notes = data.get('notes', '')
     
+    # Fetch Contact Details
+    contact = db_query_one("SELECT * FROM telecrm_contacts WHERE id = ?", (contact_id,))
+    if not contact:
+        return jsonify({'status': 'error', 'message': 'Contact not found.'}), 404
+        
+    # Gather qualification fields from request or contact
+    business_pain = data.get('business_pain', '').strip()
+    problem_statement = data.get('problem_statement', '').strip()
+    interest_level = data.get('interest_level', '').strip() or contact['interest_level']
+    next_action = data.get('next_action', '').strip()
+    urgency_level = data.get('urgency_level', 'Medium').strip()
+    decision_maker_involved = int(data.get('decision_maker_involved', 0))
+    budget_indication = data.get('budget_indication', '').strip()
+    timeline_indication = data.get('timeline_indication', '').strip()
+    economic_buyer_hint = data.get('economic_buyer_hint', '').strip()
+    
+    # Check if there is a completed meeting in telecrm_meetings
+    meeting_row = db_query_one(
+        "SELECT * FROM telecrm_meetings WHERE telecrm_contact_id = ? AND status = 'Completed' ORDER BY id DESC LIMIT 1",
+        (contact_id,)
+    )
+    
+    # Run validations
+    missing_fields = []
+    
+    # Contact name exists
+    if not contact['full_name'] and not (contact['first_name'] or contact['last_name']):
+        missing_fields.append("Contact name exists")
+        
+    # Phone or email exists
+    if not contact['phone'] and not contact['email']:
+        missing_fields.append("Phone or email exists")
+        
+    # Company name exists
+    if not contact['company']:
+        missing_fields.append("Company name exists")
+        
+    # Product/Solution is selected
+    if not contact['product_solution_id']:
+        missing_fields.append("Product/Solution is selected")
+        
+    # Meeting is completed
+    has_meeting = (contact['meeting_status'] == 'Completed' or contact['meeting_completed_at'] is not None or meeting_row is not None)
+    if not has_meeting:
+        missing_fields.append("Meeting is completed")
+        
+    # MOM is added
+    mom_text = contact['mom'] or (meeting_row['mom'] if meeting_row else '')
+    if not mom_text or not mom_text.strip():
+        missing_fields.append("MOM is added")
+        
+    # Business pain/problem captured
+    if not business_pain and not problem_statement:
+        missing_fields.append("Business pain/problem is captured")
+        
+    # Interest level Medium or High
+    if interest_level not in ('Medium', 'High'):
+        missing_fields.append("Interest level is Medium or High")
+        
+    # Next action is captured
+    if not next_action:
+        missing_fields.append("Next action is captured")
+        
+    if missing_fields:
+        return jsonify({
+            'status': 'error',
+            'message': 'Mandatory fields missing for SQL qualification.',
+            'missing_fields': missing_fields
+        }), 400
+
     now_str = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
     user_id = g.crm_user['id']
     
-    contact = db_query_one("SELECT telecrm_list_id, sql_status FROM telecrm_contacts WHERE id = ?", (contact_id,))
-    if contact['sql_status'] != 'Not SQL':
-        return jsonify({'status': 'error', 'message': 'Contact has already been qualified or submitted for SQL review.'}), 400
-        
-    # Create SQL Review entry
-    db_execute('''
-        INSERT INTO telecrm_sql_reviews (
-            telecrm_contact_id, campaign_id, submitted_by, submitted_at, review_status, notes
-        ) VALUES (?, ?, ?, ?, 'Pending', ?)
-    ''', (contact_id, contact['telecrm_list_id'], user_id, now_str, notes))
+    # Check for duplicates using check_sql_duplicates helper
+    dup_info = check_sql_duplicates(
+        contact['email'], 
+        contact['phone'], 
+        contact['company'], 
+        contact['product_solution_id']
+    )
     
+    possible_dup_contacts = ",".join(map(str, dup_info['contact_ids']))
+    possible_dup_accounts = ",".join(map(str, dup_info['account_ids']))
+    possible_dup_opportunities = ",".join(map(str, dup_info['opportunity_ids']))
+    duplicate_status = dup_info['status']
+
+    # Get meeting details from contact or meeting row
+    meeting_status = contact['meeting_status'] or (meeting_row['status'] if meeting_row else 'Completed')
+    meeting_scheduled_at = contact['meeting_scheduled_at'] or (meeting_row['start_at'] if meeting_row else None)
+    meeting_completed_at = contact['meeting_completed_at'] or (meeting_row['updated_at'] if meeting_row else now_str)
+    meeting_mode = meeting_row['meeting_mode'] if meeting_row else 'Online'
+    meeting_link = meeting_row['meeting_link'] if meeting_row else ''
+    meeting_attendees = meeting_row['attendee_json'] if meeting_row else ''
+    
+    # Check if there is an existing staging SQL record for this contact in non-final status
+    existing_sql = db_query_one(
+        "SELECT id, status FROM telecrm_sql WHERE telecrm_contact_id = ? AND status IN ('New SQL', 'Pending Review', 'More Info Required') ORDER BY id DESC LIMIT 1",
+        (contact_id,)
+    )
+    
+    if existing_sql:
+        sql_id = existing_sql['id']
+        prev_status = existing_sql['status']
+        db_execute('''
+            UPDATE telecrm_sql
+            SET contact_name = ?, first_name = ?, last_name = ?, email = ?, phone = ?, alternate_phone = ?,
+                company = ?, website = ?, domain = ?, job_title = ?, geography = ?, country = ?, industry = ?,
+                product_solution_id = ?, partner_id = ?, partner_influence_type = ?,
+                meeting_status = ?, meeting_scheduled_at = ?, meeting_completed_at = ?, meeting_mode = ?, meeting_link = ?, meeting_attendees = ?,
+                mom = ?, business_pain = ?, problem_statement = ?, urgency_level = ?, interest_level = ?, lead_quality_rating = ?,
+                decision_maker_involved = ?, economic_buyer_hint = ?, budget_indication = ?, timeline_indication = ?, next_action = ?,
+                recommended_owner_id = ?, status = 'New SQL', duplicate_status = ?,
+                possible_duplicate_contact_ids = ?, possible_duplicate_account_ids = ?, possible_duplicate_opportunity_ids = ?,
+                updated_at = ?
+            WHERE id = ?
+        ''', (
+            contact['full_name'] or f"{contact['first_name'] or ''} {contact['last_name'] or ''}".strip(), contact['first_name'], contact['last_name'],
+            contact['email'], contact['phone'], contact['alternate_phone'] or contact['phone'], contact['company'], contact['website'],
+            contact['website'].replace('http://', '').replace('https://', '').split('/')[0] if contact['website'] else '',
+            contact['job_title'], contact['geography'], contact['country'], contact['industry'], contact['product_solution_id'],
+            contact['partner_id'], 'None', meeting_status, meeting_scheduled_at, meeting_completed_at, meeting_mode, meeting_link, meeting_attendees,
+            mom_text, business_pain, problem_statement, urgency_level, interest_level, contact['lead_quality_rating'] or 3,
+            decision_maker_involved, economic_buyer_hint, budget_indication, timeline_indication, next_action,
+            contact['assigned_manager_id'] or user_id, duplicate_status, possible_dup_contacts, possible_dup_accounts, possible_dup_opportunities,
+            now_str, sql_id
+        ))
+        
+        # Log update review log
+        db_execute('''
+            INSERT INTO telecrm_sql_review_logs (
+                telecrm_sql_id, action_type, description, previous_status, new_status, performed_by, created_at
+            ) VALUES (?, 'Updated by telecaller', 'SQL record details updated and resubmitted by telecaller', ?, 'New SQL', ?, ?)
+        ''', (sql_id, prev_status, user_id, now_str))
+    else:
+        sql_id = db_execute('''
+            INSERT INTO telecrm_sql (
+                telecrm_contact_id, telecrm_campaign_id, telecrm_list_id, telecaller_id, telecaller_manager_id,
+                contact_name, first_name, last_name, email, phone, alternate_phone, company, website, domain, job_title,
+                geography, country, industry, product_solution_id, partner_id, partner_influence_type,
+                meeting_status, meeting_scheduled_at, meeting_completed_at, meeting_mode, meeting_link, meeting_attendees,
+                mom, business_pain, problem_statement, urgency_level, interest_level, lead_quality_rating,
+                decision_maker_involved, economic_buyer_hint, budget_indication, timeline_indication, next_action,
+                recommended_owner_id, status, duplicate_status, possible_duplicate_contact_ids, possible_duplicate_account_ids, possible_duplicate_opportunity_ids,
+                created_at, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'New SQL', ?, ?, ?, ?, ?, ?)
+        ''', (
+            contact_id, contact['telecrm_list_id'], contact['telecrm_list_id'], contact['assigned_telecaller_id'], contact['assigned_manager_id'],
+            contact['full_name'] or f"{contact['first_name'] or ''} {contact['last_name'] or ''}".strip(), contact['first_name'], contact['last_name'],
+            contact['email'], contact['phone'], contact['alternate_phone'] or contact['phone'], contact['company'], contact['website'],
+            contact['website'].replace('http://', '').replace('https://', '').split('/')[0] if contact['website'] else '',
+            contact['job_title'], contact['geography'], contact['country'], contact['industry'], contact['product_solution_id'],
+            contact['partner_id'], 'None', meeting_status, meeting_scheduled_at, meeting_completed_at, meeting_mode, meeting_link, meeting_attendees,
+            mom_text, business_pain, problem_statement, urgency_level, interest_level, contact['lead_quality_rating'] or 3,
+            decision_maker_involved, economic_buyer_hint, budget_indication, timeline_indication, next_action,
+            contact['assigned_manager_id'] or user_id, duplicate_status, possible_dup_contacts, possible_dup_accounts, possible_dup_opportunities,
+            now_str, now_str
+        ))
+        
+        # Log creation review log
+        db_execute('''
+            INSERT INTO telecrm_sql_review_logs (
+                telecrm_sql_id, action_type, description, new_status, performed_by, created_at
+            ) VALUES (?, 'SQL created', 'SQL record generated from dialing workspace', 'New SQL', ?, ?)
+        ''', (sql_id, user_id, now_str))
+        
+    # Update Contact Status
     db_execute('''
         UPDATE telecrm_contacts
-        SET sql_status = 'SQL Review', dialing_status = 'SQL Marked', updated_at = ?
+        SET sql_status = 'SQL Marked',
+            dialing_status = 'SQL Marked',
+            sql_record_id = ?,
+            sql_marked_at = ?,
+            sql_marked_by = ?,
+            updated_at = ?
         WHERE id = ?
-    ''', (now_str, contact_id))
+    ''', (sql_id, now_str, user_id, now_str, contact_id))
     
-    log_timeline_activity('telecrm_contact', contact_id, 'SQL requested', "Contact submitted for Manager SQL review", notes, user_id)
+    # Log activity
+    log_timeline_activity('telecrm_contact', contact_id, 'SQL marked', 
+                           f"Contact marked as SQL by caller. Staging Record ID: {sql_id}", 
+                           f"Pain points: {business_pain}. Next Action: {next_action}", user_id)
+    
+    # If duplicate found, log it in review logs as well
+    if duplicate_status == 'Duplicate':
+        db_execute('''
+            INSERT INTO telecrm_sql_review_logs (
+                telecrm_sql_id, action_type, description, previous_status, new_status, performed_by, created_at
+            ) VALUES (?, 'Duplicate detected', ?, 'New SQL', 'New SQL', ?, ?)
+        ''', (sql_id, f"Possible duplicates found. Contacts: {possible_dup_contacts}, Accounts: {possible_dup_accounts}", user_id, now_str))
+        
     update_campaign_completion_stats(contact['telecrm_list_id'])
+    
+    return jsonify({'status': 'success', 'sql_id': sql_id})
+
+
+@crm_bp.route('/api/telecrm/sql', methods=['GET'])
+@crm_login_required
+def api_get_telecrm_sqls():
+    user = g.crm_user
+    role = user['role']
+    
+    where_clauses = []
+    params = []
+    
+    if role == 'Telecaller':
+        where_clauses.append("telecaller_id = ?")
+        params.append(user['id'])
+    elif role in ('Group Admin', 'Telecaller Manager'):
+        where_clauses.append("telecaller_manager_id = ? OR telecaller_id = ?")
+        params.extend([user['id'], user['id']])
+        
+    # Gather other query parameters for search/filtering
+    status = request.args.get('status', '').strip()
+    campaign_id = request.args.get('campaign_id', '').strip()
+    telecaller_id = request.args.get('telecaller_id', '').strip()
+    product_solution_id = request.args.get('product_solution_id', '').strip()
+    partner_id = request.args.get('partner_id', '').strip()
+    industry = request.args.get('industry', '').strip()
+    geography = request.args.get('geography', '').strip()
+    lead_quality_rating = request.args.get('lead_quality_rating', '').strip()
+    interest_level = request.args.get('interest_level', '').strip()
+    meeting_completed_date = request.args.get('meeting_completed_date', '').strip()
+    duplicate_status = request.args.get('duplicate_status', '').strip()
+    assigned_owner_id = request.args.get('assigned_owner_id', '').strip()
+    unassigned = request.args.get('unassigned', '').strip()
+    
+    # Build filter clauses dynamically
+    if status:
+        where_clauses.append("status = ?")
+        params.append(status)
+    if campaign_id:
+        where_clauses.append("telecrm_campaign_id = ?")
+        params.append(int(campaign_id))
+    if telecaller_id:
+        where_clauses.append("telecaller_id = ?")
+        params.append(int(telecaller_id))
+    if product_solution_id:
+        where_clauses.append("product_solution_id = ?")
+        params.append(int(product_solution_id))
+    if partner_id:
+        where_clauses.append("partner_id = ?")
+        params.append(int(partner_id))
+    if industry:
+        where_clauses.append("industry = ?")
+        params.append(industry)
+    if geography:
+        where_clauses.append("geography = ?")
+        params.append(geography)
+    if lead_quality_rating:
+        where_clauses.append("lead_quality_rating = ?")
+        params.append(int(lead_quality_rating))
+    if interest_level:
+        where_clauses.append("interest_level = ?")
+        params.append(interest_level)
+    if meeting_completed_date:
+        where_clauses.append("DATE(meeting_completed_at) = ?")
+        params.append(meeting_completed_date)
+    if duplicate_status:
+        where_clauses.append("duplicate_status = ?")
+        params.append(duplicate_status)
+    if assigned_owner_id:
+        where_clauses.append("assigned_owner_id = ?")
+        params.append(int(assigned_owner_id))
+    if unassigned == 'true' or unassigned == '1':
+        where_clauses.append("assigned_owner_id IS NULL")
+        
+    # Search
+    search = request.args.get('search', '').strip()
+    if search:
+        search_clause = '''(
+            contact_name LIKE ? OR
+            email LIKE ? OR
+            phone LIKE ? OR
+            company LIKE ? OR
+            domain LIKE ? OR
+            job_title LIKE ?
+        )'''
+        where_clauses.append(search_clause)
+        search_param = f"%{search}%"
+        params.extend([search_param] * 6)
+        
+    where_sql = f"WHERE {' AND '.join(where_clauses)}" if where_clauses else ""
+    
+    query = f'''
+        SELECT s.*, 
+               u.name as telecaller_name,
+               ps.name as product_name,
+               p.name as partner_name,
+               c.name as campaign_name
+        FROM telecrm_sql s
+        LEFT JOIN crm_users u ON s.telecaller_id = u.id
+        LEFT JOIN product_solutions ps ON s.product_solution_id = ps.id
+        LEFT JOIN partners p ON s.partner_id = p.id
+        LEFT JOIN telecrm_lists c ON s.telecrm_campaign_id = c.id
+        {where_sql}
+        ORDER BY s.id DESC
+    '''
+    rows = db_query(query, params)
+    return jsonify(rows)
+
+
+@crm_bp.route('/api/telecrm/sql/analytics', methods=['GET'])
+@crm_login_required
+def api_telecrm_sql_analytics():
+    from crm.api import get_date_range_bounds
+    
+    date_filter = request.args.get('date_filter', 'This Month').strip()
+    start_date = request.args.get('start_date', '').strip()
+    end_date = request.args.get('end_date', '').strip()
+    
+    start_dt, end_dt = get_date_range_bounds(date_filter, start_date, end_date)
+    
+    user = g.crm_user
+    role = user['role']
+    
+    role_clause = ""
+    role_params = []
+    if role == 'Telecaller':
+        role_clause = "AND telecaller_id = ?"
+        role_params = [user['id']]
+    elif role in ('Group Admin', 'Telecaller Manager'):
+        role_clause = "AND (telecaller_manager_id = ? OR telecaller_id = ?)"
+        role_params = [user['id'], user['id']]
+
+    def get_count(status_list, date_col):
+        where_clauses = []
+        params = []
+        
+        if status_list:
+            placeholders = ','.join(['?'] * len(status_list))
+            where_clauses.append(f"status IN ({placeholders})")
+            params.extend(status_list)
+            
+        if role_clause:
+            where_clauses.append(role_clause.replace("AND ", ""))
+            params.extend(role_params)
+            
+        if start_dt and end_dt:
+            where_clauses.append(f"{date_col} BETWEEN ? AND ?")
+            params.extend([start_dt.strftime('%Y-%m-%d %H:%M:%S'), end_dt.strftime('%Y-%m-%d %H:%M:%S')])
+            
+        where_sql = f"WHERE {' AND '.join(where_clauses)}" if where_clauses else ""
+        query = f"SELECT COUNT(*) as cnt FROM telecrm_sql {where_sql}"
+        res = db_query_one(query, params)
+        return res['cnt'] if res else 0
+
+    total_sqls = get_count([], 'created_at')
+    pending = get_count(['New SQL', 'Pending Review', 'More Info Required'], 'created_at')
+    approved = get_count(['Approved for CRM'], 'reviewed_at')
+    converted = get_count(['Converted to CRM'], 'converted_at')
+    rejected = get_count(['Rejected'], 'rejected_at')
+    duplicate = get_count(['Duplicate'], 'duplicate_marked_at')
+    
+    conv_rate = 0.0
+    if total_sqls > 0:
+        conv_rate = round((converted / total_sqls) * 100, 1)
+        
+    return jsonify({
+        'total_sqls': total_sqls,
+        'pending_review': pending,
+        'approved_for_crm': approved,
+        'converted_to_crm': converted,
+        'rejected': rejected,
+        'duplicate': duplicate,
+        'conversion_rate': conv_rate
+    })
+
+
+@crm_bp.route('/api/telecrm/sql/<int:sql_id>', methods=['GET'])
+@crm_login_required
+def api_telecrm_sql_detail(sql_id):
+    sql_rec = db_query_one('''
+        SELECT s.*, 
+               u.name as telecaller_name,
+               ps.name as product_name,
+               p.name as partner_name,
+               c.name as campaign_name,
+               r.name as reviewer_name,
+               o.name as recommended_owner_name,
+               ao.name as assigned_owner_name
+        FROM telecrm_sql s
+        LEFT JOIN crm_users u ON s.telecaller_id = u.id
+        LEFT JOIN product_solutions ps ON s.product_solution_id = ps.id
+        LEFT JOIN partners p ON s.partner_id = p.id
+        LEFT JOIN telecrm_lists c ON s.telecrm_campaign_id = c.id
+        LEFT JOIN crm_users r ON s.reviewed_by = r.id
+        LEFT JOIN crm_users o ON s.recommended_owner_id = o.id
+        LEFT JOIN crm_users ao ON s.assigned_owner_id = ao.id
+        WHERE s.id = ?
+    ''', (sql_id,))
+    
+    if not sql_rec:
+        return jsonify({'status': 'error', 'message': 'SQL record not found.'}), 404
+        
+    user = g.crm_user
+    if user['role'] == 'Telecaller' and sql_rec['telecaller_id'] != user['id']:
+        return jsonify({'status': 'error', 'message': 'Access denied.'}), 403
+        
+    # Get review logs
+    logs = db_query('''
+        SELECT l.*, u.name as performed_by_name
+        FROM telecrm_sql_review_logs l
+        LEFT JOIN crm_users u ON l.performed_by = u.id
+        WHERE l.telecrm_sql_id = ?
+        ORDER BY l.created_at DESC
+    ''', (sql_id,))
+    
+    # Get duplicates checks detail
+    possible_contacts = []
+    possible_accounts = []
+    possible_opportunities = []
+    
+    if sql_rec['possible_duplicate_contact_ids']:
+        ids = [int(x) for x in sql_rec['possible_duplicate_contact_ids'].split(',') if x.strip().isdigit()]
+        if ids:
+            placeholders = ','.join(['?'] * len(ids))
+            possible_contacts = db_query(f'''
+                SELECT c.id, c.full_name, c.email, c.phone, c.job_title, a.account_name as company_name
+                FROM contacts c
+                LEFT JOIN accounts a ON c.account_id = a.id
+                WHERE c.id IN ({placeholders})
+            ''', ids)
+            
+    if sql_rec['possible_duplicate_account_ids']:
+        ids = [int(x) for x in sql_rec['possible_duplicate_account_ids'].split(',') if x.strip().isdigit()]
+        if ids:
+            placeholders = ','.join(['?'] * len(ids))
+            possible_accounts = db_query(f'''
+                SELECT a.id, a.account_name, a.website, a.industry, a.geography, u.name as owner_name
+                FROM accounts a
+                LEFT JOIN crm_users u ON a.owner_id = u.id
+                WHERE a.id IN ({placeholders})
+            ''', ids)
+            
+    if sql_rec['possible_duplicate_opportunity_ids']:
+        ids = [int(x) for x in sql_rec['possible_duplicate_opportunity_ids'].split(',') if x.strip().isdigit()]
+        if ids:
+            placeholders = ','.join(['?'] * len(ids))
+            possible_opportunities = db_query(f'''
+                SELECT o.id, o.opportunity_name, o.company, o.stage, o.status, u.name as owner_name, o.estimated_value
+                FROM opportunities o
+                LEFT JOIN crm_users u ON o.owner_id = u.id
+                WHERE o.id IN ({placeholders})
+            ''', ids)
+            
+    # Include default rejection reasons
+    rejection_reasons = db_query("SELECT * FROM telecrm_sql_rejection_reasons WHERE is_active = 1 ORDER BY sort_order ASC")
+    
+    # Active CRM Users for owner assignment
+    active_users = db_query("SELECT id, name, role FROM crm_users WHERE is_active = 1 ORDER BY name ASC")
+    
+    return jsonify({
+        'sql': sql_rec,
+        'logs': logs,
+        'duplicates': {
+            'contacts': possible_contacts,
+            'accounts': possible_accounts,
+            'opportunities': possible_opportunities
+        },
+        'rejection_reasons': rejection_reasons,
+        'active_users': active_users
+    })
+
+
+@crm_bp.route('/api/telecrm/sql/<int:sql_id>/approve', methods=['POST'])
+@crm_login_required
+@role_required('Platform Admin', 'Group Admin', 'Telecaller Manager', 'Manager / Sales Manager', 'Sales Head')
+def api_approve_sql_staging(sql_id):
+    data = request.json or {}
+    notes = data.get('notes', '').strip()
+    
+    sql_rec = db_query_one("SELECT * FROM telecrm_sql WHERE id = ?", (sql_id,))
+    if not sql_rec:
+        return jsonify({'status': 'error', 'message': 'SQL staging record not found.'}), 404
+        
+    now_str = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+    user_id = g.crm_user['id']
+    
+    db_execute('''
+        UPDATE telecrm_sql
+        SET status = 'Approved for CRM',
+            reviewed_by = ?,
+            reviewed_at = ?,
+            review_notes = ?
+        WHERE id = ?
+    ''', (user_id, now_str, notes, sql_id))
+    
+    # Update Contact Status
+    db_execute("UPDATE telecrm_contacts SET sql_status = 'Approved for CRM', updated_at = ? WHERE id = ?", (now_str, sql_rec['telecrm_contact_id']))
+    
+    # Log review log
+    db_execute('''
+        INSERT INTO telecrm_sql_review_logs (
+            telecrm_sql_id, action_type, description, previous_status, new_status, performed_by, created_at
+        ) VALUES (?, 'Approved for CRM', ?, ?, 'Approved for CRM', ?, ?)
+    ''', (sql_id, f"SQL approved for CRM by reviewer. Notes: {notes}", sql_rec['status'], user_id, now_str))
     
     return jsonify({'status': 'success'})
 
 
-@crm_bp.route('/api/telecrm/sql-review')
+@crm_bp.route('/api/telecrm/sql/<int:sql_id>/move-to-crm', methods=['POST'])
 @crm_login_required
-@role_required('Platform Admin', 'Group Admin', 'Telecaller Manager', 'Manager / Sales Manager')
-def api_get_sql_review_queue():
-    user = g.crm_user
-    role = user['role']
-    
-    params = []
-    where_clauses = ["sr.review_status = 'Pending'"]
-    
-    # Filter based on scope
-    if role in ('Group Admin', 'Telecaller Manager'):
-        where_clauses.append("tc.group_id = ?")
-        params.append(user['group_id'])
-    elif role == 'Manager / Sales Manager':
-        # Sales managers can view review entries recommended for them
-        where_clauses.append("(sr.assigned_sales_manager_id = ? OR sr.assigned_sales_manager_id IS NULL)")
-        params.append(user['id'])
-        
-    query = f'''
-        SELECT sr.*, tc.full_name as contact_name, tc.company, tc.email, tc.phone, tc.job_title,
-               tc.lead_quality_rating, tc.discovery_meeting_date, tc.mom, tc.notes as contact_notes,
-               cl.name as campaign_name, u.name as telecaller_name, ps.name as product_name, p.name as partner_name
-        FROM telecrm_sql_reviews sr
-        JOIN telecrm_contacts tc ON sr.telecrm_contact_id = tc.id
-        JOIN telecrm_lists cl ON sr.campaign_id = cl.id
-        JOIN crm_users u ON sr.submitted_by = u.id
-        LEFT JOIN product_solutions ps ON tc.product_solution_id = ps.id
-        LEFT JOIN partners p ON tc.partner_id = p.id
-        WHERE {' AND '.join(where_clauses)}
-        ORDER BY sr.submitted_at ASC
-    '''
-    reviews = db_query(query, params)
-    
-    # Inject warnings for existing records mapping
-    for r in reviews:
-        r['warnings'] = get_validation_warnings(r['email'], r['phone'], '', r['company'])
-        
-    return jsonify(reviews)
-
-
-@crm_bp.route('/api/telecrm/sql-review/<int:review_id>/approve', methods=['POST'])
-@crm_login_required
-@role_required('Platform Admin', 'Group Admin', 'Telecaller Manager', 'Manager / Sales Manager')
-def api_approve_sql(review_id):
+@role_required('Platform Admin', 'Group Admin', 'Telecaller Manager', 'Manager / Sales Manager', 'Sales Head')
+def api_move_sql_to_crm(sql_id):
     data = request.json or {}
-    sales_manager_id = data.get('assigned_sales_manager_id')
-    notes = data.get('notes', '')
+    assigned_owner_id = data.get('assigned_owner_id')
+    contact_mapping = data.get('contact_mapping')
+    account_mapping = data.get('account_mapping')
+    opportunity_mapping = data.get('opportunity_mapping')
     
-    review = db_query_one("SELECT * FROM telecrm_sql_reviews WHERE id = ?", (review_id,))
-    if not review:
-        return jsonify({'status': 'error', 'message': 'SQL review entry not found.'}), 404
+    if not assigned_owner_id:
+        return jsonify({'status': 'error', 'message': 'Owner assignment is mandatory.'}), 400
         
-    contact_id = review['telecrm_contact_id']
-    contact = db_query_one("SELECT * FROM telecrm_contacts WHERE id = ?", (contact_id,))
-    
-    user = g.crm_user
+    sql_rec = db_query_one("SELECT * FROM telecrm_sql WHERE id = ?", (sql_id,))
+    if not sql_rec:
+        return jsonify({'status': 'error', 'message': 'SQL staging record not found.'}), 404
+        
     now_str = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+    user_id = g.crm_user['id']
     
-    if not sales_manager_id:
-        sales_manager_id = user['id']
+    # Check if contact needs to be linked or created
+    contact_id = None
+    if contact_mapping and contact_mapping != 'new':
+        contact_id = int(contact_mapping)
+    else:
+        # Check if email already exists
+        if sql_rec['email']:
+            existing_cont = db_query_one("SELECT id FROM contacts WHERE LOWER(email) = ?", (sql_rec['email'].lower().strip(),))
+            if existing_cont:
+                contact_id = existing_cont['id']
+        if not contact_id:
+            # Create contact
+            full_name = sql_rec['contact_name'] or f"{sql_rec['first_name'] or ''} {sql_rec['last_name'] or ''}".strip()
+            contact_id = db_execute('''
+                INSERT INTO contacts (
+                    first_name, last_name, full_name, email, phone, alternate_phone, job_title, geography, country, linkedin_profile, source, validation_status, created_at, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'TeleCRM SQL', 'Not Validated', ?, ?)
+            ''', (
+                sql_rec['first_name'], sql_rec['last_name'], full_name, sql_rec['email'], sql_rec['phone'], sql_rec['alternate_phone'],
+                sql_rec['job_title'], sql_rec['geography'], sql_rec['country'], '', now_str, now_str
+            ))
+            log_timeline_activity('contact', contact_id, 'Contact created', f"Contact {full_name} created from SQL review", f"Email: {sql_rec['email']}", user_id)
+            
+    # Check if account needs to be linked or created
+    account_id = None
+    if account_mapping and account_mapping != 'new':
+        account_id = int(account_mapping)
+    else:
+        # Check if company already exists
+        if sql_rec['company']:
+            existing_acct = db_query_one("SELECT id FROM accounts WHERE LOWER(account_name) = ?", (sql_rec['company'].lower().strip(),))
+            if existing_acct:
+                account_id = existing_acct['id']
+        if not account_id and sql_rec['company']:
+            # Create account
+            account_id = db_execute('''
+                INSERT INTO accounts (
+                    account_name, website, domain, industry, geography, country, owner_id, partner_id, source, created_at, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'TeleCRM SQL', ?, ?)
+            ''', (
+                sql_rec['company'], sql_rec['website'], sql_rec['domain'], sql_rec['industry'], sql_rec['geography'], sql_rec['country'],
+                assigned_owner_id, sql_rec['partner_id'], now_str, now_str
+            ))
+            log_timeline_activity('account', account_id, 'Account created', f"Account {sql_rec['company']} created from SQL review", "", user_id)
+
+    # Link contact to account
+    if contact_id and account_id:
+        db_execute("UPDATE contacts SET account_id = ? WHERE id = ?", (account_id, contact_id))
+
+    # Link or Create Opportunity
+    opp_id = None
+    if opportunity_mapping and opportunity_mapping != 'new':
+        opp_id = int(opportunity_mapping)
+        log_timeline_activity('opportunity', opp_id, 'SQL Linked', f"SQL from TeleCRM linked to existing opportunity", f"MOM: {sql_rec['mom']}", user_id)
+    else:
+        # Create Opportunity
+        prod_row = db_query_one("SELECT name FROM product_solutions WHERE id = ?", (sql_rec['product_solution_id'],))
+        prod_name = prod_row['name'] if prod_row else "Solutions"
+        opp_name = f"{sql_rec['company'] or 'New Account'} - {prod_name} Opportunity"
         
-    # 1. Create or Map Account and Contact in CRM Core
-    account_id, core_contact_id = get_or_create_account_and_contact(
-        company_name=contact['company'],
-        email=contact['email'],
-        phone=contact['phone'],
-        first_name=contact['first_name'],
-        last_name=contact['last_name'],
-        job_title=contact['job_title'],
-        geography=contact['geography'],
-        country=contact['country'],
-        industry=contact['industry'],
-        website=contact['website'],
-        linkedin_profile=contact['linkedin_profile'],
-        source='TeleCRM SQL Handoff',
-        owner_id=sales_manager_id
-    )
+        expected_close = (datetime.utcnow() + timedelta(days=90)).strftime('%Y-%m-%d')
+        
+        opp_id = db_execute('''
+            INSERT INTO opportunities (
+                account_id, contact_id, opportunity_name, company, primary_contact_name, primary_contact_email,
+                owner_id, sales_manager_id, group_id, industry, geography, primary_product_solution_id, partner_id, partner_influence_type,
+                estimated_value, currency, expected_close_date, stage, bucket, probability, meddic_score, status, sql_source, telecrm_contact_id, meeting_date, mom, created_at, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0.0, 'USD', ?, 'Discovery', 'Prospecting', 10, 0, 'Open', 'TeleCRM SQL', ?, ?, ?, ?, ?)
+        ''', (
+            account_id, contact_id, opp_name, sql_rec['company'], sql_rec['contact_name'], sql_rec['email'],
+            assigned_owner_id, assigned_owner_id, sql_rec['telecaller_manager_id'], sql_rec['industry'], sql_rec['geography'], sql_rec['product_solution_id'],
+            sql_rec['partner_id'], sql_rec['partner_influence_type'] or 'None',
+            expected_close, sql_rec['telecrm_contact_id'], sql_rec['meeting_completed_at'], sql_rec['mom'], now_str, now_str
+        ))
+        log_timeline_activity('opportunity', opp_id, 'SQL Handoff', "SQL converted from TeleCRM calling", f"MOM: {sql_rec['mom']}", user_id)
+        
+    # Prefill MEDDIC from SQL qualification
+    buyer_identified = 1 if sql_rec['economic_buyer_hint'] else 0
+    decision_known = 1 if sql_rec['timeline_indication'] else 0
     
-    # 2. Create Lead in CRM Core
-    lead_list = db_query_one("SELECT id FROM lead_lists WHERE name = 'TeleCRM Dialing Lists'")
-    lead_list_id = lead_list['id'] if lead_list else None
-    
-    lead_id = db_execute('''
-        INSERT INTO leads (
-            first_name, last_name, full_name, company, email, phone, job_title, geography, country, industry, website, linkedin_profile,
-            lead_source, lead_list_id, account_id, contact_id, owner_id, group_id, status, primary_product_solution_id, partner_id, consent_status, notes, created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'TeleCRM', ?, ?, ?, ?, ?, 'Qualified', ?, ?, ?, ?, ?, ?)
-    ''', (
-        contact['first_name'], contact['last_name'], contact['full_name'], contact['company'], contact['email'], contact['phone'], contact['job_title'], contact['geography'], contact['country'], contact['industry'], contact['website'], contact['linkedin_profile'],
-        lead_list_id, account_id, core_contact_id, sales_manager_id, contact['group_id'], contact['product_solution_id'], contact['partner_id'], 1, contact['notes'], now_str, now_str
-    ))
-    
-    # 3. Create Opportunity in CRM Core
-    prod_row = db_query_one("SELECT name FROM product_solutions WHERE id = ?", (contact['product_solution_id'],))
-    prod_name = prod_row['name'] if prod_row else "Solutions"
-    opp_name = f"{contact['company'] or 'New Account'} - {prod_name} Opportunity"
-    
-    opp_id = db_execute('''
-        INSERT INTO opportunities (
-            lead_id, account_id, contact_id, opportunity_name, company, primary_contact_name, primary_contact_email,
-            owner_id, sales_manager_id, group_id, industry, geography, primary_product_solution_id, partner_id, partner_influence_type,
-            estimated_value, currency, expected_close_date, stage, bucket, probability, meddic_score, status, sql_source, telecrm_contact_id, meeting_date, mom, created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'None', 0.0, 'USD', ?, 'Discovery', 'Prospecting', 10, 0, 'Open', 'TeleCRM', ?, ?, ?, ?, ?)
-    ''', (
-        lead_id, account_id, core_contact_id, opp_name, contact['company'], contact['full_name'], contact['email'],
-        sales_manager_id, sales_manager_id, contact['group_id'], contact['industry'], contact['geography'], contact['product_solution_id'], contact['partner_id'],
-        (datetime.utcnow() + timedelta(days=90)).strftime('%Y-%m-%d'), contact_id, contact['meeting_scheduled_at'], contact['mom'], now_str, now_str
-    ))
-    
-    # 4. Initialize partially-filled MEDDIC qualification using business pain
-    db_execute('''
-        INSERT INTO meddic_qualifications (
-            entity_type, entity_id, metrics_identified, metrics_note, economic_buyer_identified, decision_process_known,
-            primary_pain, business_challenge, pain_severity, pain_validated, champion_identified, score, updated_by, created_at, updated_at
-        ) VALUES ('opportunity', ?, 0, '', 0, 0, ?, ?, 'Medium', 1, 0, 20, ?, ?, ?)
-    ''', (opp_id, contact['mom'] or 'Captured Business Pain', contact['notes'] or 'MOM notes', sales_manager_id, now_str, now_str))
-    
+    meddic_exist = db_query_one("SELECT id FROM meddic_qualifications WHERE entity_type = 'opportunity' AND entity_id = ?", (opp_id,))
+    if meddic_exist:
+        db_execute('''
+            UPDATE meddic_qualifications
+            SET primary_pain = ?,
+                business_challenge = ?,
+                economic_buyer_identified = ?,
+                decision_process_known = ?,
+                metrics_note = ?,
+                updated_by = ?,
+                updated_at = ?
+            WHERE id = ?
+        ''', (
+            sql_rec['business_pain'] or 'Captured Business Pain', sql_rec['problem_statement'] or 'Problem statement',
+            buyer_identified, decision_known, sql_rec['budget_indication'] or '',
+            user_id, now_str, meddic_exist['id']
+        ))
+    else:
+        db_execute('''
+            INSERT INTO meddic_qualifications (
+                entity_type, entity_id, metrics_identified, metrics_note, economic_buyer_identified, decision_process_known,
+                primary_pain, business_challenge, pain_severity, pain_validated, champion_identified, score, updated_by, created_at, updated_at
+            ) VALUES ('opportunity', ?, 0, ?, ?, ?, ?, ?, 'Medium', 1, 0, 20, ?, ?, ?)
+        ''', (
+            opp_id, sql_rec['budget_indication'] or '', buyer_identified, decision_known,
+            sql_rec['business_pain'] or 'Captured Business Pain', sql_rec['problem_statement'] or 'Problem statement',
+            user_id, now_str, now_str
+        ))
     db_execute("UPDATE opportunities SET meddic_score = 20 WHERE id = ?", (opp_id,))
-    
-    # 5. Update SQL Review entry
-    db_execute('''
-        UPDATE telecrm_sql_reviews
-        SET review_status = 'Approved',
-            reviewed_by = ?,
-            reviewed_at = ?,
-            assigned_sales_manager_id = ?,
-            created_opportunity_id = ?,
-            notes = ?
-        WHERE id = ?
-    ''', (user['id'], now_str, sales_manager_id, opp_id, notes, review_id))
-    
-    # 6. Update TeleCRM Contact
-    db_execute('''
-        UPDATE telecrm_contacts
-        SET sql_status = 'SQL Approved',
-            dialing_status = 'SQL Marked',
-            converted_opportunity_id = ?,
-            account_id = ?,
-            contact_id = ?,
-            lead_id = ?,
-            is_finalized = 1,
-            updated_at = ?
-        WHERE id = ?
-    ''', (opp_id, account_id, core_contact_id, lead_id, now_str, contact_id))
-    
-    # 7. Log timeline & tasks
-    log_timeline_activity('telecrm_contact', contact_id, 'SQL approved', "SQL Handoff approved by Manager", f"Assigned sales manager ID: {sales_manager_id}", user['id'])
-    log_timeline_activity('opportunity', opp_id, 'SQL Handoff', "SQL converted from TeleCRM calling", f"Telecaller notes: {contact['notes']}", user['id'])
-    
-    # Create follow-up task for Sales Manager due next business day
+
+    # Create follow-up task for the assigned CRM owner
     tomorrow = datetime.utcnow() + timedelta(days=1)
     if tomorrow.weekday() >= 5:
         tomorrow = tomorrow + timedelta(days=7 - tomorrow.weekday())
@@ -1921,100 +2404,371 @@ def api_approve_sql(review_id):
     
     db_execute('''
         INSERT INTO crm_tasks (
-            title, description, task_type, related_entity_type, related_entity_id, lead_id, opportunity_id, telecrm_contact_id,
+            title, description, task_type, related_entity_type, related_entity_id, opportunity_id, telecrm_contact_id,
             assigned_to, created_by, due_date, due_time, priority, status, created_at, updated_at
-        ) VALUES (?, ?, 'SQL Follow-up', 'opportunity', ?, ?, ?, ?, ?, ?, ?, '10:00', 'High', 'Open', ?, ?)
-    ''', ("Follow up on SQL from TeleCRM", f"Discovery call scheduled. MOM: {contact['mom']}", opp_id, lead_id, opp_id, contact_id, sales_manager_id, user['id'], tomorrow_str, now_str, now_str))
-    
-    # Update Daily Stats for the telecaller who submitted it
-    date_str = datetime.utcnow().strftime('%Y-%m-%d')
-    update_user_daily_stat(review['submitted_by'], review['campaign_id'], date_str, {'sqls': 1, 'conversions': 1})
-    
-    update_campaign_completion_stats(review['campaign_id'])
+        ) VALUES (?, ?, 'Follow-up', 'opportunity', ?, ?, ?, ?, ?, ?, '10:00', 'High', 'Open', ?, ?)
+    ''', (
+        "Follow up on TeleCRM SQL", f"SQL Handover from TeleCRM dialing workspace. MOM: {sql_rec['mom']}", opp_id, opp_id, sql_rec['telecrm_contact_id'],
+        assigned_owner_id, user_id, tomorrow_str, now_str, now_str
+    ))
+
+    # Update Staging SQL record status
+    db_execute('''
+        UPDATE telecrm_sql
+        SET status = 'Converted to CRM',
+            assigned_owner_id = ?,
+            crm_contact_id = ?,
+            crm_account_id = ?,
+            crm_opportunity_id = ?,
+            converted_by = ?,
+            converted_at = ?
+        WHERE id = ?
+    ''', (assigned_owner_id, contact_id, account_id, opp_id, user_id, now_str, sql_id))
+
+    # Update TeleCRM Contact
+    db_execute('''
+        UPDATE telecrm_contacts
+        SET sql_status = 'SQL Converted',
+            dialing_status = 'SQL Marked',
+            converted_opportunity_id = ?,
+            account_id = ?,
+            contact_id = ?,
+            is_finalized = 1,
+            updated_at = ?
+        WHERE id = ?
+    ''', (opp_id, account_id, contact_id, now_str, sql_rec['telecrm_contact_id']))
+
+    # Log review log
+    db_execute('''
+        INSERT INTO telecrm_sql_review_logs (
+            telecrm_sql_id, action_type, description, previous_status, new_status, new_owner_id, performed_by, created_at
+        ) VALUES (?, 'Converted to CRM', 'SQL staging record successfully converted and mapped in CRM', ?, 'Converted to CRM', ?, ?, ?)
+    ''', (sql_id, sql_rec['status'], assigned_owner_id, user_id, now_str))
+
+    log_timeline_activity('contact', contact_id, 'SQL Converted', "Contact converted from TeleCRM SQL Staging", f"MOM: {sql_rec['mom']}", user_id)
+    if account_id:
+        log_timeline_activity('account', account_id, 'SQL Converted', "Account linked to converted TeleCRM SQL Opportunity", f"MOM: {sql_rec['mom']}", user_id)
+
+    # Copy call logs
+    call_logs = db_query("SELECT * FROM telecrm_call_logs WHERE telecrm_contact_id = ?", (sql_rec['telecrm_contact_id'],))
+    for cl in call_logs:
+        log_timeline_activity('opportunity', opp_id, 'Call Log Import', 
+                              f"Call attempt by Telecaller. Status: {cl['call_status']}. Duration: {cl['talk_duration']}s",
+                              cl['outcome_note'] or '', cl['telecaller_id'])
+        log_timeline_activity('contact', contact_id, 'Call Log Import', 
+                              f"Call attempt by Telecaller. Status: {cl['call_status']}. Duration: {cl['talk_duration']}s",
+                              cl['outcome_note'] or '', cl['telecaller_id'])
+
     return jsonify({'status': 'success', 'opportunity_id': opp_id})
 
 
-@crm_bp.route('/api/telecrm/sql-review/<int:review_id>/reject', methods=['POST'])
+@crm_bp.route('/api/telecrm/sql/<int:sql_id>/assign-owner', methods=['POST'])
 @crm_login_required
-@role_required('Platform Admin', 'Group Admin', 'Telecaller Manager', 'Manager / Sales Manager')
-def api_reject_sql(review_id):
+@role_required('Platform Admin', 'Group Admin', 'Telecaller Manager', 'Manager / Sales Manager', 'Sales Head')
+def api_assign_owner_sql(sql_id):
     data = request.json or {}
-    reason = data.get('rejection_reason')
+    owner_id = data.get('assigned_owner_id')
+    if not owner_id:
+        return jsonify({'status': 'error', 'message': 'Owner is required.'}), 400
     
+    sql_rec = db_query_one("SELECT status, assigned_owner_id FROM telecrm_sql WHERE id = ?", (sql_id,))
+    if not sql_rec:
+        return jsonify({'status': 'error', 'message': 'SQL record not found.'}), 404
+    
+    now_str = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+    user_id = g.crm_user['id']
+    
+    db_execute("UPDATE telecrm_sql SET assigned_owner_id = ? WHERE id = ?", (owner_id, sql_id))
+    
+    db_execute('''
+        INSERT INTO telecrm_sql_review_logs (
+            telecrm_sql_id, action_type, description, previous_owner_id, new_owner_id, performed_by, created_at
+        ) VALUES (?, 'Owner assigned', 'Assigned owner updated', ?, ?, ?, ?)
+    ''', (sql_id, sql_rec['assigned_owner_id'], owner_id, user_id, now_str))
+    
+    return jsonify({'status': 'success'})
+
+
+@crm_bp.route('/api/telecrm/sql/<int:sql_id>/return-for-more-info', methods=['POST'])
+@crm_login_required
+@role_required('Platform Admin', 'Group Admin', 'Telecaller Manager', 'Manager / Sales Manager', 'Sales Head')
+def api_return_sql_staging(sql_id):
+    data = request.json or {}
+    reason = data.get('reason', '').strip()
+    if not reason:
+        return jsonify({'status': 'error', 'message': 'Reason for return is required.'}), 400
+        
+    sql_rec = db_query_one("SELECT * FROM telecrm_sql WHERE id = ?", (sql_id,))
+    if not sql_rec:
+        return jsonify({'status': 'error', 'message': 'SQL record not found.'}), 404
+        
+    now_str = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+    user_id = g.crm_user['id']
+    
+    db_execute('''
+        UPDATE telecrm_sql
+        SET status = 'More Info Required',
+            returned_at = ?,
+            returned_by = ?,
+            review_notes = ?
+        WHERE id = ?
+    ''', (now_str, user_id, reason, sql_id))
+    
+    db_execute("UPDATE telecrm_contacts SET sql_status = 'More Info Required', updated_at = ? WHERE id = ?", (now_str, sql_rec['telecrm_contact_id']))
+    
+    db_execute('''
+        INSERT INTO telecrm_sql_review_logs (
+            telecrm_sql_id, action_type, description, previous_status, new_status, performed_by, created_at
+        ) VALUES (?, 'Returned for more info', ?, ?, 'More Info Required', ?, ?)
+    ''', (sql_id, f"SQL returned to telecaller. Feedback: {reason}", sql_rec['status'], user_id, now_str))
+    
+    db_execute('''
+        INSERT INTO crm_tasks (
+            title, description, task_type, related_entity_type, related_entity_id, telecrm_contact_id,
+            assigned_to, created_by, due_date, due_time, priority, status, created_at, updated_at
+        ) VALUES (?, ?, 'Follow-up', 'telecrm_contact', ?, ?, ?, ?, ?, '12:00', 'Medium', 'Open', ?, ?)
+    ''', (
+        "Update Qualification Info", f"Reviewer requested additional info: {reason}", sql_rec['telecrm_contact_id'], sql_rec['telecrm_contact_id'],
+        sql_rec['telecaller_id'], user_id, datetime.utcnow().strftime('%Y-%m-%d'), now_str, now_str
+    ))
+    
+    return jsonify({'status': 'success'})
+
+
+@crm_bp.route('/api/telecrm/sql/<int:sql_id>/reject', methods=['POST'])
+@crm_login_required
+@role_required('Platform Admin', 'Group Admin', 'Telecaller Manager', 'Manager / Sales Manager', 'Sales Head')
+def api_reject_sql_staging(sql_id):
+    data = request.json or {}
+    reason = data.get('reason', '').strip()
     if not reason:
         return jsonify({'status': 'error', 'message': 'Rejection reason is required.'}), 400
         
-    review = db_query_one("SELECT * FROM telecrm_sql_reviews WHERE id = ?", (review_id,))
-    if not review:
-        return jsonify({'status': 'error', 'message': 'SQL review entry not found.'}), 404
+    sql_rec = db_query_one("SELECT * FROM telecrm_sql WHERE id = ?", (sql_id,))
+    if not sql_rec:
+        return jsonify({'status': 'error', 'message': 'SQL record not found.'}), 404
         
-    user = g.crm_user
     now_str = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+    user_id = g.crm_user['id']
     
-    # Update SQL review
     db_execute('''
-        UPDATE telecrm_sql_reviews
-        SET review_status = 'Rejected',
-            reviewed_by = ?,
-            reviewed_at = ?,
-            rejection_reason = ?
+        UPDATE telecrm_sql
+        SET status = 'Rejected',
+            rejected_at = ?,
+            rejected_by = ?,
+            review_notes = ?
         WHERE id = ?
-    ''', (user['id'], now_str, reason, review_id))
+    ''', (now_str, user_id, reason, sql_id))
     
-    # Update Contact
+    db_execute("UPDATE telecrm_contacts SET sql_status = 'SQL Rejected', updated_at = ? WHERE id = ?", (now_str, sql_rec['telecrm_contact_id']))
+    
     db_execute('''
-        UPDATE telecrm_contacts
-        SET sql_status = 'SQL Rejected',
-            dialing_status = 'Meeting Completed',
-            updated_at = ?
-        WHERE id = ?
-    ''', (now_str, review['telecrm_contact_id']))
+        INSERT INTO telecrm_sql_review_logs (
+            telecrm_sql_id, action_type, description, previous_status, new_status, performed_by, created_at
+        ) VALUES (?, 'Rejected', ?, ?, 'Rejected', ?, ?)
+    ''', (sql_id, f"SQL rejected. Reason: {reason}", sql_rec['status'], user_id, now_str))
     
-    log_timeline_activity('telecrm_contact', review['telecrm_contact_id'], 'SQL rejected', 
-                          f"SQL submission rejected by Manager. Reason: {reason}", "", user['id'])
-                          
-    update_campaign_completion_stats(review['campaign_id'])
     return jsonify({'status': 'success'})
 
 
-@crm_bp.route('/api/telecrm/sql-review/<int:review_id>/return', methods=['POST'])
+@crm_bp.route('/api/telecrm/sql/<int:sql_id>/mark-duplicate', methods=['POST'])
 @crm_login_required
-@role_required('Platform Admin', 'Group Admin', 'Telecaller Manager', 'Manager / Sales Manager')
-def api_return_sql(review_id):
+@role_required('Platform Admin', 'Group Admin', 'Telecaller Manager', 'Manager / Sales Manager', 'Sales Head')
+def api_mark_duplicate_sql(sql_id):
     data = request.json or {}
-    notes = data.get('notes', '')
+    reason = data.get('reason', 'Marked as duplicate').strip()
     
-    review = db_query_one("SELECT * FROM telecrm_sql_reviews WHERE id = ?", (review_id,))
-    if not review:
-        return jsonify({'status': 'error', 'message': 'SQL review entry not found.'}), 404
+    sql_rec = db_query_one("SELECT * FROM telecrm_sql WHERE id = ?", (sql_id,))
+    if not sql_rec:
+        return jsonify({'status': 'error', 'message': 'SQL record not found.'}), 404
         
-    user = g.crm_user
     now_str = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+    user_id = g.crm_user['id']
     
-    # Update SQL review
     db_execute('''
-        UPDATE telecrm_sql_reviews
-        SET review_status = 'Returned',
-            reviewed_by = ?,
-            reviewed_at = ?,
-            notes = ?
+        UPDATE telecrm_sql
+        SET status = 'Duplicate',
+            duplicate_marked_at = ?,
+            duplicate_marked_by = ?,
+            review_notes = ?
         WHERE id = ?
-    ''', (user['id'], now_str, notes, review_id))
+    ''', (now_str, user_id, reason, sql_id))
     
-    # Update Contact
+    db_execute("UPDATE telecrm_contacts SET sql_status = 'SQL Duplicate', updated_at = ? WHERE id = ?", (now_str, sql_rec['telecrm_contact_id']))
+    
+    db_execute('''
+        INSERT INTO telecrm_sql_review_logs (
+            telecrm_sql_id, action_type, description, previous_status, new_status, performed_by, created_at
+        ) VALUES (?, 'Marked duplicate', ?, ?, 'Duplicate', ?, ?)
+    ''', (sql_id, f"SQL marked as duplicate. Notes: {reason}", sql_rec['status'], user_id, now_str))
+    
+    return jsonify({'status': 'success'})
+
+
+@crm_bp.route('/api/telecrm/sql/<int:sql_id>/review-note', methods=['POST'])
+@crm_login_required
+def api_sql_review_note(sql_id):
+    data = request.json or {}
+    note = data.get('note', '').strip()
+    if not note:
+        return jsonify({'status': 'error', 'message': 'Note text is required.'}), 400
+        
+    sql_rec = db_query_one("SELECT status FROM telecrm_sql WHERE id = ?", (sql_id,))
+    if not sql_rec:
+        return jsonify({'status': 'error', 'message': 'SQL record not found.'}), 404
+        
+    now_str = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+    user_id = g.crm_user['id']
+    
+    db_execute('''
+        UPDATE telecrm_sql
+        SET review_notes = ?
+        WHERE id = ?
+    ''', (note, sql_id))
+    
+    db_execute('''
+        INSERT INTO telecrm_sql_review_logs (
+            telecrm_sql_id, action_type, description, performed_by, created_at
+        ) VALUES (?, 'Review note added', ?, ?, ?)
+    ''', (sql_id, f"Review note: {note}", user_id, now_str))
+    
+    return jsonify({'status': 'success'})
+
+
+@crm_bp.route('/api/telecrm/sql/<int:sql_id>/link-existing-contact', methods=['POST'])
+@crm_login_required
+def api_link_contact_sql(sql_id):
+    data = request.json or {}
+    contact_id = data.get('contact_id')
+    if not contact_id:
+        return jsonify({'status': 'error', 'message': 'Contact ID is required.'}), 400
+    db_execute("UPDATE telecrm_sql SET crm_contact_id = ? WHERE id = ?", (contact_id, sql_id))
+    return jsonify({'status': 'success'})
+
+
+@crm_bp.route('/api/telecrm/sql/<int:sql_id>/link-existing-account', methods=['POST'])
+@crm_login_required
+def api_link_account_sql(sql_id):
+    data = request.json or {}
+    account_id = data.get('account_id')
+    if not account_id:
+        return jsonify({'status': 'error', 'message': 'Account ID is required.'}), 400
+    db_execute("UPDATE telecrm_sql SET crm_account_id = ? WHERE id = ?", (account_id, sql_id))
+    return jsonify({'status': 'success'})
+
+
+@crm_bp.route('/api/telecrm/sql/<int:sql_id>/link-existing-opportunity', methods=['POST'])
+@crm_login_required
+def api_link_opp_sql(sql_id):
+    data = request.json or {}
+    opp_id = data.get('opportunity_id')
+    if not opp_id:
+        return jsonify({'status': 'error', 'message': 'Opportunity ID is required.'}), 400
+        
+    sql_rec = db_query_one("SELECT * FROM telecrm_sql WHERE id = ?", (sql_id,))
+    if not sql_rec:
+        return jsonify({'status': 'error', 'message': 'SQL record not found.'}), 404
+        
+    now_str = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+    user_id = g.crm_user['id']
+    
+    # Update staging
+    db_execute('''
+        UPDATE telecrm_sql
+        SET crm_opportunity_id = ?,
+            status = 'Converted to CRM',
+            converted_by = ?,
+            converted_at = ?
+        WHERE id = ?
+    ''', (opp_id, user_id, now_str, sql_id))
+    
+    # Update contact
     db_execute('''
         UPDATE telecrm_contacts
-        SET sql_status = 'Not SQL',
-            dialing_status = 'Meeting Completed',
+        SET sql_status = 'SQL Converted',
+            converted_opportunity_id = ?,
             updated_at = ?
         WHERE id = ?
-    ''', (now_str, review['telecrm_contact_id']))
+    ''', (opp_id, now_str, sql_rec['telecrm_contact_id']))
     
-    log_timeline_activity('telecrm_contact', review['telecrm_contact_id'], 'SQL returned', 
-                          f"SQL submission returned for more information: {notes}", "", user['id'])
-                          
-    update_campaign_completion_stats(review['campaign_id'])
+    # Append details to opportunity timeline
+    log_timeline_activity('opportunity', opp_id, 'SQL Linked', 
+                           f"SQL Staging record #{sql_id} linked to existing opportunity by reviewer. MOM: {sql_rec['mom']}", 
+                           f"Business Pain: {sql_rec['business_pain']}. Next Action: {sql_rec['next_action']}", user_id)
+                           
+    # Log review log
+    db_execute('''
+        INSERT INTO telecrm_sql_review_logs (
+            telecrm_sql_id, action_type, description, previous_status, new_status, performed_by, created_at
+        ) VALUES (?, 'Linked to existing opportunity', ?, ?, 'Converted to CRM', ?, ?)
+    ''', (sql_id, f"SQL linked to existing opportunity ID: {opp_id}", sql_rec['status'], user_id, now_str))
+    
     return jsonify({'status': 'success'})
+
+
+# Rejection Reasons Admin APIs
+@crm_bp.route('/api/admin/telecrm/sql-rejection-reasons', methods=['GET', 'POST'])
+@crm_login_required
+@role_required('Platform Admin')
+def api_admin_rejection_reasons():
+    if request.method == 'GET':
+        reasons = db_query("SELECT * FROM telecrm_sql_rejection_reasons ORDER BY sort_order ASC, id ASC")
+        return jsonify(reasons)
+        
+    # POST - Create reason
+    data = request.json or {}
+    reason = data.get('reason', '').strip()
+    desc = data.get('description', '').strip()
+    sort_order = int(data.get('sort_order', 10))
+    is_active = int(data.get('is_active', 1))
+    
+    if not reason:
+        return jsonify({'status': 'error', 'message': 'Reason is required.'}), 400
+        
+    now_str = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+    
+    db_execute('''
+        INSERT INTO telecrm_sql_rejection_reasons (reason, description, is_active, sort_order, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?)
+    ''', (reason, desc, is_active, sort_order, now_str, now_str))
+    
+    return jsonify({'status': 'success'})
+
+
+@crm_bp.route('/api/admin/telecrm/sql-rejection-reasons/<int:reason_id>', methods=['PUT', 'DELETE'])
+@crm_login_required
+@role_required('Platform Admin')
+def api_admin_rejection_reason_detail(reason_id):
+    if request.method == 'DELETE':
+        db_execute("DELETE FROM telecrm_sql_rejection_reasons WHERE id = ?", (reason_id,))
+        return jsonify({'status': 'success'})
+        
+    # PUT - Update reason
+    data = request.json or {}
+    reason = data.get('reason', '').strip()
+    desc = data.get('description', '').strip()
+    sort_order = int(data.get('sort_order', 10))
+    is_active = int(data.get('is_active', 1))
+    
+    if not reason:
+        return jsonify({'status': 'error', 'message': 'Reason is required.'}), 400
+        
+    now_str = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+    
+    db_execute('''
+        UPDATE telecrm_sql_rejection_reasons
+        SET reason = ?, description = ?, is_active = ?, sort_order = ?, updated_at = ?
+        WHERE id = ?
+    ''', (reason, desc, is_active, sort_order, now_str, reason_id))
+    
+    return jsonify({'status': 'success'})
+
+
+@crm_bp.route('/telecrm/reports')
+@crm_login_required
+def telecrm_reports():
+    return redirect(url_for('crm.telecrm_analytics'))
+
 
 # ----------------------------------------------------
 # Telecaller Leaderboard

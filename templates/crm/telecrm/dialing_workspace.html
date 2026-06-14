@@ -966,7 +966,87 @@
     </div>
 </div>
 
+<!-- MODAL: Mark SQL Qualification -->
+<div class="modal-backdrop" id="sql-qualification-modal">
+    <div class="modal-card" style="max-width: 650px;">
+        <div class="panel-header">
+            <span><i class="fas fa-user-check"></i> Mark Contact as SQL Staging</span>
+            <button onclick="closeModal('sql-qualification-modal')" style="background: none; border: none; color: #fff; cursor: pointer;"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="panel-body" style="padding: 20px; max-height: 80vh; overflow-y: auto;">
+            <div id="sql-validation-checklist" style="display: none; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 6px; padding: 12px; margin-bottom: 16px;">
+                <!-- Missing fields checklist will be injected here -->
+            </div>
+            
+            <form id="sql-qualification-form" onsubmit="submitSQLQualification(event)">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                    <div class="form-group">
+                        <label class="form-label">Interest Level <span style="color: #ef4444;">*</span></label>
+                        <select id="sql-interest-level" class="form-control" required>
+                            <option value="">Select Interest</option>
+                            <option value="High">High</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Low">Low</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Urgency Level</label>
+                        <select id="sql-urgency-level" class="form-control">
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+                            <option value="Low">Low</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                    <div class="form-group">
+                        <label class="form-label">Next Action <span style="color: #ef4444;">*</span></label>
+                        <input type="text" id="sql-next-action" class="form-control" placeholder="e.g. Schedule product demo" required>
+                    </div>
+                    <div class="form-group" style="display: flex; align-items: center; padding-top: 24px;">
+                        <input type="checkbox" id="sql-decision-maker" style="width: 16px; height: 16px; margin-right: 8px;">
+                        <label class="form-label" for="sql-decision-maker" style="margin-bottom: 0; cursor: pointer; color: #fff;">Decision Maker Involved?</label>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label class="form-label">Business Pain / Challenges <span style="color: #ef4444;">*</span></label>
+                    <textarea id="sql-business-pain" class="form-control" rows="3" placeholder="Explain the key pain points identified during dialing..." required></textarea>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label class="form-label">Problem Statement</label>
+                    <textarea id="sql-problem-statement" class="form-control" rows="2" placeholder="Specific problems they want to solve..."></textarea>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                    <div class="form-group">
+                        <label class="form-label">Budget Indication</label>
+                        <input type="text" id="sql-budget" class="form-control" placeholder="e.g. $50,000 / year">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Timeline Indication</label>
+                        <input type="text" id="sql-timeline" class="form-control" placeholder="e.g. Next quarter">
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label class="form-label">Economic Buyer Hint / Remarks</label>
+                    <input type="text" id="sql-buyer-hint" class="form-control" placeholder="Remarks about budget signer, CFO details...">
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                    <button type="button" class="btn-crm btn-crm-secondary" onclick="closeModal('sql-qualification-modal')">Cancel</button>
+                    <button type="submit" class="btn-crm btn-crm-primary">Submit to SQL Staging</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
+
     // State management variables
     const campaignId = {{ campaign['id'] }};
     let currentTab = 'Active';
@@ -1253,7 +1333,7 @@
 
         // Toggle Mark SQL button visibility
         const sqlBtn = document.getElementById("workbench-sql-btn");
-        if (currentContact.sql_status === 'SQL Review' || currentContact.sql_status === 'Converted to Opportunity') {
+        if (currentContact.sql_status === 'SQL Marked' || currentContact.sql_status === 'SQL Converted' || currentContact.sql_status === 'SQL Approved' || currentContact.sql_status === 'SQL Review' || currentContact.sql_status === 'Converted to Opportunity') {
             sqlBtn.classList.add("active-action");
             sqlBtn.disabled = true;
         } else {
@@ -1746,24 +1826,112 @@
         });
     }
 
-    // SQL submit action
     function submitSQLHandover() {
         if (!currentContact) return;
+        document.getElementById("sql-validation-checklist").style.display = 'none';
+        document.getElementById("sql-qualification-form").reset();
         
-        const note = prompt("Please add brief discovery handover notes for the SQL Review:");
-        if (note === null) return;
+        if (currentContact.interest_level) {
+            document.getElementById("sql-interest-level").value = currentContact.interest_level;
+        }
+        if (currentContact.mom) {
+            document.getElementById("sql-business-pain").value = currentContact.mom;
+        }
         
-        fetch(`/api/telecrm/contacts/${currentContact.id}/submit-sql`, {
+        openModal("sql-qualification-modal");
+    }
+
+    function submitSQLQualification(e) {
+        e.preventDefault();
+        
+        const pain = document.getElementById("sql-business-pain").value.trim();
+        const problem = document.getElementById("sql-problem-statement").value.trim();
+        const interest = document.getElementById("sql-interest-level").value;
+        const nextAction = document.getElementById("sql-next-action").value.trim();
+        const urgency = document.getElementById("sql-urgency-level").value;
+        const decisionMaker = document.getElementById("sql-decision-maker").checked ? 1 : 0;
+        const budget = document.getElementById("sql-budget").value.trim();
+        const timeline = document.getElementById("sql-timeline").value.trim();
+        const buyerHint = document.getElementById("sql-buyer-hint").value.trim();
+        
+        // Checklist validation
+        const missing = [];
+        if (!currentContact.full_name && !(currentContact.first_name || currentContact.last_name)) {
+            missing.push("Contact Name exists");
+        }
+        if (!currentContact.phone && !currentContact.email) {
+            missing.push("Phone or Email exists");
+        }
+        if (!currentContact.company) {
+            missing.push("Company Name exists");
+        }
+        if (!currentContact.product_solution_id) {
+            missing.push("Product/Solution is selected");
+        }
+        if (currentContact.meeting_status !== 'Completed' && !currentContact.meeting_completed_at) {
+            missing.push("Meeting is completed");
+        }
+        if (!currentContact.mom) {
+            missing.push("MOM is added");
+        }
+        if (!pain && !problem) {
+            missing.push("Business pain/problem is captured");
+        }
+        if (interest !== 'Medium' && interest !== 'High') {
+            missing.push("Interest level is Medium or High");
+        }
+        if (!nextAction) {
+            missing.push("Next action is captured");
+        }
+
+        const checklistContainer = document.getElementById("sql-validation-checklist");
+        if (missing.length > 0) {
+            checklistContainer.style.display = 'block';
+            checklistContainer.innerHTML = `
+                <div style="color: #ef4444; font-weight: 700; margin-bottom: 8px;">
+                    <i class="fas fa-exclamation-triangle"></i> Cannot Mark as SQL. Mandatory fields are missing:
+                </div>
+                <ul style="margin: 0; padding-left: 20px; color: #fca5a5; font-size: 12.5px;">
+                    ${missing.map(m => `<li>${m}</li>`).join('')}
+                </ul>
+            `;
+            return;
+        }
+        
+        checklistContainer.style.display = 'none';
+
+        fetch(`/api/telecrm/contacts/${currentContact.id}/mark-sql`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ notes: note })
+            body: JSON.stringify({
+                business_pain: pain,
+                problem_statement: problem,
+                interest_level: interest,
+                next_action: nextAction,
+                urgency_level: urgency,
+                decision_maker_involved: decisionMaker,
+                budget_indication: budget,
+                timeline_indication: timeline,
+                economic_buyer_hint: buyerHint
+            })
         })
         .then(res => res.json())
         .then(data => {
-            flashAlert("Contact submitted for SQL review.");
-            selectContact(currentContact.id);
+            if (data.status === 'success') {
+                closeModal("sql-qualification-modal");
+                flashAlert("Contact qualified and marked as SQL.");
+                selectContact(currentContact.id);
+            } else {
+                checklistContainer.style.display = 'block';
+                checklistContainer.innerHTML = `
+                    <div style="color: #ef4444; font-weight: 700; margin-bottom: 8px;">
+                        <i class="fas fa-exclamation-triangle"></i> ${data.message}
+                    </div>
+                `;
+            }
         });
     }
+
 
     // Reallocations modal
     function openReallocateModal() {
