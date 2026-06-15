@@ -544,6 +544,206 @@ def init_db():
     )
     ''')
 
+    # ═══════════════════════════════════════════════════════════════
+    # UNIFIED EVENTS + WEBINARS MODULE (v2)
+    # ═══════════════════════════════════════════════════════════════
+
+    # Main unified content table (replaces separate events + webinars)
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS event_webinars (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        content_type TEXT NOT NULL DEFAULT 'Event',
+        webinar_format TEXT,
+        event_format TEXT,
+        title TEXT NOT NULL,
+        slug TEXT UNIQUE NOT NULL,
+        short_description TEXT,
+        full_description TEXT,
+        theme TEXT,
+        topic_category TEXT,
+        start_datetime TEXT,
+        end_datetime TEXT,
+        timezone TEXT DEFAULT 'America/New_York',
+        display_time_text TEXT,
+        location_type TEXT DEFAULT 'Online',
+        location TEXT,
+        event_link TEXT,
+        live_join_link TEXT,
+        recording_link TEXT,
+        recording_duration TEXT,
+        recording_embed_code TEXT,
+        recording_access_type TEXT DEFAULT 'redirect',
+        registration_required INTEGER DEFAULT 1,
+        registration_form_title TEXT,
+        registration_cta_text TEXT DEFAULT 'Register Now',
+        thank_you_message TEXT,
+        countdown_enabled INTEGER DEFAULT 1,
+        capacity INTEGER,
+        registration_close_datetime TEXT,
+        lifecycle_status TEXT DEFAULT 'Upcoming',
+        publishing_status TEXT DEFAULT 'Draft',
+        auto_convert_to_ondemand INTEGER DEFAULT 0,
+        converted_to_ondemand_at TEXT,
+        converted_by TEXT,
+        hero_image TEXT,
+        featured_image TEXT,
+        partner_logo TEXT,
+        sponsor_logo TEXT,
+        product_solution_id INTEGER,
+        partner_id INTEGER,
+        related_solution_url TEXT,
+        related_industry_url TEXT,
+        related_case_study_id INTEGER,
+        event_label TEXT,
+        tags TEXT,
+        who_should_attend TEXT,
+        why_attend TEXT,
+        highlight_title TEXT,
+        highlight_text TEXT,
+        highlight_link TEXT,
+        custom_cta_text TEXT,
+        custom_cta_url TEXT,
+        resource_download_url TEXT,
+        calendar_details TEXT,
+        business_email_only INTEGER DEFAULT 1,
+        crm_integration_enabled INTEGER DEFAULT 1,
+        seo_title TEXT,
+        seo_description TEXT,
+        canonical_url TEXT,
+        og_title TEXT,
+        og_description TEXT,
+        og_image TEXT,
+        ai_summary TEXT,
+        schema_json TEXT,
+        created_by TEXT DEFAULT 'admin',
+        updated_by TEXT,
+        created_at TEXT,
+        updated_at TEXT,
+        published_at TEXT,
+        archived_at TEXT
+    )
+    ''')
+
+    # Speakers per event/webinar
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS event_speakers (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        event_id INTEGER NOT NULL,
+        name TEXT NOT NULL,
+        designation TEXT,
+        company TEXT,
+        image_path TEXT,
+        image_alt_text TEXT,
+        short_bio TEXT,
+        full_bio TEXT,
+        linkedin_url TEXT,
+        profile_url TEXT,
+        display_order INTEGER DEFAULT 0,
+        is_active INTEGER DEFAULT 1,
+        created_at TEXT,
+        updated_at TEXT,
+        FOREIGN KEY (event_id) REFERENCES event_webinars (id) ON DELETE CASCADE
+    )
+    ''')
+
+    # Agenda items per event/webinar
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS event_agenda_items (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        event_id INTEGER NOT NULL,
+        day_number INTEGER DEFAULT 1,
+        session_title TEXT NOT NULL,
+        start_time TEXT,
+        end_time TEXT,
+        speaker_id INTEGER,
+        track TEXT,
+        description TEXT,
+        display_order INTEGER DEFAULT 0,
+        created_at TEXT,
+        updated_at TEXT,
+        FOREIGN KEY (event_id) REFERENCES event_webinars (id) ON DELETE CASCADE,
+        FOREIGN KEY (speaker_id) REFERENCES event_speakers (id) ON DELETE SET NULL
+    )
+    ''')
+
+    # Key takeaways per event/webinar
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS event_key_takeaways (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        event_id INTEGER NOT NULL,
+        takeaway_text TEXT NOT NULL,
+        display_order INTEGER DEFAULT 0,
+        created_at TEXT,
+        updated_at TEXT,
+        FOREIGN KEY (event_id) REFERENCES event_webinars (id) ON DELETE CASCADE
+    )
+    ''')
+
+    # Registration records
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS event_registrations (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        event_id INTEGER NOT NULL,
+        first_name TEXT,
+        last_name TEXT,
+        business_email TEXT NOT NULL,
+        company TEXT,
+        job_title TEXT,
+        phone TEXT,
+        country TEXT,
+        how_did_you_hear TEXT,
+        consent_status INTEGER DEFAULT 0,
+        attendee_status TEXT DEFAULT 'Registered',
+        source_page TEXT,
+        referrer TEXT,
+        utm_source TEXT,
+        utm_medium TEXT,
+        utm_campaign TEXT,
+        utm_term TEXT,
+        utm_content TEXT,
+        crm_website_lead_id TEXT,
+        registered_at TEXT,
+        accessed_recording_at TEXT,
+        ip_address TEXT,
+        user_agent TEXT,
+        notes TEXT,
+        created_at TEXT,
+        updated_at TEXT,
+        FOREIGN KEY (event_id) REFERENCES event_webinars (id) ON DELETE CASCADE
+    )
+    ''')
+
+    # Activity / audit log
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS event_activity_log (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        event_id INTEGER NOT NULL,
+        action_type TEXT NOT NULL,
+        description TEXT,
+        previous_status TEXT,
+        new_status TEXT,
+        performed_by TEXT,
+        metadata_json TEXT,
+        created_at TEXT,
+        FOREIGN KEY (event_id) REFERENCES event_webinars (id) ON DELETE CASCADE
+    )
+    ''')
+
+    # Secure access tokens for gated on-demand recording pages
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS event_registration_tokens (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        registration_id INTEGER NOT NULL,
+        event_id INTEGER NOT NULL,
+        token_hash TEXT UNIQUE NOT NULL,
+        expires_at TEXT,
+        used_at TEXT,
+        created_at TEXT,
+        FOREIGN KEY (registration_id) REFERENCES event_registrations (id) ON DELETE CASCADE,
+        FOREIGN KEY (event_id) REFERENCES event_webinars (id) ON DELETE CASCADE
+    )
+    ''')
+
     # Seed events if empty
     cursor.execute("SELECT COUNT(*) FROM events")
     if cursor.fetchone()[0] == 0:

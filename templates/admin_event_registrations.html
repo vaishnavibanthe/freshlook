@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}Event Registrations - Artha Control Center{% endblock %}
+
+{% block content %}
+<div style="height: var(--nav-height); background-color: var(--bg-secondary);"></div>
+
+<style>
+    .registration-shell {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 40px;
+        align-items: start;
+    }
+    .registration-card {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius-lg);
+        box-shadow: var(--glass-shadow);
+        padding: 28px;
+    }
+    .registration-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+        margin-bottom: 24px;
+    }
+    .registration-header h1 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+    }
+    .registration-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+    .registration-table th {
+        background: var(--bg-secondary);
+        border-bottom: 1px solid var(--border-color);
+        color: var(--text-tertiary);
+        font-size: 10px;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+        text-align: left;
+        padding: 13px 14px;
+    }
+    .registration-table td {
+        border-bottom: 1px solid var(--border-color);
+        padding: 14px;
+        vertical-align: top;
+    }
+    .registration-table tr:last-child td {
+        border-bottom: none;
+    }
+    .status-pill {
+        display: inline-flex;
+        border-radius: 999px;
+        padding: 4px 9px;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        background: #eef2ff;
+        color: #4f46e5;
+    }
+    @media (max-width: 1100px) {
+        .registration-shell {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<section class="section-alt" style="padding-top: 40px; min-height: 90vh;">
+    <div class="container registration-shell">
+        {% include 'admin_sidebar.html' %}
+
+        <div>
+            <div class="registration-header">
+                <div>
+                    <h1>Registrations</h1>
+                    <p style="font-size:13px; color:var(--text-tertiary); margin-top:6px;">
+                        {{ event.title }} &middot; {{ event.content_type }}{% if event.webinar_format or event.event_format %} &middot; {{ event.webinar_format or event.event_format }}{% endif %}
+                    </p>
+                </div>
+                <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
+                    <a href="/admin/events/{{ event.id }}/edit" class="btn btn-secondary" style="padding:10px 16px; font-size:13px; text-decoration:none;">Edit Event</a>
+                    <a href="/admin/events/{{ event.id }}/registrations/export" class="btn btn-primary" style="padding:10px 16px; font-size:13px; text-decoration:none;"><i class="fas fa-file-export" style="margin-right:8px;"></i>Export CSV</a>
+                </div>
+            </div>
+
+            <form class="registration-card" method="GET" style="margin-bottom:22px;">
+                <div style="display:grid; grid-template-columns: 1fr 220px auto auto; gap:12px; align-items:end;">
+                    <div>
+                        <label class="form-label">Search</label>
+                        <input class="form-control" name="q" value="{{ query }}" placeholder="Name, email, company">
+                    </div>
+                    <div>
+                        <label class="form-label">Status</label>
+                        <select class="form-control" name="status">
+                            <option value="">All</option>
+                            {% for s in ['Registered','Attended','No Show','Watched On-Demand'] %}
+                            <option value="{{ s }}" {% if status_filter == s %}selected{% endif %}>{{ s }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" type="submit" style="padding:12px 18px;">Filter</button>
+                    <a href="/admin/events/{{ event.id }}/registrations" class="btn btn-secondary" style="padding:12px 18px; text-decoration:none;">Reset</a>
+                </div>
+            </form>
+
+            <div class="registration-card" style="padding:0; overflow:auto;">
+                <table class="registration-table">
+                    <thead>
+                        <tr>
+                            <th>Registrant</th>
+                            <th>Company</th>
+                            <th>Contact</th>
+                            <th>Source</th>
+                            <th>Status</th>
+                            <th>CRM Lead</th>
+                            <th>Registered</th>
+                            <th>Update</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in registrations %}
+                        <tr>
+                            <td>
+                                <strong>{{ r.first_name }} {{ r.last_name }}</strong><br>
+                                <span style="color:var(--text-tertiary);">{{ r.job_title or 'No title provided' }}</span>
+                            </td>
+                            <td>{{ r.company or '-' }}</td>
+                            <td>
+                                <a href="mailto:{{ r.business_email }}" style="color:var(--accent-blue); font-weight:700;">{{ r.business_email }}</a><br>
+                                <span style="color:var(--text-tertiary);">{{ r.phone or r.country or '' }}</span>
+                            </td>
+                            <td>
+                                {{ r.how_did_you_hear or '-' }}<br>
+                                <span style="color:var(--text-tertiary); font-size:12px;">{{ r.utm_campaign or r.source_page or '' }}</span>
+                            </td>
+                            <td><span class="status-pill">{{ r.attendee_status or 'Registered' }}</span></td>
+                            <td>{{ r.crm_website_lead_id or '-' }}</td>
+                            <td>{{ r.registered_at or r.created_at }}</td>
+                            <td>
+                                <form action="/admin/events/{{ event.id }}/registrations/{{ r.id }}/status" method="POST" style="display:flex; gap:8px; min-width:280px;">
+                                    <select class="form-control" name="attendee_status" style="padding:8px 10px;">
+                                        {% for s in ['Registered','Attended','No Show','Watched On-Demand'] %}
+                                        <option value="{{ s }}" {% if r.attendee_status == s %}selected{% endif %}>{{ s }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <input class="form-control" name="notes" value="{{ r.notes or '' }}" placeholder="Notes" style="padding:8px 10px;">
+                                    <button class="btn btn-secondary" type="submit" style="padding:8px 12px; font-size:12px;">Save</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="8" style="text-align:center; padding:44px; color:var(--text-tertiary);">No registrations found for this event/webinar.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

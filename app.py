@@ -18,13 +18,13 @@ import csv
 import io
 import json
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadTimeSignature
 from werkzeug.utils import secure_filename
 import pdf_extractor
 
 app = Flask(__name__)
-app.secret_key = 'artha-solutions-super-secret-key-2026'
+app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'artha-solutions-super-secret-key-2026')
 
 # Configure Jinja2 to cache templates and disable auto-reloading to prevent OneDrive sync lock timeouts
 app.config['TEMPLATES_AUTO_RELOAD'] = False
@@ -610,6 +610,705 @@ def load_navigation_menu():
         print(f"Error loading navigation menu: {e}")
         return get_navigation_fallback()
 
+def get_compiled_events():
+    """Compile events and webinars into a unified, sorted list for widget display."""
+    try:
+        unified = get_event_listing_cards(public_only=True)
+        if unified:
+            return unified
+    except Exception as e:
+        print(f"Error compiling unified event cards: {e}")
+
+    from datetime import datetime
+    months = {
+        'january': 1, 'february': 2, 'march': 3, 'april': 4, 'may': 5, 'june': 6,
+        'july': 7, 'august': 8, 'september': 9, 'october': 10, 'november': 11, 'december': 12
+    }
+    combined = []
+    for slug, item in get_db_events().items():
+        loc_lower = item.get('location', '').lower()
+        if 'virtual' in loc_lower or 'online' in loc_lower:
+            del_type = 'Online'
+        elif 'hybrid' in loc_lower:
+            del_type = 'Hybrid'
+        else:
+            del_type = 'In-Person'
+        combined.append({
+            'type': 'Event',
+            'slug': slug,
+            'title': item.get('title'),
+            'summary': item.get('summary'),
+            'description': item.get('description'),
+            'date_str': item.get('date'),
+            'time': '10:00 AM EST' if 'north america' in item.get('title', '').lower() else '2:30 PM IST',
+            'delivery_type': del_type,
+            'location': item.get('location'),
+            'url': f'/event-view/{slug}',
+            'card_image': item.get('card_image')
+        })
+    for slug, item in get_db_webinars().items():
+        combined.append({
+            'type': 'Webinar',
+            'slug': slug,
+            'title': item.get('title'),
+            'summary': item.get('summary'),
+            'description': item.get('description'),
+            'date_str': 'On-Demand',
+            'time': item.get('duration', '45 min'),
+            'delivery_type': 'Online',
+            'location': item.get('host', 'Artha Solutions'),
+            'url': f'/webinar-view/{slug}',
+            'card_image': item.get('card_image')
+        })
+
+    def get_sort_key(ev):
+        if ev['type'] == 'Webinar':
+            return (1, ev['title'] or '')
+        dt_str = ev.get('date_str', '')
+        try:
+            parts = (dt_str or '').replace(',', '').split()
+            if len(parts) == 3:
+                m = months.get(parts[0].lower(), 1)
+                d = int(parts[1])
+                y = int(parts[2])
+                return (0, datetime(y, m, d))
+        except Exception:
+            pass
+        return (0, datetime.max)
+
+    combined.sort(key=get_sort_key)
+    return combined
+
+EVENT_CARD_IMAGES = [
+    '/static/img/event_1.png',
+    '/static/img/event_2.png',
+    '/static/img/event_3.png',
+    '/static/img/event_4.png',
+    '/static/img/event_5.png',
+    '/static/img/event_6.png'
+]
+
+EVENT_REGISTRATION_RATE_LIMIT = {}
+
+EVENT_OPTIONAL_COLUMNS = {
+    'event_label': 'TEXT',
+    'tags': 'TEXT',
+    'who_should_attend': 'TEXT',
+    'why_attend': 'TEXT',
+    'highlight_title': 'TEXT',
+    'highlight_text': 'TEXT',
+    'highlight_link': 'TEXT',
+    'custom_cta_text': 'TEXT',
+    'custom_cta_url': 'TEXT',
+    'resource_download_url': 'TEXT',
+    'calendar_details': 'TEXT',
+    'business_email_only': 'INTEGER DEFAULT 1',
+    'crm_integration_enabled': 'INTEGER DEFAULT 1',
+    'product_solution_id': 'INTEGER',
+    'partner_id': 'INTEGER'
+}
+
+def ensure_event_webinar_schema():
+    conn = get_db_connection()
+    try:
+        table = conn.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='event_webinars'").fetchone()
+        if not table:
+            conn.close()
+            from init_db import init_db
+            init_db()
+            conn = get_db_connection()
+
+        cols = {
+            row['name']
+            for row in conn.execute("PRAGMA table_info(event_webinars)").fetchall()
+        }
+        for col_name, col_type in EVENT_OPTIONAL_COLUMNS.items():
+            if col_name not in cols:
+                conn.execute(f"ALTER TABLE event_webinars ADD COLUMN {col_name} {col_type}")
+
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_event_webinars_slug ON event_webinars(slug)")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_event_webinars_type_status ON event_webinars(content_type, publishing_status, lifecycle_status)")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_event_registrations_event_id ON event_registrations(event_id)")
+        conn.commit()
+    finally:
+        conn.close()
+
+def slugify_value(value):
+    value = (value or '').strip().lower()
+    value = re.sub(r'[^a-z0-9\s-]', '', value)
+    value = re.sub(r'\s+', '-', value)
+    value = re.sub(r'-+', '-', value).strip('-')
+    return value
+
+def parse_event_datetime(value):
+    if not value:
+        return None
+    value = str(value).strip()
+    try:
+        return datetime.fromisoformat(value.replace('Z', '+00:00')).replace(tzinfo=None)
+    except Exception:
+        pass
+    for fmt in ('%Y-%m-%d %H:%M:%S', '%Y-%m-%dT%H:%M', '%Y-%m-%d', '%B %d, %Y', '%b %d, %Y'):
+        try:
+            return datetime.strptime(value, fmt)
+        except Exception:
+            continue
+    return None
+
+def build_event_datetime(date_value, time_value, fallback_time='09:00'):
+    date_value = (date_value or '').strip()
+    time_value = (time_value or fallback_time or '09:00').strip()
+    if not date_value:
+        return ''
+    if len(time_value) == 5:
+        time_value = f"{time_value}:00"
+    return f"{date_value}T{time_value}"
+
+def split_event_datetime(value):
+    dt = parse_event_datetime(value)
+    if not dt:
+        return '', ''
+    return dt.strftime('%Y-%m-%d'), dt.strftime('%H:%M')
+
+def format_event_date(value, fallback='Date TBD'):
+    dt = parse_event_datetime(value)
+    if not dt:
+        return fallback
+    return dt.strftime('%B %d, %Y').replace(' 0', ' ')
+
+def format_event_short_date(value, fallback='On Demand'):
+    dt = parse_event_datetime(value)
+    if not dt:
+        return fallback
+    return dt.strftime('%b %d, %Y').replace(' 0', ' ')
+
+def format_event_time_range(event):
+    if event.get('display_time_text'):
+        return event.get('display_time_text')
+    start_dt = parse_event_datetime(event.get('start_datetime'))
+    end_dt = parse_event_datetime(event.get('end_datetime'))
+    if not start_dt:
+        return event.get('recording_duration') or 'Available anytime'
+    start_text = start_dt.strftime('%I:%M %p').lstrip('0')
+    if end_dt:
+        end_text = end_dt.strftime('%I:%M %p').lstrip('0')
+        return f"{start_text} - {end_text} {event.get('timezone') or ''}".strip()
+    return f"{start_text} {event.get('timezone') or ''}".strip()
+
+def event_public_url(event):
+    slug = event['slug'] if isinstance(event, sqlite3.Row) else event.get('slug')
+    content_type = event['content_type'] if isinstance(event, sqlite3.Row) else event.get('content_type')
+    webinar_format = event['webinar_format'] if isinstance(event, sqlite3.Row) else event.get('webinar_format')
+    lifecycle = event['lifecycle_status'] if isinstance(event, sqlite3.Row) else event.get('lifecycle_status')
+    if content_type == 'Webinar':
+        if webinar_format == 'On-Demand Webinar' or lifecycle == 'On-Demand':
+            return f"/events/webinars/on-demand/{slug}"
+        return f"/events/webinars/{slug}"
+    return f"/events/{slug}"
+
+def plain_text(value):
+    value = re.sub(r'<[^>]+>', ' ', value or '')
+    return re.sub(r'\s+', ' ', value).strip()
+
+def is_valid_event_url(value):
+    value = (value or '').strip()
+    if not value:
+        return True
+    from urllib.parse import urlparse
+    parsed = urlparse(value)
+    return parsed.scheme in ('http', 'https') and bool(parsed.netloc)
+
+def log_event_activity(conn, event_id, action_type, description, previous_status=None, new_status=None, metadata_dict=None):
+    conn.execute('''
+        INSERT INTO event_activity_log (
+            event_id, action_type, description, previous_status, new_status,
+            performed_by, metadata_json, created_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (
+        event_id,
+        action_type,
+        description,
+        previous_status,
+        new_status,
+        session.get('username', 'Admin'),
+        json.dumps(metadata_dict or {}),
+        datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+    ))
+
+def run_event_status_update(conn=None):
+    owns_conn = conn is None
+    if owns_conn:
+        ensure_event_webinar_schema()
+    if owns_conn:
+        conn = get_db_connection()
+    updated = 0
+    try:
+        rows = conn.execute('''
+            SELECT * FROM event_webinars
+            WHERE publishing_status != 'Archived'
+              AND lifecycle_status IN ('Upcoming', 'Live')
+        ''').fetchall()
+        now = datetime.utcnow()
+        for row in rows:
+            event = dict(row)
+            end_dt = parse_event_datetime(event.get('end_datetime')) or parse_event_datetime(event.get('start_datetime'))
+            if not end_dt or end_dt > now:
+                continue
+
+            if event.get('content_type') == 'Webinar' and event.get('webinar_format') == 'Live Webinar':
+                if event.get('auto_convert_to_ondemand') and event.get('recording_link'):
+                    conn.execute('''
+                        UPDATE event_webinars
+                        SET webinar_format = 'On-Demand Webinar',
+                            lifecycle_status = 'On-Demand',
+                            live_join_link = '',
+                            registration_cta_text = COALESCE(NULLIF(registration_cta_text, ''), 'Watch On-Demand'),
+                            converted_to_ondemand_at = ?,
+                            updated_at = ?
+                        WHERE id = ?
+                    ''', (now.strftime('%Y-%m-%d %H:%M:%S'), now.strftime('%Y-%m-%d %H:%M:%S'), event['id']))
+                    log_event_activity(conn, event['id'], 'auto_convert_to_ondemand', 'Auto-converted webinar to on-demand after scheduled end time.', event.get('lifecycle_status'), 'On-Demand')
+                else:
+                    conn.execute('''
+                        UPDATE event_webinars
+                        SET lifecycle_status = 'Completed', updated_at = ?
+                        WHERE id = ?
+                    ''', (now.strftime('%Y-%m-%d %H:%M:%S'), event['id']))
+                    log_event_activity(conn, event['id'], 'status_update', 'Marked live webinar completed. Recording link is required for on-demand conversion.', event.get('lifecycle_status'), 'Completed')
+                updated += 1
+            elif event.get('content_type') == 'Event':
+                conn.execute('''
+                    UPDATE event_webinars
+                    SET lifecycle_status = 'Completed', updated_at = ?
+                    WHERE id = ?
+                ''', (now.strftime('%Y-%m-%d %H:%M:%S'), event['id']))
+                log_event_activity(conn, event['id'], 'status_update', 'Marked event completed after scheduled end time.', event.get('lifecycle_status'), 'Completed')
+                updated += 1
+        if owns_conn:
+            conn.commit()
+    finally:
+        if owns_conn:
+            conn.close()
+    return updated
+
+def get_event_listing_cards(public_only=True, limit=None, filters=None):
+    ensure_event_webinar_schema()
+    run_event_status_update()
+    filters = filters or {}
+    clauses = []
+    params = []
+    if public_only:
+        clauses.append("publishing_status = 'Published'")
+        clauses.append("lifecycle_status != 'Cancelled'")
+    if filters.get('content_type'):
+        clauses.append("content_type = ?")
+        params.append(filters['content_type'])
+    if filters.get('webinar_format'):
+        clauses.append("webinar_format = ?")
+        params.append(filters['webinar_format'])
+    if filters.get('event_format'):
+        clauses.append("event_format = ?")
+        params.append(filters['event_format'])
+    if filters.get('lifecycle_status'):
+        clauses.append("lifecycle_status = ?")
+        params.append(filters['lifecycle_status'])
+    if filters.get('publishing_status'):
+        clauses.append("publishing_status = ?")
+        params.append(filters['publishing_status'])
+    if filters.get('theme'):
+        clauses.append("theme LIKE ?")
+        params.append(f"%{filters['theme']}%")
+
+    where_sql = f"WHERE {' AND '.join(clauses)}" if clauses else ''
+    limit_sql = 'LIMIT ?' if limit else ''
+    if limit:
+        params.append(limit)
+
+    conn = get_db_connection()
+    try:
+        rows = conn.execute(f'''
+            SELECT ew.*,
+                   (SELECT COUNT(*) FROM event_registrations er WHERE er.event_id = ew.id) as registration_count,
+                   (SELECT COUNT(*) FROM event_speakers es WHERE es.event_id = ew.id AND es.is_active = 1) as speaker_count
+            FROM event_webinars ew
+            {where_sql}
+            ORDER BY
+                CASE WHEN start_datetime IS NULL OR start_datetime = '' THEN 1 ELSE 0 END,
+                start_datetime ASC,
+                updated_at DESC
+            {limit_sql}
+        ''', params).fetchall()
+    finally:
+        conn.close()
+
+    cards = []
+    for idx, row in enumerate(rows):
+        event = dict(row)
+        cards.append({
+            'id': event['id'],
+            'type': event.get('content_type') or 'Event',
+            'format': event.get('webinar_format') or event.get('event_format') or '',
+            'slug': event.get('slug'),
+            'title': event.get('title'),
+            'summary': event.get('short_description') or plain_text(event.get('full_description'))[:180],
+            'date_str': 'On-Demand' if event.get('lifecycle_status') == 'On-Demand' else format_event_short_date(event.get('start_datetime'), 'Date TBD'),
+            'time': event.get('recording_duration') if event.get('lifecycle_status') == 'On-Demand' else format_event_time_range(event),
+            'delivery_type': event.get('location_type') or 'Online',
+            'location': event.get('location') or ('Online' if event.get('content_type') == 'Webinar' else 'Location TBD'),
+            'theme': event.get('theme') or '',
+            'url': event_public_url(event),
+            'card_image': event.get('featured_image') or event.get('hero_image') or EVENT_CARD_IMAGES[idx % len(EVENT_CARD_IMAGES)],
+            'lifecycle_status': event.get('lifecycle_status'),
+            'publishing_status': event.get('publishing_status'),
+            'registration_count': event.get('registration_count') or 0,
+            'speaker_count': event.get('speaker_count') or 0,
+            'recording_ready': bool(event.get('recording_link'))
+        })
+    return cards
+
+def fetch_event_webinar(event_id=None, slug=None):
+    ensure_event_webinar_schema()
+    conn = get_db_connection()
+    try:
+        if event_id is not None:
+            row = conn.execute("SELECT * FROM event_webinars WHERE id = ?", (event_id,)).fetchone()
+        else:
+            row = conn.execute("SELECT * FROM event_webinars WHERE slug = ?", (slug,)).fetchone()
+        return dict(row) if row else None
+    finally:
+        conn.close()
+
+def fetch_event_bundle(event_id=None, slug=None, public_only=False):
+    ensure_event_webinar_schema()
+    conn = get_db_connection()
+    try:
+        if event_id is not None:
+            row = conn.execute("SELECT * FROM event_webinars WHERE id = ?", (event_id,)).fetchone()
+        else:
+            row = conn.execute("SELECT * FROM event_webinars WHERE slug = ?", (slug,)).fetchone()
+        if not row:
+            return None
+        event = dict(row)
+        if public_only and event.get('publishing_status') != 'Published':
+            return None
+        event['speakers'] = [dict(r) for r in conn.execute(
+            "SELECT * FROM event_speakers WHERE event_id = ? AND is_active = 1 ORDER BY display_order ASC, id ASC",
+            (event['id'],)
+        ).fetchall()]
+        event['agenda_items'] = [dict(r) for r in conn.execute(
+            "SELECT * FROM event_agenda_items WHERE event_id = ? ORDER BY day_number ASC, display_order ASC, start_time ASC, id ASC",
+            (event['id'],)
+        ).fetchall()]
+        event['takeaways'] = [dict(r) for r in conn.execute(
+            "SELECT * FROM event_key_takeaways WHERE event_id = ? ORDER BY display_order ASC, id ASC",
+            (event['id'],)
+        ).fetchall()]
+        event['registration_count'] = conn.execute(
+            "SELECT COUNT(*) as cnt FROM event_registrations WHERE event_id = ?",
+            (event['id'],)
+        ).fetchone()['cnt']
+        return event
+    finally:
+        conn.close()
+
+def build_event_detail_data(event):
+    speakers = []
+    accent_cycle = ['cyan', 'yellow', 'orange', 'violet']
+    for idx, speaker in enumerate(event.get('speakers', [])):
+        speakers.append({
+            'name': speaker.get('name'),
+            'role': speaker.get('designation') or '',
+            'company': speaker.get('company') or '',
+            'bio': speaker.get('short_bio') or '',
+            'full_bio': speaker.get('full_bio') or '',
+            'linkedin_url': speaker.get('linkedin_url') or '',
+            'profile_url': speaker.get('profile_url') or '',
+            'image_url': speaker.get('image_path') or '/static/img/event_2.png',
+            'accent_class': accent_cycle[idx % len(accent_cycle)]
+        })
+
+    grouped = {}
+    for item in event.get('agenda_items', []):
+        day_num = item.get('day_number') or 1
+        grouped.setdefault(day_num, []).append({
+            'time_range': f"{item.get('start_time') or ''}{' - ' if item.get('end_time') else ''}{item.get('end_time') or ''}".strip(),
+            'title': item.get('session_title'),
+            'description': item.get('description') or '',
+            'track': item.get('track') or ''
+        })
+
+    start_dt = parse_event_datetime(event.get('start_datetime'))
+    agenda_days = []
+    for day_num in sorted(grouped.keys()):
+        day_date = ''
+        if start_dt:
+            day_date = (start_dt + timedelta(days=day_num - 1)).strftime('%b %d, %Y').replace(' 0', ' ')
+        agenda_days.append({
+            'label': f"Day {day_num:02d}",
+            'date_str': day_date,
+            'sessions': grouped[day_num]
+        })
+
+    is_on_demand = event.get('content_type') == 'Webinar' and (
+        event.get('webinar_format') == 'On-Demand Webinar' or event.get('lifecycle_status') == 'On-Demand'
+    )
+    is_in_person = event.get('content_type') == 'Event' and event.get('location_type') in ('In-Person', 'Hybrid')
+    label = event.get('event_label') or event.get('webinar_format') or event.get('event_format') or event.get('content_type')
+    summary = event.get('short_description') or plain_text(event.get('full_description'))[:220]
+    detail_text = plain_text(event.get('full_description'))
+    date_label = 'Originally aired on ' + format_event_date(event.get('start_datetime')) if is_on_demand and event.get('start_datetime') else format_event_date(event.get('start_datetime'))
+
+    return {
+        'id': event.get('id'),
+        'title': event.get('title'),
+        'summary': summary,
+        'description': detail_text,
+        'date': date_label,
+        'timezone_date': 'On-Demand' if is_on_demand else format_event_short_date(event.get('start_datetime'), 'Date TBD'),
+        'timezone_times': event.get('recording_duration') if is_on_demand else format_event_time_range(event),
+        'display_time_text': format_event_time_range(event),
+        'location': event.get('location') or ('Online' if event.get('content_type') == 'Webinar' else 'Location TBD'),
+        'is_in_person': is_in_person,
+        'countdown_enabled': bool(event.get('countdown_enabled')) and not is_on_demand,
+        'event_label': label,
+        'event_tagline': event.get('theme') or 'Artha Solutions Event',
+        'speakers': speakers,
+        'agenda_days': agenda_days,
+        'takeaways': [t.get('takeaway_text') for t in event.get('takeaways', [])],
+        'highlight_title': event.get('highlight_title') or event.get('theme') or event.get('topic_category') or event.get('title'),
+        'highlight_text': event.get('highlight_text') or detail_text or summary,
+        'highlight_link': event.get('highlight_link') or event.get('related_solution_url') or event.get('related_industry_url') or '/solutions',
+        'registration_form_title': event.get('registration_form_title') or ('Access On-Demand Webinar' if is_on_demand else f"Register for {event.get('content_type')}"),
+        'registration_cta_text': event.get('registration_cta_text') or ('Watch On-Demand' if is_on_demand else 'Register Now'),
+        'registration_endpoint': f"/api/events/{event.get('slug')}/register",
+        'thank_you_message': event.get('thank_you_message') or 'Thank you. Your registration has been received.',
+        'seo_title': event.get('seo_title') or event.get('title'),
+        'seo_description': event.get('seo_description') or summary,
+        'canonical_url': event.get('canonical_url') or event_public_url(event),
+        'og_title': event.get('og_title') or event.get('seo_title') or event.get('title'),
+        'og_description': event.get('og_description') or event.get('seo_description') or summary,
+        'og_image': event.get('og_image') or event.get('featured_image') or event.get('hero_image'),
+        'schema_json': event.get('schema_json') or '',
+        'is_noindex': event.get('publishing_status') != 'Published',
+        'recording_ready': bool(event.get('recording_link')),
+        'is_on_demand': is_on_demand
+    }
+
+def build_event_form_context(event=None):
+    event = dict(event or {})
+    start_date, start_time = split_event_datetime(event.get('start_datetime'))
+    end_date, end_time = split_event_datetime(event.get('end_datetime'))
+    close_date, close_time = split_event_datetime(event.get('registration_close_datetime'))
+    event['start_date'] = start_date
+    event['start_time'] = start_time
+    event['end_date'] = end_date
+    event['end_time'] = end_time
+    event['registration_close_date'] = close_date
+    event['registration_close_time'] = close_time
+    event.setdefault('content_type', 'Webinar')
+    event.setdefault('webinar_format', 'Live Webinar')
+    event.setdefault('event_format', 'Conference')
+    event.setdefault('publishing_status', 'Draft')
+    event.setdefault('lifecycle_status', 'Upcoming')
+    event.setdefault('location_type', 'Online')
+    event.setdefault('recording_access_type', 'redirect')
+    event.setdefault('registration_required', 1)
+    event.setdefault('countdown_enabled', 1)
+    event.setdefault('business_email_only', 1)
+    event.setdefault('crm_integration_enabled', 1)
+    return event
+
+def save_event_children(conn, event_id):
+    now_str = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+    conn.execute("DELETE FROM event_speakers WHERE event_id = ?", (event_id,))
+    conn.execute("DELETE FROM event_agenda_items WHERE event_id = ?", (event_id,))
+    conn.execute("DELETE FROM event_key_takeaways WHERE event_id = ?", (event_id,))
+
+    speaker_names = request.form.getlist('speaker_name')
+    speaker_designations = request.form.getlist('speaker_designation')
+    speaker_companies = request.form.getlist('speaker_company')
+    speaker_images = request.form.getlist('speaker_image_path')
+    speaker_alts = request.form.getlist('speaker_image_alt_text')
+    speaker_short_bios = request.form.getlist('speaker_short_bio')
+    speaker_full_bios = request.form.getlist('speaker_full_bio')
+    speaker_linkedins = request.form.getlist('speaker_linkedin_url')
+    speaker_profiles = request.form.getlist('speaker_profile_url')
+    for idx, name in enumerate(speaker_names):
+        name = (name or '').strip()
+        if not name:
+            continue
+        conn.execute('''
+            INSERT INTO event_speakers (
+                event_id, name, designation, company, image_path, image_alt_text,
+                short_bio, full_bio, linkedin_url, profile_url, display_order,
+                is_active, created_at, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?)
+        ''', (
+            event_id, name,
+            speaker_designations[idx].strip() if idx < len(speaker_designations) else '',
+            speaker_companies[idx].strip() if idx < len(speaker_companies) else '',
+            speaker_images[idx].strip() if idx < len(speaker_images) else '',
+            speaker_alts[idx].strip() if idx < len(speaker_alts) else name,
+            speaker_short_bios[idx].strip() if idx < len(speaker_short_bios) else '',
+            speaker_full_bios[idx].strip() if idx < len(speaker_full_bios) else '',
+            speaker_linkedins[idx].strip() if idx < len(speaker_linkedins) else '',
+            speaker_profiles[idx].strip() if idx < len(speaker_profiles) else '',
+            idx,
+            now_str,
+            now_str
+        ))
+
+    agenda_titles = request.form.getlist('agenda_session_title')
+    agenda_days = request.form.getlist('agenda_day_number')
+    agenda_starts = request.form.getlist('agenda_start_time')
+    agenda_ends = request.form.getlist('agenda_end_time')
+    agenda_tracks = request.form.getlist('agenda_track')
+    agenda_descs = request.form.getlist('agenda_description')
+    for idx, title in enumerate(agenda_titles):
+        title = (title or '').strip()
+        if not title:
+            continue
+        try:
+            day_number = int(agenda_days[idx]) if idx < len(agenda_days) and agenda_days[idx] else 1
+        except ValueError:
+            day_number = 1
+        conn.execute('''
+            INSERT INTO event_agenda_items (
+                event_id, day_number, session_title, start_time, end_time,
+                track, description, display_order, created_at, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            event_id,
+            day_number,
+            title,
+            agenda_starts[idx].strip() if idx < len(agenda_starts) else '',
+            agenda_ends[idx].strip() if idx < len(agenda_ends) else '',
+            agenda_tracks[idx].strip() if idx < len(agenda_tracks) else '',
+            agenda_descs[idx].strip() if idx < len(agenda_descs) else '',
+            idx,
+            now_str,
+            now_str
+        ))
+
+    takeaways = request.form.getlist('takeaway_text')
+    for idx, takeaway in enumerate(takeaways):
+        takeaway = (takeaway or '').strip()
+        if not takeaway:
+            continue
+        conn.execute('''
+            INSERT INTO event_key_takeaways (event_id, takeaway_text, display_order, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (event_id, takeaway, idx, now_str, now_str))
+
+def get_event_payload_from_form(existing=None):
+    existing = existing or {}
+    content_type = request.form.get('content_type', 'Webinar')
+    webinar_format = request.form.get('webinar_format') if content_type == 'Webinar' else ''
+    event_format = request.form.get('event_format') if content_type == 'Event' else ''
+    lifecycle_status = request.form.get('lifecycle_status') or ('On-Demand' if webinar_format == 'On-Demand Webinar' else 'Upcoming')
+    title = request.form.get('title', '').strip()
+    slug = slugify_value(request.form.get('slug') or title)
+    start_datetime = build_event_datetime(request.form.get('start_date'), request.form.get('start_time'), '09:00')
+    end_datetime = build_event_datetime(request.form.get('end_date') or request.form.get('start_date'), request.form.get('end_time'), '10:00')
+    recording_link = request.form.get('recording_link', '').strip()
+
+    if content_type == 'Webinar' and webinar_format == 'On-Demand Webinar':
+        lifecycle_status = 'On-Demand'
+
+    return {
+        'content_type': content_type,
+        'webinar_format': webinar_format,
+        'event_format': event_format,
+        'title': title,
+        'slug': slug,
+        'short_description': request.form.get('short_description', '').strip(),
+        'full_description': request.form.get('full_description', '').strip(),
+        'theme': request.form.get('theme', '').strip(),
+        'topic_category': request.form.get('topic_category', '').strip(),
+        'start_datetime': start_datetime,
+        'end_datetime': end_datetime,
+        'timezone': request.form.get('timezone', '').strip() or 'America/New_York',
+        'display_time_text': request.form.get('display_time_text', '').strip(),
+        'location_type': request.form.get('location_type', '').strip() or 'Online',
+        'location': request.form.get('location', '').strip(),
+        'event_link': request.form.get('event_link', '').strip(),
+        'live_join_link': '' if lifecycle_status == 'On-Demand' else request.form.get('live_join_link', '').strip(),
+        'recording_link': recording_link,
+        'recording_duration': request.form.get('recording_duration', '').strip(),
+        'recording_embed_code': request.form.get('recording_embed_code', '').strip(),
+        'recording_access_type': request.form.get('recording_access_type', 'redirect'),
+        'registration_required': 1 if request.form.get('registration_required') == '1' else 0,
+        'registration_form_title': request.form.get('registration_form_title', '').strip(),
+        'registration_cta_text': request.form.get('registration_cta_text', '').strip(),
+        'thank_you_message': request.form.get('thank_you_message', '').strip(),
+        'countdown_enabled': 1 if request.form.get('countdown_enabled') == '1' else 0,
+        'capacity': int(request.form.get('capacity') or 0) or None,
+        'registration_close_datetime': build_event_datetime(request.form.get('registration_close_date'), request.form.get('registration_close_time'), ''),
+        'lifecycle_status': lifecycle_status,
+        'publishing_status': request.form.get('publishing_status', 'Draft'),
+        'auto_convert_to_ondemand': 1 if request.form.get('auto_convert_to_ondemand') == '1' else 0,
+        'hero_image': request.form.get('hero_image', '').strip(),
+        'featured_image': request.form.get('featured_image', '').strip(),
+        'partner_logo': request.form.get('partner_logo', '').strip(),
+        'sponsor_logo': request.form.get('sponsor_logo', '').strip(),
+        'related_solution_url': request.form.get('related_solution_url', '').strip(),
+        'related_industry_url': request.form.get('related_industry_url', '').strip(),
+        'related_case_study_id': int(request.form.get('related_case_study_id') or 0) or None,
+        'seo_title': request.form.get('seo_title', '').strip(),
+        'seo_description': request.form.get('seo_description', '').strip(),
+        'canonical_url': request.form.get('canonical_url', '').strip(),
+        'og_title': request.form.get('og_title', '').strip(),
+        'og_description': request.form.get('og_description', '').strip(),
+        'og_image': request.form.get('og_image', '').strip(),
+        'ai_summary': request.form.get('ai_summary', '').strip(),
+        'schema_json': request.form.get('schema_json', '').strip(),
+        'event_label': request.form.get('event_label', '').strip(),
+        'tags': request.form.get('tags', '').strip(),
+        'who_should_attend': request.form.get('who_should_attend', '').strip(),
+        'why_attend': request.form.get('why_attend', '').strip(),
+        'highlight_title': request.form.get('highlight_title', '').strip(),
+        'highlight_text': request.form.get('highlight_text', '').strip(),
+        'highlight_link': request.form.get('highlight_link', '').strip(),
+        'custom_cta_text': request.form.get('custom_cta_text', '').strip(),
+        'custom_cta_url': request.form.get('custom_cta_url', '').strip(),
+        'resource_download_url': request.form.get('resource_download_url', '').strip(),
+        'calendar_details': request.form.get('calendar_details', '').strip(),
+        'business_email_only': 1 if request.form.get('business_email_only') == '1' else 0,
+        'crm_integration_enabled': 1 if request.form.get('crm_integration_enabled') == '1' else 0,
+        'product_solution_id': int(request.form.get('product_solution_id') or 0) or None,
+        'partner_id': int(request.form.get('partner_id') or 0) or None,
+        'updated_by': session.get('username', 'Admin'),
+        'updated_at': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+    }
+
+def validate_event_payload(payload, is_conversion=False):
+    errors = []
+    if not payload.get('title'):
+        errors.append('Title is required.')
+    if not payload.get('slug'):
+        errors.append('Slug is required.')
+    if not payload.get('short_description'):
+        errors.append('Short description is required.')
+    if not payload.get('theme'):
+        errors.append('Theme is required.')
+    if payload.get('content_type') == 'Webinar' and not payload.get('webinar_format'):
+        errors.append('Webinar format is required.')
+    if payload.get('content_type') == 'Event' and not payload.get('event_format'):
+        errors.append('Event format is required.')
+    if not payload.get('start_datetime') and payload.get('lifecycle_status') != 'On-Demand':
+        errors.append('Date and start time are required.')
+    if payload.get('content_type') == 'Webinar' and payload.get('lifecycle_status') == 'On-Demand' and not payload.get('recording_link'):
+        errors.append('Recording link is required for on-demand webinars.')
+    for field in ('recording_link', 'event_link', 'live_join_link', 'custom_cta_url', 'resource_download_url'):
+        if payload.get(field) and not is_valid_event_url(payload[field]):
+            errors.append(f"{field.replace('_', ' ').title()} must be a valid http(s) URL.")
+    if payload.get('schema_json'):
+        try:
+            json.loads(payload['schema_json'])
+        except Exception:
+            errors.append('Schema JSON must be valid JSON.')
+    return errors
+
 @app.context_processor
 def inject_global_data():
     def load_json_helper(val):
@@ -672,7 +1371,8 @@ def inject_global_data():
         'navigation_menu': load_navigation_menu(),
         'seo_page_override': seo_page,
         'google_verification': google_verification,
-        'bing_verification': bing_verification
+        'bing_verification': bing_verification,
+        'events_list': get_compiled_events()
     }
 
 @app.template_filter('load_json')
@@ -1752,11 +2452,11 @@ def resources_case_studies_redirect():
 
 @app.route('/resources/events')
 def resources_events():
-    return render_template('resources_list.html', items=get_db_events(), type='Event', title='Upcoming Events & Summits', active_page='resources')
+    return redirect('/events')
 
 @app.route('/resources/webinars')
 def resources_webinars():
-    return render_template('resources_list.html', items=get_db_webinars(), type='Webinar', title='On-Demand Webinars', active_page='resources')
+    return redirect('/events?type=Webinar')
 
 @app.route('/resources/whitepapers')
 def resources_whitepapers():
@@ -1775,6 +2475,232 @@ def resources_workshop():
         ]
     }
     return render_template('advantage_detail.html', data=workshop_data, slug='on-demand-workshop', active_page='resources')
+
+@app.route('/events')
+def events_listing():
+    filters = {
+        'content_type': request.args.get('type', '').strip(),
+        'webinar_format': request.args.get('webinar_format', '').strip(),
+        'event_format': request.args.get('event_format', '').strip(),
+        'lifecycle_status': request.args.get('status', '').strip(),
+        'theme': request.args.get('theme', '').strip()
+    }
+    events = get_event_listing_cards(public_only=True, filters=filters)
+    themes = sorted({e.get('theme') for e in events if e.get('theme')})
+    return render_template('events_listing.html', events=events, filters=filters, themes=themes, active_page='resources')
+
+def render_unified_event_detail(slug, expected_type=None, require_on_demand=False):
+    event = fetch_event_bundle(slug=slug, public_only=True)
+    if not event:
+        abort(404)
+    if expected_type and event.get('content_type') != expected_type:
+        abort(404)
+    is_on_demand = event.get('content_type') == 'Webinar' and (
+        event.get('webinar_format') == 'On-Demand Webinar' or event.get('lifecycle_status') == 'On-Demand'
+    )
+    if require_on_demand and not is_on_demand:
+        return redirect(f"/events/webinars/{slug}", code=302)
+    data = build_event_detail_data(event)
+    type_name = event.get('content_type') or 'Event'
+    response = make_response(render_template('resource_detail.html', data=data, type=type_name, slug=slug, active_page='resources'))
+    if data.get('is_noindex'):
+        response.headers['X-Robots-Tag'] = 'noindex, nofollow'
+    return response
+
+@app.route('/events/webinars/on-demand/<slug>')
+def events_on_demand_webinar_detail(slug):
+    return render_unified_event_detail(slug.strip('/'), expected_type='Webinar', require_on_demand=True)
+
+@app.route('/events/webinars/<slug>')
+def events_webinar_detail(slug):
+    return render_unified_event_detail(slug.strip('/'), expected_type='Webinar')
+
+@app.route('/events/<slug>')
+def events_event_detail(slug):
+    return render_unified_event_detail(slug.strip('/'), expected_type='Event')
+
+@app.route('/api/events')
+def api_events_list():
+    return jsonify({'status': 'success', 'events': get_event_listing_cards(public_only=True)})
+
+@app.route('/api/events/webinars')
+def api_events_webinars():
+    return jsonify({'status': 'success', 'events': get_event_listing_cards(public_only=True, filters={'content_type': 'Webinar'})})
+
+@app.route('/api/events/webinars/on-demand')
+def api_events_webinars_on_demand():
+    return jsonify({'status': 'success', 'events': get_event_listing_cards(public_only=True, filters={'content_type': 'Webinar', 'lifecycle_status': 'On-Demand'})})
+
+@app.route('/api/events/upcoming')
+def api_events_upcoming():
+    return jsonify({'status': 'success', 'events': get_event_listing_cards(public_only=True, filters={'lifecycle_status': 'Upcoming'})})
+
+@app.route('/api/events/past')
+def api_events_past():
+    conn = get_db_connection()
+    try:
+        rows = conn.execute('''
+            SELECT * FROM event_webinars
+            WHERE publishing_status = 'Published'
+              AND lifecycle_status IN ('Completed', 'On-Demand')
+            ORDER BY updated_at DESC
+        ''').fetchall()
+    finally:
+        conn.close()
+    events = []
+    for row in rows:
+        item = dict(row)
+        item.pop('recording_link', None)
+        item.pop('live_join_link', None)
+        events.append(item)
+    return jsonify({'status': 'success', 'events': events})
+
+@app.route('/api/events/<slug>')
+def api_event_detail(slug):
+    event = fetch_event_bundle(slug=slug.strip('/'), public_only=True)
+    if not event:
+        return jsonify({'status': 'error', 'message': 'Event not found.'}), 404
+    public_event = dict(event)
+    public_event.pop('recording_link', None)
+    public_event.pop('live_join_link', None)
+    return jsonify({'status': 'success', 'event': public_event, 'url': event_public_url(event)})
+
+@app.route('/api/events/<slug>/register', methods=['POST'])
+def api_event_register(slug):
+    ensure_event_webinar_schema()
+    event = fetch_event_webinar(slug=slug.strip('/'))
+    if not event or event.get('publishing_status') != 'Published':
+        return jsonify({'status': 'error', 'message': 'This event or webinar is not available for registration.'}), 404
+
+    if request.form.get('website_url_honeypot'):
+        return jsonify({'status': 'success', 'message': 'Registration received.'})
+
+    now = time.time()
+    ip = request.remote_addr or '127.0.0.1'
+    timestamps = EVENT_REGISTRATION_RATE_LIMIT.get(ip, [])
+    timestamps = [t for t in timestamps if now - t < 60]
+    if len(timestamps) >= 5:
+        return jsonify({'status': 'error', 'message': 'Too many registration attempts. Please try again in a minute.'}), 429
+    timestamps.append(now)
+    EVENT_REGISTRATION_RATE_LIMIT[ip] = timestamps
+
+    first_name = request.form.get('first_name', '').strip()
+    last_name = request.form.get('last_name', '').strip()
+    email = request.form.get('business_email', '').strip().lower()
+    company = request.form.get('company', '').strip()
+    job_title = request.form.get('job_title', '').strip()
+    phone = request.form.get('phone', '').strip()
+    country = request.form.get('country', '').strip()
+    how_heard = request.form.get('how_did_you_hear', '').strip() or request.form.get('source_info', '').strip()
+    consent = 1 if request.form.get('consent_status') in ('1', 'on', 'true', 'yes') else 0
+
+    if not first_name or not last_name:
+        return jsonify({'status': 'error', 'message': 'First name and last name are required.'}), 400
+    if not email:
+        return jsonify({'status': 'error', 'message': 'Business email is required.'}), 400
+    if not re.match(r'^[^@\s]+@[^@\s]+\.[^@\s]+$', email):
+        return jsonify({'status': 'error', 'message': 'Please enter a valid email address.'}), 400
+    if event.get('business_email_only', 1) and not is_corporate_email(email):
+        return jsonify({'status': 'error', 'message': 'Please use your official company business email address.'}), 400
+    if phone and not validate_phone_number(phone):
+        return jsonify({'status': 'error', 'message': 'Please enter a valid business phone number.'}), 400
+
+    close_dt = parse_event_datetime(event.get('registration_close_datetime'))
+    if close_dt and close_dt < datetime.utcnow():
+        return jsonify({'status': 'error', 'message': 'Registration is closed for this event.'}), 400
+
+    conn = get_db_connection()
+    try:
+        if event.get('capacity'):
+            current_count = conn.execute("SELECT COUNT(*) as cnt FROM event_registrations WHERE event_id = ?", (event['id'],)).fetchone()['cnt']
+            if current_count >= int(event['capacity']):
+                return jsonify({'status': 'error', 'message': 'This event has reached registration capacity.'}), 400
+
+        now_str = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+        cursor = conn.cursor()
+        cursor.execute('''
+            INSERT INTO event_registrations (
+                event_id, first_name, last_name, business_email, company, job_title,
+                phone, country, how_did_you_hear, consent_status, attendee_status,
+                source_page, referrer, utm_source, utm_medium, utm_campaign, utm_term,
+                utm_content, registered_at, ip_address, user_agent, created_at, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Registered', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            event['id'], first_name, last_name, email, company, job_title,
+            phone, country, how_heard, consent,
+            request.form.get('source_page') or request.path,
+            request.form.get('referrer') or request.referrer or '',
+            request.form.get('utm_source', ''),
+            request.form.get('utm_medium', ''),
+            request.form.get('utm_campaign', ''),
+            request.form.get('utm_term', ''),
+            request.form.get('utm_content', ''),
+            now_str,
+            ip,
+            request.headers.get('User-Agent', ''),
+            now_str,
+            now_str
+        ))
+        registration_id = cursor.lastrowid
+        conn.commit()
+
+        crm_lead_id = None
+        if event.get('crm_integration_enabled', 1):
+            try:
+                from crm.models import forward_lead_to_crm
+                is_on_demand = event.get('content_type') == 'Webinar' and event.get('lifecycle_status') == 'On-Demand'
+                source_form = 'Event Registration'
+                if event.get('content_type') == 'Webinar':
+                    source_form = 'On-Demand Webinar Registration' if is_on_demand else 'Live Webinar Registration'
+                crm_lead_id = forward_lead_to_crm(
+                    email=email,
+                    first_name=first_name,
+                    last_name=last_name,
+                    company=company,
+                    phone=phone,
+                    job_title=job_title,
+                    geography='',
+                    country=country,
+                    industry='',
+                    message=f"Registered for {event.get('content_type')}: {event.get('title')} | Theme: {event.get('theme') or ''}",
+                    source_form=source_form,
+                    source_page=event_public_url(event),
+                    cta_clicked=event.get('registration_cta_text') or 'Register',
+                    lead_source='Website',
+                    utm_source=request.form.get('utm_source', ''),
+                    utm_medium=request.form.get('utm_medium', ''),
+                    utm_campaign=request.form.get('utm_campaign', ''),
+                    utm_term=request.form.get('utm_term', ''),
+                    utm_content=request.form.get('utm_content', ''),
+                    referrer=request.form.get('referrer') or request.referrer or '',
+                    ip_address=ip,
+                    user_agent=request.headers.get('User-Agent', ''),
+                    consent_status=consent,
+                    form_name=source_form,
+                    product_solution_interest=event.get('theme') or '',
+                    partner_interest=''
+                )
+                if crm_lead_id:
+                    conn.execute("UPDATE event_registrations SET crm_website_lead_id = ? WHERE id = ?", (str(crm_lead_id), registration_id))
+            except Exception as e:
+                print(f"Error forwarding event registration to CRM: {e}")
+
+        is_on_demand = event.get('content_type') == 'Webinar' and event.get('lifecycle_status') == 'On-Demand'
+        redirect_url = None
+        if is_on_demand and event.get('recording_link'):
+            redirect_url = event.get('recording_link')
+            conn.execute("UPDATE event_registrations SET accessed_recording_at = ? WHERE id = ?", (now_str, registration_id))
+        log_event_activity(conn, event['id'], 'registration', f"Registration received from {email}.", None, None, {'registration_id': registration_id})
+        conn.commit()
+    finally:
+        conn.close()
+
+    return jsonify({
+        'status': 'success',
+        'message': event.get('thank_you_message') or f"Thank you, {first_name}. Your registration has been received.",
+        'registration_id': registration_id,
+        'redirect_url': redirect_url
+    })
 
 # 2.6 Sitemap Specific Detail Pages & Aliases
 @app.route('/cloud')
@@ -2794,6 +3720,14 @@ def sitemap_xml():
     posts = conn.execute("SELECT slug FROM posts WHERE status = 'Published'").fetchall()
     cases = conn.execute("SELECT slug, updated_at FROM case_studies WHERE status = 'Published'").fetchall()
     microsite_pages = conn.execute("SELECT url, noindex FROM industry_microsite_pages WHERE status = 'Published'").fetchall()
+    try:
+        event_rows = conn.execute("""
+            SELECT slug, content_type, webinar_format, lifecycle_status, updated_at, published_at
+            FROM event_webinars
+            WHERE publishing_status = 'Published' AND lifecycle_status != 'Cancelled'
+        """).fetchall()
+    except Exception:
+        event_rows = []
     conn.close()
     
     xml_content = '<?xml version="1.0" encoding="UTF-8"?>\n'
@@ -2808,6 +3742,7 @@ def sitemap_xml():
         ('/careers', '0.6'),
         ('/solutions', '0.8'),
         ('/partners', '0.7'),
+        ('/events', '0.8'),
         ('/blogs', '0.8'),
         ('/case-studies', '0.9'),
         ('/contact-us', '0.7')
@@ -2834,6 +3769,11 @@ def sitemap_xml():
     for case in cases:
         date_str = case['updated_at'].split(' ')[0] if case['updated_at'] else "2026-05-30"
         xml_content += f'  <url>\n    <loc>https://www.thinkartha.com/case-studies/{case["slug"]}</loc>\n    <lastmod>{date_str}</lastmod>\n    <priority>0.8</priority>\n  </url>\n'
+
+    for event in event_rows:
+        event_dict = dict(event)
+        date_str = (event_dict.get('updated_at') or event_dict.get('published_at') or datetime.now().strftime('%Y-%m-%d'))[:10]
+        xml_content += f'  <url>\n    <loc>https://www.thinkartha.com{event_public_url(event_dict)}</loc>\n    <lastmod>{date_str}</lastmod>\n    <priority>0.7</priority>\n  </url>\n'
         
     xml_content += '</urlset>'
     
@@ -3384,17 +4324,505 @@ def admin_logout():
     return redirect('/admin/login')
 
 # 4.1. Admin Events & Webinars routes
+@app.route('/admin/events')
+def admin_events():
+    if 'logged_in' not in session:
+        return redirect('/admin/login')
+
+    ensure_event_webinar_schema()
+    conn = get_db_connection()
+    try:
+        updated_count = run_event_status_update(conn)
+        if updated_count:
+            conn.commit()
+
+        filters = {
+            'content_type': request.args.get('type', '').strip(),
+            'webinar_format': request.args.get('webinar_format', '').strip(),
+            'event_format': request.args.get('event_format', '').strip(),
+            'lifecycle_status': request.args.get('status', '').strip(),
+            'publishing_status': request.args.get('publishing_status', '').strip(),
+            'theme': request.args.get('theme', '').strip()
+        }
+        clauses = []
+        params = []
+        for key, column in (
+            ('content_type', 'ew.content_type'),
+            ('webinar_format', 'ew.webinar_format'),
+            ('event_format', 'ew.event_format'),
+            ('lifecycle_status', 'ew.lifecycle_status'),
+            ('publishing_status', 'ew.publishing_status')
+        ):
+            if filters.get(key):
+                clauses.append(f"{column} = ?")
+                params.append(filters[key])
+        if filters.get('theme'):
+            clauses.append("ew.theme LIKE ?")
+            params.append(f"%{filters['theme']}%")
+        where_sql = f"WHERE {' AND '.join(clauses)}" if clauses else ''
+
+        rows = conn.execute(f'''
+            SELECT ew.*,
+                   (SELECT COUNT(*) FROM event_registrations er WHERE er.event_id = ew.id) as registration_count,
+                   (SELECT COUNT(*) FROM event_speakers es WHERE es.event_id = ew.id AND es.is_active = 1) as speaker_count,
+                   (SELECT COUNT(*) FROM event_agenda_items ea WHERE ea.event_id = ew.id) as agenda_count
+            FROM event_webinars ew
+            {where_sql}
+            ORDER BY
+                CASE WHEN ew.start_datetime IS NULL OR ew.start_datetime = '' THEN 1 ELSE 0 END,
+                ew.start_datetime ASC,
+                ew.updated_at DESC
+        ''', params).fetchall()
+
+        stats = {
+            'total': conn.execute("SELECT COUNT(*) as cnt FROM event_webinars").fetchone()['cnt'],
+            'events': conn.execute("SELECT COUNT(*) as cnt FROM event_webinars WHERE content_type = 'Event'").fetchone()['cnt'],
+            'webinars': conn.execute("SELECT COUNT(*) as cnt FROM event_webinars WHERE content_type = 'Webinar'").fetchone()['cnt'],
+            'on_demand': conn.execute("SELECT COUNT(*) as cnt FROM event_webinars WHERE lifecycle_status = 'On-Demand'").fetchone()['cnt'],
+            'needs_recording': conn.execute("""
+                SELECT COUNT(*) as cnt FROM event_webinars
+                WHERE content_type = 'Webinar'
+                  AND webinar_format = 'Live Webinar'
+                  AND lifecycle_status = 'Completed'
+                  AND (recording_link IS NULL OR recording_link = '')
+            """).fetchone()['cnt']
+        }
+        themes = [r['theme'] for r in conn.execute(
+            "SELECT DISTINCT theme FROM event_webinars WHERE theme IS NOT NULL AND theme != '' ORDER BY theme"
+        ).fetchall()]
+    finally:
+        conn.close()
+
+    events = []
+    now = datetime.utcnow()
+    for row in rows:
+        item = dict(row)
+        item['public_url'] = event_public_url(item)
+        item['display_date'] = format_event_short_date(item.get('start_datetime'), 'On-Demand')
+        item['display_time'] = format_event_time_range(item)
+        end_dt = parse_event_datetime(item.get('end_datetime')) or parse_event_datetime(item.get('start_datetime'))
+        item['is_conversion_eligible'] = (
+            item.get('content_type') == 'Webinar'
+            and item.get('webinar_format') == 'Live Webinar'
+            and item.get('publishing_status') != 'Archived'
+            and (item.get('lifecycle_status') == 'Completed' or (end_dt is not None and end_dt <= now))
+        )
+        events.append(item)
+
+    return render_template('admin_events.html', events=events, stats=stats, filters=filters, themes=themes, active_admin='events')
+
+@app.route('/admin/events/new', methods=['GET', 'POST'])
+def admin_event_new():
+    if 'logged_in' not in session:
+        return redirect('/admin/login')
+
+    ensure_event_webinar_schema()
+    if request.method == 'POST':
+        payload = get_event_payload_from_form()
+        errors = validate_event_payload(payload)
+        if errors:
+            return render_template(
+                'admin_event_editor.html',
+                event=build_event_form_context(payload),
+                speakers=[],
+                agenda_items=[],
+                takeaways=[],
+                errors=errors,
+                mode='new',
+                active_admin='events'
+            )
+
+        now_str = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+        payload['created_by'] = session.get('username', 'Admin')
+        payload['created_at'] = now_str
+        payload['published_at'] = now_str if payload.get('publishing_status') == 'Published' else None
+        payload['archived_at'] = now_str if payload.get('publishing_status') == 'Archived' else None
+
+        columns = list(payload.keys())
+        placeholders = ','.join(['?'] * len(columns))
+        conn = get_db_connection()
+        try:
+            cursor = conn.cursor()
+            cursor.execute(
+                f"INSERT INTO event_webinars ({','.join(columns)}) VALUES ({placeholders})",
+                [payload[col] for col in columns]
+            )
+            event_id = cursor.lastrowid
+            save_event_children(conn, event_id)
+            log_event_activity(conn, event_id, 'created', 'Created unified event/webinar record.', None, payload.get('lifecycle_status'))
+            conn.commit()
+        except sqlite3.IntegrityError:
+            conn.rollback()
+            return render_template(
+                'admin_event_editor.html',
+                event=build_event_form_context(payload),
+                speakers=[],
+                agenda_items=[],
+                takeaways=[],
+                errors=['Slug already exists. Please choose a unique slug.'],
+                mode='new',
+                active_admin='events'
+            )
+        finally:
+            conn.close()
+        return redirect('/admin/events')
+
+    return render_template(
+        'admin_event_editor.html',
+        event=build_event_form_context(),
+        speakers=[],
+        agenda_items=[],
+        takeaways=[],
+        errors=[],
+        mode='new',
+        active_admin='events'
+    )
+
+@app.route('/admin/events/<int:event_id>/edit', methods=['GET', 'POST'])
+def admin_event_edit_unified(event_id):
+    if 'logged_in' not in session:
+        return redirect('/admin/login')
+
+    ensure_event_webinar_schema()
+    event = fetch_event_bundle(event_id=event_id)
+    if not event:
+        abort(404)
+
+    if request.method == 'POST':
+        payload = get_event_payload_from_form(event)
+        errors = validate_event_payload(payload)
+        if errors:
+            return render_template(
+                'admin_event_editor.html',
+                event=build_event_form_context({**event, **payload}),
+                speakers=event.get('speakers', []),
+                agenda_items=event.get('agenda_items', []),
+                takeaways=event.get('takeaways', []),
+                errors=errors,
+                mode='edit',
+                active_admin='events'
+            )
+
+        if payload.get('publishing_status') == 'Published' and not event.get('published_at'):
+            payload['published_at'] = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+        if payload.get('publishing_status') == 'Archived' and not event.get('archived_at'):
+            payload['archived_at'] = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+
+        set_clause = ', '.join([f"{col} = ?" for col in payload.keys()])
+        conn = get_db_connection()
+        try:
+            conn.execute(
+                f"UPDATE event_webinars SET {set_clause} WHERE id = ?",
+                [payload[col] for col in payload.keys()] + [event_id]
+            )
+            save_event_children(conn, event_id)
+            log_event_activity(conn, event_id, 'updated', 'Updated unified event/webinar record.', event.get('lifecycle_status'), payload.get('lifecycle_status'))
+            conn.commit()
+        except sqlite3.IntegrityError:
+            conn.rollback()
+            return render_template(
+                'admin_event_editor.html',
+                event=build_event_form_context({**event, **payload}),
+                speakers=event.get('speakers', []),
+                agenda_items=event.get('agenda_items', []),
+                takeaways=event.get('takeaways', []),
+                errors=['Slug already exists. Please choose a unique slug.'],
+                mode='edit',
+                active_admin='events'
+            )
+        finally:
+            conn.close()
+        return redirect('/admin/events')
+
+    return render_template(
+        'admin_event_editor.html',
+        event=build_event_form_context(event),
+        speakers=event.get('speakers', []),
+        agenda_items=event.get('agenda_items', []),
+        takeaways=event.get('takeaways', []),
+        errors=[],
+        mode='edit',
+        active_admin='events'
+    )
+
+@app.route('/admin/events/<int:event_id>/publish', methods=['POST'])
+def admin_event_publish(event_id):
+    if 'logged_in' not in session:
+        return redirect('/admin/login')
+    conn = get_db_connection()
+    try:
+        event = conn.execute("SELECT * FROM event_webinars WHERE id = ?", (event_id,)).fetchone()
+        if not event:
+            abort(404)
+        now_str = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+        conn.execute(
+            "UPDATE event_webinars SET publishing_status = 'Published', published_at = COALESCE(published_at, ?), updated_at = ? WHERE id = ?",
+            (now_str, now_str, event_id)
+        )
+        log_event_activity(conn, event_id, 'published', 'Published event/webinar.', event['publishing_status'], 'Published')
+        conn.commit()
+    finally:
+        conn.close()
+    return redirect('/admin/events')
+
+@app.route('/admin/events/<int:event_id>/archive', methods=['POST'])
+def admin_event_archive(event_id):
+    if 'logged_in' not in session:
+        return redirect('/admin/login')
+    conn = get_db_connection()
+    try:
+        event = conn.execute("SELECT * FROM event_webinars WHERE id = ?", (event_id,)).fetchone()
+        if not event:
+            abort(404)
+        now_str = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+        conn.execute(
+            "UPDATE event_webinars SET publishing_status = 'Archived', archived_at = COALESCE(archived_at, ?), updated_at = ? WHERE id = ?",
+            (now_str, now_str, event_id)
+        )
+        log_event_activity(conn, event_id, 'archived', 'Archived event/webinar.', event['publishing_status'], 'Archived')
+        conn.commit()
+    finally:
+        conn.close()
+    return redirect('/admin/events')
+
+@app.route('/admin/events/<int:event_id>/duplicate', methods=['POST'])
+def admin_event_duplicate(event_id):
+    if 'logged_in' not in session:
+        return redirect('/admin/login')
+
+    ensure_event_webinar_schema()
+    conn = get_db_connection()
+    try:
+        source = conn.execute("SELECT * FROM event_webinars WHERE id = ?", (event_id,)).fetchone()
+        if not source:
+            abort(404)
+        columns = [r['name'] for r in conn.execute("PRAGMA table_info(event_webinars)").fetchall() if r['name'] != 'id']
+        source_dict = dict(source)
+        base_slug = slugify_value(f"{source_dict.get('slug')}-copy")
+        slug = base_slug
+        suffix = 2
+        while conn.execute("SELECT id FROM event_webinars WHERE slug = ?", (slug,)).fetchone():
+            slug = f"{base_slug}-{suffix}"
+            suffix += 1
+        now_str = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+        source_dict['title'] = f"{source_dict.get('title')} (Copy)"
+        source_dict['slug'] = slug
+        source_dict['publishing_status'] = 'Draft'
+        source_dict['published_at'] = None
+        source_dict['archived_at'] = None
+        source_dict['created_at'] = now_str
+        source_dict['updated_at'] = now_str
+        source_dict['created_by'] = session.get('username', 'Admin')
+        source_dict['updated_by'] = session.get('username', 'Admin')
+        source_dict['converted_to_ondemand_at'] = None
+        source_dict['converted_by'] = None
+        cursor = conn.cursor()
+        cursor.execute(
+            f"INSERT INTO event_webinars ({','.join(columns)}) VALUES ({','.join(['?'] * len(columns))})",
+            [source_dict.get(col) for col in columns]
+        )
+        new_id = cursor.lastrowid
+        for speaker in conn.execute("SELECT * FROM event_speakers WHERE event_id = ?", (event_id,)).fetchall():
+            s = dict(speaker)
+            s.pop('id', None)
+            s['event_id'] = new_id
+            cols = list(s.keys())
+            conn.execute(f"INSERT INTO event_speakers ({','.join(cols)}) VALUES ({','.join(['?'] * len(cols))})", [s[c] for c in cols])
+        for agenda in conn.execute("SELECT * FROM event_agenda_items WHERE event_id = ?", (event_id,)).fetchall():
+            a = dict(agenda)
+            a.pop('id', None)
+            a['event_id'] = new_id
+            cols = list(a.keys())
+            conn.execute(f"INSERT INTO event_agenda_items ({','.join(cols)}) VALUES ({','.join(['?'] * len(cols))})", [a[c] for c in cols])
+        for takeaway in conn.execute("SELECT * FROM event_key_takeaways WHERE event_id = ?", (event_id,)).fetchall():
+            t = dict(takeaway)
+            t.pop('id', None)
+            t['event_id'] = new_id
+            cols = list(t.keys())
+            conn.execute(f"INSERT INTO event_key_takeaways ({','.join(cols)}) VALUES ({','.join(['?'] * len(cols))})", [t[c] for c in cols])
+        log_event_activity(conn, new_id, 'duplicated', f"Duplicated from event/webinar #{event_id}.", None, 'Draft')
+        conn.commit()
+    finally:
+        conn.close()
+    return redirect(f'/admin/events/{new_id}/edit')
+
+@app.route('/admin/events/<int:event_id>/add-recording-link', methods=['POST'])
+def admin_event_add_recording_link(event_id):
+    if 'logged_in' not in session:
+        return redirect('/admin/login')
+    recording_link = request.form.get('recording_link', '').strip()
+    if not recording_link or not is_valid_event_url(recording_link):
+        return redirect(f'/admin/events/{event_id}/edit')
+    conn = get_db_connection()
+    try:
+        conn.execute('''
+            UPDATE event_webinars
+            SET recording_link = ?, recording_duration = ?, recording_access_type = ?, updated_at = ?
+            WHERE id = ?
+        ''', (
+            recording_link,
+            request.form.get('recording_duration', '').strip(),
+            request.form.get('recording_access_type', 'redirect'),
+            datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'),
+            event_id
+        ))
+        log_event_activity(conn, event_id, 'recording_added', 'Added or updated recording link.', None, None)
+        conn.commit()
+    finally:
+        conn.close()
+    return redirect('/admin/events')
+
+@app.route('/admin/events/<int:event_id>/convert-to-ondemand', methods=['POST'])
+def admin_event_convert_to_ondemand(event_id):
+    if 'logged_in' not in session:
+        return redirect('/admin/login')
+
+    recording_link = request.form.get('recording_link', '').strip()
+    if not recording_link or not is_valid_event_url(recording_link):
+        return redirect(f'/admin/events/{event_id}/edit')
+
+    now_str = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+    conn = get_db_connection()
+    try:
+        event = conn.execute("SELECT * FROM event_webinars WHERE id = ?", (event_id,)).fetchone()
+        if not event:
+            abort(404)
+        conn.execute('''
+            UPDATE event_webinars
+            SET webinar_format = 'On-Demand Webinar',
+                lifecycle_status = 'On-Demand',
+                live_join_link = '',
+                recording_link = ?,
+                recording_access_type = ?,
+                recording_duration = ?,
+                registration_cta_text = ?,
+                thank_you_message = ?,
+                converted_to_ondemand_at = ?,
+                converted_by = ?,
+                updated_at = ?
+            WHERE id = ?
+        ''', (
+            recording_link,
+            request.form.get('recording_access_type', 'redirect'),
+            request.form.get('recording_duration', '').strip(),
+            request.form.get('registration_cta_text', '').strip() or 'Watch On-Demand',
+            request.form.get('thank_you_message', '').strip() or 'Thank you. Your webinar access is ready.',
+            now_str,
+            session.get('username', 'Admin'),
+            now_str,
+            event_id
+        ))
+        log_event_activity(conn, event_id, 'convert_to_ondemand', 'Converted live webinar to on-demand.', event['lifecycle_status'], 'On-Demand')
+        conn.commit()
+    finally:
+        conn.close()
+    return redirect('/admin/events')
+
+@app.route('/admin/events/run-status-update', methods=['POST'])
+def admin_events_run_status_update():
+    if 'logged_in' not in session:
+        return redirect('/admin/login')
+    run_event_status_update()
+    return redirect('/admin/events')
+
+@app.route('/admin/events/<int:event_id>/registrations')
+def admin_event_registrations(event_id):
+    if 'logged_in' not in session:
+        return redirect('/admin/login')
+    event = fetch_event_webinar(event_id=event_id)
+    if not event:
+        abort(404)
+    query = request.args.get('q', '').strip()
+    status_filter = request.args.get('status', '').strip()
+    clauses = ["event_id = ?"]
+    params = [event_id]
+    if query:
+        clauses.append("(business_email LIKE ? OR first_name LIKE ? OR last_name LIKE ? OR company LIKE ?)")
+        params.extend([f"%{query}%"] * 4)
+    if status_filter:
+        clauses.append("attendee_status = ?")
+        params.append(status_filter)
+    conn = get_db_connection()
+    try:
+        rows = conn.execute(f'''
+            SELECT * FROM event_registrations
+            WHERE {' AND '.join(clauses)}
+            ORDER BY registered_at DESC, id DESC
+        ''', params).fetchall()
+    finally:
+        conn.close()
+    return render_template('admin_event_registrations.html', event=event, registrations=rows, query=query, status_filter=status_filter, active_admin='events')
+
+@app.route('/admin/events/<int:event_id>/registrations/<int:registration_id>/status', methods=['POST'])
+def admin_event_registration_status(event_id, registration_id):
+    if 'logged_in' not in session:
+        return redirect('/admin/login')
+    status_value = request.form.get('attendee_status', 'Registered')
+    notes = request.form.get('notes', '').strip()
+    conn = get_db_connection()
+    try:
+        conn.execute('''
+            UPDATE event_registrations
+            SET attendee_status = ?, notes = ?, updated_at = ?
+            WHERE id = ? AND event_id = ?
+        ''', (status_value, notes, datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'), registration_id, event_id))
+        log_event_activity(conn, event_id, 'registration_status_update', f"Updated registration #{registration_id} to {status_value}.", None, None)
+        conn.commit()
+    finally:
+        conn.close()
+    return redirect(f'/admin/events/{event_id}/registrations')
+
+@app.route('/admin/events/<int:event_id>/registrations/export')
+def admin_event_registrations_export(event_id):
+    if 'logged_in' not in session:
+        return redirect('/admin/login')
+    event = fetch_event_webinar(event_id=event_id)
+    if not event:
+        abort(404)
+    conn = get_db_connection()
+    rows = conn.execute("SELECT * FROM event_registrations WHERE event_id = ? ORDER BY registered_at DESC", (event_id,)).fetchall()
+    conn.close()
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow([
+        'id', 'first_name', 'last_name', 'business_email', 'company', 'job_title',
+        'phone', 'country', 'how_did_you_hear', 'consent_status', 'attendee_status',
+        'source_page', 'utm_source', 'utm_medium', 'utm_campaign', 'registered_at',
+        'crm_website_lead_id', 'notes'
+    ])
+    for r in rows:
+        writer.writerow([
+            r['id'], r['first_name'], r['last_name'], r['business_email'], r['company'],
+            r['job_title'], r['phone'], r['country'], r['how_did_you_hear'],
+            r['consent_status'], r['attendee_status'], r['source_page'], r['utm_source'],
+            r['utm_medium'], r['utm_campaign'], r['registered_at'], r['crm_website_lead_id'],
+            r['notes']
+        ])
+    response = make_response(output.getvalue())
+    response.headers['Content-Type'] = 'text/csv'
+    response.headers['Content-Disposition'] = f"attachment; filename=event-{event_id}-registrations.csv"
+    return response
+
+@app.route('/api/admin/events')
+def api_admin_events():
+    if 'logged_in' not in session:
+        return jsonify({'status': 'error', 'message': 'Admin login required.'}), 401
+    return jsonify({'status': 'success', 'events': get_event_listing_cards(public_only=False)})
+
+@app.route('/api/admin/events/<int:event_id>')
+def api_admin_event_detail(event_id):
+    if 'logged_in' not in session:
+        return jsonify({'status': 'error', 'message': 'Admin login required.'}), 401
+    event = fetch_event_bundle(event_id=event_id)
+    if not event:
+        return jsonify({'status': 'error', 'message': 'Event not found.'}), 404
+    return jsonify({'status': 'success', 'event': event})
+
 @app.route('/admin/resources')
 def admin_resources():
     if 'logged_in' not in session:
         return redirect('/admin/login')
-    
-    conn = get_db_connection()
-    events = conn.execute("SELECT * FROM events ORDER BY id DESC").fetchall()
-    webinars = conn.execute("SELECT * FROM webinars ORDER BY id DESC").fetchall()
-    conn.close()
-    
-    return render_template('admin_resources.html', events=events, webinars=webinars)
+    return redirect('/admin/events')
 
 @app.route('/admin/resource/new', methods=['GET', 'POST'])
 def admin_resource_new():
@@ -7393,5 +8821,7 @@ def page_not_found(e):
 init_notification_scheduler(app)
 
 if __name__ == '__main__':
-    app.run(debug=True, use_reloader=False, host='127.0.0.1', port=5050)
-
+    debug_enabled = os.environ.get('FLASK_DEBUG', '').lower() in ('1', 'true', 'yes')
+    host = os.environ.get('FLASK_HOST', '127.0.0.1')
+    port = int(os.environ.get('PORT', os.environ.get('FLASK_PORT', 5050)))
+    app.run(debug=debug_enabled, use_reloader=False, host=host, port=port)

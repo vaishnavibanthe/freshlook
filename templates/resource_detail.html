@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ data.title }} - Artha Solutions{% endblock %}
+{% block title %}{{ data.seo_title or data.title }} - Artha Solutions{% endblock %}
 
 {% block content %}
 <!-- Google Fonts & Scoped CSS -->
@@ -1041,25 +1041,25 @@
         <!-- Breadcrumbs -->
         <div class="breadcrumbs">
             <a href="/">Home</a> <span>/</span>
-            <a href="/resources/events">Resources</a> <span>/</span>
+            <a href="/events">Events</a> <span>/</span>
             <span style="color: var(--color-ip-text-primary); font-weight: 600;">Event Detail</span>
         </div>
 
         <div class="hero-grid">
             <!-- Left Hero info -->
             <div>
-                <span class="pill-badge conference">In-Person Conference</span>
-                <div class="ip-meta-tagline">Artha Enterprise Summit 2026</div>
+                <span class="pill-badge conference">{{ data.event_label or 'In-Person Conference' }}</span>
+                <div class="ip-meta-tagline">{{ data.event_tagline or 'Artha Enterprise Event' }}</div>
                 <h1 class="ip-hero-title">{{ data.title }}</h1>
                 
                 <div class="ip-info-block">
                     <div><i class="far fa-calendar-days"></i> {{ data.date }}</div>
                     <div><i class="fas fa-location-dot"></i> {{ data.location }}</div>
-                    <div><i class="far fa-clock"></i> 8:00 AM PST • 11:00 AM EST • 4:00 PM BST</div>
+                    <div><i class="far fa-clock"></i> {{ data.display_time_text or data.timezone_times }}</div>
                 </div>
 
                 <button class="ip-register-btn" id="modal-trigger-btn">
-                    Register for Event
+                    {{ data.registration_cta_text or 'Register for Event' }}
                 </button>
             </div>
 
@@ -1167,6 +1167,35 @@
 </section>
 {% endif %}
 
+{% if data.takeaways or data.highlight_title or data.highlight_text %}
+<section class="details-section">
+    <div class="resource-container">
+        <div class="details-grid">
+            <div>
+                <div class="purple-highlight-box">
+                    <h3 class="highlight-title">{{ data.highlight_title or data.event_tagline or data.title }}</h3>
+                    <p class="highlight-text">{{ data.highlight_text or data.description }}</p>
+                    <a href="{% if data.highlight_link and (data.highlight_link.startswith('http') or data.highlight_link.startswith('/')) %}{{ data.highlight_link }}{% else %}https://{{ data.highlight_link|default('www.thinkartha.com') }}{% endif %}" {% if not data.highlight_link or not data.highlight_link.startswith('/') %}target="_blank"{% endif %} class="highlight-link">
+                        {{ data.highlight_link|default('www.thinkartha.com') }}
+                    </a>
+                </div>
+            </div>
+            <div>
+                <h3 class="section-title" style="font-size: 32px; margin-bottom: 32px; letter-spacing: -0.5px;">Key Takeaways</h3>
+                <div class="takeaways-list">
+                    {% for point in data.takeaways %}
+                    <div class="takeaway-item">
+                        <div class="checkmark-icon"><i class="fas fa-check"></i></div>
+                        <p class="takeaway-text">{{ point }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
 <!-- Gated Modal Dialog Form -->
 <div class="ip-modal-overlay" id="registration-modal">
     <div class="ip-modal-content">
@@ -1174,7 +1203,7 @@
         <div class="glass-card" style="background: rgba(255, 255, 255, 0.95); box-shadow: 0 30px 70px rgba(15, 23, 42, 0.25);">
             <!-- Default Form state -->
             <div id="registration-form-container">
-                <h2 class="card-title">Register for Conferences</h2>
+                <h2 class="card-title">{{ data.registration_form_title or 'Register for Event' }}</h2>
                 
                 <!-- AJAX Warning Alert -->
                 <div class="form-alert alert-error" id="form-error-alert"></div>
@@ -1184,6 +1213,13 @@
                     <input type="hidden" name="resource_type" value="{{ type }}">
                     <input type="hidden" name="resource_slug" value="{{ slug }}">
                     <input type="hidden" name="resource_title" value="{{ data.title }}">
+                    <input type="hidden" name="source_page" value="{{ request.path }}">
+                    <input type="hidden" name="referrer" value="{{ request.referrer or '' }}">
+                    <input type="hidden" name="utm_source" value="{{ request.args.get('utm_source', '') }}">
+                    <input type="hidden" name="utm_medium" value="{{ request.args.get('utm_medium', '') }}">
+                    <input type="hidden" name="utm_campaign" value="{{ request.args.get('utm_campaign', '') }}">
+                    <input type="hidden" name="utm_term" value="{{ request.args.get('utm_term', '') }}">
+                    <input type="hidden" name="utm_content" value="{{ request.args.get('utm_content', '') }}">
 
                     <div class="input-row">
                         <input type="text" name="first_name" required class="form-input" placeholder="First Name">
@@ -1198,14 +1234,26 @@
                         <input type="text" name="company" required class="form-input" placeholder="What company do you work for?">
                     </div>
 
-                    <div class="input-group">
-                        <input type="text" name="source_info" required class="form-input" placeholder="How did you hear about us?">
+                    <div class="input-row">
+                        <input type="text" name="job_title" class="form-input" placeholder="Job Title">
+                        <input type="tel" name="phone" class="form-input" placeholder="Phone (optional)">
                     </div>
 
-                    <p class="terms-text">By submitting your details, you agree to our Terms</p>
+                    <div class="input-group">
+                        <input type="text" name="country" class="form-input" placeholder="Country">
+                    </div>
+
+                    <div class="input-group">
+                        <input type="text" name="how_did_you_hear" required class="form-input" placeholder="How did you hear about us?">
+                    </div>
+
+                    <label class="terms-text" style="display:flex; gap:8px; align-items:flex-start;">
+                        <input type="checkbox" name="consent_status" value="1" required style="margin-top:4px;">
+                        <span>By submitting your details, you agree to our Terms and consent to event communications.</span>
+                    </label>
 
                     <button type="submit" class="register-btn" id="submit-btn-element" style="background-color: var(--color-ip-accent); color: #ffffff; border-radius: 9999px;">
-                        Register Now
+                        {{ data.registration_cta_text or 'Register Now' }}
                     </button>
                 </form>
             </div>
@@ -1328,7 +1376,7 @@
         <!-- Breadcrumbs -->
         <div class="breadcrumbs">
             <a href="/">Home</a> <span>/</span>
-            <a href="/resources/events">Resources</a> <span>/</span>
+            <a href="/events">Events</a> <span>/</span>
             <span style="color: var(--color-primary); font-weight: 600;">{{ type }} Detail</span>
         </div>
 
@@ -1337,7 +1385,7 @@
             <div>
                 <!-- Category badge -->
                 <span class="pill-badge {% if type == 'Event' %}conference{% elif type == 'Webinar' %}webinar{% else %}whitepaper{% endif %}">
-                    {% if type == 'Event' %}Conference{% else %}{{ type }}{% endif %}
+                    {{ data.event_label or ('Conference' if type == 'Event' else type) }}
                 </span>
 
                 <!-- Title -->
@@ -1369,7 +1417,7 @@
                     <!-- Default Form State -->
                     <div id="registration-form-container">
                         <h2 class="card-title">
-                            {% if type == 'Whitepaper' %}Download Whitepaper{% else %}Register for {% if type == 'Event' %}Conferences{% else %}Webinar{% endif %}{% endif %}
+                            {% if type == 'Whitepaper' %}Download Whitepaper{% else %}{{ data.registration_form_title or 'Register for ' ~ type }}{% endif %}
                         </h2>
 
                         <!-- AJAX Warning Alert -->
@@ -1381,6 +1429,13 @@
                             <input type="hidden" name="resource_type" value="{{ type }}">
                             <input type="hidden" name="resource_slug" value="{{ slug }}">
                             <input type="hidden" name="resource_title" value="{{ data.title }}">
+                            <input type="hidden" name="source_page" value="{{ request.path }}">
+                            <input type="hidden" name="referrer" value="{{ request.referrer or '' }}">
+                            <input type="hidden" name="utm_source" value="{{ request.args.get('utm_source', '') }}">
+                            <input type="hidden" name="utm_medium" value="{{ request.args.get('utm_medium', '') }}">
+                            <input type="hidden" name="utm_campaign" value="{{ request.args.get('utm_campaign', '') }}">
+                            <input type="hidden" name="utm_term" value="{{ request.args.get('utm_term', '') }}">
+                            <input type="hidden" name="utm_content" value="{{ request.args.get('utm_content', '') }}">
 
                             <!-- First & Last Name row -->
                             <div class="input-row">
@@ -1398,15 +1453,27 @@
                                 <input type="text" name="company" required class="form-input" placeholder="What company do you work for?">
                             </div>
 
-                            <!-- How did you hear about us? -->
-                            <div class="input-group">
-                                <input type="text" name="source_info" required class="form-input" placeholder="How did you hear about us?">
+                            <div class="input-row">
+                                <input type="text" name="job_title" class="form-input" placeholder="Job Title">
+                                <input type="tel" name="phone" class="form-input" placeholder="Phone (optional)">
                             </div>
 
-                            <p class="terms-text">By submitting your details, you agree to our Terms</p>
+                            <div class="input-group">
+                                <input type="text" name="country" class="form-input" placeholder="Country">
+                            </div>
+
+                            <!-- How did you hear about us? -->
+                            <div class="input-group">
+                                <input type="text" name="how_did_you_hear" required class="form-input" placeholder="How did you hear about us?">
+                            </div>
+
+                            <label class="terms-text" style="display:flex; gap:8px; align-items:flex-start;">
+                                <input type="checkbox" name="consent_status" value="1" required style="margin-top:4px;">
+                                <span>By submitting your details, you agree to our Terms and consent to event communications.</span>
+                            </label>
 
                             <button type="submit" class="register-btn" id="submit-btn-element">
-                                {% if type == 'Whitepaper' %}Download Now{% else %}Register Now{% endif %}
+                                {% if type == 'Whitepaper' %}Download Now{% else %}{{ data.registration_cta_text or 'Register Now' }}{% endif %}
                             </button>
                         </form>
                     </div>
@@ -1449,6 +1516,29 @@
         </div>
     </div>
 </section>
+
+{% if type != 'Whitepaper' and data.agenda_days %}
+<section class="details-section" style="padding-top: 72px;">
+    <div class="resource-container">
+        <span class="pill-badge webinar" style="margin-bottom: 16px;">Agenda</span>
+        <h2 class="section-title" style="margin-bottom: 28px;">Agenda / Topics Covered</h2>
+        <div class="ip-sessions-timeline" style="max-width: 920px;">
+            {% for day in data.agenda_days %}
+                {% for session in day.sessions %}
+                <div class="ip-session-item">
+                    <div class="ip-session-time">{{ session.time_range }}</div>
+                    <div class="ip-session-dot"></div>
+                    <div class="ip-session-details">
+                        <h4 class="ip-session-title">{{ session.title }}</h4>
+                        <p class="ip-session-desc">{{ session.description }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
 
 <!-- Speakers Block -->
 {% if type != 'Whitepaper' and data.speakers %}
@@ -1569,7 +1659,7 @@
                 const formData = new FormData(registrationForm);
 
                 // Send request
-                fetch('/submit-resource-lead', {
+                fetch('{{ data.registration_endpoint|default("/submit-resource-lead") }}', {
                     method: 'POST',
                     body: formData
                 })
@@ -1578,6 +1668,11 @@
                     if (res.status === 200 && res.body.status === 'success') {
                         // Success transition
                         successMessage.innerText = res.body.message;
+                        if (res.body.redirect_url) {
+                            setTimeout(() => {
+                                window.location.href = res.body.redirect_url;
+                            }, 900);
+                        }
                         
                         // Fade out form and fade in success container
                         formContainer.style.opacity = '0';

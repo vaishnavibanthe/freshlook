@@ -1,0 +1,580 @@
+{% extends "base.html" %}
+
+{% block title %}{% if mode == 'edit' %}Edit{% else %}Create{% endif %} Event/Webinar - Artha Control Center{% endblock %}
+
+{% block content %}
+<div style="height: var(--nav-height); background-color: var(--bg-secondary);"></div>
+
+<style>
+    .event-editor-shell {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 40px;
+        align-items: start;
+    }
+    .event-editor-card {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius-lg);
+        box-shadow: var(--glass-shadow);
+        padding: 28px;
+        margin-bottom: 22px;
+    }
+    .event-editor-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 20px;
+        margin-bottom: 24px;
+    }
+    .event-editor-header h1 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+    }
+    .event-section-title {
+        font-size: 17px;
+        font-weight: 800;
+        color: var(--text-primary);
+        margin: 0 0 16px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .event-section-title i {
+        color: var(--accent-blue);
+    }
+    .event-form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+    }
+    .event-form-grid.three {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .event-form-grid .full {
+        grid-column: 1 / -1;
+    }
+    .repeatable-row {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 14px;
+    }
+    .repeatable-row-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        font-size: 12px;
+        color: var(--text-tertiary);
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .inline-help {
+        display: block;
+        color: var(--text-tertiary);
+        font-size: 11px;
+        line-height: 1.45;
+        margin-top: 6px;
+    }
+    .editor-actions {
+        position: sticky;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(14px);
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
+        padding: 14px;
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        z-index: 5;
+        box-shadow: 0 -12px 35px rgba(15, 23, 42, 0.08);
+    }
+    .small-danger-btn {
+        border: none;
+        background: transparent;
+        color: #dc2626;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+    @media (max-width: 1100px) {
+        .event-editor-shell {
+            grid-template-columns: 1fr;
+        }
+        .event-form-grid,
+        .event-form-grid.three {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<section class="section-alt" style="padding-top: 40px; min-height: 90vh;">
+    <div class="container event-editor-shell">
+        {% include 'admin_sidebar.html' %}
+
+        <div>
+            <div class="event-editor-header">
+                <div>
+                    <h1>{% if mode == 'edit' %}Edit Event/Webinar{% else %}Create Event/Webinar{% endif %}</h1>
+                    <p style="font-size:13px; color:var(--text-tertiary); margin-top:6px;">
+                        One form controls live webinars, on-demand webinars, and in-person or virtual events.
+                    </p>
+                </div>
+                <a href="/admin/events" class="btn btn-secondary" style="padding:10px 18px; font-size:13px; text-decoration:none;">Back to Events</a>
+            </div>
+
+            {% if errors %}
+            <div class="event-editor-card" style="border-color:#fecaca; background:#fff7f7;">
+                {% for error in errors %}
+                <div style="color:#dc2626; font-size:13px; font-weight:700; margin-bottom:4px;"><i class="fas fa-triangle-exclamation"></i> {{ error }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <form method="POST" action="{% if mode == 'edit' %}/admin/events/{{ event.id }}/edit{% else %}/admin/events/new{% endif %}" id="unified-event-form">
+                <div class="event-editor-card">
+                    <h2 class="event-section-title"><i class="fas fa-sliders"></i> Content Setup</h2>
+                    <div class="event-form-grid three">
+                        <div>
+                            <label class="form-label">Content Type *</label>
+                            <select class="form-control" name="content_type" id="content-type-select" required>
+                                <option value="Webinar" {% if event.content_type == 'Webinar' %}selected{% endif %}>Webinar</option>
+                                <option value="Event" {% if event.content_type == 'Event' %}selected{% endif %}>Event</option>
+                            </select>
+                        </div>
+                        <div class="webinar-only">
+                            <label class="form-label">Webinar Format *</label>
+                            <select class="form-control" name="webinar_format" id="webinar-format-select">
+                                <option value="Live Webinar" {% if event.webinar_format == 'Live Webinar' %}selected{% endif %}>Live Webinar</option>
+                                <option value="On-Demand Webinar" {% if event.webinar_format == 'On-Demand Webinar' %}selected{% endif %}>On-Demand Webinar</option>
+                            </select>
+                        </div>
+                        <div class="event-only">
+                            <label class="form-label">Event Format *</label>
+                            <select class="form-control" name="event_format">
+                                {% for fmt in ['Conference','Summit','Workshop','Roundtable','Partner Event','In-Person Event','Virtual Event','Hybrid Event'] %}
+                                <option value="{{ fmt }}" {% if event.event_format == fmt %}selected{% endif %}>{{ fmt }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Lifecycle Status *</label>
+                            <select class="form-control" name="lifecycle_status" id="lifecycle-select">
+                                {% for status in ['Upcoming','Live','Completed','On-Demand','Cancelled'] %}
+                                <option value="{{ status }}" {% if event.lifecycle_status == status %}selected{% endif %}>{{ status }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Publishing Status *</label>
+                            <select class="form-control" name="publishing_status">
+                                {% for status in ['Draft','Published','Archived'] %}
+                                <option value="{{ status }}" {% if event.publishing_status == status %}selected{% endif %}>{{ status }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Event Label</label>
+                            <input class="form-control" name="event_label" value="{{ event.event_label or '' }}" placeholder="e.g. Artha Enterprise Summit 2026">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="event-editor-card">
+                    <h2 class="event-section-title"><i class="fas fa-heading"></i> Page Content</h2>
+                    <div class="event-form-grid">
+                        <div class="full">
+                            <label class="form-label">Title *</label>
+                            <input class="form-control" name="title" id="event-title-input" value="{{ event.title or '' }}" required placeholder="Active Data Governance in SAP S/4HANA">
+                        </div>
+                        <div>
+                            <label class="form-label">Slug *</label>
+                            <input class="form-control" name="slug" id="event-slug-input" value="{{ event.slug or '' }}" required style="font-family:monospace;" placeholder="active-data-governance-sap-s4hana">
+                        </div>
+                        <div>
+                            <label class="form-label">Theme *</label>
+                            <input class="form-control" name="theme" value="{{ event.theme or '' }}" required placeholder="SAP Data Modernization">
+                        </div>
+                        <div>
+                            <label class="form-label">Topic / Category</label>
+                            <input class="form-control" name="topic_category" value="{{ event.topic_category or '' }}" placeholder="Data Governance">
+                        </div>
+                        <div>
+                            <label class="form-label">Tags</label>
+                            <input class="form-control" name="tags" value="{{ event.tags or '' }}" placeholder="sap, data-governance, qlik">
+                        </div>
+                        <div class="full">
+                            <label class="form-label">Short Description *</label>
+                            <textarea class="form-control" name="short_description" rows="3" required placeholder="One or two sentences for cards, hero, and registration context.">{{ event.short_description or '' }}</textarea>
+                        </div>
+                        <div class="full">
+                            <label class="form-label">Full Description</label>
+                            <textarea class="form-control" name="full_description" rows="7" placeholder="Detailed body copy, business context, and what the audience will learn.">{{ event.full_description or '' }}</textarea>
+                        </div>
+                        <div>
+                            <label class="form-label">Who Should Attend</label>
+                            <textarea class="form-control" name="who_should_attend" rows="4">{{ event.who_should_attend or '' }}</textarea>
+                        </div>
+                        <div>
+                            <label class="form-label">Why Attend</label>
+                            <textarea class="form-control" name="why_attend" rows="4">{{ event.why_attend or '' }}</textarea>
+                        </div>
+                        <div class="full">
+                            <label class="form-label">Public Highlight Card Title</label>
+                            <input class="form-control" name="highlight_title" value="{{ event.highlight_title or '' }}" placeholder="Modernize your SAP data landscape with automated conversion frameworks">
+                            <span class="inline-help">This powers the purple solution/content card on webinar and event detail pages.</span>
+                        </div>
+                        <div class="full">
+                            <label class="form-label">Public Highlight Card Text</label>
+                            <textarea class="form-control" name="highlight_text" rows="5">{{ event.highlight_text or '' }}</textarea>
+                        </div>
+                        <div class="full">
+                            <label class="form-label">Public Highlight Card Link</label>
+                            <input class="form-control" name="highlight_link" value="{{ event.highlight_link or '' }}" placeholder="/solutions/data-governance">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="event-editor-card">
+                    <h2 class="event-section-title"><i class="fas fa-calendar-days"></i> Date, Time, Location</h2>
+                    <div class="event-form-grid three">
+                        <div>
+                            <label class="form-label">Date *</label>
+                            <input class="form-control" type="date" name="start_date" value="{{ event.start_date or '' }}">
+                        </div>
+                        <div>
+                            <label class="form-label">Start Time *</label>
+                            <input class="form-control" type="time" name="start_time" value="{{ event.start_time or '' }}">
+                        </div>
+                        <div>
+                            <label class="form-label">End Time</label>
+                            <input class="form-control" type="time" name="end_time" value="{{ event.end_time or '' }}">
+                            <input type="hidden" name="end_date" value="{{ event.end_date or event.start_date or '' }}" id="end-date-hidden">
+                        </div>
+                        <div>
+                            <label class="form-label">Time Zone</label>
+                            <input class="form-control" name="timezone" value="{{ event.timezone or 'America/New_York' }}" placeholder="America/New_York">
+                        </div>
+                        <div class="full">
+                            <label class="form-label">Display Time Text</label>
+                            <input class="form-control" name="display_time_text" value="{{ event.display_time_text or '' }}" placeholder="11:00 AM EST - 4:00 PM BST - 8:30 PM IST">
+                        </div>
+                        <div>
+                            <label class="form-label">Location Type</label>
+                            <select class="form-control" name="location_type">
+                                {% for lt in ['Online','In-Person','Hybrid'] %}
+                                <option value="{{ lt }}" {% if event.location_type == lt %}selected{% endif %}>{{ lt }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Location</label>
+                            <input class="form-control" name="location" value="{{ event.location or '' }}" placeholder="Chicago, IL or Online">
+                        </div>
+                        <div>
+                            <label class="form-label">Countdown Enabled</label>
+                            <select class="form-control" name="countdown_enabled">
+                                <option value="1" {% if event.countdown_enabled %}selected{% endif %}>Yes</option>
+                                <option value="0" {% if not event.countdown_enabled %}selected{% endif %}>No</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="event-editor-card">
+                    <h2 class="event-section-title"><i class="fas fa-ticket"></i> Registration &amp; Recording</h2>
+                    <div class="event-form-grid">
+                        <div>
+                            <label class="form-label">Registration Required</label>
+                            <select class="form-control" name="registration_required">
+                                <option value="1" {% if event.registration_required %}selected{% endif %}>Yes</option>
+                                <option value="0" {% if not event.registration_required %}selected{% endif %}>No</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Business Email Only</label>
+                            <select class="form-control" name="business_email_only">
+                                <option value="1" {% if event.business_email_only %}selected{% endif %}>Yes</option>
+                                <option value="0" {% if not event.business_email_only %}selected{% endif %}>No</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">CRM Website Lead Integration</label>
+                            <select class="form-control" name="crm_integration_enabled">
+                                <option value="1" {% if event.crm_integration_enabled %}selected{% endif %}>Enabled</option>
+                                <option value="0" {% if not event.crm_integration_enabled %}selected{% endif %}>Disabled</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Capacity</label>
+                            <input class="form-control" type="number" name="capacity" min="0" value="{{ event.capacity or '' }}" placeholder="Optional">
+                        </div>
+                        <div>
+                            <label class="form-label">Registration Close Date</label>
+                            <input class="form-control" type="date" name="registration_close_date" value="{{ event.registration_close_date or '' }}">
+                        </div>
+                        <div>
+                            <label class="form-label">Registration Close Time</label>
+                            <input class="form-control" type="time" name="registration_close_time" value="{{ event.registration_close_time or '' }}">
+                        </div>
+                        <div>
+                            <label class="form-label">Registration Form Title</label>
+                            <input class="form-control" name="registration_form_title" value="{{ event.registration_form_title or '' }}" placeholder="Register for Webinar">
+                        </div>
+                        <div>
+                            <label class="form-label">Registration CTA Text</label>
+                            <input class="form-control" name="registration_cta_text" value="{{ event.registration_cta_text or '' }}" placeholder="Register Now">
+                        </div>
+                        <div class="full">
+                            <label class="form-label">Thank-You Message</label>
+                            <textarea class="form-control" name="thank_you_message" rows="3">{{ event.thank_you_message or '' }}</textarea>
+                        </div>
+                        <div>
+                            <label class="form-label">Live Join/Event Link</label>
+                            <input class="form-control" type="url" name="live_join_link" value="{{ event.live_join_link or '' }}" placeholder="Hidden after on-demand conversion">
+                        </div>
+                        <div>
+                            <label class="form-label">External Event Link</label>
+                            <input class="form-control" type="url" name="event_link" value="{{ event.event_link or '' }}" placeholder="Optional partner platform URL">
+                        </div>
+                        <div class="ondemand-field">
+                            <label class="form-label">Recording Link</label>
+                            <input class="form-control" type="url" name="recording_link" value="{{ event.recording_link or '' }}" placeholder="Required for On-Demand Webinar">
+                            <span class="inline-help">Recording links are not shown publicly before registration.</span>
+                        </div>
+                        <div class="ondemand-field">
+                            <label class="form-label">Recording Access Type</label>
+                            <select class="form-control" name="recording_access_type">
+                                <option value="redirect" {% if event.recording_access_type == 'redirect' %}selected{% endif %}>Redirect to Recording</option>
+                                <option value="internal_page" {% if event.recording_access_type == 'internal_page' %}selected{% endif %}>Internal Access Page</option>
+                            </select>
+                        </div>
+                        <div class="ondemand-field">
+                            <label class="form-label">Recording Duration</label>
+                            <input class="form-control" name="recording_duration" value="{{ event.recording_duration or '' }}" placeholder="45 minutes">
+                        </div>
+                        <div class="full">
+                            <label class="form-label">Recording Embed Code</label>
+                            <textarea class="form-control" name="recording_embed_code" rows="3" placeholder="Optional iframe embed, stored for future internal playback.">{{ event.recording_embed_code or '' }}</textarea>
+                        </div>
+                        <div>
+                            <label class="form-label">Auto Convert After Date</label>
+                            <select class="form-control" name="auto_convert_to_ondemand">
+                                <option value="0" {% if not event.auto_convert_to_ondemand %}selected{% endif %}>No, require manual review</option>
+                                <option value="1" {% if event.auto_convert_to_ondemand %}selected{% endif %}>Yes, if recording link exists</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="event-editor-card">
+                    <h2 class="event-section-title"><i class="fas fa-user-group"></i> Speakers</h2>
+                    <div id="speakers-container">
+                        {% set speaker_rows = speakers if speakers else [{}] %}
+                        {% for speaker in speaker_rows %}
+                        <div class="repeatable-row speaker-row">
+                            <div class="repeatable-row-header">Speaker <button type="button" class="small-danger-btn remove-row">Remove</button></div>
+                            <div class="event-form-grid">
+                                <div><label class="form-label">Name</label><input class="form-control" name="speaker_name" value="{{ speaker.name or '' }}"></div>
+                                <div><label class="form-label">Designation</label><input class="form-control" name="speaker_designation" value="{{ speaker.designation or '' }}"></div>
+                                <div><label class="form-label">Company</label><input class="form-control" name="speaker_company" value="{{ speaker.company or '' }}"></div>
+                                <div><label class="form-label">Image URL/Path</label><input class="form-control" name="speaker_image_path" value="{{ speaker.image_path or '' }}" placeholder="/static/img/event_2.png"></div>
+                                <div><label class="form-label">Image Alt Text</label><input class="form-control" name="speaker_image_alt_text" value="{{ speaker.image_alt_text or '' }}"></div>
+                                <div><label class="form-label">LinkedIn URL</label><input class="form-control" name="speaker_linkedin_url" value="{{ speaker.linkedin_url or '' }}"></div>
+                                <div class="full"><label class="form-label">Short Bio</label><textarea class="form-control" name="speaker_short_bio" rows="3">{{ speaker.short_bio or '' }}</textarea></div>
+                                <div class="full"><label class="form-label">Full Bio</label><textarea class="form-control" name="speaker_full_bio" rows="4">{{ speaker.full_bio or '' }}</textarea></div>
+                                <input type="hidden" name="speaker_profile_url" value="{{ speaker.profile_url or '' }}">
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <button type="button" class="admin-action-btn" id="add-speaker-btn"><i class="fas fa-plus"></i> Add Speaker</button>
+                </div>
+
+                <div class="event-editor-card">
+                    <h2 class="event-section-title"><i class="fas fa-list-check"></i> Agenda</h2>
+                    <div id="agenda-container">
+                        {% set agenda_rows = agenda_items if agenda_items else [{}] %}
+                        {% for agenda in agenda_rows %}
+                        <div class="repeatable-row agenda-row">
+                            <div class="repeatable-row-header">Agenda Item <button type="button" class="small-danger-btn remove-row">Remove</button></div>
+                            <div class="event-form-grid three">
+                                <div><label class="form-label">Day</label><input class="form-control" type="number" min="1" name="agenda_day_number" value="{{ agenda.day_number or 1 }}"></div>
+                                <div><label class="form-label">Start Time</label><input class="form-control" name="agenda_start_time" value="{{ agenda.start_time or '' }}" placeholder="10:00 AM"></div>
+                                <div><label class="form-label">End Time</label><input class="form-control" name="agenda_end_time" value="{{ agenda.end_time or '' }}" placeholder="11:00 AM"></div>
+                                <div class="full"><label class="form-label">Session Title</label><input class="form-control" name="agenda_session_title" value="{{ agenda.session_title or '' }}"></div>
+                                <div><label class="form-label">Track / Theme</label><input class="form-control" name="agenda_track" value="{{ agenda.track or '' }}"></div>
+                                <div class="full"><label class="form-label">Description</label><textarea class="form-control" name="agenda_description" rows="3">{{ agenda.description or '' }}</textarea></div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <button type="button" class="admin-action-btn" id="add-agenda-btn"><i class="fas fa-plus"></i> Add Agenda Item</button>
+                </div>
+
+                <div class="event-editor-card">
+                    <h2 class="event-section-title"><i class="fas fa-circle-check"></i> Key Takeaways</h2>
+                    <div id="takeaways-container">
+                        {% set takeaway_rows = takeaways if takeaways else [{}] %}
+                        {% for takeaway in takeaway_rows %}
+                        <div class="repeatable-row takeaway-row">
+                            <div class="repeatable-row-header">Takeaway <button type="button" class="small-danger-btn remove-row">Remove</button></div>
+                            <textarea class="form-control" name="takeaway_text" rows="2" placeholder="What will attendees learn?">{{ takeaway.takeaway_text or '' }}</textarea>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <button type="button" class="admin-action-btn" id="add-takeaway-btn"><i class="fas fa-plus"></i> Add Takeaway</button>
+                </div>
+
+                <div class="event-editor-card">
+                    <h2 class="event-section-title"><i class="fas fa-image"></i> Media, Related Links &amp; SEO</h2>
+                    <div class="event-form-grid">
+                        <div><label class="form-label">Hero Image</label><input class="form-control" name="hero_image" value="{{ event.hero_image or '' }}" placeholder="/static/img/event_1.png"></div>
+                        <div><label class="form-label">Featured/Card Image</label><input class="form-control" name="featured_image" value="{{ event.featured_image or '' }}" placeholder="/static/img/event_4.png"></div>
+                        <div><label class="form-label">Partner Logo</label><input class="form-control" name="partner_logo" value="{{ event.partner_logo or '' }}"></div>
+                        <div><label class="form-label">Sponsor Logo</label><input class="form-control" name="sponsor_logo" value="{{ event.sponsor_logo or '' }}"></div>
+                        <div><label class="form-label">Related Solution URL</label><input class="form-control" name="related_solution_url" value="{{ event.related_solution_url or '' }}" placeholder="/solutions/data-governance"></div>
+                        <div><label class="form-label">Related Industry URL</label><input class="form-control" name="related_industry_url" value="{{ event.related_industry_url or '' }}" placeholder="/industries/bfsi"></div>
+                        <div><label class="form-label">Related Case Study ID</label><input class="form-control" type="number" name="related_case_study_id" value="{{ event.related_case_study_id or '' }}"></div>
+                        <div><label class="form-label">Resource Download URL</label><input class="form-control" name="resource_download_url" value="{{ event.resource_download_url or '' }}"></div>
+                        <div><label class="form-label">Custom CTA Text</label><input class="form-control" name="custom_cta_text" value="{{ event.custom_cta_text or '' }}"></div>
+                        <div><label class="form-label">Custom CTA URL</label><input class="form-control" name="custom_cta_url" value="{{ event.custom_cta_url or '' }}"></div>
+                        <div class="full"><label class="form-label">Calendar Details</label><textarea class="form-control" name="calendar_details" rows="3">{{ event.calendar_details or '' }}</textarea></div>
+                        <div><label class="form-label">SEO Title</label><input class="form-control" name="seo_title" value="{{ event.seo_title or '' }}"></div>
+                        <div><label class="form-label">Canonical URL</label><input class="form-control" name="canonical_url" value="{{ event.canonical_url or '' }}"></div>
+                        <div class="full"><label class="form-label">SEO Description</label><textarea class="form-control" name="seo_description" rows="3">{{ event.seo_description or '' }}</textarea></div>
+                        <div><label class="form-label">Open Graph Title</label><input class="form-control" name="og_title" value="{{ event.og_title or '' }}"></div>
+                        <div><label class="form-label">Open Graph Image</label><input class="form-control" name="og_image" value="{{ event.og_image or '' }}"></div>
+                        <div class="full"><label class="form-label">Open Graph Description</label><textarea class="form-control" name="og_description" rows="3">{{ event.og_description or '' }}</textarea></div>
+                        <div class="full"><label class="form-label">AEO / AI Summary</label><textarea class="form-control" name="ai_summary" rows="4">{{ event.ai_summary or '' }}</textarea></div>
+                        <div class="full"><label class="form-label">Schema JSON-LD</label><textarea class="form-control" name="schema_json" rows="6" style="font-family:monospace;">{{ event.schema_json or '' }}</textarea></div>
+                    </div>
+                    <input type="hidden" name="product_solution_id" value="{{ event.product_solution_id or '' }}">
+                    <input type="hidden" name="partner_id" value="{{ event.partner_id or '' }}">
+                </div>
+
+                <div class="editor-actions">
+                    <a href="/admin/events" class="btn btn-secondary" style="padding:11px 18px; text-decoration:none;">Cancel</a>
+                    <div style="display:flex; gap:10px;">
+                        {% if mode == 'edit' %}
+                        <a href="/admin/events/{{ event.id }}/registrations" class="btn btn-secondary" style="padding:11px 18px; text-decoration:none;">View Registrations</a>
+                        {% endif %}
+                        <button type="submit" class="btn btn-primary btn-glow" style="padding:11px 24px;">
+                            Save Event/Webinar <i class="fas fa-save btn-icon"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<template id="speaker-template">
+    <div class="repeatable-row speaker-row">
+        <div class="repeatable-row-header">Speaker <button type="button" class="small-danger-btn remove-row">Remove</button></div>
+        <div class="event-form-grid">
+            <div><label class="form-label">Name</label><input class="form-control" name="speaker_name"></div>
+            <div><label class="form-label">Designation</label><input class="form-control" name="speaker_designation"></div>
+            <div><label class="form-label">Company</label><input class="form-control" name="speaker_company"></div>
+            <div><label class="form-label">Image URL/Path</label><input class="form-control" name="speaker_image_path" placeholder="/static/img/event_2.png"></div>
+            <div><label class="form-label">Image Alt Text</label><input class="form-control" name="speaker_image_alt_text"></div>
+            <div><label class="form-label">LinkedIn URL</label><input class="form-control" name="speaker_linkedin_url"></div>
+            <div class="full"><label class="form-label">Short Bio</label><textarea class="form-control" name="speaker_short_bio" rows="3"></textarea></div>
+            <div class="full"><label class="form-label">Full Bio</label><textarea class="form-control" name="speaker_full_bio" rows="4"></textarea></div>
+            <input type="hidden" name="speaker_profile_url">
+        </div>
+    </div>
+</template>
+
+<template id="agenda-template">
+    <div class="repeatable-row agenda-row">
+        <div class="repeatable-row-header">Agenda Item <button type="button" class="small-danger-btn remove-row">Remove</button></div>
+        <div class="event-form-grid three">
+            <div><label class="form-label">Day</label><input class="form-control" type="number" min="1" name="agenda_day_number" value="1"></div>
+            <div><label class="form-label">Start Time</label><input class="form-control" name="agenda_start_time" placeholder="10:00 AM"></div>
+            <div><label class="form-label">End Time</label><input class="form-control" name="agenda_end_time" placeholder="11:00 AM"></div>
+            <div class="full"><label class="form-label">Session Title</label><input class="form-control" name="agenda_session_title"></div>
+            <div><label class="form-label">Track / Theme</label><input class="form-control" name="agenda_track"></div>
+            <div class="full"><label class="form-label">Description</label><textarea class="form-control" name="agenda_description" rows="3"></textarea></div>
+        </div>
+    </div>
+</template>
+
+<template id="takeaway-template">
+    <div class="repeatable-row takeaway-row">
+        <div class="repeatable-row-header">Takeaway <button type="button" class="small-danger-btn remove-row">Remove</button></div>
+        <textarea class="form-control" name="takeaway_text" rows="2" placeholder="What will attendees learn?"></textarea>
+    </div>
+</template>
+
+<script>
+    function slugifyEventTitle(value) {
+        return value.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+    }
+
+    function updateDynamicFields() {
+        const contentType = document.getElementById('content-type-select').value;
+        const webinarFormat = document.getElementById('webinar-format-select').value;
+        document.querySelectorAll('.webinar-only').forEach(el => el.style.display = contentType === 'Webinar' ? '' : 'none');
+        document.querySelectorAll('.event-only').forEach(el => el.style.display = contentType === 'Event' ? '' : 'none');
+        if (contentType === 'Webinar' && webinarFormat === 'On-Demand Webinar') {
+            document.getElementById('lifecycle-select').value = 'On-Demand';
+        }
+    }
+
+    function bindRemoveButtons(scope) {
+        scope.querySelectorAll('.remove-row').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const row = btn.closest('.repeatable-row');
+                const parent = row.parentElement;
+                if (parent.querySelectorAll('.repeatable-row').length > 1) {
+                    row.remove();
+                } else {
+                    row.querySelectorAll('input, textarea').forEach(field => field.value = '');
+                }
+            });
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const titleInput = document.getElementById('event-title-input');
+        const slugInput = document.getElementById('event-slug-input');
+        if (titleInput && slugInput && !slugInput.value) {
+            titleInput.addEventListener('input', () => slugInput.value = slugifyEventTitle(titleInput.value));
+        }
+
+        document.getElementById('content-type-select').addEventListener('change', updateDynamicFields);
+        document.getElementById('webinar-format-select').addEventListener('change', updateDynamicFields);
+        updateDynamicFields();
+
+        const startDate = document.querySelector('input[name="start_date"]');
+        const endDateHidden = document.getElementById('end-date-hidden');
+        if (startDate && endDateHidden) {
+            startDate.addEventListener('change', () => endDateHidden.value = startDate.value);
+        }
+
+        document.getElementById('add-speaker-btn').addEventListener('click', function() {
+            const node = document.getElementById('speaker-template').content.cloneNode(true);
+            document.getElementById('speakers-container').appendChild(node);
+            bindRemoveButtons(document.getElementById('speakers-container'));
+        });
+        document.getElementById('add-agenda-btn').addEventListener('click', function() {
+            const node = document.getElementById('agenda-template').content.cloneNode(true);
+            document.getElementById('agenda-container').appendChild(node);
+            bindRemoveButtons(document.getElementById('agenda-container'));
+        });
+        document.getElementById('add-takeaway-btn').addEventListener('click', function() {
+            const node = document.getElementById('takeaway-template').content.cloneNode(true);
+            document.getElementById('takeaways-container').appendChild(node);
+            bindRemoveButtons(document.getElementById('takeaways-container'));
+        });
+        bindRemoveButtons(document);
+    });
+</script>
+{% endblock %}

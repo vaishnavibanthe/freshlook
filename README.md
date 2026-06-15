@@ -19,6 +19,7 @@ This repository contains the ThinkArtha.com public website, content management s
 - **Microsites**: Dedicated layouts for **Healthcare**, **Manufacturing**, **BFSI**, **Retail**, and **Artificial Intelligence** industries.
 - **Case Studies Landing Page**: PDF downloads, dynamic tags, and industry client portfolios.
 - **Resources**: Events tracker, Webinars, and Whitepapers.
+- **Unified Events & Webinars Admin**: One `/admin/events` module for live webinars, on-demand webinars, conferences, partner events, virtual events, and in-person events. Requirements and production checks are documented in [`docs/events_webinars_requirements.md`](docs/events_webinars_requirements.md).
 
 ### 2. TeleCRM Portal
 A lean, focus-driven system for tele-callers and sales managers:
@@ -59,6 +60,9 @@ Key tables in the database include:
 - `telecrm_sms_logs`: Outgoing text log tracker.
 - `telecrm_settings`: Auto-dialer delays, gateways, and group SMTP properties.
 - `case_studies` / `case_study_leads`: Metadata, tech stack tag mappings, and PDF download request histories.
+- `event_webinars`: Unified Events/Webinars records with lifecycle, publishing, registration, recording, SEO, and highlight-card fields.
+- `event_speakers` / `event_agenda_items` / `event_key_takeaways`: Editable child content for public event and webinar detail pages.
+- `event_registrations` / `event_activity_log`: Registration capture and admin lifecycle audit history.
 
 ---
 
@@ -69,6 +73,7 @@ Key tables in the database include:
 3. **Careers Module Poster Notifications**: Integrated job-specific recruiter notification fields and backend email wrappers.
 4. **Public Site Validation Framework**: Implemented global JavaScript capture-phase interceptors and backend helpers in `app.py`.
 5. **Asset Staging**: Committed and synchronized ignored asset folders (`CaseStudies/`, `Logos/`, `WhitePapers/`) containing company PDFs, partner vectors, and client brand marks directly to the GitHub repository.
+6. **Unified Events & Webinars Module**: Added one admin create/edit flow for Events, Live Webinars, and On-Demand Webinars; registration capture; CRM Website Lead staging; on-demand conversion; public `/events` listing/detail routes; and admin-mapped speakers, agenda, takeaways, highlight cards, SEO, and lifecycle fields.
 
 ---
 
@@ -80,9 +85,28 @@ python3 app.py
 ```
 *Port default: 5050*
 
+For production-style serving, set a deployment secret and run Gunicorn:
+```bash
+export FLASK_SECRET_KEY="replace-with-deployment-secret"
+gunicorn app:app
+```
+
 ### 2. Verify Validations (Automated Tests)
 We have a local validation runner verifying both validation logic and exception behaviors:
 ```bash
 python3 verify_form_validations.py
 ```
 This tests Contact Us, Careers, Case Study downloads, Whitepaper registrations, and Industry microsite forms against corporate email limits and invalid/test phone formats.
+
+### 3. Verify Events & Webinars Module
+```bash
+python3 -m py_compile app.py init_db.py migrate_events_unified.py sync_event_admin_content.py
+python3 sync_event_admin_content.py --check
+```
+
+For existing databases, run the one-time migration/backfill before launch:
+```bash
+python3 migrate_events_unified.py
+python3 sync_event_admin_content.py --overwrite
+python3 sync_event_admin_content.py --check
+```
