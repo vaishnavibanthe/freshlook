@@ -6,10 +6,10 @@ This repository contains the ThinkArtha.com public website, content management s
 
 ## 🛠️ Tech Stack & Architecture
 
-- **Backend**: Python 3 / Flask
+- **Backend**: Python 3 / FastAPI ASGI for CRM and TeleCRM APIs, with the existing Flask app mounted for public pages, admin screens, and legacy routes.
 - **Database**: SQLite3 (`blog.db`) with custom URI connection configurations for OneDrive synchronization stability (nolock enabled).
 - **Frontend**: HTML5, Vanilla JavaScript, and Custom CSS (`static/css/style.css` and `static/js/main.js`).
-- **CRM Integration**: Modular Flask blueprint routes (`crm/routes_crm.py`, `crm/routes_telecrm.py`, `crm/routes_admin.py`).
+- **CRM Integration**: Native FastAPI routers in `crm/fastapi_backend.py`, plus modular Flask blueprint routes (`crm/routes_crm.py`, `crm/routes_telecrm.py`, `crm/routes_admin.py`) during the staged migration.
 
 ---
 
@@ -74,6 +74,7 @@ Key tables in the database include:
 4. **Public Site Validation Framework**: Implemented global JavaScript capture-phase interceptors and backend helpers in `app.py`.
 5. **Asset Staging**: Committed and synchronized ignored asset folders (`CaseStudies/`, `Logos/`, `WhitePapers/`) containing company PDFs, partner vectors, and client brand marks directly to the GitHub repository.
 6. **Unified Events & Webinars Module**: Added one admin create/edit flow for Events, Live Webinars, and On-Demand Webinars; registration capture; CRM Website Lead staging; on-demand conversion; public `/events` listing/detail routes; and admin-mapped speakers, agenda, takeaways, highlight cards, SEO, and lifecycle fields.
+7. **FastAPI CRM and TeleCRM Backend**: Added `asgi.py` as the production ASGI entrypoint, native `/api/v2/crm/*` and `/api/v2/telecrm/*` endpoints, OpenAPI docs, and a Flask compatibility mount so existing pages keep working while the backend shifts to FastAPI.
 
 ---
 
@@ -86,26 +87,30 @@ python3 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt
 ```
 
-### 2. Launch Flask Server
+### 2. Launch Development Server
 ```bash
 .venv/bin/python app.py
 ```
 *Port default: 5050*
 
-For production-style serving, set a deployment secret and run Gunicorn:
+### 3. Launch FastAPI ASGI Server
+For production-style CRM and TeleCRM serving, set deployment secrets and run the ASGI app:
 ```bash
 export FLASK_SECRET_KEY="replace-with-deployment-secret"
-.venv/bin/gunicorn app:app
+export FASTAPI_INTERNAL_API_KEY="replace-with-internal-api-token"
+.venv/bin/uvicorn asgi:app --host 0.0.0.0 --port 5050
 ```
 
-### 3. Verify Validations (Automated Tests)
+The FastAPI app exposes native CRM/TeleCRM endpoints under `/api/v2/*` and mounts the existing Flask app for public pages, admin screens, and legacy CRM/TeleCRM URLs. See [`docs/fastapi_crm_telecrm_migration.md`](docs/fastapi_crm_telecrm_migration.md).
+
+### 4. Verify Validations (Automated Tests)
 We have a local validation runner verifying both validation logic and exception behaviors:
 ```bash
 .venv/bin/python verify_form_validations.py
 ```
 This tests Contact Us, Careers, Case Study downloads, Whitepaper registrations, and Industry microsite forms against corporate email limits and invalid/test phone formats.
 
-### 4. Verify Events & Webinars Module
+### 5. Verify Events & Webinars Module
 ```bash
 .venv/bin/python -m py_compile app.py init_db.py migrate_events_unified.py sync_event_admin_content.py
 .venv/bin/python sync_event_admin_content.py --check
@@ -116,4 +121,10 @@ For existing databases, run the one-time migration/backfill before launch:
 .venv/bin/python migrate_events_unified.py
 .venv/bin/python sync_event_admin_content.py --overwrite
 .venv/bin/python sync_event_admin_content.py --check
+```
+
+### 6. Verify FastAPI CRM and TeleCRM Backend
+```bash
+.venv/bin/python -m py_compile asgi.py crm/fastapi_backend.py
+.venv/bin/python -m pip check
 ```
