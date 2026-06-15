@@ -79,34 +79,41 @@ Key tables in the database include:
 
 ## 🚦 How to Run & Verify
 
-### 1. Launch Flask Server
+### 1. Create Virtual Environment
 ```bash
-python3 app.py
+python3 -m venv .venv
+.venv/bin/python -m pip install --upgrade pip
+.venv/bin/python -m pip install -r requirements.txt
+```
+
+### 2. Launch Flask Server
+```bash
+.venv/bin/python app.py
 ```
 *Port default: 5050*
 
 For production-style serving, set a deployment secret and run Gunicorn:
 ```bash
 export FLASK_SECRET_KEY="replace-with-deployment-secret"
-gunicorn app:app
+.venv/bin/gunicorn app:app
 ```
 
-### 2. Verify Validations (Automated Tests)
+### 3. Verify Validations (Automated Tests)
 We have a local validation runner verifying both validation logic and exception behaviors:
 ```bash
-python3 verify_form_validations.py
+.venv/bin/python verify_form_validations.py
 ```
 This tests Contact Us, Careers, Case Study downloads, Whitepaper registrations, and Industry microsite forms against corporate email limits and invalid/test phone formats.
 
-### 3. Verify Events & Webinars Module
+### 4. Verify Events & Webinars Module
 ```bash
-python3 -m py_compile app.py init_db.py migrate_events_unified.py sync_event_admin_content.py
-python3 sync_event_admin_content.py --check
+.venv/bin/python -m py_compile app.py init_db.py migrate_events_unified.py sync_event_admin_content.py
+.venv/bin/python sync_event_admin_content.py --check
 ```
 
 For existing databases, run the one-time migration/backfill before launch:
 ```bash
-python3 migrate_events_unified.py
-python3 sync_event_admin_content.py --overwrite
-python3 sync_event_admin_content.py --check
+.venv/bin/python migrate_events_unified.py
+.venv/bin/python sync_event_admin_content.py --overwrite
+.venv/bin/python sync_event_admin_content.py --check
 ```
