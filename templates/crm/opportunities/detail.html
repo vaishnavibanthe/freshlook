@@ -219,7 +219,7 @@
         
         <div class="meddic-widget" style="border-left-color: #3b82f6;">
             <div class="meddic-widget-score" style="color: #ffffff;">
-                <span class="badge-status {{ opp.stage.lower().replace(' ', '_') }}">{{ opp.stage }}</span>
+                <span class="badge-status {{ opp.stage.lower().replace(' ', '_').replace('/', '_') }}">{{ opp.stage }}</span>
             </div>
             <div class="meddic-widget-label">Deal Stage</div>
         </div>
@@ -264,14 +264,9 @@
                 <div class="form-group">
                     <label class="form-label">Deal Stage</label>
                     <select name="stage" class="form-control">
-                        <option value="Prospecting" {% if opp.stage == 'Prospecting' %}selected{% endif %}>Prospecting</option>
-                        <option value="Discovery" {% if opp.stage == 'Discovery' %}selected{% endif %}>Discovery</option>
-                        <option value="Solution Fit" {% if opp.stage == 'Solution Fit' %}selected{% endif %}>Solution Fit</option>
-                        <option value="Proposal" {% if opp.stage == 'Proposal' %}selected{% endif %}>Proposal</option>
-                        <option value="Negotiation" {% if opp.stage == 'Negotiation' %}selected{% endif %}>Negotiation</option>
-                        <option value="Closing" {% if opp.stage == 'Closing' %}selected{% endif %}>Closing</option>
-                        <option value="Closed Won" {% if opp.stage == 'Closed Won' %}selected{% endif %}>Closed Won</option>
-                        <option value="Closed Lost" {% if opp.stage == 'Closed Lost' %}selected{% endif %}>Closed Lost</option>
+                        {% for st in stages %}
+                        <option value="{{ st }}" {% if opp.stage == st %}selected{% endif %}>{{ st }}</option>
+                        {% endfor %}
                     </select>
                 </div>
                 <div class="form-group">
@@ -326,7 +321,7 @@
                     <input type="text" name="partner_contact_name" class="form-control" value="{{ opp.partner_contact_name or '' }}">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Closed Reason (If Won/Lost)</label>
+                    <label class="form-label">Closed Reason (If Won/Lost/Dropped)</label>
                     <input type="text" name="closed_reason" class="form-control" value="{{ opp.closed_reason or '' }}" placeholder="e.g. Budget constraints, Competitor price">
                 </div>
             </div>

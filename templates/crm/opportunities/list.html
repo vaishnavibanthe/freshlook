@@ -417,13 +417,7 @@
     <div class="kanban-board">
         
         <!-- Buckets columns -->
-        {% for bucket, stage_list in [
-            ('Prospecting', ['Prospecting', 'Discovery']),
-            ('Qualifying', ['Solution Fit']),
-            ('Proposal', ['Proposal']),
-            ('Negotiating', ['Negotiation']),
-            ('Closing', ['Closing', 'Closed Won', 'Closed Lost'])
-        ] %}
+        {% for bucket, stage_list in stage_buckets.items() %}
         
         {% set bucket_opps = kanban_opportunities[bucket] %}
         <div class="kanban-column">
@@ -446,7 +440,7 @@
                         <span class="kanban-card-value">${{ "{:,.2f}".format(opp.estimated_value or 0.0) }}</span>
                         <!-- Quick Stage Mappings Selector -->
                         <select onchange="changeOppStage({{ opp.id }}, this)" class="kanban-stage-select">
-                            {% for st in ['Prospecting', 'Discovery', 'Solution Fit', 'Proposal', 'Negotiation', 'Closing', 'Closed Won', 'Closed Lost'] %}
+                            {% for st in stages %}
                             <option value="{{ st }}" {% if opp.stage == st %}selected{% endif %}>{{ st }}</option>
                             {% endfor %}
                         </select>
@@ -504,7 +498,7 @@
                         <td style="font-weight: 600; color: var(--accent-cyan);">${{ "{:,.2f}".format(opp.estimated_value or 0.0) }}</td>
                         <td>{{ opp.expected_close_date or '-' }}</td>
                         <td>
-                            <span class="badge-status {{ opp.stage.lower().replace(' ', '_') }}">{{ opp.stage }}</span>
+                            <span class="badge-status {{ opp.stage.lower().replace(' ', '_').replace('/', '_') }}">{{ opp.stage }}</span>
                         </td>
                         <td>{{ opp.probability }}%</td>
                         <td>

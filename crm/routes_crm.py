@@ -6,6 +6,40 @@ from crm.auth import crm_login_required, role_required
 from crm.models import db_query, db_query_one, db_execute, log_timeline_activity, get_or_create_account_and_contact
 from crm.utils import calculate_meddic_score
 
+OPPORTUNITY_STAGES = [
+    'Prospecting',
+    'Discovery',
+    'Solution Fit',
+    'Proposal',
+    'Negotiation',
+    'Closing',
+    'Closed Won',
+    'Closed Lost',
+    'Lost/Dropped',
+]
+
+OPPORTUNITY_STAGE_BUCKETS = {
+    'Prospecting': ['Prospecting', 'Discovery'],
+    'Qualifying': ['Solution Fit'],
+    'Proposal': ['Proposal'],
+    'Negotiating': ['Negotiation'],
+    'Closing': ['Closing', 'Closed Won', 'Closed Lost', 'Lost/Dropped'],
+}
+
+OPPORTUNITY_CLOSED_STAGES = {'Closed Won', 'Closed Lost', 'Lost/Dropped'}
+
+
+def get_opportunity_bucket(stage):
+    for bucket, stages in OPPORTUNITY_STAGE_BUCKETS.items():
+        if stage in stages:
+            return bucket
+    return 'Prospecting'
+
+
+def get_opportunity_status(stage):
+    return 'Closed' if stage in OPPORTUNITY_CLOSED_STAGES else 'Open'
+
+
 # Helper to get visibility filter based on user role
 def get_visibility_where_clause(table_prefix=""):
     role = g.crm_user.get('role')
@@ -720,15 +754,6 @@ def convert_lead(lead_id):
 def crm_opportunities():
     where_clause, params = get_visibility_where_clause(table_prefix="o")
     
-    # Stage groups mapping
-    stage_buckets = {
-        'Prospecting': ['Prospecting', 'Discovery'],
-        'Qualifying': ['Solution Fit'],
-        'Proposal': ['Proposal'],
-        'Negotiating': ['Negotiation'],
-        'Closing': ['Closing', 'Closed Won', 'Closed Lost']
-    }
-    
     # Extract query params for filters
     search_account = request.args.get('search_account', '').strip()
     industry = request.args.get('industry', '').strip()
@@ -830,10 +855,10 @@ def crm_opportunities():
     opps = db_query(query, params)
     
     # Group into buckets for Kanban
-    kanban_opps = {bucket: [] for bucket in stage_buckets.keys()}
+    kanban_opps = {bucket: [] for bucket in OPPORTUNITY_STAGE_BUCKETS.keys()}
     for opp in opps:
         # Map bucket
-        opp_bucket = opp.get('bucket', 'Prospecting')
+        opp_bucket = opp.get('bucket') or get_opportunity_bucket(opp.get('stage'))
         if opp_bucket in kanban_opps:
             kanban_opps[opp_bucket].append(opp)
             
@@ -841,7 +866,6 @@ def crm_opportunities():
     industries = db_query("SELECT DISTINCT industry FROM opportunities WHERE industry IS NOT NULL AND industry != ''")
     geographies = db_query("SELECT DISTINCT geography FROM opportunities WHERE geography IS NOT NULL AND geography != ''")
     owners = db_query("SELECT id, name FROM crm_users WHERE is_active = 1 AND role != 'Telecaller'")
-    stages = ['Prospecting', 'Discovery', 'Solution Fit', 'Proposal', 'Negotiation', 'Closing', 'Closed Won', 'Closed Lost']
     value_ranges = [
         'Under 50k', '50k-100k', '100k-250k', '250k-500k', '500k-1M', '1M-5M', 
         '5M-10M', '10M-50M', '50M-100M', '100M-500M', '500M-1B', '1B and above'
@@ -851,13 +875,14 @@ def crm_opportunities():
         'crm/opportunities/list.html',
         opportunities=opps,
         kanban_opportunities=kanban_opps,
+        stage_buckets=OPPORTUNITY_STAGE_BUCKETS,
         active_page='crm_opportunities',
         
         # dropdowns
         industries=industries,
         geographies=geographies,
         owners=owners,
-        stages=stages,
+        stages=OPPORTUNITY_STAGES,
         value_ranges=value_ranges,
         
         # selected values
@@ -919,21 +944,13 @@ def crm_opportunity_detail(opp_id):
             partner_notes = request.form.get('partner_notes')
             closed_reason = request.form.get('closed_reason')
             
-            # Map stages to pipeline buckets
-            # buckets: Prospecting, Qualifying, Proposal, Negotiating, Closing
-            bucket = 'Prospecting'
-            if stage in ('Prospecting', 'Discovery'):
-                bucket = 'Prospecting'
-            elif stage in ('Solution Fit',):
-                bucket = 'Qualifying'
-            elif stage in ('Proposal',):
-                bucket = 'Proposal'
-            elif stage in ('Negotiation',):
-                bucket = 'Negotiating'
-            elif stage in ('Closing', 'Closed Won', 'Closed Lost'):
-                bucket = 'Closing'
-                
-            closed_at = now_str if 'Closed' in stage else None
+            if stage not in OPPORTUNITY_STAGES:
+                flash("Please select a valid opportunity stage.", "error")
+                return redirect(url_for('crm.crm_opportunity_detail', opp_id=opp_id))
+
+            bucket = get_opportunity_bucket(stage)
+            status = get_opportunity_status(stage)
+            closed_at = now_str if stage in OPPORTUNITY_CLOSED_STAGES else None
             
             # Reassignment logging
             prev_owner = opp['owner_id']
@@ -948,11 +965,11 @@ def crm_opportunity_detail(opp_id):
             db_execute('''
                 UPDATE opportunities 
                 SET estimated_value=?, expected_close_date=?, stage=?, bucket=?, probability=?, owner_id=?, sales_manager_id=?, 
-                    primary_product_solution_id=?, partner_id=?, partner_influence_type=?, partner_contact_name=?, partner_notes=?, closed_reason=?, closed_at=?, updated_at=?
+                    primary_product_solution_id=?, partner_id=?, partner_influence_type=?, partner_contact_name=?, partner_notes=?, closed_reason=?, closed_at=?, status=?, updated_at=?
                 WHERE id=?
             ''', (
                 estimated_value, expected_close_date, stage, bucket, probability, new_owner, sales_manager_id,
-                primary_product_id, partner_id, partner_influence, partner_contact, partner_notes, closed_reason, closed_at, now_str, opp_id
+                primary_product_id, partner_id, partner_influence, partner_contact, partner_notes, closed_reason, closed_at, status, now_str, opp_id
             ))
             
             log_timeline_activity('opportunity', opp_id, 'Opportunity updated', f"Stage changed to {stage}", f"Value: {estimated_value} USD", g.crm_user['id'])
@@ -1104,6 +1121,7 @@ def crm_opportunity_detail(opp_id):
         partners=partners_list,
         owners=owners,
         managers=managers,
+        stages=OPPORTUNITY_STAGES,
         active_page='crm_opportunities'
     )
 
@@ -1117,26 +1135,22 @@ def update_opportunity_stage(opp_id):
     if not opp:
         return jsonify({'status': 'error', 'message': 'Opportunity not found or access denied.'}), 404
         
-    data = request.get_json()
+    data = request.get_json() or {}
     stage = data.get('stage')
-    
-    # Map buckets
-    bucket = 'Prospecting'
-    if stage in ('Prospecting', 'Discovery'):
-        bucket = 'Prospecting'
-    elif stage in ('Solution Fit',):
-        bucket = 'Qualifying'
-    elif stage in ('Proposal',):
-        bucket = 'Proposal'
-    elif stage in ('Negotiation',):
-        bucket = 'Negotiating'
-    elif stage in ('Closing', 'Closed Won', 'Closed Lost'):
-        bucket = 'Closing'
+
+    if stage not in OPPORTUNITY_STAGES:
+        return jsonify({'status': 'error', 'message': 'Invalid opportunity stage.'}), 400
+
+    bucket = get_opportunity_bucket(stage)
+    status = get_opportunity_status(stage)
         
     now_str = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
-    closed_at = now_str if 'Closed' in stage else None
+    closed_at = now_str if stage in OPPORTUNITY_CLOSED_STAGES else None
     
-    db_execute("UPDATE opportunities SET stage = ?, bucket = ?, closed_at = ?, updated_at = ? WHERE id = ?", (stage, bucket, closed_at, now_str, opp_id))
+    db_execute(
+        "UPDATE opportunities SET stage = ?, bucket = ?, closed_at = ?, status = ?, updated_at = ? WHERE id = ?",
+        (stage, bucket, closed_at, status, now_str, opp_id)
+    )
     log_timeline_activity('opportunity', opp_id, 'Opportunity stage updated', f"Stage updated to: {stage}", f"Updated via pipeline board.", g.crm_user['id'])
     
     return jsonify({'status': 'success', 'stage': stage, 'bucket': bucket})
@@ -1298,7 +1312,6 @@ def crm_tasks():
     industries = db_query("SELECT DISTINCT industry FROM opportunities WHERE industry IS NOT NULL AND industry != '' UNION SELECT DISTINCT industry FROM leads WHERE industry IS NOT NULL AND industry != ''")
     geographies = db_query("SELECT DISTINCT geography FROM opportunities WHERE geography IS NOT NULL AND geography != '' UNION SELECT DISTINCT geography FROM leads WHERE geography IS NOT NULL AND geography != ''")
     owners = db_query("SELECT id, name FROM crm_users WHERE is_active = 1 AND role != 'Telecaller'")
-    stages = ['Prospecting', 'Discovery', 'Solution Fit', 'Proposal', 'Negotiation', 'Closing', 'Closed Won', 'Closed Lost']
     value_ranges = [
         'Under 50k', '50k-100k', '100k-250k', '250k-500k', '500k-1M', '1M-5M', 
         '5M-10M', '10M-50M', '50M-100M', '100M-500M', '500M-1B', '1B and above'
@@ -1313,7 +1326,7 @@ def crm_tasks():
         # dropdowns
         industries=industries,
         geographies=geographies,
-        stages=stages,
+        stages=OPPORTUNITY_STAGES,
         value_ranges=value_ranges,
         
         # selected values
