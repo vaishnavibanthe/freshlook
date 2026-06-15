@@ -81,6 +81,21 @@
         line-height: 1.45;
         margin-top: 6px;
     }
+    .image-upload-field {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .image-upload-field .image-file-input {
+        padding: 9px;
+        background: var(--bg-secondary);
+    }
+    .current-image-link {
+        color: var(--accent-blue);
+        font-size: 11px;
+        font-weight: 800;
+        text-decoration: none;
+    }
     .editor-actions {
         position: sticky;
         bottom: 0;
@@ -114,6 +129,21 @@
     }
 </style>
 
+{% macro image_upload_field(label, field_name, current_value, placeholder='', help_text='') %}
+<div class="image-upload-field">
+    <label class="form-label">{{ label }}</label>
+    <input class="form-control" name="{{ field_name }}" value="{{ current_value or '' }}" placeholder="{{ placeholder }}">
+    <input class="form-control image-file-input" type="file" name="{{ field_name }}_upload" accept="image/*,.svg">
+    <span class="inline-help">
+        Paste an existing path/URL or upload a new image. Uploaded files replace the path on save.
+        {% if help_text %}{{ help_text }}{% endif %}
+        {% if current_value %}
+        <a class="current-image-link" href="{{ current_value }}" target="_blank" rel="noopener">Open current image</a>
+        {% endif %}
+    </span>
+</div>
+{% endmacro %}
+
 <section class="section-alt" style="padding-top: 40px; min-height: 90vh;">
     <div class="container event-editor-shell">
         {% include 'admin_sidebar.html' %}
@@ -137,7 +167,7 @@
             </div>
             {% endif %}
 
-            <form method="POST" action="{% if mode == 'edit' %}/admin/events/{{ event.id }}/edit{% else %}/admin/events/new{% endif %}" id="unified-event-form">
+            <form method="POST" action="{% if mode == 'edit' %}/admin/events/{{ event.id }}/edit{% else %}/admin/events/new{% endif %}" id="unified-event-form" enctype="multipart/form-data">
                 <div class="event-editor-card">
                     <h2 class="event-section-title"><i class="fas fa-sliders"></i> Content Setup</h2>
                     <div class="event-form-grid three">
@@ -378,13 +408,25 @@
                     <div id="speakers-container">
                         {% set speaker_rows = speakers if speakers else [{}] %}
                         {% for speaker in speaker_rows %}
+                        {% set speaker_key = 'speaker_' ~ loop.index0 %}
                         <div class="repeatable-row speaker-row">
                             <div class="repeatable-row-header">Speaker <button type="button" class="small-danger-btn remove-row">Remove</button></div>
                             <div class="event-form-grid">
                                 <div><label class="form-label">Name</label><input class="form-control" name="speaker_name" value="{{ speaker.name or '' }}"></div>
                                 <div><label class="form-label">Designation</label><input class="form-control" name="speaker_designation" value="{{ speaker.designation or '' }}"></div>
                                 <div><label class="form-label">Company</label><input class="form-control" name="speaker_company" value="{{ speaker.company or '' }}"></div>
-                                <div><label class="form-label">Image URL/Path</label><input class="form-control" name="speaker_image_path" value="{{ speaker.image_path or '' }}" placeholder="/static/img/event_2.png"></div>
+                                <div class="image-upload-field">
+                                    <label class="form-label">Speaker Image</label>
+                                    <input type="hidden" name="speaker_upload_key" value="{{ speaker_key }}">
+                                    <input class="form-control" name="speaker_image_path" value="{{ speaker.image_path or '' }}" placeholder="/static/img/event_2.png">
+                                    <input class="form-control image-file-input" type="file" name="speaker_image_upload_{{ speaker_key }}" accept="image/*,.svg">
+                                    <span class="inline-help">
+                                        Paste an existing path/URL or upload a new headshot.
+                                        {% if speaker.image_path %}
+                                        <a class="current-image-link" href="{{ speaker.image_path }}" target="_blank" rel="noopener">Open current image</a>
+                                        {% endif %}
+                                    </span>
+                                </div>
                                 <div><label class="form-label">Image Alt Text</label><input class="form-control" name="speaker_image_alt_text" value="{{ speaker.image_alt_text or '' }}"></div>
                                 <div><label class="form-label">LinkedIn URL</label><input class="form-control" name="speaker_linkedin_url" value="{{ speaker.linkedin_url or '' }}"></div>
                                 <div class="full"><label class="form-label">Short Bio</label><textarea class="form-control" name="speaker_short_bio" rows="3">{{ speaker.short_bio or '' }}</textarea></div>
@@ -435,10 +477,10 @@
                 <div class="event-editor-card">
                     <h2 class="event-section-title"><i class="fas fa-image"></i> Media, Related Links &amp; SEO</h2>
                     <div class="event-form-grid">
-                        <div><label class="form-label">Hero Image</label><input class="form-control" name="hero_image" value="{{ event.hero_image or '' }}" placeholder="/static/img/event_1.png"></div>
-                        <div><label class="form-label">Featured/Card Image</label><input class="form-control" name="featured_image" value="{{ event.featured_image or '' }}" placeholder="/static/img/event_4.png"></div>
-                        <div><label class="form-label">Partner Logo</label><input class="form-control" name="partner_logo" value="{{ event.partner_logo or '' }}"></div>
-                        <div><label class="form-label">Sponsor Logo</label><input class="form-control" name="sponsor_logo" value="{{ event.sponsor_logo or '' }}"></div>
+                        {{ image_upload_field('Hero Image', 'hero_image', event.hero_image, '/static/img/event_1.png') }}
+                        {{ image_upload_field('Featured/Card Image', 'featured_image', event.featured_image, '/static/img/event_4.png') }}
+                        {{ image_upload_field('Partner Logo', 'partner_logo', event.partner_logo, '/static/img/partner-logo.svg') }}
+                        {{ image_upload_field('Sponsor Logo', 'sponsor_logo', event.sponsor_logo, '/static/img/sponsor-logo.svg') }}
                         <div><label class="form-label">Related Solution URL</label><input class="form-control" name="related_solution_url" value="{{ event.related_solution_url or '' }}" placeholder="/solutions/data-governance"></div>
                         <div><label class="form-label">Related Industry URL</label><input class="form-control" name="related_industry_url" value="{{ event.related_industry_url or '' }}" placeholder="/industries/bfsi"></div>
                         <div><label class="form-label">Related Case Study ID</label><input class="form-control" type="number" name="related_case_study_id" value="{{ event.related_case_study_id or '' }}"></div>
@@ -450,7 +492,7 @@
                         <div><label class="form-label">Canonical URL</label><input class="form-control" name="canonical_url" value="{{ event.canonical_url or '' }}"></div>
                         <div class="full"><label class="form-label">SEO Description</label><textarea class="form-control" name="seo_description" rows="3">{{ event.seo_description or '' }}</textarea></div>
                         <div><label class="form-label">Open Graph Title</label><input class="form-control" name="og_title" value="{{ event.og_title or '' }}"></div>
-                        <div><label class="form-label">Open Graph Image</label><input class="form-control" name="og_image" value="{{ event.og_image or '' }}"></div>
+                        {{ image_upload_field('Open Graph Image', 'og_image', event.og_image, '/static/img/event-og.png') }}
                         <div class="full"><label class="form-label">Open Graph Description</label><textarea class="form-control" name="og_description" rows="3">{{ event.og_description or '' }}</textarea></div>
                         <div class="full"><label class="form-label">AEO / AI Summary</label><textarea class="form-control" name="ai_summary" rows="4">{{ event.ai_summary or '' }}</textarea></div>
                         <div class="full"><label class="form-label">Schema JSON-LD</label><textarea class="form-control" name="schema_json" rows="6" style="font-family:monospace;">{{ event.schema_json or '' }}</textarea></div>
@@ -482,7 +524,13 @@
             <div><label class="form-label">Name</label><input class="form-control" name="speaker_name"></div>
             <div><label class="form-label">Designation</label><input class="form-control" name="speaker_designation"></div>
             <div><label class="form-label">Company</label><input class="form-control" name="speaker_company"></div>
-            <div><label class="form-label">Image URL/Path</label><input class="form-control" name="speaker_image_path" placeholder="/static/img/event_2.png"></div>
+            <div class="image-upload-field">
+                <label class="form-label">Speaker Image</label>
+                <input type="hidden" name="speaker_upload_key" value="__SPEAKER_UPLOAD_KEY__">
+                <input class="form-control" name="speaker_image_path" placeholder="/static/img/event_2.png">
+                <input class="form-control image-file-input" type="file" name="speaker_image_upload___SPEAKER_UPLOAD_KEY__" accept="image/*,.svg" data-speaker-upload>
+                <span class="inline-help">Paste an existing path/URL or upload a new headshot.</span>
+            </div>
             <div><label class="form-label">Image Alt Text</label><input class="form-control" name="speaker_image_alt_text"></div>
             <div><label class="form-label">LinkedIn URL</label><input class="form-control" name="speaker_linkedin_url"></div>
             <div class="full"><label class="form-label">Short Bio</label><textarea class="form-control" name="speaker_short_bio" rows="3"></textarea></div>
@@ -542,6 +590,21 @@
         });
     }
 
+    function prepareSpeakerUploadKeys(scope) {
+        scope.querySelectorAll('.speaker-row').forEach(row => {
+            const keyInput = row.querySelector('input[name="speaker_upload_key"]');
+            const uploadInput = row.querySelector('[data-speaker-upload]');
+            if (!keyInput || keyInput.value !== '__SPEAKER_UPLOAD_KEY__') {
+                return;
+            }
+            const key = `speaker_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+            keyInput.value = key;
+            if (uploadInput) {
+                uploadInput.name = `speaker_image_upload_${key}`;
+            }
+        });
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         const titleInput = document.getElementById('event-title-input');
         const slugInput = document.getElementById('event-slug-input');
@@ -561,6 +624,7 @@
 
         document.getElementById('add-speaker-btn').addEventListener('click', function() {
             const node = document.getElementById('speaker-template').content.cloneNode(true);
+            prepareSpeakerUploadKeys(node);
             document.getElementById('speakers-container').appendChild(node);
             bindRemoveButtons(document.getElementById('speakers-container'));
         });

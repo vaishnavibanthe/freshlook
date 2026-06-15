@@ -689,6 +689,9 @@ EVENT_CARD_IMAGES = [
 ]
 
 EVENT_REGISTRATION_RATE_LIMIT = {}
+EVENT_IMAGE_UPLOAD_ROOT = os.path.join(os.path.dirname(__file__), 'static', 'img', 'events', 'uploads')
+EVENT_IMAGE_UPLOAD_URL_ROOT = '/static/img/events/uploads'
+EVENT_ALLOWED_IMAGE_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.webp', '.gif', '.svg'}
 
 EVENT_OPTIONAL_COLUMNS = {
     'event_label': 'TEXT',
@@ -1118,7 +1121,41 @@ def build_event_form_context(event=None):
     event.setdefault('crm_integration_enabled', 1)
     return event
 
-def save_event_children(conn, event_id):
+def save_event_image_upload(field_name, category, slug_hint='', errors=None):
+    uploaded_file = request.files.get(field_name)
+    if not uploaded_file or not uploaded_file.filename:
+        return ''
+
+    original_name = secure_filename(uploaded_file.filename)
+    _, ext = os.path.splitext(original_name)
+    ext = ext.lower()
+    if ext not in EVENT_ALLOWED_IMAGE_EXTENSIONS:
+        if errors is not None:
+            errors.append(f"{original_name} is not a supported image file. Use JPG, PNG, WebP, GIF, or SVG.")
+        return ''
+
+    category = secure_filename(category or 'general') or 'general'
+    slug_hint = secure_filename(slug_hint or 'event') or 'event'
+    upload_dir = os.path.join(EVENT_IMAGE_UPLOAD_ROOT, category)
+    os.makedirs(upload_dir, exist_ok=True)
+
+    timestamp = datetime.utcnow().strftime('%Y%m%d%H%M%S%f')
+    filename = f"{slug_hint}-{field_name}-{timestamp}{ext}"
+    save_path = os.path.join(upload_dir, filename)
+    uploaded_file.save(save_path)
+    return f"{EVENT_IMAGE_UPLOAD_URL_ROOT}/{category}/{filename}"
+
+def validate_event_speaker_image_uploads(errors):
+    for speaker_upload_key in request.form.getlist('speaker_upload_key'):
+        uploaded_file = request.files.get(f"speaker_image_upload_{speaker_upload_key}")
+        if not uploaded_file or not uploaded_file.filename:
+            continue
+        original_name = secure_filename(uploaded_file.filename)
+        _, ext = os.path.splitext(original_name)
+        if ext.lower() not in EVENT_ALLOWED_IMAGE_EXTENSIONS:
+            errors.append(f"{original_name} is not a supported speaker image. Use JPG, PNG, WebP, GIF, or SVG.")
+
+def save_event_children(conn, event_id, event_slug='', upload_errors=None):
     now_str = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
     conn.execute("DELETE FROM event_speakers WHERE event_id = ?", (event_id,))
     conn.execute("DELETE FROM event_agenda_items WHERE event_id = ?", (event_id,))
@@ -1128,6 +1165,7 @@ def save_event_children(conn, event_id):
     speaker_designations = request.form.getlist('speaker_designation')
     speaker_companies = request.form.getlist('speaker_company')
     speaker_images = request.form.getlist('speaker_image_path')
+    speaker_upload_keys = request.form.getlist('speaker_upload_key')
     speaker_alts = request.form.getlist('speaker_image_alt_text')
     speaker_short_bios = request.form.getlist('speaker_short_bio')
     speaker_full_bios = request.form.getlist('speaker_full_bio')
@@ -1137,6 +1175,17 @@ def save_event_children(conn, event_id):
         name = (name or '').strip()
         if not name:
             continue
+        speaker_image_path = speaker_images[idx].strip() if idx < len(speaker_images) else ''
+        speaker_upload_key = speaker_upload_keys[idx] if idx < len(speaker_upload_keys) else ''
+        if speaker_upload_key:
+            uploaded_path = save_event_image_upload(
+                f"speaker_image_upload_{speaker_upload_key}",
+                'speakers',
+                event_slug or name,
+                upload_errors
+            )
+            if uploaded_path:
+                speaker_image_path = uploaded_path
         conn.execute('''
             INSERT INTO event_speakers (
                 event_id, name, designation, company, image_path, image_alt_text,
@@ -1147,7 +1196,7 @@ def save_event_children(conn, event_id):
             event_id, name,
             speaker_designations[idx].strip() if idx < len(speaker_designations) else '',
             speaker_companies[idx].strip() if idx < len(speaker_companies) else '',
-            speaker_images[idx].strip() if idx < len(speaker_images) else '',
+            speaker_image_path,
             speaker_alts[idx].strip() if idx < len(speaker_alts) else name,
             speaker_short_bios[idx].strip() if idx < len(speaker_short_bios) else '',
             speaker_full_bios[idx].strip() if idx < len(speaker_full_bios) else '',
@@ -1200,7 +1249,7 @@ def save_event_children(conn, event_id):
             VALUES (?, ?, ?, ?, ?)
         ''', (event_id, takeaway, idx, now_str, now_str))
 
-def get_event_payload_from_form(existing=None):
+def get_event_payload_from_form(existing=None, upload_errors=None):
     existing = existing or {}
     content_type = request.form.get('content_type', 'Webinar')
     webinar_format = request.form.get('webinar_format') if content_type == 'Webinar' else ''
@@ -1214,6 +1263,10 @@ def get_event_payload_from_form(existing=None):
 
     if content_type == 'Webinar' and webinar_format == 'On-Demand Webinar':
         lifecycle_status = 'On-Demand'
+
+    def image_value(field_name, category):
+        uploaded_path = save_event_image_upload(f"{field_name}_upload", category, slug or title, upload_errors)
+        return uploaded_path or request.form.get(field_name, '').strip()
 
     return {
         'content_type': content_type,
@@ -1247,10 +1300,10 @@ def get_event_payload_from_form(existing=None):
         'lifecycle_status': lifecycle_status,
         'publishing_status': request.form.get('publishing_status', 'Draft'),
         'auto_convert_to_ondemand': 1 if request.form.get('auto_convert_to_ondemand') == '1' else 0,
-        'hero_image': request.form.get('hero_image', '').strip(),
-        'featured_image': request.form.get('featured_image', '').strip(),
-        'partner_logo': request.form.get('partner_logo', '').strip(),
-        'sponsor_logo': request.form.get('sponsor_logo', '').strip(),
+        'hero_image': image_value('hero_image', 'hero'),
+        'featured_image': image_value('featured_image', 'featured'),
+        'partner_logo': image_value('partner_logo', 'logos'),
+        'sponsor_logo': image_value('sponsor_logo', 'logos'),
         'related_solution_url': request.form.get('related_solution_url', '').strip(),
         'related_industry_url': request.form.get('related_industry_url', '').strip(),
         'related_case_study_id': int(request.form.get('related_case_study_id') or 0) or None,
@@ -1259,7 +1312,7 @@ def get_event_payload_from_form(existing=None):
         'canonical_url': request.form.get('canonical_url', '').strip(),
         'og_title': request.form.get('og_title', '').strip(),
         'og_description': request.form.get('og_description', '').strip(),
-        'og_image': request.form.get('og_image', '').strip(),
+        'og_image': image_value('og_image', 'og'),
         'ai_summary': request.form.get('ai_summary', '').strip(),
         'schema_json': request.form.get('schema_json', '').strip(),
         'event_label': request.form.get('event_label', '').strip(),
@@ -4418,8 +4471,10 @@ def admin_event_new():
 
     ensure_event_webinar_schema()
     if request.method == 'POST':
-        payload = get_event_payload_from_form()
-        errors = validate_event_payload(payload)
+        upload_errors = []
+        payload = get_event_payload_from_form(upload_errors=upload_errors)
+        validate_event_speaker_image_uploads(upload_errors)
+        errors = upload_errors + validate_event_payload(payload)
         if errors:
             return render_template(
                 'admin_event_editor.html',
@@ -4448,7 +4503,7 @@ def admin_event_new():
                 [payload[col] for col in columns]
             )
             event_id = cursor.lastrowid
-            save_event_children(conn, event_id)
+            save_event_children(conn, event_id, payload.get('slug', ''), upload_errors)
             log_event_activity(conn, event_id, 'created', 'Created unified event/webinar record.', None, payload.get('lifecycle_status'))
             conn.commit()
         except sqlite3.IntegrityError:
@@ -4489,8 +4544,10 @@ def admin_event_edit_unified(event_id):
         abort(404)
 
     if request.method == 'POST':
-        payload = get_event_payload_from_form(event)
-        errors = validate_event_payload(payload)
+        upload_errors = []
+        payload = get_event_payload_from_form(event, upload_errors=upload_errors)
+        validate_event_speaker_image_uploads(upload_errors)
+        errors = upload_errors + validate_event_payload(payload)
         if errors:
             return render_template(
                 'admin_event_editor.html',
@@ -4515,7 +4572,7 @@ def admin_event_edit_unified(event_id):
                 f"UPDATE event_webinars SET {set_clause} WHERE id = ?",
                 [payload[col] for col in payload.keys()] + [event_id]
             )
-            save_event_children(conn, event_id)
+            save_event_children(conn, event_id, payload.get('slug', ''), upload_errors)
             log_event_activity(conn, event_id, 'updated', 'Updated unified event/webinar record.', event.get('lifecycle_status'), payload.get('lifecycle_status'))
             conn.commit()
         except sqlite3.IntegrityError:
