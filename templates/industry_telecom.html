@@ -265,61 +265,21 @@
     </div>
 </section>
 
-<!-- Events & Blogs Section -->
-<section class="section" id="resources">
+<!-- Events & Webinars Widget -->
+{% include 'events_widget.html' %}
+
+<!-- Blogs Section -->
+<section class="section" id="blog-insights" style="background:var(--bg-primary); padding:80px 0;">
     <div class="container">
         <div class="section-header" style="text-align: center; margin-bottom: 50px;">
             <span class="section-subtitle">Resource Center</span>
-            <h2 class="section-title">Events & <span>Latest Insights</span></h2>
-            <p class="section-desc">Explore upcoming events and latest blogs from our analytics experts.</p>
+            <h2 class="section-title">From the <span>Blog</span></h2>
+            <p class="section-desc">Explore latest articles from our analytics experts.</p>
         </div>
-        
-        <!-- Events Grid -->
-        <h3 style="font-size: 22px; color: var(--text-primary); margin-bottom: 24px; display: flex; align-items: center; gap: 8px;">
-            <i class="fas fa-calendar-alt" style="color: #8b5cf6;"></i> Upcoming Events & Webinars
-        </h3>
-        
-        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; margin-bottom: 50px;">
-            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
-                <div>
-                    <span style="font-size: 12px; color: #8b5cf6; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Webinar &middot; May 31</span>
-                    <h4 style="font-size: 17px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Future Ready Data Foundation From AI Pilot to Production Value</h4>
-                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">Explores how organizations can overcome these challenges by building a future-ready data foundation that enables trusted, scalable, and AI-ready data.</p>
-                </div>
-                <div style="margin-top: 20px;">
-                    <a href="/contact-us" class="card-link" style="color: #8b5cf6;">Watch Now <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
-                </div>
-            </div>
-            
-            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
-                <div>
-                    <span style="font-size: 12px; color: #8b5cf6; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Event &middot; Apr 13</span>
-                    <h4 style="font-size: 17px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Artha Solutions Proud Sponsor of Qlik Connect 2026</h4>
-                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">Gaylord Palms Resort & Convention Center, Kissimmee, Florida. Showcasing AI-ready data foundations, data integration, ETL modernization, and MDM solutions at Booth# SS15.</p>
-                </div>
-                <div style="margin-top: 20px;">
-                    <a href="/contact-us" class="card-link" style="color: #8b5cf6;">Read More <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
-                </div>
-            </div>
-            
-            <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
-                <div>
-                    <span style="font-size: 12px; color: #8b5cf6; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Event &middot; Nov 27</span>
-                    <h4 style="font-size: 17px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;">Artha Solutions to host Qlik AI Reality Tour 2025 – Bengaluru</h4>
-                    <p class="card-desc" style="font-size: 14px; line-height: 1.5;">An exclusive event designed to help you turn data, analytics, and AI initiatives into real business impact. Discover practical strategies, real-world use cases, and embedding intelligence.</p>
-                </div>
-                <div style="margin-top: 20px;">
-                    <a href="/contact-us" class="card-link" style="color: #8b5cf6;">Read More <i class="fas fa-chevron-right" style="font-size: 11px;"></i></a>
-                </div>
-            </div>
-        </div>
-        
+
         <!-- Blogs Grid -->
-        <h3 style="font-size: 22px; color: var(--text-primary); margin-bottom: 24px; display: flex; align-items: center; gap: 8px;">
-            <i class="fas fa-blog" style="color: #8b5cf6;"></i> From the ThinkArtha Blog
-        </h3>
-        
         <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
+
             <div class="card card-brand-hover" style="display: flex; flex-direction: column; justify-content: space-between;">
                 <div>
                     <span style="font-size: 12px; color: #8b5cf6; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 8px;">Talend &middot; August 30, 2021</span>

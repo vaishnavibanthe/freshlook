@@ -1,0 +1,94 @@
+<!-- ══════════════════════════════════════════
+     EVENTS & WEBINARS WIDGET — shared across internal pages
+     Uses global `events_list` injected by inject_global_data()
+     ═════════════════════════════════════════════ -->
+<section class="section" style="background:var(--bg-secondary); padding:80px 0;">
+    <div class="container">
+        <div class="section-header" style="text-align:center; margin-bottom:48px;">
+            <span class="section-subtitle-badge">Events &amp; Webinars</span>
+            <h2 class="section-title" style="margin-top:16px;">Learn. <span>Connect. Grow.</span></h2>
+            <p class="section-desc" style="max-width:640px; margin:16px auto 0;">
+                Join our upcoming summits or explore on-demand webinars featuring real-world data &amp; AI strategies from certified engineers.
+            </p>
+        </div>
+
+        {% set event_images = [
+            '/static/img/event_1.png',
+            '/static/img/event_2.png',
+            '/static/img/event_3.png',
+            '/static/img/event_4.png',
+            '/static/img/event_5.png',
+            '/static/img/event_6.png'
+        ] %}
+
+        <!-- Cards Grid — max 3 cards -->
+        <div class="events-redesigned-grid">
+            {% for item in events_list[:3] %}
+            {% set img_url = item.card_image if item.card_image else event_images[loop.index0 % event_images|length] %}
+            <div class="event-premium-card" data-type="{{ item.type|lower }}">
+                <!-- Image Container -->
+                <div class="event-card-img-wrapper">
+                    <img src="{{ img_url }}" alt="{{ item.title }}" class="event-card-img">
+                    <!-- Dynamic badges overlay -->
+                    <div class="event-card-badges">
+                        {% if item.type == 'Event' %}
+                        <span class="badge-type live"><i class="fas fa-calendar-days"></i> Event</span>
+                        {% else %}
+                        <span class="badge-type webinar"><i class="fas fa-circle-play"></i> Webinar</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Content Area -->
+                <div class="event-card-body">
+                    <h3 class="event-card-title">{{ item.title }}</h3>
+                    <p class="event-card-desc">{{ item.summary }}</p>
+
+                    <hr class="event-card-divider">
+
+                    <!-- Meta Details -->
+                    <div class="event-card-meta">
+                        <span class="meta-label">TIME</span>
+                        <div class="meta-details">
+                            <span class="meta-detail-item"><i class="far fa-calendar"></i> {{ item.date_str }}</span>
+                            <span class="meta-detail-item"><i class="far fa-clock"></i> {{ item.time }}</span>
+                            <span class="meta-detail-item" title="{{ item.location }}">
+                                {% if item.type == 'Event' %}
+                                <i class="fas fa-location-dot"></i>
+                                {% else %}
+                                <i class="fas fa-user-tie"></i>
+                                {% endif %}
+                                {{ item.location }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action CTA -->
+                <div class="event-card-footer">
+                    <a href="{{ item.url }}" class="event-card-cta">
+                        {% if item.type == 'Event' %}
+                        REGISTER FOR EVENT <span class="cta-arrow">&rarr;</span>
+                        {% else %}
+                        WATCH WEBINAR <span class="cta-arrow">+</span>
+                        {% endif %}
+                    </a>
+                </div>
+            </div>
+            {% else %}
+            <!-- Fallback if no events exist -->
+            <div style="text-align:center; color:var(--text-muted); padding:40px; grid-column:1/-1;">
+                <i class="fas fa-calendar-alt" style="font-size:2rem; margin-bottom:12px; display:block; opacity:0.4;"></i>
+                No upcoming events at this time. <a href="/resources/events" style="color:var(--accent-primary);">Browse all events</a>.
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- View All Button -->
+        <div style="text-align:center; margin-top:48px;">
+            <a href="/resources/events" class="btn btn-secondary btn-glow" style="padding:12px 32px; border-radius:30px; font-weight:700; font-size:14.5px;">
+                View All Events &amp; Webinars <i class="fas fa-calendar-alt" style="margin-left:8px;"></i>
+            </a>
+        </div>
+    </div>
+</section>
