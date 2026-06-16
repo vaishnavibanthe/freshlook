@@ -495,6 +495,128 @@ def init_db():
     )
     ''')
 
+    # Create whitepapers table
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS whitepapers (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        slug TEXT UNIQUE NOT NULL,
+        description TEXT,
+        summary TEXT,
+        content_type TEXT,
+        category TEXT,
+        industry TEXT,
+        solution_area TEXT,
+        file_path TEXT,
+        file_size INTEGER,
+        file_hash TEXT,
+        thumbnail_path TEXT,
+        preview_image_path TEXT,
+        seo_title TEXT,
+        seo_description TEXT,
+        seo_keywords TEXT,
+        canonical_url TEXT,
+        og_title TEXT,
+        og_description TEXT,
+        og_image TEXT,
+        ai_summary TEXT,
+        schema_json TEXT,
+        author TEXT,
+        publish_date TEXT,
+        status TEXT DEFAULT 'Published',
+        featured INTEGER DEFAULT 0,
+        views INTEGER DEFAULT 0,
+        downloads INTEGER DEFAULT 0,
+        tags TEXT,
+        related_resources TEXT,
+        created_by TEXT,
+        updated_by TEXT,
+        created_at TEXT,
+        updated_at TEXT,
+        published_at TEXT
+    )
+    ''')
+
+    # Create whitepaper_leads table
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS whitepaper_leads (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        whitepaper_id INTEGER,
+        first_name TEXT,
+        last_name TEXT,
+        business_email TEXT NOT NULL,
+        company TEXT,
+        job_title TEXT,
+        phone TEXT,
+        country TEXT,
+        industry TEXT,
+        consent INTEGER DEFAULT 0,
+        source_url TEXT,
+        referrer TEXT,
+        utm_source TEXT,
+        utm_medium TEXT,
+        utm_campaign TEXT,
+        utm_term TEXT,
+        utm_content TEXT,
+        ip_address TEXT,
+        user_agent TEXT,
+        lead_score INTEGER DEFAULT 0,
+        downloaded_at TEXT,
+        created_at TEXT,
+        FOREIGN KEY (whitepaper_id) REFERENCES whitepapers (id) ON DELETE CASCADE
+    )
+    ''')
+
+    # Create blogs table
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS blogs (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        slug TEXT UNIQUE NOT NULL,
+        author TEXT,
+        content TEXT,
+        excerpt TEXT,
+        featured_image_path TEXT,
+        featured_image_alt TEXT,
+        category TEXT,
+        tags TEXT,
+        status TEXT DEFAULT 'Published',
+        featured INTEGER DEFAULT 0,
+        views INTEGER DEFAULT 0,
+        seo_title TEXT,
+        seo_description TEXT,
+        seo_keywords TEXT,
+        canonical_url TEXT,
+        og_title TEXT,
+        og_description TEXT,
+        og_image TEXT,
+        ai_summary TEXT,
+        schema_json TEXT,
+        reading_time_minutes INTEGER,
+        published_date TEXT,
+        created_by TEXT,
+        updated_by TEXT,
+        created_at TEXT,
+        updated_at TEXT,
+        published_at TEXT
+    )
+    ''')
+
+    # Create blog_comments table (for future comments functionality)
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS blog_comments (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        blog_id INTEGER,
+        name TEXT,
+        email TEXT,
+        comment TEXT,
+        is_approved INTEGER DEFAULT 0,
+        created_at TEXT,
+        updated_at TEXT,
+        FOREIGN KEY (blog_id) REFERENCES blogs (id) ON DELETE CASCADE
+    )
+    ''')
+
     # Check if admin user exists, if not, create default
     cursor.execute("SELECT id FROM users WHERE username = 'admin'")
     if not cursor.fetchone():

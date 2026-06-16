@@ -1,0 +1,177 @@
+{% extends 'crm/base_crm.html' %}
+
+{% block title %}Case Studies Management | ThinkArtha CRM{% endblock %}
+
+{% block content %}
+<style>
+    .admin-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 24px;
+    }
+    
+    @media (max-width: 992px) {
+        .admin-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="crm-header-bar">
+    <div class="crm-title-section">
+        <h1>Case Studies Management</h1>
+        <p>Upload, manage, and publish client success stories</p>
+    </div>
+</div>
+
+<div class="admin-grid">
+    
+    <!-- Left: Case Studies table list -->
+    <div class="crm-card">
+        <div class="crm-card-title">Published Case Studies</div>
+        <div style="overflow-x: auto;">
+            <table class="crm-table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Client</th>
+                        <th>Industry</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cs in case_studies %}
+                    <tr>
+                        <td style="font-weight: 600; color: #ffffff;">{{ cs.title }}</td>
+                        <td>{{ cs.client_name or '-' }}</td>
+                        <td>{{ cs.industry or '-' }}</td>
+                        <td>
+                            <span class="badge-status {% if cs.status == 'Published' %}qualified{% else %}pending{% endif %}">
+                                {{ cs.status }}
+                            </span>
+                        </td>
+                        <td>
+                            <div style="display: flex; gap: 6px;">
+                                <button onclick="populateEditForm({{ cs|tojson|safe }})" class="btn-crm btn-crm-secondary" style="padding: 2px 8px; font-size: 11px;">Edit</button>
+                                <form action="{{ url_for('crm.admin_case_studies') }}" method="POST" style="display: inline;" onsubmit="return confirm('Delete this case study?')">
+                                    <input type="hidden" name="action" value="delete">
+                                    <input type="hidden" name="case_study_id" value="{{ cs.id }}">
+                                    <button type="submit" class="btn-crm btn-crm-danger" style="padding: 2px 8px; font-size: 11px;">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Right: Upload/Edit form card -->
+    <div class="crm-card" style="align-self: start;">
+        <div class="crm-card-title" id="form-title">Upload Case Study</div>
+        <form action="{{ url_for('crm.admin_case_studies') }}" method="POST" enctype="multipart/form-data" id="cs-form">
+            <input type="hidden" name="action" value="upload" id="form-action">
+            <input type="hidden" name="case_study_id" id="form-cs-id">
+            
+            <div class="form-group">
+                <label class="form-label">Case Study Title</label>
+                <input type="text" name="title" id="form-title-input" class="form-control" required placeholder="e.g. Digital Transformation Success at Global Bank">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">URL Slug</label>
+                <input type="text" name="slug" id="form-slug" class="form-control" required placeholder="digital-transformation-global-bank">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Client Name</label>
+                <input type="text" name="client_name" id="form-client-name" class="form-control" placeholder="Client company name">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Industry</label>
+                <input type="text" name="industry" id="form-industry" class="form-control" placeholder="e.g. Financial Services, Healthcare, Manufacturing">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Solution Area</label>
+                <input type="text" name="solution_area" id="form-solution" class="form-control" placeholder="e.g. Data Integration, Data Governance">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Business Challenge</label>
+                <textarea name="business_challenge" id="form-challenge" class="form-control" rows="2" placeholder="Describe the client's challenge"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Solution Summary</label>
+                <textarea name="solution_summary" id="form-solution-summary" class="form-control" rows="2" placeholder="How Artha solved the challenge"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Business Outcomes</label>
+                <textarea name="business_outcomes" id="form-outcomes" class="form-control" rows="2" placeholder="Results achieved"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">PDF File <span style="color: red;">*</span></label>
+                <input type="file" name="pdf_file" id="form-file" class="form-control" accept=".pdf" required>
+                <small style="color: var(--text-crm-muted);">PDF format only</small>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">
+                    <input type="checkbox" name="featured" id="form-featured"> Mark as Featured
+                </label>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Status</label>
+                <select name="status" id="form-status" class="form-control">
+                    <option value="Published">Published</option>
+                    <option value="Draft">Draft</option>
+                    <option value="Archived">Archived</option>
+                </select>
+            </div>
+            
+            <button type="submit" class="btn-crm btn-crm-primary" style="width: 100%;">
+                <span id="btn-text">Upload Case Study</span>
+            </button>
+            <button type="reset" class="btn-crm btn-crm-secondary" style="width: 100%; margin-top: 8px;" onclick="resetForm()">Clear Form</button>
+        </form>
+    </div>
+</div>
+
+<script>
+function populateEditForm(caseStudy) {
+    document.getElementById('form-action').value = 'edit';
+    document.getElementById('form-title').textContent = 'Edit Case Study';
+    document.getElementById('form-cs-id').value = caseStudy.id;
+    document.getElementById('form-title-input').value = caseStudy.title;
+    document.getElementById('form-slug').value = caseStudy.slug;
+    document.getElementById('form-client-name').value = caseStudy.client_name || '';
+    document.getElementById('form-industry').value = caseStudy.industry || '';
+    document.getElementById('form-solution').value = caseStudy.solution_area || '';
+    document.getElementById('form-challenge').value = caseStudy.business_challenge || '';
+    document.getElementById('form-solution-summary').value = caseStudy.solution_summary || '';
+    document.getElementById('form-outcomes').value = caseStudy.business_outcomes || '';
+    document.getElementById('form-featured').checked = caseStudy.featured === 1;
+    document.getElementById('form-status').value = caseStudy.status;
+    document.getElementById('form-file').removeAttribute('required');
+    document.getElementById('btn-text').textContent = 'Update Case Study';
+    document.querySelector('.crm-card:last-child').scrollIntoView({ behavior: 'smooth' });
+}
+
+function resetForm() {
+    document.getElementById('form-action').value = 'upload';
+    document.getElementById('form-title').textContent = 'Upload Case Study';
+    document.getElementById('form-cs-id').value = '';
+    document.getElementById('cs-form').reset();
+    document.getElementById('form-file').setAttribute('required', 'required');
+    document.getElementById('btn-text').textContent = 'Upload Case Study';
+}
+</script>
+
+{% endblock %}

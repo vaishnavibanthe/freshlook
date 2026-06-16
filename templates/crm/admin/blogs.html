@@ -1,0 +1,170 @@
+{% extends 'crm/base_crm.html' %}
+
+{% block title %}Blog Management | ThinkArtha CRM{% endblock %}
+
+{% block content %}
+<style>
+    .admin-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 24px;
+    }
+    
+    @media (max-width: 992px) {
+        .admin-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="crm-header-bar">
+    <div class="crm-title-section">
+        <h1>Blog Posts Management</h1>
+        <p>Create, edit, and publish blog articles</p>
+    </div>
+</div>
+
+<div class="admin-grid">
+    
+    <!-- Left: Blog posts table list -->
+    <div class="crm-card">
+        <div class="crm-card-title">Published Blog Posts</div>
+        <div style="overflow-x: auto;">
+            <table class="crm-table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>Category</th>
+                        <th>Status</th>
+                        <th>Views</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for blog in blogs %}
+                    <tr>
+                        <td style="font-weight: 600; color: #ffffff;">{{ blog.title }}</td>
+                        <td>{{ blog.author or '-' }}</td>
+                        <td>{{ blog.category or '-' }}</td>
+                        <td>
+                            <span class="badge-status {% if blog.status == 'Published' %}qualified{% else %}pending{% endif %}">
+                                {{ blog.status }}
+                            </span>
+                        </td>
+                        <td>{{ blog.views or 0 }}</td>
+                        <td>
+                            <div style="display: flex; gap: 6px;">
+                                <button onclick="populateEditForm({{ blog|tojson|safe }})" class="btn-crm btn-crm-secondary" style="padding: 2px 8px; font-size: 11px;">Edit</button>
+                                <form action="{{ url_for('crm.admin_blogs') }}" method="POST" style="display: inline;" onsubmit="return confirm('Delete this blog post?')">
+                                    <input type="hidden" name="action" value="delete">
+                                    <input type="hidden" name="blog_id" value="{{ blog.id }}">
+                                    <button type="submit" class="btn-crm btn-crm-danger" style="padding: 2px 8px; font-size: 11px;">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Right: Create/Edit form card -->
+    <div class="crm-card" style="align-self: start;">
+        <div class="crm-card-title" id="form-title">Create Blog Post</div>
+        <form action="{{ url_for('crm.admin_blogs') }}" method="POST" enctype="multipart/form-data" id="blog-form">
+            <input type="hidden" name="action" value="create" id="form-action">
+            <input type="hidden" name="blog_id" id="form-blog-id">
+            
+            <div class="form-group">
+                <label class="form-label">Blog Title</label>
+                <input type="text" name="title" id="form-title-input" class="form-control" required placeholder="Blog post title">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">URL Slug</label>
+                <input type="text" name="slug" id="form-slug" class="form-control" required placeholder="blog-post-slug">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Author</label>
+                <input type="text" name="author" id="form-author" class="form-control" placeholder="Author name">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Category</label>
+                <input type="text" name="category" id="form-category" class="form-control" placeholder="e.g. Data Integration, Cloud, Analytics">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Tags</label>
+                <input type="text" name="tags" id="form-tags" class="form-control" placeholder="Comma-separated tags">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Excerpt</label>
+                <textarea name="excerpt" id="form-excerpt" class="form-control" rows="2" placeholder="Short summary for preview"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Featured Image</label>
+                <input type="file" name="featured_image" id="form-image" class="form-control" accept=".jpg,.jpeg,.png,.gif,.webp">
+                <small style="color: var(--text-crm-muted);">Supported: JPG, PNG, GIF, WebP</small>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Content <span style="color: red;">*</span></label>
+                <textarea name="content" id="form-content" class="form-control" rows="6" required placeholder="Blog post content (HTML supported)"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">
+                    <input type="checkbox" name="featured" id="form-featured"> Featured Article
+                </label>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Status</label>
+                <select name="status" id="form-status" class="form-control">
+                    <option value="Published">Published</option>
+                    <option value="Draft">Draft</option>
+                </select>
+            </div>
+            
+            <button type="submit" class="btn-crm btn-crm-primary" style="width: 100%;">
+                <span id="btn-text">Create Blog Post</span>
+            </button>
+            <button type="reset" class="btn-crm btn-crm-secondary" style="width: 100%; margin-top: 8px;" onclick="resetForm()">Clear Form</button>
+        </form>
+    </div>
+</div>
+
+<script>
+function populateEditForm(blog) {
+    document.getElementById('form-action').value = 'edit';
+    document.getElementById('form-title').textContent = 'Edit Blog Post';
+    document.getElementById('form-blog-id').value = blog.id;
+    document.getElementById('form-title-input').value = blog.title;
+    document.getElementById('form-slug').value = blog.slug;
+    document.getElementById('form-author').value = blog.author || '';
+    document.getElementById('form-category').value = blog.category || '';
+    document.getElementById('form-tags').value = blog.tags || '';
+    document.getElementById('form-excerpt').value = blog.excerpt || '';
+    document.getElementById('form-content').value = blog.content || '';
+    document.getElementById('form-featured').checked = blog.featured === 1;
+    document.getElementById('form-status').value = blog.status;
+    document.getElementById('btn-text').textContent = 'Update Blog Post';
+    document.querySelector('.crm-card:last-child').scrollIntoView({ behavior: 'smooth' });
+}
+
+function resetForm() {
+    document.getElementById('form-action').value = 'create';
+    document.getElementById('form-title').textContent = 'Create Blog Post';
+    document.getElementById('form-blog-id').value = '';
+    document.getElementById('blog-form').reset();
+    document.getElementById('btn-text').textContent = 'Create Blog Post';
+}
+</script>
+
+{% endblock %}

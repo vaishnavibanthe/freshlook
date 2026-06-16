@@ -9,4 +9,5 @@ from crm import auth
 from crm import routes_crm
 from crm import routes_telecrm
 from crm import routes_admin
+from crm import routes_content_admin
 from crm import api

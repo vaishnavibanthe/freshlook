@@ -38,9 +38,9 @@ app.register_blueprint(crm_bp)
 
 @app.before_request
 def handle_seo_and_referrals():
-    # 1. Skip static assets, admin routes, CRM routes
+    # 1. Skip static assets, admin routes, CRM routes, and file downloads
     path = request.path
-    if path.startswith('/static/') or path.startswith('/admin') or path.startswith('/api/') or path.startswith('/crm'):
+    if path.startswith('/static/') or path.startswith('/admin') or path.startswith('/api/') or path.startswith('/crm') or path.startswith('/uploads/'):
         return
 
     # 2. Check for redirect override
@@ -1438,6 +1438,32 @@ def load_json_filter(val):
         return []
 
 # 1. Main Static Routes
+
+# Serve uploaded files (whitepapers, case studies, blogs)
+@app.route('/uploads/<path:filename>')
+def download_file(filename):
+    """Serve uploaded files from the uploads directory"""
+    import os
+    uploads_folder = os.path.join(os.path.dirname(__file__), 'uploads')
+    file_path = os.path.join(uploads_folder, filename)
+    
+    # Security: ensure the file is within the uploads folder
+    if not os.path.abspath(file_path).startswith(os.path.abspath(uploads_folder)):
+        abort(403)
+    
+    if not os.path.exists(file_path):
+        abort(404)
+    
+    # Get file extension
+    _, ext = os.path.splitext(file_path)
+    ext_lower = ext.lower()
+    
+    # Determine if it's a download or inline view
+    is_pdf = ext_lower == '.pdf'
+    
+    # For PDFs, allow viewing inline; for other files, force download
+    return send_file(file_path, as_attachment=not is_pdf)
+
 @app.route('/')
 def home():
     # Fetch 3 latest published blog posts

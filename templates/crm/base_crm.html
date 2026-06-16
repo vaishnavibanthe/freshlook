@@ -1035,6 +1035,22 @@
                         <i class="fas fa-sliders-h"></i> Custom Fields
                     </a>
                 </li>
+                <li class="crm-nav-header">Content Management</li>
+                <li>
+                    <a href="{{ url_for('crm.admin_whitepapers') }}" class="crm-nav-link {% if active_page == 'admin_whitepapers' %}active{% endif %}">
+                        <i class="fas fa-file-pdf"></i> Whitepapers
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('crm.admin_case_studies') }}" class="crm-nav-link {% if active_page == 'admin_case_studies' %}active{% endif %}">
+                        <i class="fas fa-briefcase"></i> Case Studies
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('crm.admin_blogs') }}" class="crm-nav-link {% if active_page == 'admin_blogs' %}active{% endif %}">
+                        <i class="fas fa-blog"></i> Blogs
+                    </a>
+                </li>
                 {% endif %}
                 {% endif %}
                 
